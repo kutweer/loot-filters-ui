@@ -1,13 +1,5 @@
 import { Editor } from "@monaco-editor/react";
-import {
-  Box,
-  Container,
-  Link,
-  Paper,
-  Tab,
-  Tabs,
-  Typography,
-} from "@mui/material";
+import { Box, Container, Link, Tab, Tabs, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { FilterConfiguration } from "./components/FilterConfiguration";
 import {
@@ -23,7 +15,7 @@ export const App: React.FC = () => {
   const [configuration, setConfiguration] = useState<FilterConfig>(
     JSON.parse(
       localStorage.getItem(LOOT_FILTER_CONFIG_KEY) ||
-      JSON.stringify(DEFAULT_CONFIG),
+        JSON.stringify(DEFAULT_CONFIG),
     ),
   );
 
@@ -41,23 +33,29 @@ export const App: React.FC = () => {
       <Box sx={{ py: 4 }}>
         <Typography variant="h4" gutterBottom>
           Loot Filter Builder
-          <Typography sx={{ paddingLeft: '1em', display: "inline-block" }} variant="subtitle1" gutterBottom>
+          <Typography
+            sx={{ paddingLeft: "1em", display: "inline-block" }}
+            variant="subtitle1"
+            gutterBottom
+          >
             A Loot Filter builder for{" "}
-            <Link target="_blank" href="https://github.com/riktenx/loot-filters">
+            <Link
+              target="_blank"
+              href="https://github.com/riktenx/loot-filters"
+            >
               RuneLite Loot Filters
             </Link>
           </Typography>
-
         </Typography>
 
-        <Paper sx={{ mt: 3, p: 2 }}>
+        <Box sx={{ mt: 3, p: 2, background: "#f0f0f0", borderRadius: 5 }}>
           <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
             <Tabs
               value={activeTab}
               onChange={(e, newValue) => setActiveTab(newValue)}
               aria-label="filter tabs"
             >
-              <Tab label="Configuration" />
+              <Tab label="Filter Settings" />
               <Tab label="Rendered Filter" />
             </Tabs>
           </Box>
@@ -70,13 +68,14 @@ export const App: React.FC = () => {
           </Box>
 
           <Box sx={{ display: activeTab === 1 ? "block" : "none" }}>
+            <Typography>Copy and paste it for now.</Typography>
             <Editor
               height="70vh"
               language="cpp"
               value={renderFilter(configuration)}
             />
           </Box>
-        </Paper>
+        </Box>
       </Box>
     </Container>
   );

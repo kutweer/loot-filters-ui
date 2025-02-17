@@ -171,6 +171,72 @@ const CreateLootGroupDialog: React.FC<CreateLootGroupDialogProps> = ({
   );
 };
 
+type LootGroupProps = LootGroup & {
+  index: number;
+  groups: LootGroup[];
+  inner: boolean;
+  setGroups: Dispatch<SetStateAction<LootGroup[]>>;
+};
+const LootGroupItem: React.FC<LootGroupProps> = ({
+  index,
+  name,
+  foregroundColor,
+  backgroundColor,
+  borderColor,
+  beam,
+  valueThreshold,
+  uniqueOverrides,
+  groups,
+  setGroups,
+  inner = false,
+}) => {
+  return (
+    <Card variant="outlined" sx={{ border: inner ? "none" : null }}>
+      <CardHeader
+        title={
+          <Box>
+            <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
+              <Typography>{name}</Typography>
+              <Typography>Foreground</Typography>
+              <ColorSwatch color={foregroundColor} />
+              <Typography>Background</Typography>
+              <ColorSwatch color={backgroundColor} />
+              <Typography>Border</Typography>
+              <ColorSwatch color={borderColor} />
+              <Typography>Beam:</Typography>
+              {beam ? <AutoAwesomeIcon /> : <NotInterestedIcon />}
+
+              <Typography>Value Tier:</Typography>
+              <Typography>{valueThreshold.toLocaleString()}</Typography>
+              {!inner ? (
+                <IconButton
+                  sx={{ marginLeft: "auto" }}
+                  onClick={() => {
+                    setGroups(groups.filter((_, i) => i !== index));
+                  }}
+                >
+                  <DeleteForever />
+                </IconButton>
+              ) : null}
+            </Box>
+            {!inner && uniqueOverrides ? (
+              <LootGroupItem
+                index={index}
+                groups={groups}
+                setGroups={setGroups}
+                inner={true}
+                {...groups.filter((_, i) => i === index)[0]}
+                {...uniqueOverrides}
+                name={`unique settings`}
+              />
+            ) : null}
+          </Box>
+        }
+      />
+    </Card>
+  );
+};
+
 export const LootGroupAccordion: React.FC<LootGroupAccordionProps> = ({
   groups,
   setGroups,
@@ -179,7 +245,7 @@ export const LootGroupAccordion: React.FC<LootGroupAccordionProps> = ({
 
   return (
     <div>
-      <Accordion defaultExpanded>
+      <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography>Loot Groups</Typography>
         </AccordionSummary>
@@ -199,36 +265,14 @@ export const LootGroupAccordion: React.FC<LootGroupAccordionProps> = ({
             />
           ) : null}
           {groups?.map((group, index) => (
-            <Card key={index} variant="outlined">
-              <CardHeader
-                title={
-                  <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
-                    <Typography>{group.name}</Typography>
-                    <Typography>Foreground</Typography>
-                    <ColorSwatch color={group.foregroundColor} />
-                    <Typography>Background</Typography>
-                    <ColorSwatch color={group.backgroundColor} />
-                    <Typography>Border</Typography>
-                    <ColorSwatch color={group.borderColor} />
-                    <Typography>Beam:</Typography>
-                    {group.beam ? <AutoAwesomeIcon /> : <NotInterestedIcon />}
-
-                    <Typography>Value Tier:</Typography>
-                    <Typography>
-                      {group.valueThreshold.toLocaleString()}
-                    </Typography>
-                    <IconButton
-                      sx={{ marginLeft: "auto" }}
-                      onClick={() => {
-                        setGroups(groups?.filter((_, i) => i !== index));
-                      }}
-                    >
-                      <DeleteForever />
-                    </IconButton>
-                  </Box>
-                }
-              />
-            </Card>
+            <LootGroupItem
+              inner={false}
+              key={index}
+              index={index}
+              groups={groups}
+              setGroups={setGroups}
+              {...group}
+            />
           ))}
         </AccordionDetails>
       </Accordion>

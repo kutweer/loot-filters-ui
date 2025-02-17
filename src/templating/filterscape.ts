@@ -1,4 +1,4 @@
-import { BLACK, HexColor, LIGHT_BROWN, RED, WHITE } from "./hexcolor";
+import { BLACK, GREEN, HexColor, LIGHT_BROWN, RED, WHITE } from "./hexcolor";
 import { renderLootGroup } from "./lootgroup";
 import { preamble } from "./preamble";
 
@@ -22,6 +22,7 @@ export type LootGroup = {
   borderColor: HexColor;
   beam: boolean;
   valueThreshold: number;
+  uniqueOverrides?: Partial<Omit<LootGroup, "valueThreshold" | "name">>;
 };
 
 export const DEFAULT_CONFIG: FilterConfig = {
@@ -33,14 +34,9 @@ export const DEFAULT_CONFIG: FilterConfig = {
       backgroundColor: "#00000000",
       beam: true,
       valueThreshold: 100_000_000,
-    },
-    {
-      name: "S_TIER_UNIQUE",
-      foregroundColor: RED,
-      backgroundColor: WHITE,
-      borderColor: WHITE,
-      beam: true,
-      valueThreshold: 100_000_000,
+      uniqueOverrides: {
+        backgroundColor: WHITE,
+      },
     },
     {
       name: "A_TIER",
@@ -49,14 +45,9 @@ export const DEFAULT_CONFIG: FilterConfig = {
       backgroundColor: "#00000000",
       beam: true,
       valueThreshold: 10_000_000,
-    },
-    {
-      name: "A_TIER_UNIQUE",
-      foregroundColor: WHITE,
-      backgroundColor: LIGHT_BROWN,
-      borderColor: WHITE,
-      beam: true,
-      valueThreshold: 10_000_000,
+      uniqueOverrides: {
+        backgroundColor: LIGHT_BROWN,
+      },
     },
     {
       name: "B_TIER",
@@ -65,14 +56,18 @@ export const DEFAULT_CONFIG: FilterConfig = {
       backgroundColor: "#00000000",
       beam: false,
       valueThreshold: 1_000_000,
+      uniqueOverrides: {
+        backgroundColor: LIGHT_BROWN,
+        beam: true,
+      },
     },
     {
-      name: "B_TIER_UNIQUE",
-      foregroundColor: BLACK,
-      borderColor: BLACK,
-      backgroundColor: LIGHT_BROWN,
-      beam: true,
-      valueThreshold: 1_000_000,
+      name: "HERB_TIER",
+      foregroundColor: GREEN,
+      borderColor: GREEN,
+      backgroundColor: "#00000000",
+      beam: false,
+      valueThreshold: 10_000,
     },
   ],
   date: new Date(),
@@ -84,7 +79,9 @@ export const renderFilter = (filterConfig: FilterConfig): string => {
     "// META",
     meta(filterConfig.date),
     "// PREAMBLE",
-    window.location.hostname !== "localhost" ? preamble() : "// Preamble Excluded",
+    window.location.hostname !== "localhost"
+      ? preamble()
+      : "// Preamble Excluded",
     "// LOOT GROUPS",
     ...filterConfig.lootGroups.map(renderLootGroup),
   ].join("\n\n");

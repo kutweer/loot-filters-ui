@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import React, { Dispatch, SetStateAction } from "react";
 import { FilterConfig } from "../templating/filterscape";
 import { LootGroupAccordion } from "./LootGroupAccordion";
@@ -14,9 +14,6 @@ export const FilterConfiguration: React.FC<FilterConfigurationProps> = ({
 }) => {
   return (
     <Box>
-      <Typography variant="h6" gutterBottom>
-        Filter Settings
-      </Typography>
       <LootGroupAccordion
         groups={configuration.lootGroups}
         setGroups={(maybeFn) => {

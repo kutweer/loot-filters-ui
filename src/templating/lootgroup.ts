@@ -19,9 +19,11 @@ export const renderLootGroup = ({
   backgroundColor,
   borderColor,
   beam,
+  valueThreshold,
 }: LootGroup): string => {
-  const configName = checkUpperUnderscore(name) ? name : `LOOT_GROUP_${randCaps(4)}`;
-  
+  const configName = checkUpperUnderscore(name)
+    ? name
+    : `LOOT_GROUP_${randCaps(4)}`;
 
   return `
 // LOOT GROUP: ${name}
@@ -32,15 +34,11 @@ export const renderLootGroup = ({
     fontType = 2; \
 }
 // For manually defined value tiers of items
-#define VALUE_S_TIER (_name) if (name:_name) ${configName} 
+#define VALUE_${configName} (_name) if (name:_name) ${configName} 
 // For automatically defined value tiers of items
-if (value:>VALUE_TIER_S) S_TIER
-#define VALUE_${configName} (_name) if (name:_name) { \
-    COLOR_FG_BR_BG(${foregroundColor}, ${borderColor}, ${backgroundColor}); \
-    textAccent = 1; \
-    showLootBeam = ${beam ? "true" : "false"}; \
-    fontType = 2; \
-}
+#define VALUE_THRESHOLD_${configName} ${valueThreshold}
+if (value:>VALUE_THRESHOLD_${configName}) ${configName}
+// Different settings for unique items
 #define UNIQUE_${configName} (_name) if (name:_name) { \
     COLOR_FG_BR_BG(${foregroundColor}, ${borderColor}, ${backgroundColor}); \
     textAccent = 3; \
