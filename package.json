@@ -1,5 +1,5 @@
 {
-  "name": "loot-filters,
+  "name": "loot-filters",
   "version": "1.0.0",
   "homepage": "https://kaqemeex.github.io/loot-filters/",
   "private": true,
@@ -10,6 +10,12 @@
     "lint": "eslint src --ext .ts,.tsx"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@monaco-editor/react": "^4.7.0",
+    "@mui/icons-material": "^6.4.4",
+    "@mui/material": "^6.4.4",
+    "monaco-editor": "^0.47.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
