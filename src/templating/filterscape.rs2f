@@ -60,6 +60,7 @@ meta {
     fontType = 2; \
 }
 #define A_TIER { \
+
     COLOR3(WHITE, ORANGE) \
     textAccent = 1; \
     showLootBeam = true; \

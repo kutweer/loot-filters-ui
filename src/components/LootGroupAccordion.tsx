@@ -16,24 +16,29 @@ import {
     Card,
     CardContent,
     CardHeader,
-    IconButton
+    IconButton,
+    Select,
+    MenuItem,
+    Radio,
+    ToggleButton
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { HexColor, LootGroup } from '../templating/filterscape';
 import { DeleteForever } from '@mui/icons-material';
-
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import NotInterestedIcon from '@mui/icons-material/NotInterested';
 interface LootGroupAccordionProps {
-    groups: LootGroup[] | undefined;
-    setGroups: Dispatch<SetStateAction<LootGroup[] | undefined>>
+    groups: LootGroup[];
+    setGroups: Dispatch<SetStateAction<LootGroup[]>>
 }
 
 interface CreateLootGroupDialogProps {
     open: boolean;
     onClose: () => void;
-    setGroups: Dispatch<SetStateAction<LootGroup[] | undefined>>
+    setGroups: Dispatch<SetStateAction<LootGroup[]>>
 }
 
-const ColorSwatch = ({ color, onChange }: { color: string, onChange?: (color: HexColor) => void }) => (
+const ColorSwatch = ({ color, onChange }: { color?: HexColor, onChange?: (color: HexColor) => void }) => (
     <Box
         component="span"
         sx={{
@@ -52,7 +57,7 @@ const ColorSwatch = ({ color, onChange }: { color: string, onChange?: (color: He
         {onChange ?
             <input
                 type="color"
-                value={color}
+                value={color || '#00000000'}
                 onChange={(e) => onChange(e.target.value as HexColor)}
                 style={{
                     width: 24,
@@ -65,7 +70,7 @@ const ColorSwatch = ({ color, onChange }: { color: string, onChange?: (color: He
     </Box>
 );
 
-const ColorButton = ({ color, onChange, label }: { color: string; onChange: (color: HexColor) => void; label: string }) => (
+const ColorButton = ({ color, onChange, label }: { color?: HexColor; onChange: (color: HexColor) => void; label: string }) => (
     <Box sx={{ position: 'relative' }}>
 
         <ColorSwatch onChange={onChange} color={color} />
@@ -76,20 +81,21 @@ const ColorButton = ({ color, onChange, label }: { color: string; onChange: (col
 );
 
 const CreateLootGroupDialog: React.FC<CreateLootGroupDialogProps> = ({ open, onClose, setGroups }) => {
+    const [name, setName] = useState<string | null>(null);
     const [foregroundColor, setForegroundColor] = useState<HexColor>('#ffffff');
     const [backgroundColor, setBackgroundColor] = useState<HexColor>('#000000');
     const [borderColor, setBorderColor] = useState<HexColor>('#ffffff');
-    const [textColor, setTextColor] = useState<HexColor>('#ffffff');
-    const [name, setName] = useState<string | null>(null);
+    const [beam, setBeam] = useState<boolean>(true);
 
     const create = () => {
-        setGroups((prevGroups) => {
+        setGroups((prevGroups: LootGroup[]) => {
             const group = {
                 name: name as string,
                 foregroundColor,
                 backgroundColor,
                 borderColor,
-                textColor,
+                beam,
+                valueThreshold: 10_000_000
             }
             return [...(prevGroups || []), group]
         })
@@ -104,6 +110,7 @@ const CreateLootGroupDialog: React.FC<CreateLootGroupDialogProps> = ({ open, onC
                     Configure a new loot group to add to your filter.
                 </DialogContentText>
                 <TextField
+                    slotProps={{ htmlInput: { 'data-op-ignore': 'true' } }}
                     autoFocus
                     margin="dense"
                     id="name"
@@ -134,11 +141,13 @@ const CreateLootGroupDialog: React.FC<CreateLootGroupDialogProps> = ({ open, onC
                         onChange={setBorderColor}
                         label="Border Color"
                     />
-                    <ColorButton
-                        color={textColor}
-                        onChange={setTextColor}
-                        label="Text Color"
-                    />
+                    <ToggleButton
+                        value="check"
+                        selected={beam}
+                        onChange={() => setBeam((prevSelected) => !prevSelected)}
+                    >
+                        <AutoAwesomeIcon />
+                    </ToggleButton>
                 </Box>
 
             </DialogContent>
@@ -172,12 +181,12 @@ export const LootGroupAccordion: React.FC<LootGroupAccordionProps> = ({
                     >
                         Add Loot Group
                     </Button>
-
-                    <CreateLootGroupDialog
-                        open={open}
-                        onClose={() => setOpen(false)}
-                        setGroups={setGroups}
-                    />
+                    {open ?
+                        <CreateLootGroupDialog
+                            open={open}
+                            onClose={() => setOpen(false)}
+                            setGroups={setGroups}
+                        /> : null}
                     {groups?.map((group, index) => (
                         <Card
                             key={index}
@@ -192,9 +201,12 @@ export const LootGroupAccordion: React.FC<LootGroupAccordionProps> = ({
                                     <ColorSwatch color={group.backgroundColor} />
                                     <Typography>Border</Typography>
                                     <ColorSwatch color={group.borderColor} />
-                                    <Typography>Text</Typography>
-                                    <ColorSwatch color={group.textColor} />
-                                    <IconButton 
+                                    <Typography>Beam:</Typography>
+                                    {group.beam ? <AutoAwesomeIcon /> : <NotInterestedIcon />}
+                                    
+                                    <Typography>Value Tier:</Typography>
+                                    <Typography>{group.valueThreshold.toLocaleString()}</Typography>
+                                    <IconButton
                                         sx={{ marginLeft: 'auto' }}
                                         onClick={() => {
                                             setGroups(groups?.filter((_, i) => i !== index))

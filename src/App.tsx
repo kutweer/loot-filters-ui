@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { SetStateAction, useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -12,13 +12,22 @@ import {
   Tab
 } from '@mui/material';
 import { Editor } from '@monaco-editor/react';
-import { FilterConfig } from './templating/filterscape';
+import { DEFAULT_CONFIG, FilterConfig, renderFilter } from './templating/filterscape';
 import { FilterConfiguration } from './components/FilterConfiguration';
 
+const LOOT_FILTER_CONFIG_KEY = "loot-filter-config"
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0)
-  const [configuration, setConfiguration] = useState<FilterConfig | null> (null)
+  const [configuration, setConfiguration] = useState<FilterConfig>(
+    JSON.parse(localStorage.getItem(LOOT_FILTER_CONFIG_KEY) || JSON.stringify(DEFAULT_CONFIG))
+  )
+
+  if (window.location.hostname !== 'localhost') {
+    useEffect(() => {
+      localStorage.setItem(LOOT_FILTER_CONFIG_KEY, JSON.stringify(configuration))
+    }, [configuration])
+  }
 
   return (
     <Container maxWidth="lg">
@@ -34,7 +43,7 @@ export const App: React.FC = () => {
           <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
             <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)} aria-label="filter tabs">
               <Tab label="Configuration" />
-              <Tab label="Filter Editor" />
+              <Tab label="Rendered Filter" />
             </Tabs>
           </Box>
 
@@ -44,7 +53,9 @@ export const App: React.FC = () => {
           </Box>
 
           <Box sx={{ display: activeTab === 1 ? 'block' : 'none' }}>
-            <Editor height='300px' defaultLanguage='c++' value={'//foo'} />
+            <Editor height='300px' language='cpp' value={
+              renderFilter(configuration)
+            } />
           </Box>
 
         </Paper>
