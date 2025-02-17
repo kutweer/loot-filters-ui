@@ -14,19 +14,19 @@ export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [configuration, setConfiguration] = useState<FilterConfig>(
     JSON.parse(
-      localStorage.getItem(LOOT_FILTER_CONFIG_KEY) ||
+      // localStorage.getItem(LOOT_FILTER_CONFIG_KEY) ||
         JSON.stringify(DEFAULT_CONFIG),
     ),
   );
 
-  if (window.location.hostname !== "localhost") {
-    useEffect(() => {
-      localStorage.setItem(
-        LOOT_FILTER_CONFIG_KEY,
-        JSON.stringify(configuration),
-      );
-    }, [configuration]);
-  }
+  // if (window.location.hostname !== "localhost") {
+  //   useEffect(() => {
+  //     localStorage.setItem(
+  //       LOOT_FILTER_CONFIG_KEY,
+  //       JSON.stringify(configuration),
+  //     );
+  //   }, [configuration]);
+  // }
 
   return (
     <Container maxWidth="lg">
