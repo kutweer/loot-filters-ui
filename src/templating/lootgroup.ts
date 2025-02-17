@@ -1,26 +1,24 @@
-import { LootGroup } from "./filterscape"
+import { LootGroup } from "./filterscape";
 
 const randCaps = (length: number): string => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    let result = '';
-    for (let i = 0; i < length; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
-}
-
-
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+};
 
 export const renderLootGroup = ({
-    name,
-    foregroundColor,
-    backgroundColor,
-    borderColor,
-    beam
+  name,
+  foregroundColor,
+  backgroundColor,
+  borderColor,
+  beam,
 }: LootGroup): string => {
-    const configName = `LOOT_GROUP_${randCaps(4)}`
-    
-    return `
+  const configName = `LOOT_GROUP_${randCaps(4)}`;
+
+  return `
 // LOOT GROUP: ${name}
 #define ${configName} { \
     COLOR_FG_BR_BG(${foregroundColor}, ${borderColor}, ${backgroundColor}); \
@@ -48,5 +46,5 @@ if (value:>VALUE_TIER_S) S_TIER
     textAccent = 3; \
     showLootBeam = ${beam ? "true" : "false"}; \
     fontType = 2; \
-}`
-}
+}`;
+};

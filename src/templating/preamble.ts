@@ -1,9 +1,9 @@
 export type Colors = {
-    red?: string
+  red?: string;
 };
 
-    export const preamble = (colors: Colors = {}) => {
-    return `#define RED "${colors.red || "ffff0000"}"
+export const preamble = (colors: Colors = {}) => {
+  return `#define RED "${colors.red || "ffff0000"}"
 #define GREEN "ff00ff00"
 #define BLUE "ff0000ff"
 #define CYAN "ff00ffff"
@@ -47,5 +47,5 @@ export type Colors = {
 #define COLOR_FG_BR_BG(_fg, _br,  _bg) textColor = _fg; borderColor = _br; backgroundColor = _bg;
 #define HIDE_1(_name) if (name:_name && quantity:<2) { hidden = true; }
 #define DARK_BG(_name, _color) if (name:_name) { color = _color; borderColor = _color; backgroundColor = BLACK; }
-#define TEXT_HIGHLIGHT(_name, _color) if (name:_name) { color = _color; textAccent = 2; }`
-}
+#define TEXT_HIGHLIGHT(_name, _color) if (name:_name) { color = _color; textAccent = 2; }`;
+};
