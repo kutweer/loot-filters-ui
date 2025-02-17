@@ -84,7 +84,7 @@ export const renderFilter = (filterConfig: FilterConfig): string => {
     "// META",
     meta(filterConfig.date),
     "// PREAMBLE",
-    filterConfig.includePreamble ? preamble() : "// Preamble Excluded",
+    window.location.hostname !== "localhost" ? preamble() : "// Preamble Excluded",
     "// LOOT GROUPS",
     ...filterConfig.lootGroups.map(renderLootGroup),
   ].join("\n\n");
