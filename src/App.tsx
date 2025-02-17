@@ -23,7 +23,7 @@ export const App: React.FC = () => {
   const [configuration, setConfiguration] = useState<FilterConfig>(
     JSON.parse(
       localStorage.getItem(LOOT_FILTER_CONFIG_KEY) ||
-        JSON.stringify(DEFAULT_CONFIG),
+      JSON.stringify(DEFAULT_CONFIG),
     ),
   );
 
@@ -39,14 +39,15 @@ export const App: React.FC = () => {
   return (
     <Container maxWidth="lg">
       <Box sx={{ py: 4 }}>
-        <Typography variant="h3" component="h1" gutterBottom>
-          Loot Filter UI
-        </Typography>
-        <Typography variant="subtitle1" gutterBottom>
-          A Loot Filter editor for{" "}
-          <Link target="_blank" href="https://github.com/riktenx/loot-filters">
-            RuneLite Loot Filters
-          </Link>
+        <Typography variant="h4" gutterBottom>
+          Loot Filter Builder
+          <Typography sx={{ paddingLeft: '1em', display: "inline-block" }} variant="subtitle1" gutterBottom>
+            A Loot Filter builder for{" "}
+            <Link target="_blank" href="https://github.com/riktenx/loot-filters">
+              RuneLite Loot Filters
+            </Link>
+          </Typography>
+
         </Typography>
 
         <Paper sx={{ mt: 3, p: 2 }}>

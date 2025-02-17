@@ -9,6 +9,10 @@ const randCaps = (length: number): string => {
   return result;
 };
 
+const checkUpperUnderscore = (str: string): boolean => {
+  return /^[A-Z_]+$/.test(str);
+};
+
 export const renderLootGroup = ({
   name,
   foregroundColor,
@@ -16,7 +20,8 @@ export const renderLootGroup = ({
   borderColor,
   beam,
 }: LootGroup): string => {
-  const configName = `LOOT_GROUP_${randCaps(4)}`;
+  const configName = checkUpperUnderscore(name) ? name : `LOOT_GROUP_${randCaps(4)}`;
+  
 
   return `
 // LOOT GROUP: ${name}
@@ -26,25 +31,21 @@ export const renderLootGroup = ({
     showLootBeam = ${beam ? "true" : "false"}; \
     fontType = 2; \
 }
-
 // For manually defined value tiers of items
 #define VALUE_S_TIER (_name) if (name:_name) ${configName} 
-
 // For automatically defined value tiers of items
 if (value:>VALUE_TIER_S) S_TIER
-
-
-#define VALUE_${configName} (_name ) if (name:_name) { \
+#define VALUE_${configName} (_name) if (name:_name) { \
     COLOR_FG_BR_BG(${foregroundColor}, ${borderColor}, ${backgroundColor}); \
     textAccent = 1; \
     showLootBeam = ${beam ? "true" : "false"}; \
     fontType = 2; \
 }
-
-# define UNIQUE_${configName} (_name ) if (name:_name) { \
+#define UNIQUE_${configName} (_name) if (name:_name) { \
     COLOR_FG_BR_BG(${foregroundColor}, ${borderColor}, ${backgroundColor}); \
     textAccent = 3; \
     showLootBeam = ${beam ? "true" : "false"}; \
     fontType = 2; \
-}`;
+}
+// END LOOT GROUP: ${name}`;
 };
