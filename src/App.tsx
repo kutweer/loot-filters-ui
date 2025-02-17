@@ -6,7 +6,7 @@ import {
   Paper,
   Tab,
   Tabs,
-  Typography
+  Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { FilterConfiguration } from "./components/FilterConfiguration";
@@ -70,7 +70,7 @@ export const App: React.FC = () => {
 
           <Box sx={{ display: activeTab === 1 ? "block" : "none" }}>
             <Editor
-              height="300px"
+              height="70vh"
               language="cpp"
               value={renderFilter(configuration)}
             />

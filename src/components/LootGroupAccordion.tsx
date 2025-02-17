@@ -18,10 +18,11 @@ import {
   IconButton,
   TextField,
   ToggleButton,
-  Typography
+  Typography,
 } from "@mui/material";
 import React, { Dispatch, SetStateAction, useState } from "react";
-import { HexColor, LootGroup } from "../templating/filterscape";
+import { LootGroup } from "../templating/filterscape";
+import { HexColor } from "../templating/hexcolor";
 interface LootGroupAccordionProps {
   groups: LootGroup[];
   setGroups: Dispatch<SetStateAction<LootGroup[]>>;
@@ -37,7 +38,7 @@ const ColorSwatch = ({
   color,
   onChange,
 }: {
-  color?: HexColor;
+  color: HexColor;
   onChange?: (color: HexColor) => void;
 }) => (
   <Box
@@ -47,7 +48,7 @@ const ColorSwatch = ({
       width: 24,
       height: 24,
       borderRadius: "50%",
-      backgroundColor: color,
+      backgroundColor: `rgba(${parseInt(color.slice(3, 5), 16)}, ${parseInt(color.slice(5, 7), 16)}, ${parseInt(color.slice(7, 9), 16)}, ${parseInt(color.slice(1, 3), 16)})`,
       border: "1px solid rgba(0, 0, 0, 0.23)",
       marginRight: 1,
       verticalAlign: "middle",
@@ -57,7 +58,7 @@ const ColorSwatch = ({
     {onChange ? (
       <input
         type="color"
-        value={color || "#00000000"}
+        value={color ? (color.length == 9 ? `#${color.slice(2)}` : color) : ""}
         onChange={(e) => onChange(e.target.value as HexColor)}
         style={{
           width: 24,
@@ -76,7 +77,7 @@ const ColorButton = ({
   onChange,
   label,
 }: {
-  color?: HexColor;
+  color: HexColor;
   onChange: (color: HexColor) => void;
   label: string;
 }) => (

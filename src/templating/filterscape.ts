@@ -1,3 +1,4 @@
+import { BLACK, HexColor, LIGHT_BROWN, RED, WHITE } from "./hexcolor";
 import { renderLootGroup } from "./lootgroup";
 import { preamble } from "./preamble";
 
@@ -14,14 +15,6 @@ export type FilterConfig = {
   includePreamble: boolean;
 };
 
-export type HexColor =
-  | `#${string}`
-  | "RED"
-  | "WHITE"
-  | "LIGHT_BROWN"
-  | "BLACK"
-  | null;
-
 export type LootGroup = {
   name: string;
   foregroundColor: HexColor;
@@ -35,49 +28,49 @@ export const DEFAULT_CONFIG: FilterConfig = {
   lootGroups: [
     {
       name: "S_TIER",
-      foregroundColor: "RED",
-      borderColor: "RED",
-      backgroundColor: null,
+      foregroundColor: RED,
+      borderColor: RED,
+      backgroundColor: "#00000000",
       beam: true,
       valueThreshold: 100_000_000,
     },
     {
       name: "S_TIER_UNIQUE",
-      foregroundColor: "RED",
-      backgroundColor: "WHITE",
-      borderColor: "RED",
+      foregroundColor: RED,
+      backgroundColor: WHITE,
+      borderColor: WHITE,
       beam: true,
       valueThreshold: 100_000_000,
     },
     {
       name: "A_TIER",
-      foregroundColor: "WHITE",
-      borderColor: "WHITE",
-      backgroundColor: null,
+      foregroundColor: WHITE,
+      borderColor: WHITE,
+      backgroundColor: "#00000000",
       beam: true,
       valueThreshold: 10_000_000,
     },
     {
       name: "A_TIER_UNIQUE",
-      foregroundColor: "WHITE",
-      backgroundColor: "LIGHT_BROWN",
-      borderColor: "WHITE",
+      foregroundColor: WHITE,
+      backgroundColor: LIGHT_BROWN,
+      borderColor: WHITE,
       beam: true,
       valueThreshold: 10_000_000,
     },
     {
       name: "B_TIER",
-      foregroundColor: "BLACK",
-      borderColor: "BLACK",
-      backgroundColor: null,
+      foregroundColor: BLACK,
+      borderColor: BLACK,
+      backgroundColor: "#00000000",
       beam: false,
       valueThreshold: 1_000_000,
     },
     {
-      name: "B_TIER",
-      foregroundColor: "BLACK",
-      borderColor: "BLACK",
-      backgroundColor: "LIGHT_BROWN",
+      name: "B_TIER_UNIQUE",
+      foregroundColor: BLACK,
+      borderColor: BLACK,
+      backgroundColor: LIGHT_BROWN,
       beam: true,
       valueThreshold: 1_000_000,
     },

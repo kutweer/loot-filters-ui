@@ -1,7 +1,4 @@
-import {
-  Box,
-  Typography
-} from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import React, { Dispatch, SetStateAction } from "react";
 import { FilterConfig } from "../templating/filterscape";
 import { LootGroupAccordion } from "./LootGroupAccordion";

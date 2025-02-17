@@ -1,9 +1,5 @@
-export type Colors = {
-  red?: string;
-};
-
-export const preamble = (colors: Colors = {}) => {
-  return `#define RED "${colors.red || "ffff0000"}"
+export const preamble = () => {
+  return `#define RED "ffff0000"
 #define GREEN "ff00ff00"
 #define BLUE "ff0000ff"
 #define CYAN "ff00ffff"
@@ -11,6 +7,15 @@ export const preamble = (colors: Colors = {}) => {
 #define YELLOW "ffffff00"
 #define WHITE "ffffffff"
 #define BLACK "ff000000"
+
+#define BROWN "ffD2B287"
+#define LIGHT_BROWN "ffAF6025"
+#define ORANGE "ffF05A23"
+#define CARAMEL "ffF99619"
+#define GOLD "ffD59F00"
+#define BURGUNDY "ff350D0D"
+#define DARK_GREEN "ff09600D"
+#define KHAKI "ffBEB287"
 
 #define BRONZE "ff5b462a"
 #define BLURITE "ff8f90d8"
