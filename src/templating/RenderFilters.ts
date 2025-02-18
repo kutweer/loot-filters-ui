@@ -1,5 +1,6 @@
 import preamble from "../filterscape/preamble.rs2f";
 import { FilterConfig, LootGroup } from "../types/FilterTypes";
+import { ItemGroupMapping } from "../types/ItemGroupMapping";
 import useSiteConfig from "../utils/devmode";
 
 const meta = (date: Date) => {
@@ -30,7 +31,8 @@ export const renderLootGroup = ({
   beam,
   valueThreshold,
   uniqueOverrides,
-}: LootGroup): string => {
+  items,
+}: LootGroup & { items: ItemGroupMapping[] }): string => {
   const configName = checkUpperUnderscore(name)
     ? name
     : `LOOT_GROUP_${randCaps(4)}`;
@@ -65,6 +67,15 @@ if (value:> VALUE_THRESHOLD_${configName}) ${configName}`;
 }`;
     sections.push(uniqueDef);
   }
+  const itemDefs = items.map((item) => {
+    if (item.isUnique) {
+      return `UNIQUE_${configName} ("${item.itemExpr}")`;
+    } else {
+      return `VALUE_${configName} ("${item.itemExpr}")`;
+    }
+  });
+  sections.push(itemDefs.join("\n"));
+
   const endDef = `// END LOOT GROUP: ${name}`;
   sections.push(endDef);
 
@@ -79,6 +90,11 @@ export const renderFilter = (filterConfig: FilterConfig): string => {
     "// PREAMBLE",
     siteConfig.devMode ? "// Preamble Excluded" : preamble,
     "// LOOT GROUPS",
-    ...filterConfig.lootGroups.map(renderLootGroup),
+    ...filterConfig.lootGroups.map((lg) => (
+      {
+        ...lg,
+        items: filterConfig.itemGroupMappings.filter((m) => m.groupName === lg.name)
+      }
+    )).map(renderLootGroup),
   ].join("\n\n");
 };

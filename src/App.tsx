@@ -3,8 +3,8 @@ import { Box, Container, Link, Tab, Tabs, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { FilterConfiguration } from "./components/FilterConfiguration";
 import { DEFAULT_CONFIG } from "./filterscape/Filterscape";
-import { FilterConfig } from "./types/FilterTypes";
 import { renderFilter } from "./templating/RenderFilters";
+import { FilterConfig } from "./types/FilterTypes";
 import useSiteConfig from "./utils/devmode";
 
 const LOOT_FILTER_CONFIG_KEY = "loot-filter-config";
