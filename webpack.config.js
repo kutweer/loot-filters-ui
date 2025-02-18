@@ -27,6 +27,10 @@ module.exports = {
       {
         test: /\.rs2f$/,
         type: 'asset/source'
+      },
+      {
+        test: /\.json$/,
+        type: 'json'
       }
     ]
   },

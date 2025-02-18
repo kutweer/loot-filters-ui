@@ -1,7 +1,7 @@
 {
-  "name": "loot-filters",
+  "name": "loot-filters-ui",
   "version": "1.0.0",
-  "homepage": "https://kaqemeex.github.io/loot-filters/",
+  "homepage": "https://kaqemeex.github.io/loot-filters-ui/",
   "private": true,
   "scripts": {
     "start": "webpack serve --mode development",

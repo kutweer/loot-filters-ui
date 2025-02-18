@@ -9,7 +9,7 @@ import useSiteConfig from "./utils/devmode";
 
 const LOOT_FILTER_CONFIG_KEY = "loot-filter-config";
 
-export const App: React.FC = () => {
+export const App: React.FC<{ sha: string }> = ({ sha = "main" }) => {
   const [activeTab, setActiveTab] = useState(0);
   const [siteConfig, setSiteConfig] = useSiteConfig();
   const [configuration, setConfiguration] = useState<FilterConfig>(
@@ -78,7 +78,7 @@ export const App: React.FC = () => {
             <Editor
               height="70vh"
               language="cpp"
-              value={renderFilter(configuration)}
+              value={renderFilter(configuration, sha)}
             />
           </Box>
         </Box>

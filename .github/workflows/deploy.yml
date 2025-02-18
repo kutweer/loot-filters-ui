@@ -17,6 +17,8 @@ jobs:
           node-version: '18'
       - name: Install dependencies
         run: npm install
+      - name: Save Git SHA
+        run: echo "{\"gitSha\": \"${{ github.sha }}\"}" > src/build-info.json
       - name: Build
         run: npm run build
         env:

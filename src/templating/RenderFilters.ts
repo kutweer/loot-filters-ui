@@ -3,10 +3,10 @@ import { FilterConfig, LootGroup } from "../types/FilterTypes";
 import { ItemGroupMapping } from "../types/ItemGroupMapping";
 import useSiteConfig from "../utils/devmode";
 
-const meta = (date: Date) => {
+const meta = (date: Date, sha: string) => {
   return `meta {
     name = "loot-filters/filterscape";
-    description = "Reference implementation of a loot filter, covering all major rares/uniques. Generated on ${date.toString()}.";
+    description = "Reference implementation of a loot filter, covering all major rares/uniques. Generated on ${date.toString()} with git SHA ${sha}.";
 }`.trim();
 };
 
@@ -82,19 +82,24 @@ if (value:> VALUE_THRESHOLD_${configName}) ${configName}`;
   return sections.join("\n\n");
 };
 
-export const renderFilter = (filterConfig: FilterConfig): string => {
+export const renderFilter = (
+  filterConfig: FilterConfig,
+  sha: string,
+): string => {
   const [siteConfig, _] = useSiteConfig();
   return [
     "// META",
-    meta(filterConfig.date),
+    meta(filterConfig.date, sha),
     "// PREAMBLE",
     siteConfig.devMode ? "// Preamble Excluded" : preamble,
     "// LOOT GROUPS",
-    ...filterConfig.lootGroups.map((lg) => (
-      {
+    ...filterConfig.lootGroups
+      .map((lg) => ({
         ...lg,
-        items: filterConfig.itemGroupMappings.filter((m) => m.groupName === lg.name)
-      }
-    )).map(renderLootGroup),
+        items: filterConfig.itemGroupMappings.filter(
+          (m) => m.groupName === lg.name,
+        ),
+      }))
+      .map(renderLootGroup),
   ].join("\n\n");
 };
