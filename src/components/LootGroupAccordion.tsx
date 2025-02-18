@@ -1,7 +1,9 @@
-import { DeleteForever } from "@mui/icons-material";
-import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import NotInterestedIcon from "@mui/icons-material/NotInterested";
+import {
+  DeleteForever,
+  AutoAwesome as AutoAwesomeIcon,
+  ExpandMore as ExpandMoreIcon,
+  NotInterested as NotInterestedIcon,
+} from "@mui/icons-material";
 import {
   Accordion,
   AccordionDetails,
@@ -20,9 +22,9 @@ import {
   ToggleButton,
   Typography,
 } from "@mui/material";
-import React, { Dispatch, SetStateAction, useState } from "react";
-import { LootGroup } from "../templating/filterscape";
-import { HexColor } from "../templating/hexcolor";
+import { Dispatch, SetStateAction, useState } from "react";
+import { LootGroup } from "../types/FilterTypes";
+import { HexColor } from "../types/hexcolor";
 interface LootGroupAccordionProps {
   groups: LootGroup[];
   setGroups: Dispatch<SetStateAction<LootGroup[]>>;

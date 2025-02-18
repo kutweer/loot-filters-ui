@@ -6,7 +6,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
-    publicPath: process.env.NODE_ENV === 'production' 
+    publicPath: process.env.NODE_ENV === 'production'
       ? '/loot-filters/'
       : '/'
   },
@@ -23,6 +23,10 @@ module.exports = {
       {
         test: /\.css$/,
         use: ['style-loader', 'css-loader']
+      },
+      {
+        test: /\.rs2f$/,
+        type: 'asset/source'
       }
     ]
   },

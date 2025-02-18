@@ -2,31 +2,31 @@ import { Editor } from "@monaco-editor/react";
 import { Box, Container, Link, Tab, Tabs, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { FilterConfiguration } from "./components/FilterConfiguration";
-import {
-  DEFAULT_CONFIG,
-  FilterConfig,
-  renderFilter,
-} from "./templating/filterscape";
+import { DEFAULT_CONFIG } from "./filterscape/Filterscape";
+import { FilterConfig } from "./types/FilterTypes";
+import { renderFilter } from "./templating/RenderFilters";
+import useSiteConfig from "./utils/devmode";
 
 const LOOT_FILTER_CONFIG_KEY = "loot-filter-config";
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
+  const [siteConfig, setSiteConfig] = useSiteConfig();
   const [configuration, setConfiguration] = useState<FilterConfig>(
     JSON.parse(
       // localStorage.getItem(LOOT_FILTER_CONFIG_KEY) ||
-        JSON.stringify(DEFAULT_CONFIG),
+      JSON.stringify(DEFAULT_CONFIG),
     ),
   );
 
-  // if (window.location.hostname !== "localhost") {
-  //   useEffect(() => {
-  //     localStorage.setItem(
-  //       LOOT_FILTER_CONFIG_KEY,
-  //       JSON.stringify(configuration),
-  //     );
-  //   }, [configuration]);
-  // }
+  if (!siteConfig.devMode) {
+    useEffect(() => {
+      localStorage.setItem(
+        LOOT_FILTER_CONFIG_KEY,
+        JSON.stringify(configuration),
+      );
+    }, [configuration]);
+  }
 
   return (
     <Container maxWidth="lg">
@@ -35,16 +35,22 @@ export const App: React.FC = () => {
           Loot Filter Builder
           <Typography
             sx={{ paddingLeft: "1em", display: "inline-block" }}
-            variant="subtitle1"
             gutterBottom
+            variant="caption"
           >
-            A Loot Filter builder for{" "}
-            <Link
-              target="_blank"
-              href="https://github.com/riktenx/loot-filters"
-            >
-              RuneLite Loot Filters
-            </Link>
+            {siteConfig.devMode ? (
+              "Development Mode"
+            ) : (
+              <span>
+                A Loot Filter builder for
+                <Link
+                  target="_blank"
+                  href="https://github.com/riktenx/loot-filters"
+                >
+                  RuneLite Loot Filters
+                </Link>
+              </span>
+            )}
           </Typography>
         </Typography>
 

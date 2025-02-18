@@ -16,6 +16,8 @@ export const BURGUNDY = "#ff350D0D";
 export const DARK_GREEN = "#ff09600D";
 export const KHAKI = "#ffBEB287";
 
+export const NO_COLOR = "#00000000";
+
 export type HexColor =
   | `#${string}`
   | typeof RED
@@ -33,4 +35,5 @@ export type HexColor =
   | typeof GOLD
   | typeof BURGUNDY
   | typeof DARK_GREEN
-  | typeof KHAKI;
+  | typeof KHAKI
+  | typeof NO_COLOR;
