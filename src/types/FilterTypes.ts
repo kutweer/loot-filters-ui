@@ -1,4 +1,4 @@
-import { HexColor } from "./hexcolor";
+import { ArgbHexColor } from "./hexcolor";
 import { ItemGroupMapping } from "./ItemGroupMapping";
 
 export type FilterConfig = {
@@ -10,9 +10,9 @@ export type FilterConfig = {
 
 export type LootGroup = {
   name: string;
-  foregroundColor: HexColor;
-  backgroundColor: HexColor;
-  borderColor: HexColor;
+  foregroundColor: ArgbHexColor;
+  backgroundColor: ArgbHexColor;
+  borderColor: ArgbHexColor;
   beam: boolean;
   valueThreshold: number;
   uniqueOverrides?: Partial<Omit<LootGroup, "valueThreshold" | "name">>;

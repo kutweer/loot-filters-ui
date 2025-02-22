@@ -41,7 +41,7 @@ export const renderLootGroup = ({
   const baseDef = `
 // LOOT GROUP: ${name}
 #define ${configName} { \
-    COLOR_FG_BR_BG(${foregroundColor}, ${borderColor}, ${backgroundColor}); \
+    COLOR_FG_BR_BG("${foregroundColor}", "${borderColor}", "${backgroundColor}"); \
     textAccent = 1; \
     showLootBeam = ${beam ? "true" : "false"}; \
     fontType = 2; \
@@ -60,7 +60,7 @@ if (value:> VALUE_THRESHOLD_${configName}) ${configName}`;
   if (uniqueOverrides != null) {
     const uniqueDef = `// Different settings for unique items
 #define UNIQUE_${configName} (_name) if (name:_name) { \
-  COLOR_FG_BR_BG(${foregroundColor}, ${borderColor}, ${backgroundColor}); \
+  COLOR_FG_BR_BG("${foregroundColor}", "${borderColor}", "${backgroundColor}"); \
   textAccent = 3; \
   showLootBeam = ${beam ? "true" : "false"}; \
   fontType = 2; \

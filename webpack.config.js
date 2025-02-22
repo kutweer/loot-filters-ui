@@ -31,6 +31,10 @@ module.exports = {
       {
         test: /\.json$/,
         type: 'json'
+      },
+      {
+        test: /\.ttf$/,
+        type: 'asset/resource'
       }
     ]
   },

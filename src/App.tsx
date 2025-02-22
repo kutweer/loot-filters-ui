@@ -31,7 +31,7 @@ export const App: React.FC<{ sha: string }> = ({ sha = "main" }) => {
   return (
     <Container maxWidth="lg">
       <Box sx={{ py: 4 }}>
-        <Typography variant="h4" gutterBottom>
+        <Typography style={{ fontFamily: 'RuneScape' }} variant="h4" gutterBottom>
           Loot Filter Builder
           <Typography
             sx={{ paddingLeft: "1em", display: "inline-block" }}

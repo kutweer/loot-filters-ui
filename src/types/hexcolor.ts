@@ -18,7 +18,7 @@ export const KHAKI = "#ffBEB287";
 
 export const NO_COLOR = "#00000000";
 
-export type HexColor =
+export type ArgbHexColor =
   | `#${string}`
   | typeof RED
   | typeof GREEN
@@ -37,3 +37,17 @@ export type HexColor =
   | typeof DARK_GREEN
   | typeof KHAKI
   | typeof NO_COLOR;
+
+
+export const argbToParts = (hex: ArgbHexColor) => {
+  const a = parseInt(hex.slice(1, 3), 16)
+  const r = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const g = parseInt(hex.slice(7, 9), 16);
+  return [r, g, b, a]
+}
+
+export const argbToRgba = (hex: ArgbHexColor) => {
+  const [r, g, b, a] = argbToParts(hex)
+  return `rgba(${r}, ${g}, ${b}, ${a})`
+}
