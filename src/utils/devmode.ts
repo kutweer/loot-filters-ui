@@ -9,7 +9,6 @@ export const useSiteConfig = () => {
     localStorage.getItem("loot-filter-site-config") || "{}",
   );
   const configWithDefaults = { ...config };
-  console.log(configWithDefaults);
 
   for (const key in defaultConfig) {
     if (configWithDefaults[key] === undefined) {

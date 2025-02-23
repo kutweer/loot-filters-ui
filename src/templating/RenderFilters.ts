@@ -30,7 +30,6 @@ export const renderLootGroup = ({
   borderColor,
   beam,
   valueThreshold,
-  uniqueOverrides,
   items,
 }: LootGroup & { items: ItemGroupMapping[] }): string => {
   const configName = checkUpperUnderscore(name)
@@ -57,24 +56,14 @@ if (value:> VALUE_THRESHOLD_${configName}) ${configName}`;
     sections.push(valueDef);
   }
 
-  if (uniqueOverrides != null) {
-    const uniqueDef = `// Different settings for unique items
-#define UNIQUE_${configName} (_name) if (name:_name) { \
-  COLOR_FG_BR_BG("${foregroundColor}", "${borderColor}", "${backgroundColor}"); \
-  textAccent = 3; \
-  showLootBeam = ${beam ? "true" : "false"}; \
-  fontType = 2; \
-}`;
-    sections.push(uniqueDef);
-  }
-  const itemDefs = items.map((item) => {
-    if (item.isUnique) {
-      return `UNIQUE_${configName} ("${item.itemExpr}")`;
-    } else {
-      return `VALUE_${configName} ("${item.itemExpr}")`;
-    }
-  });
-  sections.push(itemDefs.join("\n"));
+  // const itemDefs = items.map((item) => {
+  //   if (item.isUnique) {
+  //     return `UNIQUE_${configName} ("${item.itemExpr}")`;
+  //   } else {
+  //     return `VALUE_${configName} ("${item.itemExpr}")`;
+  //   }
+  // });
+  // sections.push(itemDefs.join("\n"));
 
   const endDef = `// END LOOT GROUP: ${name}`;
   sections.push(endDef);
@@ -96,9 +85,7 @@ export const renderFilter = (
     ...filterConfig.lootGroups
       .map((lg) => ({
         ...lg,
-        items: filterConfig.itemGroupMappings.filter(
-          (m) => m.groupName === lg.name,
-        ),
+        items: [],
       }))
       .map(renderLootGroup),
   ].join("\n\n");

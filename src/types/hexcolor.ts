@@ -1,3 +1,5 @@
+import { RGBColor } from "react-color";
+
 export const RED = "#ffff0000";
 export const GREEN = "#ff00ff00";
 export const BLUE = "#ff0000ff";
@@ -38,16 +40,35 @@ export type ArgbHexColor =
   | typeof KHAKI
   | typeof NO_COLOR;
 
+export type Color = {
+  r: string;
+  g: string;
+  b: string;
+  a: string;
+};
 
 export const argbToParts = (hex: ArgbHexColor) => {
-  const a = parseInt(hex.slice(1, 3), 16)
+  const a = parseInt(hex.slice(1, 3), 16);
   const r = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  const g = parseInt(hex.slice(7, 9), 16);
-  return [r, g, b, a]
-}
+  const g = parseInt(hex.slice(5, 7), 16);
+  const b = parseInt(hex.slice(7, 9), 16);
+  return [r, g, b, a];
+};
 
-export const argbToRgba = (hex: ArgbHexColor) => {
-  const [r, g, b, a] = argbToParts(hex)
-  return `rgba(${r}, ${g}, ${b}, ${a})`
-}
+export const argbHexToRgbaCss = (hex: ArgbHexColor) => {
+  const [r, g, b, a] = argbToParts(hex);
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+};
+
+export const rgbHexToArgbHex = (hex: string) => {
+  return `#ff${hex.slice(1)}`;
+};
+
+export const rGBColorToArgbHex = (color: RGBColor): ArgbHexColor => {
+  return `#${color.a?.toString(16).padStart(2, "0") || "00"}${color.r.toString(16).padStart(2, "0")}${color.g.toString(16).padStart(2, "0")}${color.b.toString(16).padStart(2, "0")}`;
+};
+
+export const argbHexColorToRGBColor = (hex: ArgbHexColor): RGBColor => {
+  const [r, g, b, a] = argbToParts(hex);
+  return { r, g, b, a };
+};

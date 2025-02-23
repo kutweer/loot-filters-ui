@@ -8,12 +8,26 @@ export type FilterConfig = {
   includePreamble: boolean;
 };
 
-export type LootGroup = {
-  name: string;
+export type DisplayConfig = {
   foregroundColor: ArgbHexColor;
   backgroundColor: ArgbHexColor;
   borderColor: ArgbHexColor;
   beam: boolean;
-  valueThreshold: number;
-  uniqueOverrides?: Partial<Omit<LootGroup, "valueThreshold" | "name">>;
 };
+
+export type TargetConfig = {
+  valueThreshold: number;
+  // TODO other things, col log
+};
+
+export type LootGroup = {
+  name: string;
+  items?: ItemConfig[];
+} & DisplayConfig &
+  TargetConfig;
+
+export type ItemConfig = {
+  name: string;
+  matcher?: string;
+} & DisplayConfig &
+  TargetConfig;

@@ -21,9 +21,6 @@ const DEFAULT_LOOT_GROUPS: LootGroup[] = [
     backgroundColor: NO_COLOR,
     beam: true,
     valueThreshold: 100_000_000,
-    uniqueOverrides: {
-      backgroundColor: WHITE,
-    },
   },
   {
     name: "A_TIER",
@@ -32,9 +29,6 @@ const DEFAULT_LOOT_GROUPS: LootGroup[] = [
     backgroundColor: NO_COLOR,
     beam: true,
     valueThreshold: 10_000_000,
-    uniqueOverrides: {
-      backgroundColor: LIGHT_BROWN,
-    },
   },
   {
     name: "B_TIER",
@@ -43,10 +37,6 @@ const DEFAULT_LOOT_GROUPS: LootGroup[] = [
     backgroundColor: NO_COLOR,
     beam: false,
     valueThreshold: 1_000_000,
-    uniqueOverrides: {
-      backgroundColor: LIGHT_BROWN,
-      beam: true,
-    },
   },
   {
     name: "C_TIER",
@@ -55,11 +45,6 @@ const DEFAULT_LOOT_GROUPS: LootGroup[] = [
     backgroundColor: NO_COLOR,
     beam: false,
     valueThreshold: 500_000,
-    uniqueOverrides: {
-      foregroundColor: LIGHT_BROWN,
-      borderColor: LIGHT_BROWN,
-      backgroundColor: BURGUNDY,
-    },
   },
   {
     name: "D_TIER",

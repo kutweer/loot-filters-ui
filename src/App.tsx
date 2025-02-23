@@ -1,11 +1,19 @@
 import { Editor } from "@monaco-editor/react";
-import { Box, Container, Link, Tab, Tabs, Typography } from "@mui/material";
+import {
+  Box,
+  Container,
+  Link,
+  Stack,
+  Tab,
+  Tabs,
+  Typography,
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { FilterConfiguration } from "./components/FilterConfiguration";
 import { DEFAULT_CONFIG } from "./filterscape/Filterscape";
 import { renderFilter } from "./templating/RenderFilters";
-import { FilterConfig } from "./types/FilterTypes";
+import { FilterConfig, LootGroup } from "./types/FilterTypes";
 import useSiteConfig from "./utils/devmode";
+import { LootGroupComponent } from "./v2-components/LootGroup";
 
 const LOOT_FILTER_CONFIG_KEY = "loot-filter-config";
 
@@ -19,6 +27,8 @@ export const App: React.FC<{ sha: string }> = ({ sha = "main" }) => {
     ),
   );
 
+  const [expanded, setExpanded] = useState<string[]>([]);
+
   if (!siteConfig.devMode) {
     useEffect(() => {
       localStorage.setItem(
@@ -31,7 +41,11 @@ export const App: React.FC<{ sha: string }> = ({ sha = "main" }) => {
   return (
     <Container maxWidth="lg">
       <Box sx={{ py: 4 }}>
-        <Typography style={{ fontFamily: 'RuneScape' }} variant="h4" gutterBottom>
+        <Typography
+          style={{ fontFamily: "RuneScape" }}
+          variant="h4"
+          gutterBottom
+        >
           Loot Filter Builder
           <Typography
             sx={{ paddingLeft: "1em", display: "inline-block" }}
@@ -67,10 +81,22 @@ export const App: React.FC<{ sha: string }> = ({ sha = "main" }) => {
           </Box>
 
           <Box sx={{ display: activeTab === 0 ? "block" : "none" }}>
-            <FilterConfiguration
-              configuration={configuration}
-              setConfiguration={setConfiguration}
-            />
+            <Stack direction="column" spacing={2}>
+              {configuration.lootGroups.map((group, index) => (
+                <LootGroupComponent
+                  key={index}
+                  group={group}
+                  onChange={(updatedGroup: LootGroup) => {
+                    setConfiguration((config: FilterConfig) => {
+                      const groups = [...config.lootGroups];
+                      groups[index] = updatedGroup;
+                      console.log(updatedGroup);
+                      return { ...configuration, lootGroups: groups };
+                    });
+                  }}
+                />
+              ))}
+            </Stack>
           </Box>
 
           <Box sx={{ display: activeTab === 1 ? "block" : "none" }}>
