@@ -1,4 +1,4 @@
-import { Box, FormControl, InputLabel } from "@mui/material";
+import { FormControl } from "@mui/material";
 import React, { useState } from "react";
 import { RGBColor, SketchPicker } from "react-color";
 import {
@@ -10,7 +10,8 @@ import {
 const ColorPicker: React.FC<{
   color: ArgbHexColor;
   onChange: (color: ArgbHexColor) => void;
-}> = ({ color, onChange }) => {
+  labelText: string;
+}> = ({ color, onChange, labelText }) => {
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
 
   const handleClick = (displayColor: boolean) => {
@@ -29,25 +30,32 @@ const ColorPicker: React.FC<{
 
   return (
     <div>
-      <div
-        style={{
-          padding: "5px",
-          background: "#fff",
-          borderRadius: "1px",
-          boxShadow: "0 0 0 1px rgba(0,0,0,.1)",
-          display: "inline-block",
-          cursor: "pointer",
-        }}
-        onClick={() => handleClick(displayColorPicker)}
-      >
-        <div
-          style={{
-            width: "36px",
-            height: "14px",
-            borderRadius: "2px",
-            background: `rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, ${displayColor.a})`,
-          }}
-        />
+      <div>
+        <div>
+          <div
+            style={{
+              padding: "5px",
+              background: "#fff",
+              borderRadius: "1px",
+              boxShadow: "0 0 0 1px rgba(0,0,0,.1)",
+              display: "inline-block",
+              cursor: "pointer",
+            }}
+            onClick={() => handleClick(displayColorPicker)}
+          >
+            <div
+              style={{
+                width: "36px",
+                height: "14px",
+                borderRadius: "2px",
+                background: `rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, ${displayColor.a})`,
+              }}
+            />
+          </div>
+          <div style={{ fontFamily: "RuneScape", textAlign: "left" }}>
+            {labelText}
+          </div>
+        </div>
       </div>
       {displayColorPicker ? (
         <div style={{ position: "absolute", zIndex: "2" }}>
@@ -77,14 +85,9 @@ const ColorPickerInput: React.FC<{
   onChange: (color: ArgbHexColor) => void;
 }> = ({ color, onChange, labelText }) => {
   return (
-    <Box>
-      <FormControl>
-        <ColorPicker color={color} onChange={onChange} />
-        <InputLabel className="color-input-label" sx={{ mt: 1 }}>
-          {labelText}
-        </InputLabel>
-      </FormControl>
-    </Box>
+    <FormControl sx={{ marginTop: "auto", marginBottom: "auto" }}>
+      <ColorPicker labelText={labelText} color={color} onChange={onChange} />
+    </FormControl>
   );
 };
 

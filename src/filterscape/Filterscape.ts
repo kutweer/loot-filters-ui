@@ -7,7 +7,7 @@ import {
   KHAKI,
   NO_COLOR,
   RED,
-  WHITE
+  WHITE,
 } from "../types/hexcolor";
 
 // Item lists by tier
@@ -37,9 +37,8 @@ const A_TIER_UNIQUES = [
   "Noxious pommel",
   "Noxious point",
   "*half of key (moon key)",
-  "Hill giant club"
+  "Hill giant club",
 ];
-
 
 const B_TIER_UNIQUES = [
   "Dark totem",
@@ -203,7 +202,6 @@ const DEFAULT_LOOT_GROUPS: LootGroup[] = [
     valueThreshold: 0,
   },
 ];
-
 
 export const DEFAULT_CONFIG: FilterConfig = {
   lootGroups: DEFAULT_LOOT_GROUPS,
