@@ -1,76 +1,14 @@
 import { FilterConfig, LootGroup } from "../types/FilterTypes";
 import {
   BLACK,
-  BURGUNDY,
   CARAMEL,
   GOLD,
   GREEN,
   KHAKI,
-  LIGHT_BROWN,
   NO_COLOR,
   RED,
-  WHITE,
+  WHITE
 } from "../types/hexcolor";
-import { ItemGroupMapping } from "../types/ItemGroupMapping";
-
-const DEFAULT_LOOT_GROUPS: LootGroup[] = [
-  {
-    name: "S_TIER",
-    foregroundColor: RED,
-    borderColor: RED,
-    backgroundColor: NO_COLOR,
-    beam: true,
-    valueThreshold: 100_000_000,
-  },
-  {
-    name: "A_TIER",
-    foregroundColor: WHITE,
-    borderColor: WHITE,
-    backgroundColor: NO_COLOR,
-    beam: true,
-    valueThreshold: 10_000_000,
-  },
-  {
-    name: "B_TIER",
-    foregroundColor: BLACK,
-    borderColor: BLACK,
-    backgroundColor: NO_COLOR,
-    beam: false,
-    valueThreshold: 1_000_000,
-  },
-  {
-    name: "C_TIER",
-    foregroundColor: CARAMEL,
-    borderColor: CARAMEL,
-    backgroundColor: NO_COLOR,
-    beam: false,
-    valueThreshold: 500_000,
-  },
-  {
-    name: "D_TIER",
-    foregroundColor: GOLD,
-    borderColor: GOLD,
-    backgroundColor: NO_COLOR,
-    beam: false,
-    valueThreshold: 100_000,
-  },
-  {
-    name: "E_TIER",
-    foregroundColor: KHAKI,
-    borderColor: KHAKI,
-    backgroundColor: NO_COLOR,
-    beam: false,
-    valueThreshold: 20_000,
-  },
-  {
-    name: "HERB_GROUP",
-    foregroundColor: GREEN,
-    borderColor: GREEN,
-    backgroundColor: NO_COLOR,
-    beam: false,
-    valueThreshold: 0,
-  },
-];
 
 // Item lists by tier
 const S_TIER_UNIQUES = [
@@ -99,9 +37,9 @@ const A_TIER_UNIQUES = [
   "Noxious pommel",
   "Noxious point",
   "*half of key (moon key)",
+  "Hill giant club"
 ];
 
-const A_TIER_VALUES = ["Hill giant club"];
 
 const B_TIER_UNIQUES = [
   "Dark totem",
@@ -201,39 +139,73 @@ const E_TIER_VALUES = [
   "Ecumenical key shard",
 ];
 
-// Helper functions to create mappings
-const createUniqueMappings = (tier: string, items: string[]) =>
-  items.map((itemExpr) => ({
-    groupName: tier,
-    itemExpr,
-    isUnique: true,
-  }));
-
-const createValueMappings = (tier: string, items: string[]) =>
-  items.map((itemExpr) => ({
-    groupName: tier,
-    itemExpr,
-    isUnique: false,
-  }));
-
-const DEFAULT_ITEM_GROUP_MAPPINGS: ItemGroupMapping[] = [
-  ...createUniqueMappings("S_TIER", S_TIER_UNIQUES),
-  ...createUniqueMappings("A_TIER", A_TIER_UNIQUES),
-  ...createValueMappings("A_TIER", A_TIER_VALUES),
-  ...createUniqueMappings("B_TIER", B_TIER_UNIQUES),
-  ...createUniqueMappings("C_TIER", C_TIER_UNIQUES),
-  ...createValueMappings("D_TIER", D_TIER_VALUES),
-  ...createValueMappings("E_TIER", E_TIER_VALUES),
-  // Herb Group
+const DEFAULT_LOOT_GROUPS: LootGroup[] = [
   {
-    groupName: "HERB_GROUP",
-    itemExpr: "Guam Leaf",
-    isUnique: false,
+    name: "S_TIER",
+    foregroundColor: RED,
+    borderColor: RED,
+    backgroundColor: NO_COLOR,
+    beam: true,
+    valueThreshold: 100_000_000,
+    items: [...S_TIER_UNIQUES.map((item) => ({ name: item, matcher: item }))],
+  },
+  {
+    name: "A_TIER",
+    foregroundColor: WHITE,
+    borderColor: WHITE,
+    backgroundColor: NO_COLOR,
+    beam: true,
+    valueThreshold: 10_000_000,
+    items: [...A_TIER_UNIQUES.map((item) => ({ name: item, matcher: item }))],
+  },
+  {
+    name: "B_TIER",
+    foregroundColor: BLACK,
+    borderColor: BLACK,
+    backgroundColor: NO_COLOR,
+    beam: false,
+    valueThreshold: 1_000_000,
+    items: [...B_TIER_UNIQUES.map((item) => ({ name: item, matcher: item }))],
+  },
+  {
+    name: "C_TIER",
+    foregroundColor: CARAMEL,
+    borderColor: CARAMEL,
+    backgroundColor: NO_COLOR,
+    beam: false,
+    valueThreshold: 500_000,
+    items: [...C_TIER_UNIQUES.map((item) => ({ name: item, matcher: item }))],
+  },
+  {
+    name: "D_TIER",
+    foregroundColor: GOLD,
+    borderColor: GOLD,
+    backgroundColor: NO_COLOR,
+    beam: false,
+    valueThreshold: 100_000,
+    items: [...D_TIER_VALUES.map((item) => ({ name: item, matcher: item }))],
+  },
+  {
+    name: "E_TIER",
+    foregroundColor: KHAKI,
+    borderColor: KHAKI,
+    backgroundColor: NO_COLOR,
+    beam: false,
+    valueThreshold: 20_000,
+    items: [...E_TIER_VALUES.map((item) => ({ name: item, matcher: item }))],
+  },
+  {
+    name: "HERB_GROUP",
+    foregroundColor: GREEN,
+    borderColor: GREEN,
+    backgroundColor: NO_COLOR,
+    beam: false,
+    valueThreshold: 0,
   },
 ];
 
+
 export const DEFAULT_CONFIG: FilterConfig = {
-  itemGroupMappings: DEFAULT_ITEM_GROUP_MAPPINGS,
   lootGroups: DEFAULT_LOOT_GROUPS,
   date: new Date(),
   includePreamble: false,

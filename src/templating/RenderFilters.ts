@@ -47,7 +47,7 @@ export const renderLootGroup = ({
 }`;
   sections.push(baseDef);
 
-  if (valueThreshold > 0) {
+  if (valueThreshold || 0 > 0) {
     const valueDef = `// For manually defined value tiers of items
 #define VALUE_${configName} (_name) if (name:_name) ${configName}
 // For automatically defined value tiers of items

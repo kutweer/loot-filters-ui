@@ -1,55 +1,12 @@
-.app {
-  font-family: Arial, sans-serif;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.rules-container {
-  margin-top: 20px;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  padding: 20px;
-}
-
-.rule-item {
-  padding: 10px;
-  margin: 5px 0;
-  background-color: #f5f5f5;
-  border-radius: 4px;
-}
-
 @font-face {
   font-family: 'RuneScape';
   src: url('./fonts/runescape.ttf') format('truetype');
 }
 
-.color-input-label {
-  position: relative !important;
-  transform: none !important;
-  margin-bottom: 8px !important;
-  width: 100% !important;
-  overflow: unset !important;
+:root {
+  --color-rs-dark-brown: #2c2721;
 }
 
-#color-input {
-  -webkit-appearance: none;
-  padding: 0;
-  border: none;
-  border-radius: 10px;
-  width: 20px;
-  height: 20px;
-  border: 1px solid #aaa;
-}
-
-#color-input::-webkit-color-swatch {
-  border: none;
-  border-radius: 10px;
-  padding: 0;
-}
-
-#color-input::-webkit-color-swatch-wrapper {
-  border: none;
-  border-radius: 10px;
-  padding: 0;
+body {
+  background-color: var(--color-rs-dark-brown);
 }

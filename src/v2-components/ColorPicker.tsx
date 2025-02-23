@@ -7,20 +7,10 @@ import {
   rGBColorToArgbHex,
 } from "../types/hexcolor";
 
-type Color = {
-  r: string;
-  g: string;
-  b: string;
-  a: string;
-};
-
 const ColorPicker: React.FC<{
   color: ArgbHexColor;
   onChange: (color: ArgbHexColor) => void;
 }> = ({ color, onChange }) => {
-  const [displayColor, setDisplayColor] = useState<RGBColor>(
-    argbHexColorToRGBColor(color),
-  );
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
 
   const handleClick = (displayColor: boolean) => {
@@ -33,8 +23,9 @@ const ColorPicker: React.FC<{
 
   const handleChange = (color: RGBColor) => {
     onChange(rGBColorToArgbHex(color));
-    setDisplayColor(color);
   };
+
+  const displayColor = argbHexColorToRGBColor(color);
 
   return (
     <div>
