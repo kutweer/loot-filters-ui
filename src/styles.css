@@ -21,7 +21,7 @@
 
 @font-face {
   font-family: 'RuneScape';
-  src: url('./fonts/RuneScape.ttf') format('truetype');
+  src: url('./fonts/runescape.ttf') format('truetype');
 }
 
 .color-input-label {
