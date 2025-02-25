@@ -13,14 +13,14 @@ import { MuiRsTheme } from "./styles/MuiTheme";
 const LOOT_FILTER_CONFIG_KEY = "loot-filter-config";
 
 export const App: React.FC<{ sha: string }> = ({ sha = "main" }) => {
-  const [activeTab, setActiveTab] = useState(1);
+  const [activeTab, setActiveTab] = useState(0);
   const [siteConfig, setSiteConfig] = useSiteConfig();
   const [configuration, setConfiguration] = useState<FilterConfig>(
     JSON.parse(
       siteConfig.devMode
         ? JSON.stringify(DEFAULT_CONFIG)
         : localStorage.getItem(LOOT_FILTER_CONFIG_KEY) ||
-            JSON.stringify(DEFAULT_CONFIG),
+        JSON.stringify(DEFAULT_CONFIG),
     ),
   );
 
