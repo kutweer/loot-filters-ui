@@ -1,20 +1,9 @@
+import { Edit, KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 import {
-  Delete,
-  Edit,
-  ExpandMore,
-  KeyboardArrowDown,
-  KeyboardArrowUp,
-} from "@mui/icons-material";
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Box,
   Button,
   FormControl,
-  IconButton,
   Paper,
-  TextField,
   ToggleButton,
   ToggleButtonGroup,
   Tooltip,
@@ -26,19 +15,22 @@ import { ArgbHexColor } from "../types/hexcolor";
 import { ColorPickerInput } from "./ColorPicker";
 import { EditLootGroupDialog } from "./EditLootGroupDialog";
 import { ExampleItemLabel } from "./ExampleItemLabel";
+import { MappedItemAccordion } from "./MappedItemAccordion";
 
 interface LootGroupProps {
   index: number;
   group: LootGroup;
+  groupsLength: number;
   onChange: any;
   handleSortChange: (
     event: React.MouseEvent<HTMLElement>,
-    newIndex: number,
+    direction: "up" | "down",
   ) => void;
 }
 
 export const LootGroupComponent: React.FC<LootGroupProps> = ({
   index,
+  groupsLength,
   group,
   onChange,
   handleSortChange,
@@ -89,23 +81,9 @@ export const LootGroupComponent: React.FC<LootGroupProps> = ({
           labelText="Border"
           onChange={(color: ArgbHexColor) => handleChange("borderColor", color)}
         />
-        <Box
-          sx={{
-            border: "3px solid black",
-            backgroundColor: "#dddddd",
-            marginTop: "5px",
-            height: "80%",
-          }}
-        >
-          <ExampleItemLabel
-            itemName={group.name}
-            foregroundColor={group.foregroundColor}
-            backgroundColor={group.backgroundColor}
-            borderColor={group.borderColor}
-          />
-        </Box>
         <FormControl sx={{ marginTop: "auto", marginBottom: "auto" }}>
           <ToggleButtonGroup
+            sx={{ borderColor: "red" }}
             exclusive={true}
             orientation="vertical"
             value={group.beam ? "beam" : "no-beam"}
@@ -128,6 +106,21 @@ export const LootGroupComponent: React.FC<LootGroupProps> = ({
             </ToggleButton>
           </ToggleButtonGroup>
         </FormControl>
+        <Box
+          sx={{
+            border: "3px solid black",
+            backgroundColor: "#dddddd",
+            marginTop: "5px",
+            height: "80%",
+          }}
+        >
+          <ExampleItemLabel
+            itemName={group.name}
+            foregroundColor={group.foregroundColor}
+            backgroundColor={group.backgroundColor}
+            borderColor={group.borderColor}
+          />
+        </Box>
         <Button
           sx={{ marginTop: "auto", marginBottom: "auto", marginLeft: "auto" }}
           size="small"
@@ -153,7 +146,7 @@ export const LootGroupComponent: React.FC<LootGroupProps> = ({
             <ToggleButton
               value="up"
               onClick={(e) => {
-                handleSortChange(e, Math.min(index - 1, 0));
+                handleSortChange(e, "up");
               }}
               disabled={index === 0}
             >
@@ -164,56 +157,24 @@ export const LootGroupComponent: React.FC<LootGroupProps> = ({
             <ToggleButton
               value="down"
               onClick={(e) => {
-                handleSortChange(e, index + 1);
+                handleSortChange(e, "down");
               }}
-              disabled={!group.items || index === group.items.length - 1}
+              disabled={index === groupsLength - 1}
             >
               <KeyboardArrowDown fontSize="small" />
             </ToggleButton>
           </Tooltip>
         </ToggleButtonGroup>
       </Box>
-      <Accordion sx={{ margin: 1 }}>
-        <AccordionSummary expandIcon={<ExpandMore />}>
-          <Typography>
-            Manually Mapped Items ({group.items?.length || 0})
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-            {group.items?.map((item, index) => (
-              <Box
-                key={index}
-                sx={{ display: "flex", alignItems: "center", gap: 1 }}
-              >
-                <Typography>{item.name}</Typography>
-                <IconButton
-                  size="small"
-                  onClick={() => {
-                    const newItems = [...(group.items || [])];
-                    newItems.splice(index, 1);
-                    handleChange("items", newItems);
-                  }}
-                >
-                  <Delete fontSize="small" />
-                </IconButton>
-              </Box>
-            ))}
-            <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-              <TextField
-                size="small"
-                placeholder="Add item..."
-                onChange={(e) => {
-                  handleChange("items", [
-                    ...(group.items || []),
-                    e.target.value,
-                  ]);
-                }}
-              />
-            </Box>
-          </Box>
-        </AccordionDetails>
-      </Accordion>
+
+      <Box sx={{ paddingBottom: 1 }}>
+        <MappedItemAccordion
+          items={group.items || []}
+          handleChange={(updater) => {
+            onChange(updater(group));
+          }}
+        />
+      </Box>
     </Paper>
   );
 };

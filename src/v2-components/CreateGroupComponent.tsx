@@ -1,4 +1,12 @@
-import { Box, Button, Paper, TextField } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControl,
+  Paper,
+  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+} from "@mui/material";
 import React, { useState } from "react";
 import { LootGroup } from "../types/FilterTypes";
 import { ArgbHexColor } from "../types/hexcolor";
@@ -49,6 +57,7 @@ export const CreateGroupComponent: React.FC<CreateGroupComponentProps> = ({
         }}
       >
         <TextField
+          sx={{ width: "15%" }}
           label="Group Name"
           value={newGroup.name}
           onChange={(e) => handleChange("name", e.target.value)}
@@ -73,6 +82,31 @@ export const CreateGroupComponent: React.FC<CreateGroupComponentProps> = ({
           labelText="Border"
           onChange={(color: ArgbHexColor) => handleChange("borderColor", color)}
         />
+        <FormControl sx={{ marginTop: "auto", marginBottom: "auto" }}>
+          <ToggleButtonGroup
+            sx={{ borderColor: "red" }}
+            exclusive={true}
+            orientation="vertical"
+            value={newGroup.beam ? "beam" : "no-beam"}
+            size="small"
+            onChange={(_, newValue) => {
+              handleChange("beam", newValue === "beam");
+            }}
+          >
+            <ToggleButton
+              sx={{ fontSize: "12px", padding: "4px" }}
+              value="beam"
+            >
+              Loot Beam
+            </ToggleButton>
+            <ToggleButton
+              sx={{ fontSize: "12px", padding: "4px" }}
+              value="no-beam"
+            >
+              No Loot Beam
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </FormControl>
         <Box sx={{ border: "3px solid black", backgroundColor: "#dddddd" }}>
           <ExampleItemLabel
             itemName={newGroup.name || "Example"}

@@ -1,14 +1,15 @@
 import { Stack } from "@mui/material";
 import React from "react";
-import { LootGroup } from "../types/FilterTypes";
+import { FilterConfig, LootGroup } from "../types/FilterTypes";
 import { CreateGroupComponent } from "./CreateGroupComponent";
 import { LootGroupComponent } from "./LootGroup";
 
 export const LootGroupList: React.FC<{
   groups: LootGroup[];
-  handleGroupUpdate: (groups: LootGroup[]) => void;
+  handleGroupUpdate: (updater: (config: FilterConfig) => FilterConfig) => void;
   handleCreateGroup: (group: LootGroup) => void;
 }> = ({ groups, handleGroupUpdate, handleCreateGroup }) => {
+  console.log("groups", groups);
   return (
     <Stack direction="column" spacing={2}>
       <CreateGroupComponent onCreateGroup={handleCreateGroup} />
@@ -16,25 +17,51 @@ export const LootGroupList: React.FC<{
         <LootGroupComponent
           key={index}
           index={index}
+          groupsLength={groups.length}
           group={group}
           onChange={(updatedGroup: LootGroup) => {
-            const newGroups = [...groups];
-            newGroups[index] = updatedGroup;
-            handleGroupUpdate(newGroups);
+            handleGroupUpdate((prev: FilterConfig) => {
+              const newGroups = [...prev.lootGroups];
+              newGroups[index] = updatedGroup;
+              return { ...prev, lootGroups: newGroups };
+            });
           }}
-          handleSortChange={(event, newIndex) => {
-            const newGroups = [...groups];
-            const removed = newGroups.splice(index, 1)[0];
-            if (event.ctrlKey || event.metaKey) {
-              const pos = newIndex < index ? 0 : newGroups.length;
-              newGroups.splice(pos, 0, removed);
-            } else if (event.shiftKey) {
-              const pos = newIndex < index ? index - 5 : index + 5;
-              newGroups.splice(pos, 0, removed);
-            } else {
-              newGroups.splice(newIndex, 0, removed);
+          handleSortChange={(event, direction) => {
+            const key =
+              event.ctrlKey || event.metaKey
+                ? "ctrl"
+                : event.shiftKey
+                  ? "shift"
+                  : "none";
+
+            let newIndex = index;
+
+            if (direction === "up") {
+              if (key === "ctrl") {
+                newIndex = 0;
+              } else if (key === "shift") {
+                newIndex = index - 5;
+              } else {
+                newIndex = index - 1;
+              }
+            } else if (direction === "down") {
+              if (key === "ctrl") {
+                newIndex = groups.length - 1;
+              } else if (key === "shift") {
+                newIndex = index + 5;
+              } else {
+                newIndex = index + 1;
+              }
             }
-            handleGroupUpdate(newGroups);
+
+            handleGroupUpdate((prev: FilterConfig) => {
+              const newGroups = [...prev.lootGroups];
+              const removed = newGroups.splice(index, 1)[0];
+              console.log(removed);
+              newGroups.splice(newIndex, 0, removed);
+              console.log(newGroups);
+              return { ...prev, lootGroups: newGroups };
+            });
           }}
         />
       ))}

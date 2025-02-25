@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'RuneScape';
-  src: url('./fonts/runescape.ttf') format('truetype');
+  src: url('../fonts/runescape.ttf') format('truetype');
 }
 
 :root {

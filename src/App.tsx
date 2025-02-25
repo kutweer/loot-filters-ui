@@ -91,11 +91,7 @@ export const App: React.FC<{ sha: string }> = ({ sha = "main" }) => {
             <Box sx={{ display: activeTab === 0 ? "block" : "none" }}>
               <LootGroupList
                 groups={configuration.lootGroups}
-                handleGroupUpdate={(groups: LootGroup[]) => {
-                  setConfiguration((config: FilterConfig) => {
-                    return { ...config, lootGroups: groups };
-                  });
-                }}
+                handleGroupUpdate={setConfiguration}
                 handleCreateGroup={handleCreateGroup}
               />
             </Box>
