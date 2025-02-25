@@ -1,6 +1,5 @@
 import preamble from "../filterscape/preamble.rs2f";
-import { FilterConfig, ItemConfig, LootGroup } from "../types/FilterTypes";
-import { ItemGroupMapping } from "../types/ItemGroupMapping";
+import { FilterConfig, LootGroup } from "../types/FilterTypes";
 import useSiteConfig from "../utils/devmode";
 
 const meta = (date: Date, sha: string) => {
@@ -40,7 +39,7 @@ export const renderLootGroup = ({
   const baseDef = `
 // LOOT GROUP: ${name}
 #define ${configName} { \
-    COLOR_FG_BR_BG("${foregroundColor}", "${borderColor}", "${backgroundColor}"); \
+    COLOR_FG_BR_BG("${foregroundColor}", "${borderColor}", "${backgroundColor}") \
     textAccent = 1; \
     showLootBeam = ${beam ? "true" : "false"}; \
     fontType = 2; \
@@ -52,7 +51,7 @@ export const renderLootGroup = ({
 #define VALUE_${configName} (_name) if (name:_name) ${configName}
 // For automatically defined value tiers of items
 #define VALUE_THRESHOLD_${configName} ${valueThreshold}
-if (value:> VALUE_THRESHOLD_${configName}) ${configName}`;
+if (value:>VALUE_THRESHOLD_${configName}) ${configName}`;
     sections.push(valueDef);
   }
 
@@ -60,15 +59,6 @@ if (value:> VALUE_THRESHOLD_${configName}) ${configName}`;
     const itemMatchText = item.matcher || item.name;
     sections.push(`VALUE_${configName} ("${itemMatchText}")`);
   });
-
-  // const itemDefs = items.map((item) => {
-  //   if (item.isUnique) {
-  //     return `UNIQUE_${configName} ("${item.itemExpr}")`;
-  //   } else {
-  //     return `VALUE_${configName} ("${item.itemExpr}")`;
-  //   }
-  // });
-  // sections.push(itemDefs.join("\n"));
 
   const endDef = `// END LOOT GROUP: ${name}`;
   sections.push(endDef);
