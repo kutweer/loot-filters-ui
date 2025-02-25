@@ -1,12 +1,12 @@
 import preamble from "../filterscape/preamble.rs2f";
-import { FilterConfig, LootGroup } from "../types/FilterTypes";
+import { FilterConfig, ItemConfig, LootGroup } from "../types/FilterTypes";
 import { ItemGroupMapping } from "../types/ItemGroupMapping";
 import useSiteConfig from "../utils/devmode";
 
 const meta = (date: Date, sha: string) => {
   return `meta {
-    name = "loot-filters/filterscape";
-    description = "Reference implementation of a loot filter, covering all major rares/uniques. Generated on ${date.toString()} with git SHA ${sha}.";
+    name = "kaqemeex/filterscape";
+    description = "An all in one loot filter for OSRS. Generated on ${date.toString()} with git SHA ${sha}.";
 }`.trim();
 };
 
@@ -31,7 +31,7 @@ export const renderLootGroup = ({
   beam,
   valueThreshold,
   items,
-}: LootGroup & { items: ItemGroupMapping[] }): string => {
+}: LootGroup): string => {
   const configName = checkUpperUnderscore(name)
     ? name
     : `LOOT_GROUP_${randCaps(4)}`;
@@ -56,6 +56,11 @@ if (value:> VALUE_THRESHOLD_${configName}) ${configName}`;
     sections.push(valueDef);
   }
 
+  (items || []).forEach((item) => {
+    const itemMatchText = item.matcher || item.name;
+    sections.push(`VALUE_${configName} ("${itemMatchText}")`);
+  });
+
   // const itemDefs = items.map((item) => {
   //   if (item.isUnique) {
   //     return `UNIQUE_${configName} ("${item.itemExpr}")`;
@@ -68,7 +73,7 @@ if (value:> VALUE_THRESHOLD_${configName}) ${configName}`;
   const endDef = `// END LOOT GROUP: ${name}`;
   sections.push(endDef);
 
-  return sections.join("\n\n");
+  return sections.join("\n");
 };
 
 export const renderFilter = (
@@ -85,7 +90,6 @@ export const renderFilter = (
     ...filterConfig.lootGroups
       .map((lg) => ({
         ...lg,
-        items: [],
       }))
       .map(renderLootGroup),
   ].join("\n\n");

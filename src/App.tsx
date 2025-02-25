@@ -13,7 +13,7 @@ import { MuiRsTheme } from "./styles/MuiTheme";
 const LOOT_FILTER_CONFIG_KEY = "loot-filter-config";
 
 export const App: React.FC<{ sha: string }> = ({ sha = "main" }) => {
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(1);
   const [siteConfig, setSiteConfig] = useSiteConfig();
   const [configuration, setConfiguration] = useState<FilterConfig>(
     JSON.parse(
@@ -97,10 +97,19 @@ export const App: React.FC<{ sha: string }> = ({ sha = "main" }) => {
             </Box>
 
             <Box sx={{ display: activeTab === 1 ? "block" : "none" }}>
-              <Typography>Copy and paste it for now.</Typography>
+              <Typography color="text.secondary">
+                Copy and paste it for now.
+              </Typography>
               <Editor
                 height="70vh"
                 language="cpp"
+                theme="vs-dark"
+                options={{
+                  minimap: {
+                    enabled: false,
+                  },
+                  readOnly: true,
+                }}
                 value={renderFilter(configuration, sha)}
               />
             </Box>
