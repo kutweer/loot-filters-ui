@@ -50,9 +50,9 @@ export const CreateGroupComponent: React.FC<CreateGroupComponentProps> = ({
     <Paper>
       <Box
         sx={{
-          padding: 2,
+          padding: 1,
           display: "flex",
-          gap: 2,
+          gap: 3,
           alignItems: "center",
         }}
       >
