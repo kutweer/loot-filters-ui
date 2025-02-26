@@ -73,7 +73,7 @@ export const renderFilter = (
   const [siteConfig, _] = useSiteConfig();
   return [
     "// META",
-    meta(filterConfig.date, sha),
+    meta(new Date(), sha),
     "// PREAMBLE",
     siteConfig.devMode ? "// Preamble Excluded" : preamble,
     "// LOOT GROUPS",

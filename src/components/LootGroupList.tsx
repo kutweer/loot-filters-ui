@@ -1,4 +1,4 @@
-import { Stack } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 import React from "react";
 import { FilterConfig, LootGroup } from "../types/FilterTypes";
 import { CreateGroupComponent } from "./CreateGroupComponent";
@@ -9,10 +9,12 @@ export const LootGroupList: React.FC<{
   handleGroupUpdate: (updater: (config: FilterConfig) => FilterConfig) => void;
   handleCreateGroup: (group: LootGroup) => void;
 }> = ({ groups, handleGroupUpdate, handleCreateGroup }) => {
-  console.log("groups", groups);
   return (
     <Stack direction="column" spacing={2}>
       <CreateGroupComponent onCreateGroup={handleCreateGroup} />
+      {groups.length === 0 && (
+        <Typography sx={{ textAlign: "center" }} variant="h4" color="text.secondary">Create a group to get started</Typography>
+      )}
       {groups.map((group, index) => (
         <LootGroupComponent
           key={index}
@@ -57,9 +59,7 @@ export const LootGroupList: React.FC<{
             handleGroupUpdate((prev: FilterConfig) => {
               const newGroups = [...prev.lootGroups];
               const removed = newGroups.splice(index, 1)[0];
-              console.log(removed);
               newGroups.splice(newIndex, 0, removed);
-              console.log(newGroups);
               return { ...prev, lootGroups: newGroups };
             });
           }}

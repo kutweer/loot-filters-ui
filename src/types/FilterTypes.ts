@@ -1,10 +1,10 @@
 import { ArgbHexColor } from "./hexcolor";
-import { ItemGroupMapping } from "./ItemGroupMapping";
 
 export type FilterConfig = {
-  date: Date;
+  name: string;
   lootGroups: LootGroup[];
   includePreamble: boolean;
+  active: boolean;
 };
 
 export type DisplayConfig = {

@@ -36,7 +36,6 @@ export const LootGroupComponent: React.FC<LootGroupProps> = ({
   handleSortChange,
 }) => {
   const handleChange = (field: keyof LootGroup, value: any) => {
-    console.log("handleChange", group.name, field, value);
     onChange({
       ...group,
       [field]: value,

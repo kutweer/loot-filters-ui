@@ -1,121 +1,80 @@
-import { Editor } from "@monaco-editor/react";
-import { Box, Container, Link, Tab, Tabs, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import { DEFAULT_CONFIG } from "./filterscape/Filterscape";
-import { renderFilter } from "./templating/RenderFilters";
-import { FilterConfig, LootGroup } from "./types/FilterTypes";
-import useSiteConfig from "./utils/devmode";
-import { LootGroupList } from "./components/LootGroupList";
+import { Container, Typography } from "@mui/material";
+import React from "react";
 
 import { ThemeProvider } from "@mui/material/styles";
+import { FilterConfigComponent } from "./components/FilterConfig";
+import { Header } from "./components/Header";
 import { MuiRsTheme } from "./styles/MuiTheme";
+import { LootFilterUiData, useStoredConfigs } from "./utils/dataStorage";
 
-const LOOT_FILTER_CONFIG_KEY = "loot-filter-config";
 
 export const App: React.FC<{ sha: string }> = ({ sha = "main" }) => {
-  const [activeTab, setActiveTab] = useState(0);
-  const [siteConfig, setSiteConfig] = useSiteConfig();
-  const [configuration, setConfiguration] = useState<FilterConfig>(
-    JSON.parse(
-      siteConfig.devMode
-        ? JSON.stringify(DEFAULT_CONFIG)
-        : localStorage.getItem(LOOT_FILTER_CONFIG_KEY) ||
-        JSON.stringify(DEFAULT_CONFIG),
-    ),
-  );
+  const [storedConfigs, setStoredConfigs] = useStoredConfigs();
 
-  if (!siteConfig.devMode) {
-    useEffect(() => {
-      localStorage.setItem(
-        LOOT_FILTER_CONFIG_KEY,
-        JSON.stringify(configuration),
-      );
-    }, [configuration]);
-  }
-
-  const handleCreateGroup = (newGroup: LootGroup) => {
-    setConfiguration((config: FilterConfig) => {
-      const groups = [newGroup, ...config.lootGroups];
-      return { ...configuration, lootGroups: groups };
-    });
-  };
 
   return (
     <ThemeProvider theme={MuiRsTheme}>
       <Container className="rs-container" maxWidth="lg">
-        <Box>
-          <Box
-            sx={{
-              padding: 1,
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography variant="h4" color="primary">
-              Loot Filter Builder
-              <Typography
-                sx={{ paddingLeft: "1em", display: "inline-block" }}
-                gutterBottom
-                variant="caption"
-              >
-                {siteConfig.devMode ? (
-                  <span className="rs-yellow-text">Development Mode</span>
-                ) : (
-                  <span className="rs-yellow-text">
-                    A Loot Filter builder for
-                    <Link
-                      target="_blank"
-                      href="https://github.com/riktenx/loot-filters"
-                    >
-                      RuneLite Loot Filters
-                    </Link>
-                  </span>
-                )}
-              </Typography>
-            </Typography>
-          </Box>
+        <Header
+          deleteConfig={(config) => {
+            setStoredConfigs((prev: LootFilterUiData) => {
+              console.log('deleting', config);
+              const newConfigs = prev.configs.filter((c) => c.name !== config.label);
+              return { ...prev, configs: newConfigs };
+            });
+          }}
+          data={storedConfigs}
+          filterConfigs={storedConfigs.configs.map((config) => ({
+            label: config.name,
+            inputValue: config.name,
+            active: config.active
+          }))}
+          setOrCreateNewActiveConfig={(config) => {
+            const name = config.label;
 
-          <Box sx={{ mt: 3, p: 2, borderRadius: 5 }}>
-            <Box sx={{ borderBottom: 1, mb: 2 }}>
-              <Tabs
-                value={activeTab}
-                onChange={(e, newValue) => setActiveTab(newValue)}
-                aria-label="filter tabs"
-              >
-                <Tab label="Filter Settings" />
-                <Tab label="Rendered Filter" />
-              </Tabs>
-            </Box>
+            setStoredConfigs((prev: LootFilterUiData) => {
+              // update active state of all configs
+              const configs = [...prev.configs.map((c) => ({
+                ...c,
+                active: c.name === name
+              }))];
 
-            <Box sx={{ display: activeTab === 0 ? "block" : "none" }}>
-              <LootGroupList
-                groups={configuration.lootGroups}
-                handleGroupUpdate={setConfiguration}
-                handleCreateGroup={handleCreateGroup}
-              />
-            </Box>
+              // if no active config, create a new one with the given name
+              if (configs.find((c) => c.active) == null) {
+                console.log('creating with', config);
+                const newConfig = {
+                  lootGroups: [],
+                  includePreamble: true,
+                  active: true,
+                  ...(config.sourceConfig ? { ...config.sourceConfig } : {}),
+                  name,
+                }
+                console.log('newConfig', newConfig);
+                configs.push(newConfig);
+              }
 
-            <Box sx={{ display: activeTab === 1 ? "block" : "none" }}>
-              <Typography color="text.secondary">
-                Copy and paste it for now.
-              </Typography>
-              <Editor
-                height="70vh"
-                language="cpp"
-                theme="vs-dark"
-                options={{
-                  minimap: {
-                    enabled: false,
-                  },
-                  readOnly: true,
-                }}
-                value={renderFilter(configuration, sha)}
-              />
-            </Box>
-          </Box>
-        </Box>
+              return { ...prev, configs };
+            });
+
+          }}
+        />
+        {
+          storedConfigs.configs.find((c) => c.active) != null ?
+            <FilterConfigComponent
+              setConfiguration={(updater) => {
+                setStoredConfigs(
+                  (prev: LootFilterUiData) => {
+                    const activeConfig = prev.configs.find((c) => c.active)!!;
+                    const configs = prev.configs.map((c) => (c.name === activeConfig.name ? updater(c) : c));
+                    return { ...prev, configs };
+                  });
+              }}
+              sha={sha}
+              configuration={storedConfigs.configs.find((c) => c.active)!!} />
+            : <Typography>No active config</Typography>
+        }
       </Container>
-    </ThemeProvider>
+    </ThemeProvider >
   );
 };
 

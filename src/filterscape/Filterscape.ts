@@ -204,7 +204,8 @@ const DEFAULT_LOOT_GROUPS: LootGroup[] = [
 ];
 
 export const DEFAULT_CONFIG: FilterConfig = {
+  name: "Default",
   lootGroups: DEFAULT_LOOT_GROUPS,
-  date: new Date(),
   includePreamble: false,
+  active: true
 };

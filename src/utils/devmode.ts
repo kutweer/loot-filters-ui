@@ -1,6 +1,10 @@
 import { SetStateAction, useState } from "react";
 
-const defaultConfig: Record<string, any> = {
+export type SiteConfig = {
+  devMode: boolean;
+};
+
+const defaultConfig: SiteConfig = {
   devMode: false,
 };
 
@@ -8,13 +12,7 @@ export const useSiteConfig = () => {
   const config = JSON.parse(
     localStorage.getItem("loot-filter-site-config") || "{}",
   );
-  const configWithDefaults = { ...config };
-
-  for (const key in defaultConfig) {
-    if (configWithDefaults[key] === undefined) {
-      configWithDefaults[key] = defaultConfig[key];
-    }
-  }
+  const configWithDefaults = { ...defaultConfig, ...config, };
 
   const [configState, setConfigState] = useState(configWithDefaults);
 
