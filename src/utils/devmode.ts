@@ -12,7 +12,7 @@ export const useSiteConfig = () => {
   const config = JSON.parse(
     localStorage.getItem("loot-filter-site-config") || "{}",
   );
-  const configWithDefaults = { ...defaultConfig, ...config, };
+  const configWithDefaults = { ...defaultConfig, ...config };
 
   const [configState, setConfigState] = useState(configWithDefaults);
 

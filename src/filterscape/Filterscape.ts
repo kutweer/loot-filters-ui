@@ -207,5 +207,5 @@ export const DEFAULT_CONFIG: FilterConfig = {
   name: "Default",
   lootGroups: DEFAULT_LOOT_GROUPS,
   includePreamble: false,
-  active: true
+  active: true,
 };

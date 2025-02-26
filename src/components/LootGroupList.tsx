@@ -13,7 +13,13 @@ export const LootGroupList: React.FC<{
     <Stack direction="column" spacing={2}>
       <CreateGroupComponent onCreateGroup={handleCreateGroup} />
       {groups.length === 0 && (
-        <Typography sx={{ textAlign: "center" }} variant="h4" color="text.secondary">Create a group to get started</Typography>
+        <Typography
+          sx={{ textAlign: "center" }}
+          variant="h4"
+          color="text.secondary"
+        >
+          Create a group to get started
+        </Typography>
       )}
       {groups.map((group, index) => (
         <LootGroupComponent
