@@ -5,7 +5,7 @@ import { DEFAULT_CONFIG } from "./filterscape/Filterscape";
 import { renderFilter } from "./templating/RenderFilters";
 import { FilterConfig, LootGroup } from "./types/FilterTypes";
 import useSiteConfig from "./utils/devmode";
-import { LootGroupList } from "./v2-components/LootGroupList";
+import { LootGroupList } from "./components/LootGroupList";
 
 import { ThemeProvider } from "@mui/material/styles";
 import { MuiRsTheme } from "./styles/MuiTheme";
@@ -26,7 +26,6 @@ export const App: React.FC<{ sha: string }> = ({ sha = "main" }) => {
 
   if (!siteConfig.devMode) {
     useEffect(() => {
-      console.log("hi");
       localStorage.setItem(
         LOOT_FILTER_CONFIG_KEY,
         JSON.stringify(configuration),
