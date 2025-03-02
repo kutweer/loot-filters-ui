@@ -1,7 +1,7 @@
 import { Editor } from "@monaco-editor/react";
 import { Box, Tab, Tabs, Typography } from "@mui/material";
 import { useState } from "react";
-import InputDevelopmentTab from "../inputDevelopment/InputDevelopmentTab";
+import InputDevelopmentTab from "../tabs/InputDevelopmentTab";
 import { renderFilter } from "../templating/RenderFilters";
 import { FilterConfig, LootGroup } from "../types/FilterTypes";
 import { SiteConfig } from "../utils/devmode";
