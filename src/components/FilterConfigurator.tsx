@@ -1,12 +1,13 @@
-import { Editor } from "@monaco-editor/react";
 import { Box, Tab, Tabs, Typography } from "@mui/material";
 import { useState } from "react";
-import InputDevelopmentTab from "../tabs/InputDevelopmentTab";
-import { SiteConfig } from "../utils/devmode";
 import { filter } from "underscore";
-import { RenderedFilterTab } from "../tabs/RenderedFilterTab";
+import { useLootFilterUiLocalStorage } from "../utils/dataStorage";
+import { SiteConfig } from "../utils/devmode";
+import { FilterSelector } from "./FilterSelector";
+import InputDevelopmentTab from "./tabs/InputDevelopmentTab";
+import { RenderedFilterTab } from "./tabs/RenderedFilterTab";
 
-export const FilterConfigComponent: React.FC<{
+export const FilterConfigurator: React.FC<{
   sha: string;
   siteConfig: SiteConfig;
 }> = ({ sha, siteConfig }) => {
@@ -48,8 +49,16 @@ export const FilterConfigComponent: React.FC<{
     (tab) => siteConfig.devMode || tab.dev === false
   );
 
+  const [lootFilterUiData, setLootFilterUiData] = useLootFilterUiLocalStorage();
+
   return (
     <Box sx={{ mt: 3, p: 2, borderRadius: 5 }}>
+      <Box>
+        <FilterSelector
+          lootFilterUiData={lootFilterUiData}
+          setLootFilterUiData={setLootFilterUiData}
+        />
+      </Box>
       <Tabs
         value={activeTab}
         onChange={(e, newValue) => setActiveTab(newValue)}

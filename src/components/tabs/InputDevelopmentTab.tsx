@@ -1,16 +1,5 @@
 import { Box, Container, Divider, Paper, Typography } from "@mui/material";
 import { useState } from "react";
-import { ItemLabelColorPicker } from "../components/inputs/ItemLabelColorPicker";
-import { LootBeamSwitch } from "../components/inputs/LootBeamSwitch";
-import {
-  BooleanRuleInput,
-  ItemIdRuleInput,
-  ItemNameRuleInput,
-  ItemNotedRuleInput,
-  ItemStackableRuleInput,
-  ItemTradeableRuleInput,
-  ItemValueRuleInput,
-} from "../components/inputs/LootRuleInputs";
 import {
   BooleanRule,
   ItemIdRule,
@@ -19,9 +8,20 @@ import {
   ItemStackableRule,
   ItemTradeableRule,
   ItemValueRule,
-} from "../types/FilterTypes2";
-import { ArgbHexColor } from "../types/hexcolor";
-import { ColorPickerInput } from "../components/inputs/ColorPicker";
+} from "../../types/FilterTypes2";
+import { ArgbHexColor } from "../../types/hexcolor";
+import { ColorPickerInput } from "../inputs/ColorPicker";
+import { ItemLabelColorPicker } from "../inputs/ItemLabelColorPicker";
+import { LootBeamSwitch } from "../inputs/LootBeamSwitch";
+import {
+  BooleanRuleInput,
+  ItemIdRuleInput,
+  ItemNameRuleInput,
+  ItemNotedRuleInput,
+  ItemStackableRuleInput,
+  ItemTradeableRuleInput,
+  ItemValueRuleInput,
+} from "../inputs/LootRuleInputs";
 
 const InputBox: React.FC<{ children?: React.ReactNode; title: string }> = ({
   children,
