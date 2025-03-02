@@ -3,6 +3,7 @@ import { createTheme } from "@mui/material";
 export const colors = {
   rsYellow: "#ffff00",
   rsOrange: "#ff9300",
+  rsDarkOrange: "#b2813d",
   rsDarkBrown: "#2c2721",
   rsLightDarkBrown: "#3d3429",
   rsLightBrown: "#564e43",
@@ -10,6 +11,8 @@ export const colors = {
   rsMediumBrown: "#4a4036",
   rsWhite: "#ffffff",
   rsBlack: "#000000",
+
+  rsGrey: "#808080",
 };
 
 const typography = {
@@ -19,15 +22,16 @@ const typography = {
 export const MuiRsTheme = createTheme({
   typography: {
     fontFamily: "RuneScape",
+    fontSize: 18,
   },
   palette: {
     primary: {
       main: colors.rsOrange,
-      contrastText: colors.rsWhite,
+      contrastText: colors.rsGrey,
     },
     secondary: {
-      main: colors.rsWhite,
-      contrastText: colors.rsYellow,
+      main: colors.rsYellow,
+      contrastText: colors.rsGrey,
     },
     background: {
       default: colors.rsDarkBrown,
@@ -36,7 +40,7 @@ export const MuiRsTheme = createTheme({
     divider: colors.rsWhite,
     text: {
       primary: colors.rsOrange,
-      secondary: colors.rsLighterBrown,
+      secondary: colors.rsDarkOrange,
       disabled: "#cccccc",
     },
     common: {

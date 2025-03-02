@@ -52,7 +52,7 @@ const ColorPicker: React.FC<{
               }}
             />
           </div>
-          <div style={{ fontFamily: "RuneScape", textAlign: "left" }}>
+          <div style={{ fontFamily: "RuneScape", textAlign: "left", fontSize: "1.2rem" }}>
             {labelText}
           </div>
         </div>

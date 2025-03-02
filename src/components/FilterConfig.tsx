@@ -1,10 +1,9 @@
-import { Box, Tab, Tabs, Typography } from "@mui/material";
-import { LootGroupList } from "./LootGroupList";
 import { Editor } from "@monaco-editor/react";
-import { renderFilter } from "../templating/RenderFilters";
+import { Box, Tab, Tabs, Typography } from "@mui/material";
 import { useState } from "react";
+import { renderFilter } from "../templating/RenderFilters";
 import { FilterConfig, LootGroup } from "../types/FilterTypes";
-import useSiteConfig from "../utils/devmode";
+import { LootGroupList } from "./LootGroupList";
 
 export const FilterConfigComponent: React.FC<{
   configuration: FilterConfig;
@@ -28,8 +27,8 @@ export const FilterConfigComponent: React.FC<{
           onChange={(e, newValue) => setActiveTab(newValue)}
           aria-label="filter tabs"
         >
-          <Tab label="Filter Settings" />
-          <Tab label="Rendered Filter" />
+          <Tab sx={{ fontSize: "1.2rem" }} label="Filter Settings" />
+          <Tab sx={{ fontSize: "1.2rem" }} label="Rendered Filter" />
         </Tabs>
       </Box>
 
