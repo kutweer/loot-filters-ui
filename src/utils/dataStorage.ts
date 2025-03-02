@@ -1,22 +1,22 @@
 import { useEffect, useState } from "react";
-import { DEFAULT_CONFIG } from "../filterscape/Filterscape";
-import { FilterConfig } from "../types/FilterTypes";
+import { LootFilter } from "../types/FilterTypes2";
 
 export const LOOT_FILTER_CONFIG_KEY = "loot-filter-configs";
 
 export type LootFilterUiData = {
-  configs: FilterConfig[];
+  configs: LootFilter[];
+  selectedFilterIndex?: number;
 };
 
 const loadConfigs = (): LootFilterUiData => {
   const data: LootFilterUiData = JSON.parse(
-    localStorage.getItem(LOOT_FILTER_CONFIG_KEY) || '{"configs": []}',
+    localStorage.getItem(LOOT_FILTER_CONFIG_KEY) || '{"configs": []}'
   );
 
   if (data.configs.length > 0) {
     return data;
   } else {
-    return { configs: [DEFAULT_CONFIG] };
+    return { configs: [], selectedFilterIndex: undefined };
   }
 };
 
@@ -24,7 +24,7 @@ const storeConfigs = (data: LootFilterUiData) => {
   localStorage.setItem(LOOT_FILTER_CONFIG_KEY, JSON.stringify(data));
 };
 
-export const useStoredConfigs: () => [
+export const useLootFilterUiLocalStorage: () => [
   LootFilterUiData,
   (updater: (prev: LootFilterUiData) => LootFilterUiData) => void,
 ] = () => {
