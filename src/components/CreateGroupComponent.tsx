@@ -11,8 +11,8 @@ import {
 import React, { useState } from "react";
 import { LootGroup } from "../types/FilterTypes";
 import { ArgbHexColor } from "../types/hexcolor";
-import { ColorPickerInput } from "./ColorPicker";
-import { ExampleItemLabel } from "./ExampleItemLabel";
+import { ColorPickerInput } from "./inputs/ColorPicker";
+import { ExampleItemLabel } from "./inputs/ExampleItemLabel";
 
 interface CreateGroupComponentProps {
   onCreateGroup: (group: LootGroup) => void;

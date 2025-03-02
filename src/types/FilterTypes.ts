@@ -7,6 +7,8 @@ export type FilterConfig = {
   active: boolean;
 };
 
+// TODO; replace with DisplayConfig2
+// Its just gonna break all the existing code everywhere
 export type DisplayConfig = {
   foregroundColor: ArgbHexColor;
   backgroundColor: ArgbHexColor;
