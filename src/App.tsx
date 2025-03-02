@@ -65,17 +65,7 @@ export const App: React.FC<{ sha: string }> = ({ sha = "main" }) => {
         {storedConfigs.configs.find((c) => c.active) != null ? (
           <FilterConfigComponent
             siteConfig={siteConfig}
-            setConfiguration={(updater) => {
-              setStoredConfigs((prev: LootFilterUiData) => {
-                const activeConfig = prev.configs.find((c) => c.active)!!;
-                const configs = prev.configs.map((c) =>
-                  c.name === activeConfig.name ? updater(c) : c,
-                );
-                return { ...prev, configs };
-              });
-            }}
             sha={sha}
-            configuration={storedConfigs.configs.find((c) => c.active)!!}
           />
         ) : (
           <Typography>No active config</Typography>
