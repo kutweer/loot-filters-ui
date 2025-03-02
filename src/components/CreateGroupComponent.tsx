@@ -2,10 +2,11 @@ import {
   Box,
   Button,
   FormControl,
+  FormControlLabel,
+  FormGroup,
   Paper,
+  Switch,
   TextField,
-  ToggleButton,
-  ToggleButtonGroup,
 } from "@mui/material";
 import React, { useState } from "react";
 import { LootGroup } from "../types/FilterTypes";
@@ -25,7 +26,7 @@ export const CreateGroupComponent: React.FC<CreateGroupComponentProps> = ({
     foregroundColor: "#FFFFFFFF" as ArgbHexColor,
     backgroundColor: "#FFFF22DD" as ArgbHexColor,
     borderColor: "#FFFFDD22" as ArgbHexColor,
-    beam: false,
+    beam: true,
     items: [],
   };
   const [newGroup, setNewGroup] = useState<LootGroup>(defaultState);
@@ -83,31 +84,15 @@ export const CreateGroupComponent: React.FC<CreateGroupComponentProps> = ({
           onChange={(color: ArgbHexColor) => handleChange("borderColor", color)}
         />
         <FormControl sx={{ marginTop: "auto", marginBottom: "auto" }}>
-          <ToggleButtonGroup
-            sx={{ borderColor: "red" }}
-            exclusive={true}
-            orientation="vertical"
-            value={newGroup.beam ? "beam" : "no-beam"}
-            size="small"
-            onChange={(_, newValue) => {
-              handleChange("beam", newValue === "beam");
-            }}
-          >
-            <ToggleButton
-              sx={{ fontSize: "12px", padding: "4px" }}
-              value="beam"
-            >
-              Loot Beam
-            </ToggleButton>
-            <ToggleButton
-              sx={{ fontSize: "12px", padding: "4px" }}
-              value="no-beam"
-            >
-              No Loot Beam
-            </ToggleButton>
-          </ToggleButtonGroup>
+          <FormGroup>
+            <FormControlLabel
+              control={<Switch checked={newGroup.beam} />}
+              onChange={(_, checked: boolean) => handleChange("beam", checked)}
+              label="Loot Beam"
+            />
+          </FormGroup>
         </FormControl>
-        <Box sx={{ border: "3px solid black", backgroundColor: "#dddddd" }}>
+        <Box sx={{ border: "3px solid black" }}>
           <ExampleItemLabel
             itemName={newGroup.name || "Example"}
             foregroundColor={newGroup.foregroundColor}
@@ -119,7 +104,7 @@ export const CreateGroupComponent: React.FC<CreateGroupComponentProps> = ({
           variant="contained"
           onClick={handleSubmit}
           disabled={newGroup.name.trim() === ""}
-          sx={{ marginLeft: "auto" }}
+          sx={{ color: "black", marginLeft: "auto" }}
         >
           Create Group
         </Button>

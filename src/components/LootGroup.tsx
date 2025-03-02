@@ -3,7 +3,10 @@ import {
   Box,
   Button,
   FormControl,
+  FormControlLabel,
+  FormGroup,
   Paper,
+  Switch,
   ToggleButton,
   ToggleButtonGroup,
   Tooltip,
@@ -24,7 +27,7 @@ interface LootGroupProps {
   onChange: any;
   handleSortChange: (
     event: React.MouseEvent<HTMLElement>,
-    direction: "up" | "down",
+    direction: "up" | "down"
   ) => void;
 }
 
@@ -81,29 +84,13 @@ export const LootGroupComponent: React.FC<LootGroupProps> = ({
           onChange={(color: ArgbHexColor) => handleChange("borderColor", color)}
         />
         <FormControl sx={{ marginTop: "auto", marginBottom: "auto" }}>
-          <ToggleButtonGroup
-            sx={{ borderColor: "red" }}
-            exclusive={true}
-            orientation="vertical"
-            value={group.beam ? "beam" : "no-beam"}
-            size="small"
-            onChange={(_, newValue) => {
-              handleChange("beam", newValue === "beam");
-            }}
-          >
-            <ToggleButton
-              sx={{ fontSize: "12px", padding: "4px" }}
-              value="beam"
-            >
-              Loot Beam
-            </ToggleButton>
-            <ToggleButton
-              sx={{ fontSize: "12px", padding: "4px" }}
-              value="no-beam"
-            >
-              No Loot Beam
-            </ToggleButton>
-          </ToggleButtonGroup>
+          <FormGroup>
+            <FormControlLabel
+              control={<Switch checked={group.beam} />}
+              onChange={(_, checked: boolean) => handleChange("beam", checked)}
+              label="Loot Beam"
+            />
+          </FormGroup>
         </FormControl>
         <Box
           sx={{
