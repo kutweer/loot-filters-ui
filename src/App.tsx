@@ -6,14 +6,17 @@ import { FilterConfigComponent } from "./components/FilterConfig";
 import { Header } from "./components/Header";
 import { MuiRsTheme } from "./styles/MuiTheme";
 import { LootFilterUiData, useStoredConfigs } from "./utils/dataStorage";
+import useSiteConfig from "./utils/devmode";
 
 export const App: React.FC<{ sha: string }> = ({ sha = "main" }) => {
   const [storedConfigs, setStoredConfigs] = useStoredConfigs();
-
+  const [siteConfig, setSiteConfig] = useSiteConfig();
   return (
     <ThemeProvider theme={MuiRsTheme}>
       <Container className="rs-container" maxWidth="lg">
         <Header
+          siteConfig={siteConfig}
+          setSiteConfig={setSiteConfig}
           deleteConfig={(config) => {
             setStoredConfigs((prev: LootFilterUiData) => {
               console.log("deleting", config);
@@ -61,6 +64,7 @@ export const App: React.FC<{ sha: string }> = ({ sha = "main" }) => {
         />
         {storedConfigs.configs.find((c) => c.active) != null ? (
           <FilterConfigComponent
+            siteConfig={siteConfig}
             setConfiguration={(updater) => {
               setStoredConfigs((prev: LootFilterUiData) => {
                 const activeConfig = prev.configs.find((c) => c.active)!!;

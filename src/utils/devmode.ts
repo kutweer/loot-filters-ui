@@ -2,17 +2,25 @@ import { SetStateAction, useState } from "react";
 
 export type SiteConfig = {
   devMode: boolean;
+  isLocal: boolean;
 };
 
 const defaultConfig: SiteConfig = {
   devMode: false,
+  isLocal: false,
 };
 
-export const useSiteConfig = () => {
+export const useSiteConfig = (): [
+  SiteConfig,
+  (action: SetStateAction<SiteConfig>) => void,
+] => {
   const config = JSON.parse(
-    localStorage.getItem("loot-filter-site-config") || "{}",
+    localStorage.getItem("loot-filter-site-config") || "{}"
   );
-  const configWithDefaults = { ...defaultConfig, ...config };
+  const isLocal =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+  const configWithDefaults = { ...defaultConfig, ...config, isLocal };
 
   const [configState, setConfigState] = useState(configWithDefaults);
 
@@ -24,7 +32,7 @@ export const useSiteConfig = () => {
       setConfigState(newConfig);
       localStorage.setItem(
         "loot-filter-site-config",
-        JSON.stringify(newConfig),
+        JSON.stringify(newConfig)
       );
     },
   ];

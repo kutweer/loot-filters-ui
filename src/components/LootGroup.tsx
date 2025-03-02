@@ -2,11 +2,7 @@ import { Edit, KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 import {
   Box,
   Button,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
   Paper,
-  Switch,
   ToggleButton,
   ToggleButtonGroup,
   Tooltip,
@@ -15,9 +11,9 @@ import {
 import React, { useState } from "react";
 import { LootGroup } from "../types/FilterTypes";
 import { ArgbHexColor } from "../types/hexcolor";
-import { ColorPickerInput } from "./ColorPicker";
 import { EditLootGroupDialog } from "./EditLootGroupDialog";
-import { ExampleItemLabel } from "./ExampleItemLabel";
+import { ItemLabelColorPicker } from "./inputs/ItemLabelColorPicker";
+import { LootBeamSwitch } from "./inputs/LootBeamSwitch";
 import { MappedItemAccordion } from "./MappedItemAccordion";
 
 interface LootGroupProps {
@@ -64,49 +60,24 @@ export const LootGroupComponent: React.FC<LootGroupProps> = ({
         >
           {group.name}
         </Typography>
-        <ColorPickerInput
-          color={group.foregroundColor}
-          labelText="Text Color"
-          onChange={(color: ArgbHexColor) =>
+        <LootBeamSwitch
+          beam={group.beam}
+          onChange={(beam: boolean) => handleChange("beam", beam)}
+        />
+        <ItemLabelColorPicker
+          textColor={group.foregroundColor}
+          backgroundColor={group.backgroundColor}
+          borderColor={group.borderColor}
+          textColorOnChange={(color: ArgbHexColor) =>
             handleChange("foregroundColor", color)
           }
-        />
-        <ColorPickerInput
-          color={group.backgroundColor}
-          labelText="Background"
-          onChange={(color: ArgbHexColor) =>
+          backgroundColorOnChange={(color: ArgbHexColor) =>
             handleChange("backgroundColor", color)
           }
+          borderColorOnChange={(color: ArgbHexColor) =>
+            handleChange("borderColor", color)
+          }
         />
-        <ColorPickerInput
-          color={group.borderColor}
-          labelText="Border"
-          onChange={(color: ArgbHexColor) => handleChange("borderColor", color)}
-        />
-        <FormControl sx={{ marginTop: "auto", marginBottom: "auto" }}>
-          <FormGroup>
-            <FormControlLabel
-              control={<Switch checked={group.beam} />}
-              onChange={(_, checked: boolean) => handleChange("beam", checked)}
-              label="Loot Beam"
-            />
-          </FormGroup>
-        </FormControl>
-        <Box
-          sx={{
-            border: "3px solid black",
-            backgroundColor: "#dddddd",
-            marginTop: "5px",
-            height: "80%",
-          }}
-        >
-          <ExampleItemLabel
-            itemName={group.name}
-            foregroundColor={group.foregroundColor}
-            backgroundColor={group.backgroundColor}
-            borderColor={group.borderColor}
-          />
-        </Box>
         <Button
           sx={{ marginTop: "auto", marginBottom: "auto", marginLeft: "auto" }}
           size="small"

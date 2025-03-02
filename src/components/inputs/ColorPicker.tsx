@@ -1,11 +1,11 @@
-import { FormControl } from "@mui/material";
+import { FormControl, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { RGBColor, SketchPicker } from "react-color";
 import {
   ArgbHexColor,
   argbHexColorToRGBColor,
   rGBColorToArgbHex,
-} from "../types/hexcolor";
+} from "../../types/hexcolor";
 
 const ColorPicker: React.FC<{
   color: ArgbHexColor;
@@ -52,9 +52,15 @@ const ColorPicker: React.FC<{
               }}
             />
           </div>
-          <div style={{ fontFamily: "RuneScape", textAlign: "left", fontSize: "1.2rem" }}>
+          <Typography
+            style={{
+              fontFamily: "RuneScape",
+              textAlign: "left",
+              fontSize: "1.2rem",
+            }}
+          >
             {labelText}
-          </div>
+          </Typography>
         </div>
       </div>
       {displayColorPicker ? (

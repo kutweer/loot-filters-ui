@@ -8,11 +8,15 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
   InputLabel,
   Link,
   List,
   ListItemButton,
   ListItemText,
+  Switch,
   TextField,
   Typography,
 } from "@mui/material";
@@ -20,6 +24,7 @@ import { useEffect, useState } from "react";
 import { colors } from "../styles/MuiTheme";
 import { FilterConfig } from "../types/FilterTypes";
 import { LootFilterUiData } from "../utils/dataStorage";
+import useSiteConfig, { SiteConfig } from "../utils/devmode";
 
 const filter = createFilterOptions<LootFilterConfigOption>();
 
@@ -35,13 +40,15 @@ export const Header: React.FC<{
   data: LootFilterUiData;
   filterConfigs: LootFilterConfigOption[];
   setOrCreateNewActiveConfig: (
-    config: LootFilterConfigOption & { sourceConfig?: FilterConfig },
+    config: LootFilterConfigOption & { sourceConfig?: FilterConfig }
   ) => void;
   deleteConfig: (config: LootFilterConfigOption) => void;
-}> = ({ data, deleteConfig, filterConfigs, setOrCreateNewActiveConfig }) => {
+  siteConfig: SiteConfig;
+  setSiteConfig: (config: SiteConfig) => void;
+}> = ({ data, deleteConfig, filterConfigs, setOrCreateNewActiveConfig, siteConfig, setSiteConfig }) => {
   const activeConfig = filterConfigs.find((c) => c.active);
   const [value, setValue] = useState<LootFilterConfigOption | null>(
-    activeConfig ?? filterConfigs[0],
+    activeConfig ?? filterConfigs[0]
   );
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newFilterName, setNewFilterName] = useState("");
@@ -60,7 +67,7 @@ export const Header: React.FC<{
 
   const handleCopyFilter = (sourceName: string) => {
     const sourceConfig = data.configs.find(
-      (group) => group.name === sourceName,
+      (group) => group.name === sourceName
     );
 
     setOrCreateNewActiveConfig({
@@ -112,6 +119,20 @@ export const Header: React.FC<{
             </span>
           </Typography>
         </Typography>
+        {siteConfig.isLocal ? (
+          <FormControl >
+            <FormGroup>
+              <FormControlLabel
+                sx={{ color: colors.rsYellow }}
+                control={<Switch checked={siteConfig.devMode} />}
+                onChange={(_, checked: boolean) =>
+                  setSiteConfig({ ...siteConfig, devMode: checked })
+                }
+                label="Dev Mode"
+              />
+            </FormGroup>
+          </FormControl>
+        ) : null}
         <Box sx={{ marginLeft: "auto" }}>
           <Button
             variant="outlined"
@@ -191,7 +212,7 @@ export const Header: React.FC<{
             const { inputValue } = params;
             // Suggest the creation of a new value
             const isExisting = options.some(
-              (option) => inputValue === option.label,
+              (option) => inputValue === option.label
             );
             if (inputValue !== "" && !isExisting) {
               filtered.push({
