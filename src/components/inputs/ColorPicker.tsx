@@ -5,13 +5,15 @@ import {
   ArgbHexColor,
   argbHexColorToRGBColor,
   rGBColorToArgbHex,
-} from "../../types/hexcolor";
+} from "../../types/Color";
 
 const ColorPicker: React.FC<{
   color: ArgbHexColor;
   onChange: (color: ArgbHexColor) => void;
   labelText: string;
-}> = ({ color, onChange, labelText }) => {
+  labelLocation: "right" | "bottom";
+  disabled: boolean;
+}> = ({ color, onChange, labelText, labelLocation, disabled }) => {
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
 
   const handleClick = (displayColor: boolean) => {
@@ -31,7 +33,9 @@ const ColorPicker: React.FC<{
   return (
     <div>
       <div>
-        <div>
+        <div
+          style={labelLocation == "right" ? { display: "flex", gap: 2 } : {}}
+        >
           <div
             style={{
               padding: "5px",
@@ -39,16 +43,22 @@ const ColorPicker: React.FC<{
               borderRadius: "1px",
               boxShadow: "0 0 0 1px rgba(0,0,0,.1)",
               display: "inline-block",
-              cursor: "pointer",
+              cursor: disabled ? "not-allowed" : "pointer",
             }}
-            onClick={() => handleClick(displayColorPicker)}
+            onClick={() => {
+              if (!disabled) {
+                handleClick(displayColorPicker);
+              }
+            }}
           >
             <div
               style={{
                 width: "36px",
-                height: "14px",
+                height: labelLocation == "right" ? "100%" : "14px",
                 borderRadius: "2px",
-                background: `rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, ${displayColor.a})`,
+                background: disabled
+                  ? "#cccccc"
+                  : `rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, ${displayColor.a})`,
               }}
             />
           </div>
@@ -56,8 +66,9 @@ const ColorPicker: React.FC<{
             style={{
               fontFamily: "RuneScape",
               textAlign: "left",
-              fontSize: "1.2rem",
+              marginLeft: labelLocation == "right" ? "10px" : "0px",
             }}
+            color={disabled ? "#cccccc" : "inherit"}
           >
             {labelText}
           </Typography>
@@ -89,10 +100,18 @@ const ColorPickerInput: React.FC<{
   color: ArgbHexColor;
   labelText: string;
   onChange: (color: ArgbHexColor) => void;
-}> = ({ color, onChange, labelText }) => {
+  labelLocation?: "right" | "bottom";
+  disabled?: boolean;
+}> = ({ color, onChange, labelText, labelLocation = "bottom", disabled }) => {
   return (
     <FormControl sx={{ marginTop: "auto", marginBottom: "auto" }}>
-      <ColorPicker labelText={labelText} color={color} onChange={onChange} />
+      <ColorPicker
+        labelLocation={labelLocation}
+        labelText={labelText}
+        color={color}
+        onChange={onChange}
+        disabled={disabled || false}
+      />
     </FormControl>
   );
 };

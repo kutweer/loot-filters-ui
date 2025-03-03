@@ -1,5 +1,6 @@
 import { Box, Container, Divider, Paper, Typography } from "@mui/material";
 import { useState } from "react";
+import { ArgbHexColor } from "../../types/Color";
 import {
   BooleanRule,
   ItemIdRule,
@@ -9,7 +10,6 @@ import {
   ItemTradeableRule,
   ItemValueRule,
 } from "../../types/FilterTypes2";
-import { ArgbHexColor } from "../../types/hexcolor";
 import { ColorPickerInput } from "../inputs/ColorPicker";
 import { ItemLabelColorPicker } from "../inputs/ItemLabelColorPicker";
 import { LootBeamSwitch } from "../inputs/LootBeamSwitch";
@@ -45,6 +45,8 @@ const InputDevelopmentTab: React.FC = () => {
   const [backgroundColor, setBackgroundColor] =
     useState<ArgbHexColor>("#FFCCCCCC");
   const [borderColor, setBorderColor] = useState<ArgbHexColor>("#FF02F201");
+  const [menuTextColor, setMenuTextColor] = useState<ArgbHexColor>("#FF000000");
+
 
   const [itemNameRule, setItemNameRule] = useState<ItemNameRule>({
     type: "name",
@@ -110,14 +112,16 @@ const InputDevelopmentTab: React.FC = () => {
         </InputBox>
 
         <InputBox title="Item Label Color Picker">
-          <ItemLabelColorPicker
+          {/* <ItemLabelColorPicker
             textColor={textColor}
             backgroundColor={backgroundColor}
             borderColor={borderColor}
+            menuTextColor={menuTextColor}
             textColorOnChange={setTextColor}
             backgroundColorOnChange={setBackgroundColor}
             borderColorOnChange={setBorderColor}
-          />
+            menuTextColorOnChange={setMenuTextColor}
+          /> */}
         </InputBox>
 
         <InputBox title="Item Name Rule Input">

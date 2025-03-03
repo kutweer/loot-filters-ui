@@ -1,4 +1,4 @@
-import { ArgbHexColor } from "./hexcolor";
+import { ArgbHexColor } from "./Color";
 
 export type FilterConfig = {
   name: string;
