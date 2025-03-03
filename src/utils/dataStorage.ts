@@ -1,38 +1,85 @@
 import { useEffect, useState } from "react";
-import { LootFilter } from "../types/FilterTypes2";
+import { filterscape } from "../filterscape/Filterscape";
+import { Rs2fModule } from "../types/Rs2fModule";
 
 export const LOOT_FILTER_CONFIG_KEY = "loot-filter-configs";
 
-export type LootFilterUiData = {
-  configs: LootFilter[];
+export type Filter = {
+  name: string;
+  modules: Rs2fModule[];
+};
+
+export type StoredData = {
+  filters: Filter[];
   selectedFilterIndex?: number;
 };
 
-const loadConfigs = (): LootFilterUiData => {
-  const data: LootFilterUiData = JSON.parse(
-    localStorage.getItem(LOOT_FILTER_CONFIG_KEY) || '{"configs": []}'
-  );
+const defaultData: StoredData = {
+  filters: [filterscape],
+  selectedFilterIndex: undefined,
+};
 
-  if (data.configs.length > 0) {
-    return data;
+const loadConfigs = (): StoredData => {
+  const localData = localStorage.getItem(LOOT_FILTER_CONFIG_KEY);
+  if (!localData) {
+    return defaultData;
   } else {
-    return { configs: [], selectedFilterIndex: undefined };
+    const data: StoredData = JSON.parse(localData);
+    return { ...defaultData, ...data };
   }
 };
 
-const storeConfigs = (data: LootFilterUiData) => {
+const storeConfigs = (data: StoredData) => {
   localStorage.setItem(LOOT_FILTER_CONFIG_KEY, JSON.stringify(data));
 };
 
+export type StoredDataUpdater = (
+  updater: (prev: StoredData) => StoredData
+) => void;
+
+export const updateOneFilter = (
+  storedDataUpdater: StoredDataUpdater,
+  filterName: string,
+  filterUpdater: (prev: Filter) => Filter
+) => {
+  storedDataUpdater((prevStoredData) => {
+    return {
+      ...prevStoredData,
+      filters: prevStoredData.filters.map((filter) => {
+        if (filter.name === filterName) {
+          const updated = filterUpdater(filter);
+          return updated;
+        } else {
+          return filter;
+        }
+      }),
+    };
+  });
+};
+
 export const useLootFilterUiLocalStorage: () => [
-  LootFilterUiData,
-  (updater: (prev: LootFilterUiData) => LootFilterUiData) => void,
+  StoredData,
+  Filter,
+  StoredDataUpdater,
 ] = () => {
-  const [data, setData] = useState<LootFilterUiData>(loadConfigs());
+  const [data, setData] = useState<StoredData>(loadConfigs());
+  const [activeFilter, setActiveFilter] = useState<Filter>(
+    data.selectedFilterIndex
+      ? data.filters[data.selectedFilterIndex]
+      : data.filters[0]
+  );
 
   useEffect(() => {
     storeConfigs(data);
   }, [data]);
 
-  return [data, setData];
+  useEffect(() => {
+    setActiveFilter(
+      data.selectedFilterIndex
+        ? data.filters[data.selectedFilterIndex]
+        : data.filters[0]
+    );
+  }, [data.selectedFilterIndex]);
+
+  return [data, activeFilter, setData];
 };

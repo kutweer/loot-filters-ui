@@ -1,6 +1,6 @@
 // Needs to match the display config in the plugin. All display features should be supported.
 
-import { ArgbHexColor } from "./hexcolor";
+import { ArgbHexColor } from "./Color";
 
 // https://github.com/riktenx/loot-filters/blob/main/src/main/java/com/lootfilters/DisplayConfig.java
 type DisplayConfig = {
@@ -117,19 +117,19 @@ type ItemTradeableRule = {
   tradeable: boolean;
 };
 
-export { TextAccent, FontType };
+export { FontType, TextAccent };
 
 export type {
-  DisplayConfig,
-  LootFilter,
-  LootGroup,
-  LootTarget,
-  LootRule,
   BooleanRule,
-  ItemNameRule,
+  DisplayConfig,
   ItemIdRule,
-  ItemValueRule,
+  ItemNameRule,
   ItemNotedRule,
   ItemStackableRule,
   ItemTradeableRule,
+  ItemValueRule,
+  LootFilter,
+  LootGroup,
+  LootRule,
+  LootTarget,
 };
