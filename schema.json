@@ -1,0 +1,308 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "description": "the definition of the API for Loot-Filter-Ui filter definitions",
+  "type": "object",
+  "anyOf": [
+    {
+      "type": "object",
+      "$ref": "#/module"
+    },
+    {
+      "type": "object",
+      "$ref": "#/filter"
+    }
+  ],
+  "module": {
+    "type": "object",
+    "properties": {
+      "type": { "const": "module" },
+      "name": {
+        "type": "string",
+        "description": "Display name of the module"
+      },
+      "inputs": {
+        "type": "array",
+        "items": {
+          "anyOf": [
+            { "$ref": "#/$defs/booleanInput" },
+            { "$ref": "#/$defs/enumlistInput" },
+            { "$ref": "#/$defs/includeExcludeListInput" },
+            { "$ref": "#/$defs/stringlistInput" },
+            { "$ref": "#/$defs/styleInput" },
+            { "$ref": "#/$defs/valueInput" }
+          ]
+        }
+      }
+    },
+    "required": ["name", "inputs"]
+  },
+  "filter": {
+    "type": "object",
+    "properties": {
+      "type": { "const": "filter" },
+      "name": {
+        "type": "string",
+        "description": "Display name of the filter"
+      },
+      "description": {
+        "type": "string",
+        "description": "Description of the filter"
+      },
+      "modules": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "description": "A reference to a module",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Name of the module"
+                },
+                "moduleJsonUrl": {
+                  "type": "string",
+                  "description": "The url of the module json file"
+                },
+                "moduleRs2fUrl": {
+                  "type": "string",
+                  "description": "The url of the module rs2f file"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Name of the module"
+                },
+                "moduleJson": {
+                  "type": "object",
+                  "$ref": "#/topLevelDefinitions/module"
+                },
+                "moduleRs2fUrl": {
+                  "type": "string",
+                  "description": "The rs2f content of the module"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "required": ["name", "modules"]
+  },
+  "$defs": {
+    "inputDefinition": {
+      "type": "object",
+      "id": "schema:inputDefinition",
+      "required": ["type", "description", "macroName", "label"],
+      "properties": {
+        "type": { "type": "string" },
+        "description": {
+          "type": "string",
+          "description": "The description of the input"
+        },
+        "macroName": {
+          "type": "string",
+          "description": "The name of the rs2f macro where the itemlist will be templated in"
+        },
+        "label": {
+          "type": "string",
+          "description": "The label the UI will display for this input"
+        },
+        "group": {
+          "type": "string",
+          "description": "[Optional] Used to group inputs together in the UI"
+        }
+      }
+    },
+    "includeExcludeListInput": {
+      "type": "object",
+      "id": "schema:includeExcludeListInput",
+      "allOf": [{ "$ref": "#/$defs/inputDefinition" }],
+      "required": ["type", "description", "macroName", "label", "defaults"],
+      "properties": {
+        "type": { "const": "includeExcludeList" },
+        "unevaluatedProperties": false,
+        "defaults": {
+          "type": "object",
+          "properties": {
+            "includes": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "The default items to include in the list"
+            },
+            "excludes": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "The default items to exclude from the list"
+            }
+          }
+        }
+      }
+    },
+    "stringlistInput": {
+      "type": "object",
+      "id": "schema:stringListInput",
+      "allOf": [{ "$ref": "#/$defs/inputDefinition" }],
+      "required": ["type", "description", "macroName", "label", "defaults"],
+      "properties": {
+        "type": { "const": "stringlist" },
+        "unevaluatedProperties": false,
+        "defaults": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "The default value of the input in the UI"
+        }
+      }
+    },
+    "booleanInput": {
+      "type": "object",
+      "id": "schema:booleanInput",
+      "allOf": [{ "$ref": "#/$defs/inputDefinition" }],
+      "required": ["type", "description", "macroName", "label", "defaults"],
+      "properties": {
+        "type": { "const": "boolean" },
+        "unevaluatedProperties": false,
+        "defaults": {
+          "type": "boolean",
+          "description": "The default value of the input in the UI"
+        }
+      }
+    },
+    "valueInput": {
+      "type": "object",
+      "id": "schema:numberInput",
+      "allOf": [{ "$ref": "#/$defs/inputDefinition" }],
+      "required": ["type", "description", "macroName", "label", "defaults"],
+      "properties": {
+        "type": { "const": "value" },
+        "unevaluatedProperties": false,
+        "defaults": {
+          "type": "number",
+          "description": "The default value of the input in the UI"
+        }
+      }
+    },
+    "enumlistInput": {
+      "type": "object",
+      "id": "schema:enumListInput",
+      "allOf": [{ "$ref": "#/$defs/inputDefinition" }],
+      "required": [
+        "type",
+        "description",
+        "macroName",
+        "label",
+        "defaults",
+        "enum"
+      ],
+      "properties": {
+        "type": { "const": "enumlist" },
+        "unevaluatedProperties": false,
+        "defaults": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "The default value of the input in the UI"
+          }
+        },
+        "enum": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "The id of the item"
+          }
+        }
+      }
+    },
+    "styleInput": {
+      "type": "object",
+      "id": "schema:styleInput",
+      "allOf": [{ "$ref": "#/$defs/inputDefinition" }],
+      "required": ["type", "description", "macroName", "label", "defaults"],
+      "properties": {
+        "type": { "const": "style" },
+        "unevaluatedProperties": false,
+
+        "defaults": {
+          "type": "object",
+          "properties": {
+            "textColor": {
+              "type": "string",
+              "description": "The text color in ARGB hex format"
+            },
+            "backgroundColor": {
+              "type": "string",
+              "description": "The background color in ARGB hex format"
+            },
+            "borderColor": {
+              "type": "string",
+              "description": "The border color in ARGB hex format"
+            },
+            "hidden": {
+              "type": "boolean",
+              "description": "Whether the item is hidden"
+            },
+            "showLootbeam": {
+              "type": "boolean",
+              "description": "Whether to show a lootbeam"
+            },
+            "showValue": {
+              "type": "boolean",
+              "description": "Whether to show the item value"
+            },
+            "showDespawn": {
+              "type": "boolean",
+              "description": "Whether to show despawn timer"
+            },
+            "notify": {
+              "type": "boolean",
+              "description": "Whether to show notifications"
+            },
+            "textAccent": {
+              "type": "string",
+              "enum": ["use filter", "shadow", "outline", "none"],
+              "description": "The text accent style"
+            },
+            "textAccentColor": {
+              "type": "string",
+              "description": "The text accent color in ARGB hex format"
+            },
+            "lootbeamColor": {
+              "type": "string",
+              "description": "The lootbeam color in ARGB hex format"
+            },
+            "fontType": {
+              "type": "string",
+              "enum": ["use filter", "normal", "larger"],
+              "description": "The font type"
+            },
+            "menuTextColor": {
+              "type": "string",
+              "description": "The menu text color in ARGB hex format"
+            },
+            "hideOverlay": {
+              "type": "boolean",
+              "description": "Whether to hide the overlay"
+            },
+            "highlightTile": {
+              "type": "boolean",
+              "description": "Whether to highlight the tile"
+            },
+            "tileStrokeColor": {
+              "type": "string",
+              "description": "The tile stroke color in ARGB hex format"
+            },
+            "tileFillColor": {
+              "type": "string",
+              "description": "The tile fill color in ARGB hex format"
+            }
+          }
+        }
+      }
+    }
+  }
+}
