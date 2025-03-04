@@ -1,5 +1,5 @@
 {
-  "$schema": "https://json-schema.org/draft-07/schema",
+  "$schema": "http://json-schema.org/draft-07/schema",
   "description": "the definition of the API for Loot-Filter-Ui filter definitions",
   "type": "object",
   "anyOf": [
