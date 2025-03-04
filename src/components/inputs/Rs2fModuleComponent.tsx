@@ -1,14 +1,10 @@
-import {
-  Box,
-  Stack,
-  Typography,
-} from "@mui/material";
-import { Rs2fModule, Rs2fModuleInput } from "../../types/Rs2fModule";
+import { Box, Stack, Typography } from "@mui/material";
+import { FilterModule, ModuleInput } from "../../types/FilterModule";
 import { DisplayConfigurationInput } from "./DisplayConfigurationInput";
 
 const getInputComponent = (
-  input: Rs2fModuleInput,
-  onChange: (input: Rs2fModuleInput) => void
+  input: ModuleInput,
+  onChange: (input: ModuleInput) => void
 ): React.ReactNode => {
   switch (input.type) {
     case "itemlist":
@@ -21,8 +17,8 @@ const getInputComponent = (
 };
 
 const Rs2fInputComponent: React.FC<{
-  input: Rs2fModuleInput;
-  onChange: (input: Rs2fModuleInput) => void;
+  input: ModuleInput;
+  onChange: (input: ModuleInput) => void;
 }> = ({ input, onChange }) => {
   const component = getInputComponent(input, onChange);
 
@@ -37,8 +33,8 @@ const Rs2fInputComponent: React.FC<{
 };
 
 export const Rs2fModuleComponent: React.FC<{
-  module: Rs2fModule;
-  onChange: (module: Rs2fModule) => void;
+  module: FilterModule;
+  onChange: (module: FilterModule) => void;
 }> = ({ module, onChange }) => {
   return (
     <Box>
@@ -53,7 +49,9 @@ export const Rs2fModuleComponent: React.FC<{
             onChange={(input) =>
               onChange({
                 ...module,
-                input: module.input.map((i) => i.name === input.name ? input : i),
+                input: module.input.map((i) =>
+                  i.name === input.name ? input : i
+                ),
               })
             }
           />

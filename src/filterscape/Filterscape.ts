@@ -1,6 +1,6 @@
-import { Rs2fModule } from "../types/Rs2fModule";
+import { FilterModule } from "../types/FilterModule";
 
-const cluesModule: Rs2fModule = {
+const cluesModule: FilterModule = {
   name: "Clues",
   input: [
     {
@@ -49,9 +49,19 @@ const cluesModule: Rs2fModule = {
   ],
 };
 
-const filterscapeModules = [cluesModule];
-
-export const filterscape = {
-  name: "Filterscape",
-  modules: filterscapeModules,
-};
+// export const filterscape: Rs2fFilter = {
+//   name: "Filterscape",
+//   description: "Filterscape is a filter that filters items based on the item list and style.",
+//   modules: [
+//     {
+//       name: "Clues",
+//       moduleJson: "https://raw.githubusercontent.com/riktenx/filterscape/refs/heads/main/clue/mod_clue.json",
+//       rs2f: "https://raw.githubusercontent.com/riktenx/filterscape/refs/heads/main/clue/mod_clue.rs2f",
+//     },
+//     {
+//       name: "Herb",
+//       moduleUrl: "https://raw.githubusercontent.com/riktenx/filterscape/refs/heads/main/herb/module.json",
+//       rs2fUrl: "https://raw.githubusercontent.com/riktenx/filterscape/refs/heads/main/herb/module.rsf2",
+//     },
+//   ],
+// };

@@ -9,17 +9,17 @@ import {
   Grid2 as Grid,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { ArgbHexColor } from "../../types/Color";
-import { FontType, TextAccent } from "../../types/FilterTypes2";
-import { Rs2fModuleInput } from "../../types/Rs2fModule";
+import { ModuleInput } from "../../types/FilterModule";
+import { FontType, TextAccent } from "../../types/FilterTypes";
+import { ArgbHexColor } from "../../utils/Color";
 import { useSiteConfig } from "../../utils/devmode";
+import { ItemLabelPreview, ItemMenuPreview } from "../Previews";
 import { ColorPickerInput } from "./ColorPicker";
-import { ExampleItemLabel, ExampleItemMenu } from "./ExampleItem";
 import { ItemLabelColorPicker } from "./ItemLabelColorPicker";
 
 export const DisplayConfigurationInput: React.FC<{
-  input: Rs2fModuleInput;
-  onChange: (input: Rs2fModuleInput) => void;
+  input: ModuleInput;
+  onChange: (input: ModuleInput) => void;
 }> = ({ input, onChange }) => {
   if (input.type !== "style") {
     throw new Error("DisplayConfigurationInput only supports style inputs");
@@ -246,13 +246,13 @@ export const DisplayConfigurationInput: React.FC<{
     <Accordion defaultExpanded={siteConfig.devMode || false}>
       <AccordionSummary expandIcon={<ExpandMore />}>
         <Box sx={{ display: "flex", gap: 2 }}>
-          <ExampleItemLabel
+          <ItemLabelPreview
             itemName={input.label}
             foregroundColor={textColor}
             backgroundColor={backgroundColor}
             borderColor={borderColor}
           />
-          <ExampleItemMenu
+          <ItemMenuPreview
             itemName={input.label}
             menuTextColor={menuTextColor}
           />

@@ -1,11 +1,10 @@
-import { ArgbHexColor } from "./Color";
-import { FontType, TextAccent } from "./FilterTypes2";
+import { ArgbHexColor } from "../utils/Color";
+import { FontType, TextAccent } from "./FilterTypes";
 
-export type Rs2fModule = {
+export type FilterModule = {
   name: string;
-  input: Rs2fModuleInput[];
+  input: ModuleInput[];
 };
-
 
 export type inputTypes = {
   itemlist: {
@@ -33,7 +32,7 @@ export type inputTypes = {
   };
 };
 
-export type Rs2fModuleInput = {
+export type ModuleInput = {
   name: string;
   label: string;
 } & Partial<inputTypes[keyof inputTypes]>;

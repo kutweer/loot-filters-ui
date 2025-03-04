@@ -5,7 +5,6 @@ import { useLootFilterUiLocalStorage } from "../utils/dataStorage";
 import { SiteConfig } from "../utils/devmode";
 import { FilterSelector } from "./FilterSelector";
 import { CustomizeTab } from "./tabs/CustomizeTab";
-import InputDevelopmentTab from "./tabs/InputDevelopmentTab";
 import { RenderedFilterTab } from "./tabs/RenderedFilterTab";
 export const FilterTabs: React.FC<{
   sha: string;
@@ -32,16 +31,11 @@ export const FilterTabs: React.FC<{
         />
       ),
     },
-    {
-      label: "Rendered Filter",
-      dev: true,
-      component: <RenderedFilterTab sha={sha} />,
-    },
-    {
-      label: "Input Development",
-      dev: true,
-      component: <InputDevelopmentTab />,
-    },
+    // {
+    //   label: "Rendered Filter",
+    //   dev: true,
+    //   component: <RenderedFilterTab sha={sha} />,
+    // },
   ];
 
   const filteredTabs = filter(

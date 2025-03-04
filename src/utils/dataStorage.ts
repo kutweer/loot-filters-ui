@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { filterscape } from "../filterscape/Filterscape";
-import { Rs2fModule } from "../types/Rs2fModule";
+import { FilterModule } from "../types/FilterModule";
 
 export const LOOT_FILTER_CONFIG_KEY = "loot-filter-configs";
 
 export type Filter = {
   name: string;
-  modules: Rs2fModule[];
+  modules: FilterModule[];
 };
 
 export type StoredData = {
@@ -15,7 +14,7 @@ export type StoredData = {
 };
 
 const defaultData: StoredData = {
-  filters: [filterscape],
+  filters: [],
   selectedFilterIndex: undefined,
 };
 
