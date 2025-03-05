@@ -26,12 +26,12 @@
           "type": "array",
           "items": {
             "anyOf": [
-              { "$ref": "#/$defs/booleanInput" },
-              { "$ref": "#/$defs/enumlistInput" },
-              { "$ref": "#/$defs/includeExcludeListInput" },
-              { "$ref": "#/$defs/stringlistInput" },
-              { "$ref": "#/$defs/styleInput" },
-              { "$ref": "#/$defs/valueInput" }
+              { "$ref": "schema.json#/$defs/booleanInput" },
+              { "$ref": "schema.json#/$defs/enumListInput" },
+              { "$ref": "schema.json#/$defs/includeExcludeListInput" },
+              { "$ref": "schema.json#/$defs/stringlistInput" },
+              { "$ref": "schema.json#/$defs/styleInput" },
+              { "$ref": "schema.json#/$defs/numberInput" }
             ]
           }
         }
@@ -99,17 +99,23 @@
     "inputDefinition": {
       "type": "object",
       "$id": "schema:inputDefinition",
-      "required": ["type", "description", "macroName", "label"],
+      "required": ["type", "macroName", "label"],
+      "anyOf": [
+        {
+          "macroName": {
+            "type": "string",
+            "description": "The name of the rs2f macro where the itemlist will be templated in"
+          }
+        },
+        {
+          "macroName": {
+            "type": "object",
+            "description": "Allows some types like includeExcludeList to define custom definitions for macroName inputs"
+          }
+        }
+      ],
       "properties": {
         "type": { "type": "string" },
-        "description": {
-          "type": "string",
-          "description": "The description of the input"
-        },
-        "macroName": {
-          "type": "string",
-          "description": "The name of the rs2f macro where the itemlist will be templated in"
-        },
         "label": {
           "type": "string",
           "description": "The label the UI will display for this input"
@@ -124,11 +130,24 @@
       "type": "object",
       "$id": "schema:includeExcludeListInput",
       "allOf": [{ "$ref": "schema.json#/$defs/inputDefinition" }],
-      "required": ["type", "description", "macroName", "label", "defaults"],
+      "required": ["type", "macroName", "label", "default"],
       "properties": {
         "type": { "const": "includeExcludeList" },
         "unevaluatedProperties": false,
-        "defaults": {
+        "macroName": {
+          "type": "object",
+          "properties": {
+            "includes": {
+              "type": "string",
+              "description": "The name of the rs2f macro where the items to include will be templated in"
+            },
+            "excludes": {
+              "type": "string",
+              "description": "The name of the rs2f macro where the items to exclude will be templated in"
+            }
+          }
+        },
+        "default": {
           "type": "object",
           "properties": {
             "includes": {
@@ -149,11 +168,11 @@
       "type": "object",
       "$id": "schema:stringListInput",
       "allOf": [{ "$ref": "schema.json#/$defs/inputDefinition" }],
-      "required": ["type", "description", "macroName", "label", "defaults"],
+      "required": ["type", "macroName", "label", "default"],
       "properties": {
         "type": { "const": "stringlist" },
         "unevaluatedProperties": false,
-        "defaults": {
+        "default": {
           "type": "array",
           "items": { "type": "string" },
           "description": "The default value of the input in the UI"
@@ -164,46 +183,39 @@
       "type": "object",
       "$id": "schema:booleanInput",
       "allOf": [{ "$ref": "schema.json#/$defs/inputDefinition" }],
-      "required": ["type", "description", "macroName", "label", "defaults"],
+      "required": ["type", "macroName", "label", "default"],
       "properties": {
         "type": { "const": "boolean" },
         "unevaluatedProperties": false,
-        "defaults": {
+        "default": {
           "type": "boolean",
           "description": "The default value of the input in the UI"
         }
       }
     },
-    "valueInput": {
+    "numberInput": {
       "type": "object",
       "$id": "schema:numberInput",
       "allOf": [{ "$ref": "schema.json#/$defs/inputDefinition" }],
-      "required": ["type", "description", "macroName", "label", "defaults"],
+      "required": ["type", "macroName", "label", "default"],
       "properties": {
-        "type": { "const": "value" },
+        "type": { "const": "number" },
         "unevaluatedProperties": false,
-        "defaults": {
+        "default": {
           "type": "number",
           "description": "The default value of the input in the UI"
         }
       }
     },
-    "enumlistInput": {
+    "enumListInput": {
       "type": "object",
       "$id": "schema:enumListInput",
       "allOf": [{ "$ref": "schema.json#/$defs/inputDefinition" }],
-      "required": [
-        "type",
-        "description",
-        "macroName",
-        "label",
-        "defaults",
-        "enum"
-      ],
+      "required": ["type", "macroName", "label", "default", "enum"],
       "properties": {
         "type": { "const": "enumlist" },
         "unevaluatedProperties": false,
-        "defaults": {
+        "default": {
           "type": "array",
           "items": {
             "type": "string",
@@ -223,12 +235,12 @@
       "type": "object",
       "$id": "schema:styleInput",
       "allOf": [{ "$ref": "schema.json#/$defs/inputDefinition" }],
-      "required": ["type", "description", "macroName", "label", "defaults"],
+      "required": ["type", "macroName", "label", "default"],
       "properties": {
         "type": { "const": "style" },
         "unevaluatedProperties": false,
 
-        "defaults": {
+        "default": {
           "type": "object",
           "properties": {
             "textColor": {
@@ -264,8 +276,7 @@
               "description": "Whether to show notifications"
             },
             "textAccent": {
-              "type": "string",
-              "enum": ["use filter", "shadow", "outline", "none"],
+              "type": "number",
               "description": "The text accent style"
             },
             "textAccentColor": {
@@ -277,8 +288,7 @@
               "description": "The lootbeam color in ARGB hex format"
             },
             "fontType": {
-              "type": "string",
-              "enum": ["use filter", "normal", "larger"],
+              "type": "number",
               "description": "The font type"
             },
             "menuTextColor": {
