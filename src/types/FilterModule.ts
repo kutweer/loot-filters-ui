@@ -1,18 +1,16 @@
 import { ArgbHexColor } from "../utils/Color";
 import { FontType, TextAccent } from "./FilterTypes";
 
-export type FilterModule = {
+export type Module = {
   name: string;
   input: ModuleInput[];
 };
 
 export type inputTypes = {
   itemlist: {
-    type: "itemlist";
     enum?: string[];
   };
   style: {
-    type: "style";
     textColor: ArgbHexColor;
     backgroundColor: ArgbHexColor;
     borderColor: ArgbHexColor;
@@ -32,7 +30,10 @@ export type inputTypes = {
   };
 };
 
-export type ModuleInput = {
+export type ModuleInput<T extends keyof inputTypes = keyof inputTypes> = {
   name: string;
   label: string;
-} & Partial<inputTypes[keyof inputTypes]>;
+  type: T;
+  default: Partial<inputTypes[T]>;
+  overrides: Partial<inputTypes[T]>;
+};

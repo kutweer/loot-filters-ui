@@ -1,32 +1,43 @@
 import { Box, Tab, Tabs } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { filter } from "underscore";
-import { useLootFilterUiLocalStorage } from "../utils/dataStorage";
+import { loadConfigs, storeConfigs, StoredData } from "../utils/dataStorage";
 import { SiteConfig } from "../utils/devmode";
 import { FilterSelector } from "./FilterSelector";
 import { CustomizeTab } from "./tabs/CustomizeTab";
-import { RenderedFilterTab } from "./tabs/RenderedFilterTab";
 export const FilterTabs: React.FC<{
   sha: string;
   siteConfig: SiteConfig;
 }> = ({ sha, siteConfig }) => {
+  console.log("FilterTabs rendered");
   const [activeTab, setActiveTab] = useState(1);
 
-  const [storedData, activeFilter, setStoredData] =
-    useLootFilterUiLocalStorage();
+  const [storedData, setStoredData] = useState<StoredData>(loadConfigs());
+  useEffect(() => {
+    storeConfigs(storedData);
+  }, [storedData]);
+
+  const activeFilter =
+    storedData.selectedFilterIndex >= 0
+      ? storedData.filters[storedData.selectedFilterIndex]
+      : null;
+
+  console.log("FilterTabs activeFilter", activeFilter);
+  console.log("FilterTabs storedData", storedData);
 
   const tabs = [
     {
-      label: `${activeFilter.name} Preview`,
+      label: `${activeFilter?.name || "Filter"} Preview`,
       dev: false,
       component: <></>,
     },
     {
-      label: `Customize ${activeFilter.name}`,
+      label: `Customize ${activeFilter?.name}`,
+      disabled: activeFilter === null,
       dev: false,
       component: (
         <CustomizeTab
-          activeFilter={activeFilter}
+          activeFilter={activeFilter!!}
           storedDataUpdater={setStoredData}
         />
       ),
@@ -46,11 +57,7 @@ export const FilterTabs: React.FC<{
   return (
     <Box sx={{ mt: 3, p: 2, borderRadius: 5 }}>
       <Box>
-        <FilterSelector
-          activeFilter={activeFilter}
-          storedData={storedData}
-          setStoredData={setStoredData}
-        />
+        <FilterSelector storedData={storedData} setStoredData={setStoredData} />
       </Box>
       <Tabs
         value={activeTab}
@@ -61,6 +68,7 @@ export const FilterTabs: React.FC<{
           <Tab
             key={index}
             label={tab.label}
+            disabled={tab.disabled}
             sx={{
               fontSize: "1.2rem",
             }}

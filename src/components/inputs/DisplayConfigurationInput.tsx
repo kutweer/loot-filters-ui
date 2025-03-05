@@ -25,26 +25,30 @@ export const DisplayConfigurationInput: React.FC<{
     throw new Error("DisplayConfigurationInput only supports style inputs");
   }
 
+  console.log("DisplayConfigurationInput", input);
+
+  const styleInput = input as ModuleInput<"style">;
+
   const [textColor, setTextColor] = useState<ArgbHexColor>(
-    input.textColor || "#FF000000"
+    styleInput.default?.textColor || "#FF000000"
   );
   const [backgroundColor, setBackgroundColor] = useState<ArgbHexColor>(
-    input.backgroundColor || "#FFCCCCCC"
+    styleInput.default?.backgroundColor || "#FFCCCCCC"
   );
   const [borderColor, setBorderColor] = useState<ArgbHexColor>(
-    input.borderColor || "#FF0F00F0"
+    styleInput.default?.borderColor || "#FF0F00F0"
   );
   const [menuTextColor, setMenuTextColor] = useState<ArgbHexColor>(
-    input.menuTextColor || "#FFff9040"
+    styleInput.default?.menuTextColor || "#FFff9040"
   );
   const [textAccent, setTextAccent] = useState<TextAccent>(
-    input.textAccent || TextAccent.NONE
+    styleInput.default?.textAccent || TextAccent.NONE
   );
   const [textAccentColor, setTextAccentColor] = useState<ArgbHexColor>(
-    input.textAccentColor || "#FF000000"
+    styleInput.default?.textAccentColor || "#FF000000"
   );
   const [fontType, setFontType] = useState<FontType>(
-    input.fontType || FontType.NORMAL
+    styleInput.default?.fontType || FontType.NORMAL
   );
 
   const itemLabelColorPicker = (
@@ -74,10 +78,10 @@ export const DisplayConfigurationInput: React.FC<{
   );
 
   const [showLootbeam, setShowLootbeam] = useState<boolean>(
-    input.showLootbeam || false
+    styleInput.default?.showLootbeam || false
   );
   const [lootbeamColor, setLootbeamColor] = useState<ArgbHexColor>(
-    input.lootbeamColor || "#FFFF0000"
+    styleInput.default?.lootbeamColor || "#FFFF0000"
   );
   const lootbeamComponent = (
     <Grid
@@ -103,7 +107,9 @@ export const DisplayConfigurationInput: React.FC<{
     </Grid>
   );
 
-  const [showValue, setShowValue] = useState<boolean>(input.showValue || false);
+  const [showValue, setShowValue] = useState<boolean>(
+    styleInput.default?.showValue || false
+  );
   const valueComponent = (
     <FormControlLabel
       label="Show Item Value"
@@ -117,7 +123,7 @@ export const DisplayConfigurationInput: React.FC<{
   );
 
   const [showDespawn, setShowDespawn] = useState<boolean>(
-    input.showDespawn || false
+    styleInput.default?.showDespawn || false
   );
   const despawnComponent = (
     <FormControlLabel
@@ -130,7 +136,9 @@ export const DisplayConfigurationInput: React.FC<{
       }
     />
   );
-  const [notify, setNotify] = useState<boolean>(input.notify || false);
+  const [notify, setNotify] = useState<boolean>(
+    styleInput.default?.notify || false
+  );
   const notifyComponent = (
     <FormControlLabel
       label="Notify on Drop"
@@ -144,7 +152,7 @@ export const DisplayConfigurationInput: React.FC<{
   );
 
   const [hideOverlay, setHideOverlay] = useState<boolean>(
-    input.hideOverlay || false
+    styleInput.default?.hideOverlay || false
   );
   const hideOverlayComponent = (
     <FormControlLabel
@@ -158,13 +166,13 @@ export const DisplayConfigurationInput: React.FC<{
     />
   );
   const [highlightTile, setHighlightTile] = useState<boolean>(
-    input.highlightTile || false
+    styleInput.default?.highlightTile || false
   );
   const [tileStrokeColor, setTileStrokeColor] = useState<ArgbHexColor>(
-    input.tileStrokeColor || "#FF42D47A"
+    styleInput.default?.tileStrokeColor || "#FF42D47A"
   );
   const [tileFillColor, setTileFillColor] = useState<ArgbHexColor>(
-    input.tileFillColor || "#FF3DA3AB"
+    styleInput.default?.tileFillColor || "#FF3DA3AB"
   );
   const highlightTileComponent = (
     <Grid
@@ -199,20 +207,25 @@ export const DisplayConfigurationInput: React.FC<{
 
   useEffect(() => {
     onChange({
-      ...input,
-      textColor,
-      backgroundColor,
-      borderColor,
-      textAccent,
-      textAccentColor,
-      fontType,
-      showLootbeam,
-      lootbeamColor,
-      showValue,
-      showDespawn,
-      notify,
-      hideOverlay,
-      highlightTile,
+      ...styleInput,
+      default: {
+        ...styleInput.default,
+        textColor,
+        backgroundColor,
+        borderColor,
+        textAccent,
+        textAccentColor,
+        fontType,
+        showLootbeam,
+        lootbeamColor,
+        showValue,
+        showDespawn,
+        notify,
+        hideOverlay,
+        highlightTile,
+        tileStrokeColor,
+        tileFillColor,
+      },
     });
   }, [
     textColor,
@@ -228,6 +241,8 @@ export const DisplayConfigurationInput: React.FC<{
     notify,
     hideOverlay,
     highlightTile,
+    tileStrokeColor,
+    tileFillColor,
   ]);
 
   const inputComponents = [

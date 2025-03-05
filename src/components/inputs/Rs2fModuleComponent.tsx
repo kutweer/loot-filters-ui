@@ -1,5 +1,5 @@
 import { Box, Stack, Typography } from "@mui/material";
-import { FilterModule, ModuleInput } from "../../types/FilterModule";
+import { Module, ModuleInput } from "../../types/FilterModule";
 import { DisplayConfigurationInput } from "./DisplayConfigurationInput";
 
 const getInputComponent = (
@@ -33,8 +33,8 @@ const Rs2fInputComponent: React.FC<{
 };
 
 export const Rs2fModuleComponent: React.FC<{
-  module: FilterModule;
-  onChange: (module: FilterModule) => void;
+  module: Module;
+  onChange: (module: Module) => void;
 }> = ({ module, onChange }) => {
   return (
     <Box>
@@ -42,9 +42,9 @@ export const Rs2fModuleComponent: React.FC<{
         {module.name}
       </Typography>
       <Stack spacing={2} direction="column">
-        {module.input.map((input) => (
+        {module.input.map((input, index) => (
           <Rs2fInputComponent
-            key={input.name}
+            key={index}
             input={input}
             onChange={(input) =>
               onChange({

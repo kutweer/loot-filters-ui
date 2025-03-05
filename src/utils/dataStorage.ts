@@ -1,24 +1,28 @@
-import { useEffect, useState } from "react";
-import { FilterModule } from "../types/FilterModule";
+import { SetStateAction, useEffect, useState } from "react";
+import { Module } from "../types/FilterModule";
+import { FilterSource } from "./filtermanager";
 
 export const LOOT_FILTER_CONFIG_KEY = "loot-filter-configs";
 
 export type Filter = {
+  source: FilterSource;
   name: string;
-  modules: FilterModule[];
+  description: string;
+  modules: Module[];
+  importedOn: string;
 };
 
 export type StoredData = {
   filters: Filter[];
-  selectedFilterIndex?: number;
+  selectedFilterIndex: number;
 };
 
 const defaultData: StoredData = {
   filters: [],
-  selectedFilterIndex: undefined,
+  selectedFilterIndex: -1,
 };
 
-const loadConfigs = (): StoredData => {
+export const loadConfigs = (): StoredData => {
   const localData = localStorage.getItem(LOOT_FILTER_CONFIG_KEY);
   if (!localData) {
     return defaultData;
@@ -28,7 +32,7 @@ const loadConfigs = (): StoredData => {
   }
 };
 
-const storeConfigs = (data: StoredData) => {
+export const storeConfigs = (data: StoredData) => {
   localStorage.setItem(LOOT_FILTER_CONFIG_KEY, JSON.stringify(data));
 };
 
@@ -56,29 +60,3 @@ export const updateOneFilter = (
   });
 };
 
-export const useLootFilterUiLocalStorage: () => [
-  StoredData,
-  Filter,
-  StoredDataUpdater,
-] = () => {
-  const [data, setData] = useState<StoredData>(loadConfigs());
-  const [activeFilter, setActiveFilter] = useState<Filter>(
-    data.selectedFilterIndex
-      ? data.filters[data.selectedFilterIndex]
-      : data.filters[0]
-  );
-
-  useEffect(() => {
-    storeConfigs(data);
-  }, [data]);
-
-  useEffect(() => {
-    setActiveFilter(
-      data.selectedFilterIndex
-        ? data.filters[data.selectedFilterIndex]
-        : data.filters[0]
-    );
-  }, [data.selectedFilterIndex]);
-
-  return [data, activeFilter, setData];
-};
