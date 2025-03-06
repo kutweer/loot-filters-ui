@@ -63,7 +63,7 @@ export const FilterTabs: React.FC<{
 
   const filteredTabs = filter(
     tabs,
-    (tab) => siteConfig.devMode || tab.dev === false
+    (tab) => siteConfig.devMode || tab.dev === false,
   );
 
   return (

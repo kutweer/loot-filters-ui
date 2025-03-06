@@ -6,15 +6,13 @@ export type ModularFilterId = string;
 export type ModularFilterConfigurationId = string;
 
 // TODO define this
-export type ModularFilterConfiguration<T extends keyof typeof filterTypes> = Record<string, FilterModuleInput<T>["default"]>;
+export type ModularFilterConfiguration<T extends keyof typeof filterTypes> =
+  Record<string, FilterModuleInput<T>["default"]>;
 
 export type UiData = {
   importedModularFilters: Record<string, UiModularFilter>;
 
-  filterConfigurations: Record<
-    ModularFilterId,
-    Record<string, any>
-  >;
+  filterConfigurations: Record<ModularFilterId, Record<string, any>>;
 
   activeFilterId?: ModularFilterId;
   activeFilterConfigurationId?: ModularFilterConfigurationId;
@@ -23,7 +21,7 @@ export type UiData = {
 const withUpdatedActiveFilters = (
   uiData: UiData,
   filterId?: ModularFilterId,
-  activeFilterConfigurationId?: ModularFilterConfigurationId
+  activeFilterConfigurationId?: ModularFilterConfigurationId,
 ) => {
   return {
     ...uiData,
@@ -35,7 +33,7 @@ const withUpdatedActiveFilters = (
 const withNewImportedModularFilter = (
   uiData: UiData,
   id: ModularFilterId,
-  filter: UiModularFilter
+  filter: UiModularFilter,
 ) => {
   return {
     ...uiData,
@@ -49,7 +47,7 @@ const withNewImportedModularFilter = (
 const withFilterConfiguration = (
   uiData: UiData,
   filterId: ModularFilterId,
-  configuration: Record<string, any>
+  configuration: Record<string, any>,
 ) => {
   return {
     ...uiData,
@@ -65,7 +63,7 @@ const withFilterConfiguration = (
 
 const withFilterConfigurationRemoved = (
   uiData: UiData,
-  filterId: ModularFilterId
+  filterId: ModularFilterId,
 ) => {
   const newFilterConfigurations = {
     ...uiData.filterConfigurations,
@@ -79,7 +77,7 @@ const withFilterConfigurationRemoved = (
 
 const withModularFilterRemoved = (
   uiData: UiData,
-  filterId: ModularFilterId
+  filterId: ModularFilterId,
 ) => {
   const newImportedModularFilters = {
     ...uiData.importedModularFilters,
@@ -103,15 +101,15 @@ const loadData = () => {
 
 export type SetActiveFilters = (
   filterId?: ModularFilterId,
-  activeFilterConfigurationId?: ModularFilterConfigurationId
+  activeFilterConfigurationId?: ModularFilterConfigurationId,
 ) => void;
 export type SetNewImportedModularFilter = (
   id: ModularFilterId,
-  filter: UiModularFilter
+  filter: UiModularFilter,
 ) => void;
 export type SetFilterConfiguration = (
   filterId: ModularFilterId,
-  configuration: Record<string, any>
+  configuration: Record<string, any>,
 ) => void;
 export type SetFilterConfigurationRemoved = (filterId: ModularFilterId) => void;
 export type SetModularFilterRemoved = (filterId: ModularFilterId) => void;
@@ -134,27 +132,25 @@ export const useData = (): DataContext => {
 
   const setActiveFilters = (
     filterId?: ModularFilterId,
-    activeFilterConfigurationId?: ModularFilterConfigurationId
+    activeFilterConfigurationId?: ModularFilterConfigurationId,
   ) => {
     setData((prev) =>
-      withUpdatedActiveFilters(prev, filterId, activeFilterConfigurationId)
+      withUpdatedActiveFilters(prev, filterId, activeFilterConfigurationId),
     );
   };
 
   const setNewImportedModularFilter = (
     id: ModularFilterId,
-    filter: UiModularFilter
+    filter: UiModularFilter,
   ) => {
     setData((prev) => withNewImportedModularFilter(prev, id, filter));
   };
 
   const setFilterConfiguration = (
     filterId: ModularFilterId,
-    configuration: ModularFilterConfiguration<keyof typeof filterTypes>
+    configuration: ModularFilterConfiguration<keyof typeof filterTypes>,
   ) => {
-    setData((prev) =>
-      withFilterConfiguration(prev, filterId, configuration)
-    );
+    setData((prev) => withFilterConfiguration(prev, filterId, configuration));
   };
 
   const setFilterConfigurationRemoved = (filterId: ModularFilterId) => {

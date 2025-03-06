@@ -15,7 +15,7 @@ export const useSiteConfig = (): [
   (action: SetStateAction<SiteConfig>) => void,
 ] => {
   const config = JSON.parse(
-    localStorage.getItem("loot-filter-site-config") || "{}"
+    localStorage.getItem("loot-filter-site-config") || "{}",
   );
   const isLocal =
     window.location.hostname === "localhost" ||
@@ -32,7 +32,7 @@ export const useSiteConfig = (): [
       setConfigState(newConfig);
       localStorage.setItem(
         "loot-filter-site-config",
-        JSON.stringify(newConfig)
+        JSON.stringify(newConfig),
       );
     },
   ];

@@ -117,7 +117,7 @@ export const StringListInputComponent: React.FC<{
         };
       }
       return value;
-    }
+    },
   );
 
   return (
@@ -149,7 +149,7 @@ export const StringListInputComponent: React.FC<{
         const { inputValue } = params;
         // Suggest the creation of a new value
         const isExisting = options.some(
-          (option) => inputValue === option.label
+          (option) => inputValue === option.label,
         );
         if (inputValue !== "" && !isExisting) {
           newOptions.push({
@@ -177,10 +177,12 @@ export const StringListInputComponent: React.FC<{
       renderOption={(props, option) => {
         const { key, ...optionProps } = props;
         const isNewValue = !currentValues.some(
-          (value: { value: string }) => value.value === option.value
+          (value: { value: string }) => value.value === option.value,
         );
 
-        const selectText = isNewValue ? `Add "${option.inputValue}"` : option.label;
+        const selectText = isNewValue
+          ? `Add "${option.inputValue}"`
+          : option.label;
         return (
           <li key={key} {...optionProps}>
             {option.label || `Add "${option.inputValue}"`}

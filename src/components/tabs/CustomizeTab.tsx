@@ -27,7 +27,12 @@ import {
   ModularFilterId,
 } from "../../utils/storage";
 import { DisplayConfigurationInput } from "../inputs/DisplayConfigurationInput";
-import { BooleanInputComponent, EnumInputComponent, NumberInputComponent, StringListInputComponent } from "../inputs/BasicInputs";
+import {
+  BooleanInputComponent,
+  EnumInputComponent,
+  NumberInputComponent,
+  StringListInputComponent,
+} from "../inputs/BasicInputs";
 
 const getInputComponent = (
   input: FilterModuleInput<keyof typeof filterTypes>,
@@ -35,12 +40,12 @@ const getInputComponent = (
   activeFilterConfiguration: ModularFilterConfiguration<
     keyof typeof filterTypes
   >,
-  dataContext: DataContext
+  dataContext: DataContext,
 ): React.ReactNode => {
   switch (input.type) {
     case "number":
       const numberInput = input as NumberInput;
-       return (
+      return (
         <NumberInputComponent
           input={numberInput}
           activeFilterConfiguration={activeFilterConfiguration}
@@ -95,19 +100,14 @@ const ModuleSection: React.FC<{
     keyof typeof filterTypes
   >;
   dataContext: DataContext;
-}> = ({
-  module,
-  activeFilterId,
-  activeFilterConfiguration,
-  dataContext,
-}) => {
+}> = ({ module, activeFilterId, activeFilterConfiguration, dataContext }) => {
   const defaultGroupId = crypto.randomUUID();
   const groupedInputs = groupBy(
     module.inputs.map((input) => ({
       ...input,
       group: input.group ?? defaultGroupId,
     })),
-    "group"
+    "group",
   );
 
   return (
@@ -134,7 +134,7 @@ const ModuleSection: React.FC<{
                       input,
                       activeFilterId,
                       activeFilterConfiguration,
-                      dataContext
+                      dataContext,
                     )}
                   </Box>
                 );

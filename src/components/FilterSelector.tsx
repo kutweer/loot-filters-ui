@@ -28,7 +28,9 @@ import { filterTypes } from "../types/ModularFilterSpec";
 export const FilterSelector: React.FC<{
   activeFilterId: ModularFilterId | undefined;
   activeFilter: UiModularFilter | undefined;
-  activeConfiguration: ModularFilterConfiguration<keyof typeof filterTypes> | undefined;
+  activeConfiguration:
+    | ModularFilterConfiguration<keyof typeof filterTypes>
+    | undefined;
   importedModularFilters: Record<string, UiModularFilter>;
   setActiveFilters: SetActiveFilters;
   setNewImportedModularFilter: SetNewImportedModularFilter;

@@ -60,8 +60,11 @@ export const argbHexToRgbaCss = (hex: ArgbHexColor) => {
   return `rgba(${r}, ${g}, ${b}, ${a})`;
 };
 
-export const rgbHexToArgbHex = (hex: string) => {
-  return `#ff${hex.slice(1)}`;
+export const rgbHexToArgbHex = (hex: string): ArgbHexColor => {
+  if (!!hex && hex.startsWith("#") && hex.length === 7) {
+    return `#ff${hex.slice(1)}`;
+  }
+  return hex as ArgbHexColor;
 };
 
 export const rGBColorToArgbHex = (color: RGBColor): ArgbHexColor => {

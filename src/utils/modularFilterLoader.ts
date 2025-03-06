@@ -1,7 +1,15 @@
-
-import { UiModularFilter, FilterSource, UiFilterModule } from "../types/ModularFilter";
+import {
+  UiModularFilter,
+  FilterSource,
+  UiFilterModule,
+} from "../types/ModularFilter";
 import { ModuleSource } from "../types/ModularFilter";
-import { FilterModule, validateFilterModuleInput, validateModule } from "../types/ModularFilterSpec";
+import {
+  FilterModule,
+  StyleInput,
+  validateFilterModuleInput,
+  validateModule,
+} from "../types/ModularFilterSpec";
 
 type FilterDefinition = {
   name: string;
@@ -10,7 +18,7 @@ type FilterDefinition = {
 };
 
 export const loadFilter = async (
-  source: FilterSource | UiModularFilter
+  source: FilterSource | UiModularFilter,
 ): Promise<UiModularFilter> => {
   let filter: FilterDefinition;
 
@@ -27,7 +35,7 @@ export const loadFilter = async (
   const resolvedModules: FilterModule[] = await Promise.all(
     filter.modules.map(
       async (
-        moduleSource: ModuleSource | FilterModule
+        moduleSource: ModuleSource | FilterModule,
       ): Promise<UiFilterModule> => {
         if (
           "moduleJson" in moduleSource &&
@@ -52,7 +60,7 @@ export const loadFilter = async (
           const moduleRs2fResponse = await fetch(moduleSource.moduleRs2fUrl);
           const moduleRs2fText = await moduleRs2fResponse.text();
 
-          const module=  {
+          const module = {
             ...moduleJson,
             rs2fText: moduleRs2fText,
             source: moduleSource,
@@ -62,11 +70,11 @@ export const loadFilter = async (
           return module;
         } else {
           throw new Error(
-            `Invalid module source '${JSON.stringify(moduleSource)}', no moduleJson or moduleJsonUrl`
+            `Invalid module source '${JSON.stringify(moduleSource)}', no moduleJson or moduleJsonUrl`,
           );
         }
-      }
-    )
+      },
+    ),
   );
 
   return {
