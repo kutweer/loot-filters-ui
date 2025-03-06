@@ -9,6 +9,8 @@ import { isNumber } from "underscore";
 import {
   BooleanInput,
   EnumListInput,
+  IncludeExcludeListInput,
+  IncludeExcludeListInputDefaults,
   NumberInput,
   StringListInput,
 } from "../../types/ModularFilterSpec";
@@ -100,13 +102,32 @@ export const BooleanInputComponent: React.FC<{
 };
 
 export const StringListInputComponent: React.FC<{
-  input: StringListInput;
-  activeFilterConfiguration: ModularFilterConfiguration<"stringlist">;
+  input: StringListInput | IncludeExcludeListInput;
+  defaultField?: "includes" | "excludes";
+  activeFilterConfiguration: ModularFilterConfiguration<
+    "stringlist" | "includeExcludeList"
+  >;
   activeFilterId: string;
   dataContext: DataContext;
-}> = ({ input, activeFilterConfiguration, activeFilterId, dataContext }) => {
+}> = ({
+  input,
+  defaultField,
+  activeFilterConfiguration,
+  activeFilterId,
+  dataContext,
+}) => {
+  const macroName =
+    input.type === "includeExcludeList"
+      ? (input.macroName as { includes: string; excludes: string })[
+          defaultField!!
+        ]
+      : (input.macroName as string);
+
   const currentValues =
-    activeFilterConfiguration?.[input.macroName as string] ?? input.default;
+    activeFilterConfiguration?.[macroName] ??
+    (input.type === "includeExcludeList"
+      ? (input.default as IncludeExcludeListInputDefaults)[defaultField!!]
+      : input.default);
 
   const options = currentValues.map(
     (value: string | { label: string; value: string }) => {
@@ -117,7 +138,7 @@ export const StringListInputComponent: React.FC<{
         };
       }
       return value;
-    },
+    }
   );
 
   return (
@@ -129,17 +150,17 @@ export const StringListInputComponent: React.FC<{
         console.log(newValue);
         if (typeof newValue === "string") {
           dataContext.setFilterConfiguration(activeFilterId, {
-            [input.macroName as string]: [{ value: newValue, label: newValue }],
+            [macroName as string]: [{ value: newValue, label: newValue }],
           });
         }
 
         if (newValue && (newValue as any)?.inputValue) {
           dataContext.setFilterConfiguration(activeFilterId, {
-            [input.macroName as string]: newValue,
+            [macroName as string]: newValue,
           });
         } else {
           dataContext.setFilterConfiguration(activeFilterId, {
-            [input.macroName as string]: newValue,
+            [macroName as string]: newValue,
           });
         }
       }}
@@ -149,7 +170,7 @@ export const StringListInputComponent: React.FC<{
         const { inputValue } = params;
         // Suggest the creation of a new value
         const isExisting = options.some(
-          (option) => inputValue === option.label,
+          (option) => inputValue === option.label
         );
         if (inputValue !== "" && !isExisting) {
           newOptions.push({
@@ -177,7 +198,7 @@ export const StringListInputComponent: React.FC<{
       renderOption={(props, option) => {
         const { key, ...optionProps } = props;
         const isNewValue = !currentValues.some(
-          (value: { value: string }) => value.value === option.value,
+          (value: { value: string }) => value.value === option.value
         );
 
         const selectText = isNewValue

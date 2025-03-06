@@ -61,16 +61,19 @@ export type EnumListInput = FilterModuleInput<"enumlist"> & {
   enum: string[];
 };
 
+
+export type IncludeExcludeListInputDefaults = {
+  includes: string[];
+  excludes: string[];
+};
+
 export type IncludeExcludeListInput =
   FilterModuleInput<"includeExcludeList"> & {
     macroName: {
       includes: string;
       excludes: string;
     };
-    default: {
-      includes: string[];
-      excludes: string[];
-    };
+    default: IncludeExcludeListInputDefaults;
   };
 
 export enum TextAccent {

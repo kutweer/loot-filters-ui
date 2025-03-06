@@ -1,20 +1,13 @@
-import {
-  Box,
-  Checkbox,
-  MenuItem,
-  Paper,
-  Select,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Paper, Stack, Typography } from "@mui/material";
 import { groupBy } from "underscore";
+import { colors } from "../../styles/MuiTheme";
 import {
   BooleanInput,
   EnumListInput,
   FilterModule,
   FilterModuleInput,
   filterTypes,
+  IncludeExcludeListInput,
   ModularFilter,
   NumberInput,
   StringListInput,
@@ -23,16 +16,16 @@ import {
 import {
   DataContext,
   ModularFilterConfiguration,
-  ModularFilterConfigurationId,
   ModularFilterId,
 } from "../../utils/storage";
-import { DisplayConfigurationInput } from "../inputs/DisplayConfigurationInput";
 import {
   BooleanInputComponent,
   EnumInputComponent,
   NumberInputComponent,
   StringListInputComponent,
 } from "../inputs/BasicInputs";
+import { DisplayConfigurationInput } from "../inputs/DisplayConfigurationInput";
+import { IncludeExcludeListInputComponent } from "../inputs/IncludeExcludeListInputComponent";
 
 const getInputComponent = (
   input: FilterModuleInput<keyof typeof filterTypes>,
@@ -40,7 +33,7 @@ const getInputComponent = (
   activeFilterConfiguration: ModularFilterConfiguration<
     keyof typeof filterTypes
   >,
-  dataContext: DataContext,
+  dataContext: DataContext
 ): React.ReactNode => {
   switch (input.type) {
     case "number":
@@ -89,7 +82,12 @@ const getInputComponent = (
         />
       );
     default:
-      return null;
+      return <IncludeExcludeListInputComponent
+          input={input as IncludeExcludeListInput}
+          activeFilterConfiguration={activeFilterConfiguration}
+          activeFilterId={activeFilterId}
+          dataContext={dataContext}
+        />
   }
 };
 
@@ -107,7 +105,7 @@ const ModuleSection: React.FC<{
       ...input,
       group: input.group ?? defaultGroupId,
     })),
-    "group",
+    "group"
   );
 
   return (
@@ -134,7 +132,7 @@ const ModuleSection: React.FC<{
                       input,
                       activeFilterId,
                       activeFilterConfiguration,
-                      dataContext,
+                      dataContext
                     )}
                   </Box>
                 );
