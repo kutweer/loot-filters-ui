@@ -30,25 +30,25 @@ export const DisplayConfigurationInput: React.FC<{
   const styleInput = input as StyleInput;
 
   const [textColor, setTextColor] = useState<ArgbHexColor>(
-    rgbHexToArgbHex(styleInput.default?.textColor) || "#FF000000",
+    rgbHexToArgbHex(styleInput.default?.textColor) || "#FF000000"
   );
   const [backgroundColor, setBackgroundColor] = useState<ArgbHexColor>(
-    rgbHexToArgbHex(styleInput.default?.backgroundColor) || "#FFCCCCCC",
+    rgbHexToArgbHex(styleInput.default?.backgroundColor) || "#FFCCCCCC"
   );
   const [borderColor, setBorderColor] = useState<ArgbHexColor>(
-    rgbHexToArgbHex(styleInput.default?.borderColor) || "#FF0F00F0",
+    rgbHexToArgbHex(styleInput.default?.borderColor) || "#FF000000"
   );
   const [menuTextColor, setMenuTextColor] = useState<ArgbHexColor>(
-    rgbHexToArgbHex(styleInput.default?.menuTextColor) || "#FFff9040",
+    rgbHexToArgbHex(styleInput.default?.menuTextColor) || "#FFff9040"
   );
   const [textAccent, setTextAccent] = useState<TextAccent>(
-    textAccentFromOrdinal(styleInput.default?.textAccent || 0),
+    textAccentFromOrdinal(styleInput.default?.textAccent || 0)
   );
   const [textAccentColor, setTextAccentColor] = useState<ArgbHexColor>(
-    rgbHexToArgbHex(styleInput.default?.textAccentColor) || "#FF000000",
+    rgbHexToArgbHex(styleInput.default?.textAccentColor) || "#FF000000"
   );
   const [fontType, setFontType] = useState<FontType>(
-    fontTypeFromOrdinal(styleInput.default?.fontType || 0),
+    fontTypeFromOrdinal(styleInput.default?.fontType || 0)
   );
 
   const itemLabelColorPicker = (
@@ -78,10 +78,10 @@ export const DisplayConfigurationInput: React.FC<{
   );
 
   const [showLootbeam, setShowLootbeam] = useState<boolean>(
-    styleInput.default?.showLootbeam || false,
+    styleInput.default?.showLootbeam || false
   );
   const [lootbeamColor, setLootbeamColor] = useState<ArgbHexColor>(
-    rgbHexToArgbHex(styleInput.default?.lootbeamColor) || "#FFFF0000",
+    rgbHexToArgbHex(styleInput.default?.lootbeamColor) || "#FFFF0000"
   );
   const lootbeamComponent = (
     <Grid
@@ -108,7 +108,7 @@ export const DisplayConfigurationInput: React.FC<{
   );
 
   const [showValue, setShowValue] = useState<boolean>(
-    styleInput.default?.showValue || false,
+    styleInput.default?.showValue || false
   );
   const valueComponent = (
     <FormControlLabel
@@ -123,7 +123,7 @@ export const DisplayConfigurationInput: React.FC<{
   );
 
   const [showDespawn, setShowDespawn] = useState<boolean>(
-    styleInput.default?.showDespawn || false,
+    styleInput.default?.showDespawn || false
   );
   const despawnComponent = (
     <FormControlLabel
@@ -137,7 +137,7 @@ export const DisplayConfigurationInput: React.FC<{
     />
   );
   const [notify, setNotify] = useState<boolean>(
-    styleInput.default?.notify || false,
+    styleInput.default?.notify || false
   );
   const notifyComponent = (
     <FormControlLabel
@@ -152,7 +152,7 @@ export const DisplayConfigurationInput: React.FC<{
   );
 
   const [hideOverlay, setHideOverlay] = useState<boolean>(
-    styleInput.default?.hideOverlay || false,
+    styleInput.default?.hideOverlay || false
   );
   const hideOverlayComponent = (
     <FormControlLabel
@@ -166,13 +166,13 @@ export const DisplayConfigurationInput: React.FC<{
     />
   );
   const [highlightTile, setHighlightTile] = useState<boolean>(
-    styleInput.default?.highlightTile || false,
+    styleInput.default?.highlightTile || false
   );
   const [tileStrokeColor, setTileStrokeColor] = useState<ArgbHexColor>(
-    rgbHexToArgbHex(styleInput.default?.tileStrokeColor) || "#FF42D47A",
+    rgbHexToArgbHex(styleInput.default?.tileStrokeColor) || "#FF42D47A"
   );
   const [tileFillColor, setTileFillColor] = useState<ArgbHexColor>(
-    rgbHexToArgbHex(styleInput.default?.tileFillColor) || "#FF3DA3AB",
+    rgbHexToArgbHex(styleInput.default?.tileFillColor) || "#FF3DA3AB"
   );
   const highlightTileComponent = (
     <Grid
