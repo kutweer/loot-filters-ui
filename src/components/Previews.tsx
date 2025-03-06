@@ -1,8 +1,8 @@
 import { Box, SxProps } from "@mui/material";
-import { colors } from "../../styles/MuiTheme";
-import { ArgbHexColor, argbHexToRgbaCss } from "../../types/Color";
+import { colors } from "../styles/MuiTheme";
+import { ArgbHexColor, argbHexToRgbaCss } from "../utils/Color";
 
-export const ExampleItemMenu: React.FC<{
+export const ItemMenuPreview: React.FC<{
   itemName: string;
   menuTextColor: ArgbHexColor;
 }> = ({ itemName, menuTextColor }) => {
@@ -65,7 +65,7 @@ export const ExampleItemMenu: React.FC<{
   );
 };
 
-export const ExampleItemLabel: React.FC<{
+export const ItemLabelPreview: React.FC<{
   itemName: string;
   foregroundColor: ArgbHexColor;
   backgroundColor: ArgbHexColor;

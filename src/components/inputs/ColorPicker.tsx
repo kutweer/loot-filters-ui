@@ -5,7 +5,7 @@ import {
   ArgbHexColor,
   argbHexColorToRGBColor,
   rGBColorToArgbHex,
-} from "../../types/Color";
+} from "../../utils/Color";
 
 const ColorPicker: React.FC<{
   color: ArgbHexColor;

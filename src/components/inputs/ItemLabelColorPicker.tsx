@@ -1,11 +1,8 @@
-import { MenuItem } from "@mui/material";
-import { Select } from "@mui/material";
-import { ArgbHexColor } from "../../types/Color";
-import { TextAccent } from "../../types/FilterTypes2";
-import { FontType } from "../../types/FilterTypes2";
+import { MenuItem, Select } from "@mui/material";
+import { ArgbHexColor } from "../../utils/Color";
+import { ItemLabelPreview, ItemMenuPreview } from "../Previews";
 import { ColorPickerInput } from "./ColorPicker";
-import { ExampleItemLabel, ExampleItemMenu } from "./ExampleItem";
-
+import { FontType, TextAccent } from "../../types/ModularFilterSpec";
 export const ItemLabelColorPicker: React.FC<{
   itemName?: string;
   showExamples?: boolean;
@@ -98,13 +95,13 @@ export const ItemLabelColorPicker: React.FC<{
       </Select>
       {showExamples && (
         <>
-          <ExampleItemLabel
+          <ItemLabelPreview
             itemName={itemName}
             foregroundColor={textColor}
             backgroundColor={backgroundColor}
             borderColor={borderColor}
           />
-          <ExampleItemMenu itemName={itemName} menuTextColor={menuTextColor} />
+          <ItemMenuPreview itemName={itemName} menuTextColor={menuTextColor} />
         </>
       )}
     </div>
