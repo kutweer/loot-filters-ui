@@ -9,25 +9,25 @@ import {
   Grid2 as Grid,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { ModuleInput } from "../../types/FilterModule";
-import { FontType, TextAccent } from "../../types/FilterTypes";
+import {
+  FontType,
+  fontTypeFromOrdinal,
+  StyleInput,
+  TextAccent,
+  textAccentFromOrdinal,
+} from "../../types/ModularFilterSpec";
 import { ArgbHexColor } from "../../utils/Color";
 import { useSiteConfig } from "../../utils/devmode";
+import { DataContext } from "../../utils/storage";
 import { ItemLabelPreview, ItemMenuPreview } from "../Previews";
 import { ColorPickerInput } from "./ColorPicker";
 import { ItemLabelColorPicker } from "./ItemLabelColorPicker";
 
 export const DisplayConfigurationInput: React.FC<{
-  input: ModuleInput;
-  onChange: (input: ModuleInput) => void;
-}> = ({ input, onChange }) => {
-  if (input.type !== "style") {
-    throw new Error("DisplayConfigurationInput only supports style inputs");
-  }
-
-  console.log("DisplayConfigurationInput", input);
-
-  const styleInput = input as ModuleInput<"style">;
+  input: StyleInput;
+  dataContext: DataContext;
+}> = ({ input, dataContext: { setFilterConfiguration } }) => {
+  const styleInput = input as StyleInput;
 
   const [textColor, setTextColor] = useState<ArgbHexColor>(
     styleInput.default?.textColor || "#FF000000"
@@ -42,13 +42,13 @@ export const DisplayConfigurationInput: React.FC<{
     styleInput.default?.menuTextColor || "#FFff9040"
   );
   const [textAccent, setTextAccent] = useState<TextAccent>(
-    styleInput.default?.textAccent || TextAccent.NONE
+    textAccentFromOrdinal(styleInput.default?.textAccent || 0)
   );
   const [textAccentColor, setTextAccentColor] = useState<ArgbHexColor>(
     styleInput.default?.textAccentColor || "#FF000000"
   );
   const [fontType, setFontType] = useState<FontType>(
-    styleInput.default?.fontType || FontType.NORMAL
+    fontTypeFromOrdinal(styleInput.default?.fontType || 0)
   );
 
   const itemLabelColorPicker = (
@@ -206,27 +206,7 @@ export const DisplayConfigurationInput: React.FC<{
   );
 
   useEffect(() => {
-    onChange({
-      ...styleInput,
-      default: {
-        ...styleInput.default,
-        textColor,
-        backgroundColor,
-        borderColor,
-        textAccent,
-        textAccentColor,
-        fontType,
-        showLootbeam,
-        lootbeamColor,
-        showValue,
-        showDespawn,
-        notify,
-        hideOverlay,
-        highlightTile,
-        tileStrokeColor,
-        tileFillColor,
-      },
-    });
+    // TODO
   }, [
     textColor,
     backgroundColor,
@@ -258,7 +238,7 @@ export const DisplayConfigurationInput: React.FC<{
   const [siteConfig, setSiteConfig] = useSiteConfig();
 
   return (
-    <Accordion defaultExpanded={siteConfig.devMode || false}>
+    <Accordion>
       <AccordionSummary expandIcon={<ExpandMore />}>
         <Box sx={{ display: "flex", gap: 2 }}>
           <ItemLabelPreview

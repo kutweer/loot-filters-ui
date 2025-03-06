@@ -24,6 +24,7 @@
     "react-color": "^2.19.3",
     "react-dnd": "^16.0.1",
     "react-dom": "^18.2.0",
+    "ts-json-schema-generator": "^2.3.0",
     "underscore": "^1.13.7"
   },
   "devDependencies": {

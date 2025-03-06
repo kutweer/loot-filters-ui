@@ -1,31 +1,41 @@
 import { Box, Tab, Tabs } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { filter } from "underscore";
-import { loadConfigs, storeConfigs, StoredData } from "../utils/dataStorage";
 import { SiteConfig } from "../utils/devmode";
+import { useData } from "../utils/storage";
 import { FilterSelector } from "./FilterSelector";
 import { CustomizeTab } from "./tabs/CustomizeTab";
 export const FilterTabs: React.FC<{
   sha: string;
   siteConfig: SiteConfig;
 }> = ({ sha, siteConfig }) => {
-  console.log("FilterTabs rendered");
   const [activeTab, setActiveTab] = useState(1);
 
-  const [storedData, setStoredData] = useState<StoredData>(loadConfigs());
-  useEffect(() => {
-    storeConfigs(storedData);
-  }, [storedData]);
+  const dataContext = useData();
 
-  const activeFilter =
-    storedData.selectedFilterIndex >= 0
-      ? storedData.filters[storedData.selectedFilterIndex]
-      : null;
+  const {
+    data: { activeFilterId, importedModularFilters, filterConfigurations },
+    setActiveFilters,
+    setNewImportedModularFilter,
+    setFilterConfiguration,
+    setFilterConfigurationRemoved,
+    setModularFilterRemoved,
+  } = dataContext;
 
-  console.log("FilterTabs activeFilter", activeFilter);
-  console.log("FilterTabs storedData", storedData);
+  const activeFilter = activeFilterId
+    ? importedModularFilters[activeFilterId]
+    : undefined;
 
-  const tabs = [
+  const activeFilterConfiguration = activeFilter
+    ? filterConfigurations[activeFilter.id]
+    : undefined;
+
+  const tabs: {
+    label: string;
+    dev: boolean;
+    component: React.ReactNode;
+    disabled?: boolean;
+  }[] = [
     {
       label: `${activeFilter?.name || "Filter"} Preview`,
       dev: false,
@@ -37,8 +47,10 @@ export const FilterTabs: React.FC<{
       dev: false,
       component: (
         <CustomizeTab
+          activeFilterId={activeFilterId!!}
           activeFilter={activeFilter!!}
-          storedDataUpdater={setStoredData}
+          activeFilterConfiguration={activeFilterConfiguration!!}
+          dataContext={dataContext}
         />
       ),
     },
@@ -57,7 +69,17 @@ export const FilterTabs: React.FC<{
   return (
     <Box sx={{ mt: 3, p: 2, borderRadius: 5 }}>
       <Box>
-        <FilterSelector storedData={storedData} setStoredData={setStoredData} />
+        <FilterSelector
+          activeFilterId={activeFilterId}
+          activeFilter={activeFilter}
+          activeConfiguration={activeFilterConfiguration}
+          importedModularFilters={importedModularFilters}
+          setActiveFilters={setActiveFilters}
+          setNewImportedModularFilter={setNewImportedModularFilter}
+          setFilterConfiguration={setFilterConfiguration}
+          setFilterConfigurationRemoved={setFilterConfigurationRemoved}
+          setModularFilterRemoved={setModularFilterRemoved}
+        />
       </Box>
       <Tabs
         value={activeTab}

@@ -1,9 +1,8 @@
 import { MenuItem, Select } from "@mui/material";
-import { FontType, TextAccent } from "../../types/FilterTypes";
 import { ArgbHexColor } from "../../utils/Color";
 import { ItemLabelPreview, ItemMenuPreview } from "../Previews";
 import { ColorPickerInput } from "./ColorPicker";
-
+import { FontType, TextAccent } from "../../types/ModularFilterSpec";
 export const ItemLabelColorPicker: React.FC<{
   itemName?: string;
   showExamples?: boolean;
