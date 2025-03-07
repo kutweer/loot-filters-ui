@@ -6,7 +6,7 @@ export type StyleConfigKey = keyof StyleConfig & string;
 export const defaultOrConfigOrNone = <T extends StyleConfigKey>(
   key: T,
   styleInput: StyleInput,
-  activeConfiguration: StyleConfig
+  activeConfiguration: StyleConfig,
 ): StyleConfig[T] | undefined => {
   const activeConfigValue = activeConfiguration?.[key];
   if (activeConfigValue) {
@@ -26,7 +26,7 @@ export const updateStyleConfig = (
   value: StyleConfig[StyleConfigKey],
   styleInput: StyleInput,
   activeConfiguration: StyleConfig,
-  updateConfigurationForActiveFilter: (configuration: StyleConfig) => void
+  updateConfigurationForActiveFilter: (configuration: StyleConfig) => void,
 ) => {
   const newConfiguration = {
     ...activeConfiguration,
@@ -38,4 +38,3 @@ export const updateStyleConfig = (
 
   updateConfigurationForActiveFilter(newConfiguration);
 };
-

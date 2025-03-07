@@ -13,12 +13,16 @@ import { colors } from "../../styles/MuiTheme";
 import { StyleInput } from "../../types/ModularFilterSpec";
 import { ArgbHexColor, rgbHexToArgbHex } from "../../utils/Color";
 import useSiteConfig from "../../utils/devmode";
-import { useData } from "../../utils/storage";
 import { ItemLabelPreview, ItemMenuPreview } from "../Previews";
 import { ColorPickerInput } from "./ColorPicker";
 import { ItemLabelColorPicker } from "./ItemLabelColorPicker";
-import { updateStyleConfig, defaultOrConfigOrNone, StyleConfig, StyleConfigKey } from "./StyleInputHelprs";
-
+import {
+  updateStyleConfig,
+  defaultOrConfigOrNone,
+  StyleConfig,
+  StyleConfigKey,
+} from "./StyleInputHelprs";
+import { useData } from "../../context/UiDataContext";
 export const DisplayConfigurationInput: React.FC<{
   input: StyleInput;
 }> = ({ input }) => {
@@ -28,10 +32,19 @@ export const DisplayConfigurationInput: React.FC<{
   const { getActiveFilterConfiguration, updateConfigurationForActiveFilter } =
     useData();
 
-  const activeConf = getActiveFilterConfiguration();  
+  const activeConf = getActiveFilterConfiguration();
 
-  const updateStyleField = (field: StyleConfigKey, value: StyleConfig[StyleConfigKey]) => {
-    updateStyleConfig(field, value, styleInput, activeConf, updateConfigurationForActiveFilter);
+  const updateStyleField = (
+    field: StyleConfigKey,
+    value: StyleConfig[StyleConfigKey],
+  ) => {
+    updateStyleConfig(
+      field,
+      value,
+      styleInput,
+      activeConf,
+      updateConfigurationForActiveFilter,
+    );
   };
 
   const itemLabelColorPicker = (
@@ -40,21 +53,26 @@ export const DisplayConfigurationInput: React.FC<{
     </Grid>
   );
 
-
   const lootbeamComponent = (
     <Grid size={4} sx={{ display: "flex", padding: 1 }}>
       <FormControlLabel
         label="Lootbeam"
         control={
           <Checkbox
-            checked={defaultOrConfigOrNone("showLootbeam", styleInput, activeConf)}
+            checked={defaultOrConfigOrNone(
+              "showLootbeam",
+              styleInput,
+              activeConf,
+            )}
             onChange={(e) => updateStyleField("showLootbeam", e.target.checked)}
           />
         }
       />
       <ColorPickerInput
         color={defaultOrConfigOrNone("lootbeamColor", styleInput, activeConf)}
-        onChange={(color: ArgbHexColor) => updateStyleField("lootbeamColor", color)}
+        onChange={(color: ArgbHexColor) =>
+          updateStyleField("lootbeamColor", color)
+        }
         labelText={"Lootbeam Color"}
         labelLocation="right"
         disabled={defaultOrConfigOrNone("showLootbeam", styleInput, activeConf)}
@@ -86,7 +104,7 @@ export const DisplayConfigurationInput: React.FC<{
     />
   );
   const [notify, setNotify] = useState<boolean>(
-    styleInput.default?.notify || false
+    styleInput.default?.notify || false,
   );
   const notifyComponent = (
     <FormControlLabel
@@ -118,24 +136,38 @@ export const DisplayConfigurationInput: React.FC<{
         label="Highlight Tile"
         control={
           <Checkbox
-            checked={defaultOrConfigOrNone("highlightTile", styleInput, activeConf)}
-            onChange={(e) => updateStyleField("highlightTile", e.target.checked)}
+            checked={defaultOrConfigOrNone(
+              "highlightTile",
+              styleInput,
+              activeConf,
+            )}
+            onChange={(e) =>
+              updateStyleField("highlightTile", e.target.checked)
+            }
           />
         }
       />
       <ColorPickerInput
         color={defaultOrConfigOrNone("tileStrokeColor", styleInput, activeConf)}
-        onChange={(color: ArgbHexColor) => updateStyleField("tileStrokeColor", color)}
+        onChange={(color: ArgbHexColor) =>
+          updateStyleField("tileStrokeColor", color)
+        }
         labelText={"Tile Stroke Color"}
         labelLocation="right"
-        disabled={!defaultOrConfigOrNone("highlightTile", styleInput, activeConf)}
+        disabled={
+          !defaultOrConfigOrNone("highlightTile", styleInput, activeConf)
+        }
       />
       <ColorPickerInput
         color={defaultOrConfigOrNone("tileFillColor", styleInput, activeConf)}
-        onChange={(color: ArgbHexColor) => updateStyleField("tileFillColor", color)}
+        onChange={(color: ArgbHexColor) =>
+          updateStyleField("tileFillColor", color)
+        }
         labelText={"Tile Fill Color"}
         labelLocation="right"
-        disabled={!defaultOrConfigOrNone("highlightTile", styleInput, activeConf)}
+        disabled={
+          !defaultOrConfigOrNone("highlightTile", styleInput, activeConf)
+        }
       />
     </Grid>
   );
@@ -164,12 +196,8 @@ export const DisplayConfigurationInput: React.FC<{
         expandIcon={<ExpandMore />}
       >
         <Box sx={{ display: "flex", gap: 2 }}>
-          <ItemLabelPreview
-            itemName={input.label}
-          />
-          <ItemMenuPreview
-            itemName={input.label}
-          />
+          <ItemLabelPreview itemName={input.label} />
+          <ItemMenuPreview itemName={input.label} />
         </Box>
       </AccordionSummary>
       <AccordionDetails>

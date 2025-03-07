@@ -2,10 +2,9 @@ import { Box, Tab, Tabs } from "@mui/material";
 import { useState } from "react";
 import { filter } from "underscore";
 import { SiteConfig } from "../utils/devmode";
-import { useData } from "../utils/storage";
 import { FilterSelector } from "./FilterSelector";
 import { CustomizeTab } from "./tabs/CustomizeTab";
-
+import { useData } from "../context/UiDataContext";
 export const FilterTabs: React.FC<{
   sha: string;
   siteConfig: SiteConfig;
@@ -42,7 +41,7 @@ export const FilterTabs: React.FC<{
 
   const filteredTabs = filter(
     tabs,
-    (tab) => siteConfig.devMode || tab.dev === false
+    (tab) => siteConfig.devMode || tab.dev === false,
   );
 
   return (

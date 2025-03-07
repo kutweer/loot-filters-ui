@@ -1,4 +1,5 @@
 import { useFilterModule } from "../../context/FilterModuleContext";
+import { useData } from "../../context/UiDataContext";
 import {
   FontType,
   fontTypeFromOrdinal,
@@ -6,7 +7,6 @@ import {
   StyleInput,
 } from "../../types/ModularFilterSpec";
 import { ArgbHexColor } from "../../utils/Color";
-import { useData } from "../../utils/storage";
 import { ItemLabelPreview, ItemMenuPreview } from "../Previews";
 import { ConfiguredAutoComplete } from "./BasicInputs";
 import { ColorPickerInput } from "./ColorPicker";
@@ -38,14 +38,14 @@ export const ItemLabelColorPicker: React.FC<{
 
   const updateStyleField = (
     field: StyleConfigKey,
-    value: StyleConfig[StyleConfigKey]
+    value: StyleConfig[StyleConfigKey],
   ) => {
     updateStyleConfig(
       field,
       value,
       input,
       activeConf,
-      updateConfigurationForActiveFilter
+      updateConfigurationForActiveFilter,
     );
   };
 

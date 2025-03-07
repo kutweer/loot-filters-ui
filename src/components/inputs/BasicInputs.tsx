@@ -18,7 +18,8 @@ import {
   NumberInput,
   StringListInput,
 } from "../../types/ModularFilterSpec";
-import { ModularFilterConfiguration, useData } from "../../utils/storage";
+import { ModularFilterConfiguration } from "../../utils/storage";
+import { useData } from "../../context/UiDataContext";
 export const NumberInputComponent: React.FC<{
   input: NumberInput;
 }> = ({ input }) => {
@@ -143,7 +144,7 @@ export const StringListInputComponent: React.FC<{
         };
       }
       return value;
-    }
+    },
   );
 
   return (
@@ -173,7 +174,7 @@ export const StringListInputComponent: React.FC<{
         const { inputValue } = params;
         // Suggest the creation of a new value
         const isExisting = options.some(
-          (option) => inputValue === option.label
+          (option) => inputValue === option.label,
         );
         if (inputValue !== "" && !isExisting) {
           newOptions.push({
@@ -227,15 +228,15 @@ export interface ConfiguredAutoCompleteProps<
   inputLabel: string;
   configurationUpdater: <T extends keyof typeof filterTypes>(
     configuration: ModularFilterConfiguration<T>,
-    newValue: Option[] | Option | undefined
+    newValue: Option[] | Option | undefined,
   ) => ModularFilterConfiguration<T>;
 
   getSetting: <T extends keyof typeof filterTypes>(
-    configuration: ModularFilterConfiguration<T>
+    configuration: ModularFilterConfiguration<T>,
   ) => Multiple extends true ? Option[] : Option | undefined;
 
   getDefaultValue: <T extends keyof typeof filterTypes>(
-    input: FilterModuleInput<T>
+    input: FilterModuleInput<T>,
   ) => Multiple extends true
     ? Option[] | Option | undefined
     : Option | undefined;
@@ -284,7 +285,7 @@ export const ConfiguredAutoComplete: React.FC<ConfiguredAutoCompleteProps> = ({
             activeConfiguration,
             multiple
               ? [{ label: newValue, value: newValue }]
-              : { label: newValue, value: newValue }
+              : { label: newValue, value: newValue },
           );
           return;
         }
@@ -317,7 +318,7 @@ export const ConfiguredAutoComplete: React.FC<ConfiguredAutoCompleteProps> = ({
 
         // Suggest the creation of a new value
         const isExisting = options.some(
-          (option) => inputValue === option.label
+          (option) => inputValue === option.label,
         );
 
         if (inputValue !== "" && !isExisting) {
@@ -351,7 +352,7 @@ export const ConfiguredAutoComplete: React.FC<ConfiguredAutoCompleteProps> = ({
       renderOption={(props, option) => {
         const { key, ...optionProps } = props;
         const isNewValue = !options.some(
-          (value: { value: string }) => value.value === option.value
+          (value: { value: string }) => value.value === option.value,
         );
 
         return (

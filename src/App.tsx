@@ -6,7 +6,7 @@ import { Header } from "./components/AppHeader";
 import { FilterTabs } from "./components/FilterTabs";
 import { MuiRsTheme } from "./styles/MuiTheme";
 import useSiteConfig from "./utils/devmode";
-import { DataProvider } from "./utils/storage";
+import { DataProvider } from "./context/UiDataContext";
 
 export const App: React.FC<{ sha: string }> = ({ sha = "main" }) => {
   const [siteConfig, setSiteConfig] = useSiteConfig();

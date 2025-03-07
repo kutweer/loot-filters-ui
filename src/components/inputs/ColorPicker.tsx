@@ -123,13 +123,7 @@ const ColorPickerInput: React.FC<{
   onChange: (color: ArgbHexColor) => void;
   labelLocation?: "right" | "bottom";
   disabled?: boolean;
-}> = ({
-  color,
-  onChange,
-  labelText,
-  labelLocation = "bottom",
-  disabled,
-}) => {
+}> = ({ color, onChange, labelText, labelLocation = "bottom", disabled }) => {
   return (
     <FormControl sx={{ marginTop: "auto", marginBottom: "auto" }}>
       <ColorPicker
