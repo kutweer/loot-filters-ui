@@ -6,15 +6,35 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
+  FormHelperText,
   MenuItem,
   Select,
   TextField,
   Typography,
 } from "@mui/material";
 import { useState } from "react";
+import { useData } from "../context/UiDataContext";
 import { loadFilter } from "../utils/modularFilterLoader";
 import { ModularFilterId } from "../utils/storage";
-import { useData } from "../context/UiDataContext";
+import useSiteConfig from "../utils/devmode";
+
+const COMMON_FILTERS = [
+  {
+    name: "FilterScape - An all in one filter for mains",
+    url: "https://raw.githubusercontent.com/riktenx/filterscape/refs/heads/main/index.json",
+  },
+  {
+    name: "Typical Whack's Loot Filter for Persnickity Irons",
+    url: "https://raw.githubusercontent.com/typical-whack/loot-filters-modules/refs/heads/main/filter.json",
+  },
+];
+
+const DEV_FILTERS = [
+  {
+    name: "Style Input Test",
+    url: "https://raw.githubusercontent.com/Kaqemeex/example-configurable-filter/refs/heads/main/single_style_filter.json",
+  },
+];
 
 export const FilterSelector: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -28,6 +48,13 @@ export const FilterSelector: React.FC = () => {
   } = useData();
 
   const activeFilter = getActiveFilter();
+
+  const [siteConfig, _] = useSiteConfig();
+
+  const filtersForImport = [
+    ...(siteConfig.devMode ? DEV_FILTERS : []),
+    ...COMMON_FILTERS,
+  ];
 
   return (
     <Container>
@@ -115,6 +142,24 @@ export const FilterSelector: React.FC = () => {
                     marginBottom: 2,
                   }}
                 >
+                  <FormControl>
+                    <FormHelperText sx={{ fontSize: "24px" }}>
+                      Select a commonly used filter or paste a URL below
+                    </FormHelperText>
+                    <Select
+                      color="secondary"
+                      labelId="common-filter-select"
+                      value={filterUrl}
+                      displayEmpty
+                      onChange={(e) => setFilterUrl(e.target.value)}
+                    >
+                      {filtersForImport.map((filter) => (
+                        <MenuItem key={filter.url} value={filter.url}>
+                          {filter.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                   <TextField
                     label="Filter URL"
                     value={filterUrl}

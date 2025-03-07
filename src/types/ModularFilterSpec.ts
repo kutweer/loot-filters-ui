@@ -147,7 +147,10 @@ export const validateFilterModuleInput = (
 };
 
 export const validateModule = (module: FilterModule) => {
+  console.log("validateModule", module);
   module.inputs.forEach((input: FilterModuleInput<any>) => {
+    checkObjectProperty(input, "macroName", "string");
+
     switch (input.type) {
       case "boolean":
         checkObjectProperty(input as BooleanInput, "default", "boolean");
@@ -225,20 +228,21 @@ const checkObjectProperty = (
   type: string,
   optional = false,
 ) => {
+  console.log("checkObjectProperty", value, key, type, optional);
   if (!isObject(value)) {
     throw new Error(`Value ${value} is not an object`);
   }
 
   if (!Object.keys(value).includes(key)) {
     if (!optional) {
-      throw new Error(`Value ${value} has no property ${key} of type ${type}`);
+      throw new Error(`Value ${JSON.stringify(value)} has no property ${key} of type ${type}`);
     }
     return;
   }
 
   if (typeof value[key] !== type) {
     throw new Error(
-      `Value ${value} has property ${key} of type ${typeof value[key]} instead of ${type}`,
+      `Value ${JSON.stringify(value)} has property ${key} of type ${typeof value[key]} instead of ${type}`,
     );
   }
 
