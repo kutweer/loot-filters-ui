@@ -149,7 +149,23 @@ export const validateFilterModuleInput = (
 export const validateModule = (module: FilterModule) => {
   console.log("validateModule", module);
   module.inputs.forEach((input: FilterModuleInput<any>) => {
-    checkObjectProperty(input, "macroName", "string");
+
+    if (Object.keys(input).includes("macroName")) {
+      if (typeof input.macroName === "string") {
+        if (input.macroName.length === 0) {
+          throw new Error(`Module ${module.name} has empty macroName`);
+        }
+      } else if (typeof input.macroName === "object") {
+        checkObjectProperty(input.macroName, "includes", "string") && input.macroName.includes.length > 0;
+        checkObjectProperty(input.macroName, "excludes", "string") && input.macroName.excludes.length > 0;
+      } else {
+        throw new Error(`Module ${module.name} has invalid macroName ${input.macroName} or the macroName is empty`);
+      }
+
+    } else {
+      throw new Error(`Module ${module.name} has no macroName`);
+    }
+
 
     switch (input.type) {
       case "boolean":
