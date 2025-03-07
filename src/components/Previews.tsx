@@ -1,11 +1,20 @@
 import { Box, SxProps } from "@mui/material";
 import { colors } from "../styles/MuiTheme";
 import { ArgbHexColor, argbHexToRgbaCss } from "../utils/Color";
+import { useData } from "../utils/storage";
+import { defaultOrConfigOrNone } from "./inputs/StyleInputHelprs";
+import { StyleInput } from "../types/ModularFilterSpec";
+import { useFilterModule } from "../context/FilterModuleContext";
 
 export const ItemMenuPreview: React.FC<{
   itemName: string;
-  menuTextColor: ArgbHexColor;
-}> = ({ itemName, menuTextColor }) => {
+}> = ({ itemName }) => {
+  const { getActiveFilterConfiguration } = useData();
+  const { input } = useFilterModule() as { input: StyleInput };
+  const activeConf = getActiveFilterConfiguration();
+
+  const menuTextColor = argbHexToRgbaCss(defaultOrConfigOrNone("menuTextColor", input, activeConf));
+
   return (
     <Box>
       <div
@@ -50,7 +59,7 @@ export const ItemMenuPreview: React.FC<{
               </span>
               <span
                 style={{
-                  color: `${argbHexToRgbaCss(menuTextColor)}`,
+                  color: menuTextColor,
                   fontFamily: "RuneScape",
                   fontSize: "24px",
                 }}
@@ -67,11 +76,16 @@ export const ItemMenuPreview: React.FC<{
 
 export const ItemLabelPreview: React.FC<{
   itemName: string;
-  foregroundColor: ArgbHexColor;
-  backgroundColor: ArgbHexColor;
-  borderColor: ArgbHexColor;
   sx?: SxProps;
-}> = ({ itemName, foregroundColor, backgroundColor, borderColor, sx }) => {
+}> = ({ itemName, sx }) => {
+  const { input } = useFilterModule() as { input: StyleInput };
+  const { getActiveFilterConfiguration } = useData();
+  const activeConf = getActiveFilterConfiguration();
+
+  const backgroundColor = argbHexToRgbaCss(defaultOrConfigOrNone("backgroundColor", input, activeConf));
+  const borderColor = argbHexToRgbaCss(defaultOrConfigOrNone("borderColor", input, activeConf));
+  const foregroundColor = argbHexToRgbaCss(defaultOrConfigOrNone("textColor", input, activeConf));
+
   return (
     <Box
       sx={{
@@ -86,14 +100,14 @@ export const ItemLabelPreview: React.FC<{
           display: "flex",
           alignItems: "center",
           gap: 2,
-          backgroundColor: argbHexToRgbaCss(backgroundColor),
-          border: `1px solid ${argbHexToRgbaCss(borderColor)}`,
+          backgroundColor: backgroundColor,
+          border: `1px solid ${borderColor}`,
         }}
       >
         <span
           style={{
             padding: "4px",
-            color: argbHexToRgbaCss(foregroundColor),
+            color: foregroundColor,
             fontSize: "24px",
             fontFamily: "RuneScape",
           }}

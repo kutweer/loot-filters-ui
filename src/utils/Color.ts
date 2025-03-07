@@ -47,7 +47,10 @@ export type Color = {
   a: string;
 };
 
-export const argbToParts = (hex: ArgbHexColor) => {
+export const argbToParts = (hex?: ArgbHexColor) => {
+  if (!hex) {
+    return hex;
+  }
   const a = parseInt(hex.slice(1, 3), 16);
   const r = parseInt(hex.slice(3, 5), 16);
   const g = parseInt(hex.slice(5, 7), 16);
@@ -55,12 +58,15 @@ export const argbToParts = (hex: ArgbHexColor) => {
   return [r, g, b, a];
 };
 
-export const argbHexToRgbaCss = (hex: ArgbHexColor) => {
-  const [r, g, b, a] = argbToParts(hex);
+export const argbHexToRgbaCss = (hex?: ArgbHexColor) => {
+  if (!hex) {
+    return hex;
+  }
+  const [r, g, b, a] = argbToParts(hex!!) as number[];
   return `rgba(${r}, ${g}, ${b}, ${a})`;
 };
 
-export const rgbHexToArgbHex = (hex: string): ArgbHexColor => {
+export const rgbHexToArgbHex = (hex: string): ArgbHexColor | undefined => {
   if (!!hex && hex.startsWith("#") && hex.length === 7) {
     return `#ff${hex.slice(1)}`;
   }
@@ -72,6 +78,9 @@ export const rGBColorToArgbHex = (color: RGBColor): ArgbHexColor => {
 };
 
 export const argbHexColorToRGBColor = (hex: ArgbHexColor): RGBColor => {
-  const [r, g, b, a] = argbToParts(hex);
+  if (!hex) {
+    return hex;
+  }
+  const [r, g, b, a] = argbToParts(hex) as number[];
   return { r, g, b, a };
 };

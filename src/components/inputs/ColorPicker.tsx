@@ -1,14 +1,14 @@
-import { FormControl, Typography } from "@mui/material";
+import { FormControl, Tooltip, Typography } from "@mui/material";
 import React, { useState } from "react";
-import { RGBColor, SketchPicker } from "react-color";
+import { ChromePicker, RGBColor } from "react-color";
 import {
   ArgbHexColor,
-  argbHexColorToRGBColor,
+  argbHexToRgbaCss,
   rGBColorToArgbHex,
 } from "../../utils/Color";
 
 const ColorPicker: React.FC<{
-  color: ArgbHexColor;
+  color?: ArgbHexColor;
   onChange: (color: ArgbHexColor) => void;
   labelText: string;
   labelLocation: "right" | "bottom";
@@ -28,7 +28,22 @@ const ColorPicker: React.FC<{
     onChange(rGBColorToArgbHex(color));
   };
 
-  const displayColor = argbHexColorToRGBColor(color);
+  const unset = color === undefined;
+
+  const baseStyle = {
+    width: "36px",
+    height: labelLocation == "right" ? "100%" : "14px",
+    borderRadius: "2px",
+  };
+  const style = color
+    ? {
+        ...baseStyle,
+        background: disabled ? "#cccccc" : argbHexToRgbaCss(color),
+      }
+    : {
+        ...baseStyle,
+        // backgroundImage: "var(--checkerboard)",
+      };
 
   return (
     <div>
@@ -36,32 +51,38 @@ const ColorPicker: React.FC<{
         <div
           style={labelLocation == "right" ? { display: "flex", gap: 2 } : {}}
         >
-          <div
-            style={{
-              padding: "5px",
-              background: "#fff",
-              borderRadius: "1px",
-              boxShadow: "0 0 0 1px rgba(0,0,0,.1)",
-              display: "inline-block",
-              cursor: disabled ? "not-allowed" : "pointer",
-            }}
-            onClick={() => {
-              if (!disabled) {
-                handleClick(displayColorPicker);
-              }
-            }}
+          <Tooltip
+            title={
+              disabled
+                ? "Color picker is disabled"
+                : !unset
+                  ? "Shift + Click to unset color"
+                  : "Click to pick a color"
+            }
           >
             <div
-              style={{
-                width: "36px",
-                height: labelLocation == "right" ? "100%" : "14px",
-                borderRadius: "2px",
-                background: disabled
-                  ? "#cccccc"
-                  : `rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, ${displayColor.a})`,
+              style={
+                !unset
+                  ? {
+                      padding: "5px",
+                      background: "#fff",
+                      borderRadius: "1px",
+                      boxShadow: "0 0 0 1px rgba(0,0,0,.1)",
+                      display: "inline-block",
+                      cursor: disabled ? "not-allowed" : "pointer",
+                    }
+                  : undefined
+              }
+              className={unset ? "unset-color-picker" : ""}
+              onClick={() => {
+                if (!disabled) {
+                  handleClick(displayColorPicker);
+                }
               }}
-            />
-          </div>
+            >
+              <div style={style} />
+            </div>
+          </Tooltip>
           <Typography
             style={{
               fontFamily: "RuneScape",
@@ -86,8 +107,8 @@ const ColorPicker: React.FC<{
             }}
             onClick={() => handleClose()}
           />
-          <SketchPicker
-            color={displayColor}
+          <ChromePicker
+            color={color}
             onChange={(color) => handleChange(color.rgb)}
           />
         </div>
@@ -97,12 +118,18 @@ const ColorPicker: React.FC<{
 };
 
 const ColorPickerInput: React.FC<{
-  color: ArgbHexColor;
+  color?: ArgbHexColor;
   labelText: string;
   onChange: (color: ArgbHexColor) => void;
   labelLocation?: "right" | "bottom";
   disabled?: boolean;
-}> = ({ color, onChange, labelText, labelLocation = "bottom", disabled }) => {
+}> = ({
+  color,
+  onChange,
+  labelText,
+  labelLocation = "bottom",
+  disabled,
+}) => {
   return (
     <FormControl sx={{ marginTop: "auto", marginBottom: "auto" }}>
       <ColorPicker

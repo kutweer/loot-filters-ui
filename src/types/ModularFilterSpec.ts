@@ -61,7 +61,6 @@ export type EnumListInput = FilterModuleInput<"enumlist"> & {
   enum: string[];
 };
 
-
 export type IncludeExcludeListInputDefaults = {
   includes: string[];
   excludes: string[];
@@ -77,10 +76,10 @@ export type IncludeExcludeListInput =
   };
 
 export enum TextAccent {
-  USE_FILTER = "use filter",
   SHADOW = "shadow",
   OUTLINE = "outline",
   NONE = "none",
+  BOLD = "bold",
 }
 
 export const textAccentFromOrdinal = (ordinal: number): TextAccent => {
@@ -92,9 +91,9 @@ export const textAccentOrdinal = (textAccent: TextAccent): number => {
 };
 
 export enum FontType {
-  USE_FILTER = "use filter",
   NORMAL = "normal",
   LARGER = "larger",
+  BOLD = "bold",
 }
 
 export const fontTypeOrdinal = (fontType: FontType): number => {
@@ -133,7 +132,7 @@ export type StyleInput = FilterModuleInput<"style"> & {
 
 export const validateFilterModuleInput = (
   filter: ModularFilter,
-  checkModules = false,
+  checkModules = false
 ) => {
   assertString(filter, "name");
   assertString(filter, "description");
@@ -165,11 +164,11 @@ export const validateModule = (module: FilterModule) => {
       case "includeExcludeList":
         checkArrayProperty(
           (input as IncludeExcludeListInput).default.includes,
-          "string",
+          "string"
         );
         checkArrayProperty(
           (input as IncludeExcludeListInput).default.excludes,
-          "string",
+          "string"
         );
         break;
       case "style":
@@ -224,7 +223,7 @@ const checkObjectProperty = (
   value: any,
   key: string,
   type: string,
-  optional = false,
+  optional = false
 ) => {
   if (!isObject(value)) {
     throw new Error(`Value ${value} is not an object`);
@@ -239,7 +238,7 @@ const checkObjectProperty = (
 
   if (typeof value[key] !== type) {
     throw new Error(
-      `Value ${value} has property ${key} of type ${typeof value[key]} instead of ${type}`,
+      `Value ${value} has property ${key} of type ${typeof value[key]} instead of ${type}`
     );
   }
 

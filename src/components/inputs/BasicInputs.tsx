@@ -1,29 +1,35 @@
 import {
   Autocomplete,
   Checkbox,
+  createFilterOptions,
   MenuItem,
   Select,
   TextField,
 } from "@mui/material";
 import { isNumber } from "underscore";
+import { useFilterModule } from "../../context/FilterModuleContext";
 import {
   BooleanInput,
   EnumListInput,
+  FilterModuleInput,
+  filterTypes,
   IncludeExcludeListInput,
   IncludeExcludeListInputDefaults,
   NumberInput,
   StringListInput,
 } from "../../types/ModularFilterSpec";
-import { DataContext, ModularFilterConfiguration } from "../../utils/storage";
-
+import { ModularFilterConfiguration, useData } from "../../utils/storage";
 export const NumberInputComponent: React.FC<{
   input: NumberInput;
-  activeFilterConfiguration: ModularFilterConfiguration<"number">;
-  activeFilterId: string;
-  dataContext: DataContext;
-}> = ({ input, activeFilterConfiguration, activeFilterId, dataContext }) => {
+}> = ({ input }) => {
+  const {
+    getActiveFilterConfiguration,
+    updateConfigurationForActiveFilter: setConfigurationForActiveFilter,
+  } = useData();
+
+  const activeConfiguration = getActiveFilterConfiguration();
   const currentSetting =
-    activeFilterConfiguration?.[input.macroName as string] ?? input.default;
+    activeConfiguration?.[input.macroName as string] ?? input.default;
 
   return (
     <TextField
@@ -31,7 +37,7 @@ export const NumberInputComponent: React.FC<{
       value={currentSetting}
       onChange={(event) => {
         const value = event.target.value;
-        dataContext.setFilterConfiguration(activeFilterId, {
+        setConfigurationForActiveFilter({
           [input.macroName as string]: isNumber(parseInt(value))
             ? parseInt(value)
             : value,
@@ -43,18 +49,21 @@ export const NumberInputComponent: React.FC<{
 
 export const EnumInputComponent: React.FC<{
   input: EnumListInput;
-  activeFilterConfiguration: ModularFilterConfiguration<"enumlist">;
-  activeFilterId: string;
-  dataContext: DataContext;
-}> = ({ input, activeFilterConfiguration, activeFilterId, dataContext }) => {
-  const currentValue =
-    activeFilterConfiguration?.[input.macroName as string] ?? input.default;
+}> = ({ input }) => {
+  const {
+    getActiveFilterConfiguration,
+    updateConfigurationForActiveFilter: setConfigurationForActiveFilter,
+  } = useData();
+
+  const activeConfiguration = getActiveFilterConfiguration();
+  const currentSetting =
+    activeConfiguration?.[input.macroName as string] ?? input.default;
 
   return (
     <Select
-      value={currentValue ?? []}
+      value={currentSetting ?? []}
       onChange={(event) => {
-        dataContext.setFilterConfiguration(activeFilterId, {
+        setConfigurationForActiveFilter({
           [input.macroName as string]: Array.isArray(event.target.value)
             ? event.target.value
             : [event.target.value],
@@ -82,18 +91,19 @@ export const EnumInputComponent: React.FC<{
 
 export const BooleanInputComponent: React.FC<{
   input: BooleanInput;
-  activeFilterConfiguration: ModularFilterConfiguration<"boolean">;
-  activeFilterId: string;
-  dataContext: DataContext;
-}> = ({ input, activeFilterConfiguration, activeFilterId, dataContext }) => {
-  const currentValue =
-    activeFilterConfiguration?.[input.macroName as string] ?? input.default;
+}> = ({ input }) => {
+  const { getActiveFilterConfiguration, updateConfigurationForActiveFilter } =
+    useData();
+
+  const activeConfiguration = getActiveFilterConfiguration();
+  const currentSetting =
+    activeConfiguration?.[input.macroName as string] ?? input.default;
   return (
     <Checkbox
-      checked={currentValue}
+      checked={currentSetting}
       onChange={(event) => {
         const value = event.target.checked;
-        dataContext.setFilterConfiguration(activeFilterId, {
+        updateConfigurationForActiveFilter({
           [input.macroName as string]: value,
         });
       }}
@@ -104,18 +114,13 @@ export const BooleanInputComponent: React.FC<{
 export const StringListInputComponent: React.FC<{
   input: StringListInput | IncludeExcludeListInput;
   defaultField?: "includes" | "excludes";
-  activeFilterConfiguration: ModularFilterConfiguration<
-    "stringlist" | "includeExcludeList"
-  >;
-  activeFilterId: string;
-  dataContext: DataContext;
-}> = ({
-  input,
-  defaultField,
-  activeFilterConfiguration,
-  activeFilterId,
-  dataContext,
-}) => {
+  label?: string;
+}> = ({ input, defaultField, label }) => {
+  const { getActiveFilterConfiguration, updateConfigurationForActiveFilter } =
+    useData();
+
+  const activeConfiguration = getActiveFilterConfiguration();
+
   const macroName =
     input.type === "includeExcludeList"
       ? (input.macroName as { includes: string; excludes: string })[
@@ -124,7 +129,7 @@ export const StringListInputComponent: React.FC<{
       : (input.macroName as string);
 
   const currentValues =
-    activeFilterConfiguration?.[macroName] ??
+    activeConfiguration?.[macroName] ??
     (input.type === "includeExcludeList"
       ? (input.default as IncludeExcludeListInputDefaults)[defaultField!!]
       : input.default);
@@ -147,25 +152,23 @@ export const StringListInputComponent: React.FC<{
       freeSolo
       value={currentValues}
       onChange={(event, newValue) => {
-        console.log(newValue);
         if (typeof newValue === "string") {
-          dataContext.setFilterConfiguration(activeFilterId, {
+          updateConfigurationForActiveFilter({
             [macroName as string]: [{ value: newValue, label: newValue }],
           });
         }
 
         if (newValue && (newValue as any)?.inputValue) {
-          dataContext.setFilterConfiguration(activeFilterId, {
+          updateConfigurationForActiveFilter({
             [macroName as string]: newValue,
           });
         } else {
-          dataContext.setFilterConfiguration(activeFilterId, {
+          updateConfigurationForActiveFilter({
             [macroName as string]: newValue,
           });
         }
       }}
       filterOptions={(options, params) => {
-        console.log("render input", params, options);
         const newOptions = [...options];
         const { inputValue } = params;
         // Suggest the creation of a new value
@@ -181,7 +184,9 @@ export const StringListInputComponent: React.FC<{
 
         return newOptions;
       }}
-      renderInput={(params) => <TextField {...params} label={input.label} />}
+      renderInput={(params) => (
+        <TextField {...params} label={label || input.label} />
+      )}
       options={options}
       getOptionLabel={(option) => {
         // Value selected with enter, right from the input
@@ -197,13 +202,158 @@ export const StringListInputComponent: React.FC<{
       }}
       renderOption={(props, option) => {
         const { key, ...optionProps } = props;
-        const isNewValue = !currentValues.some(
+
+        return (
+          <li key={key} {...optionProps}>
+            {option.label || `Add "${option.inputValue}"`}
+          </li>
+        );
+      }}
+    />
+  );
+};
+
+export type Option = {
+  label: string;
+  value: string;
+  inputValue?: string;
+};
+
+export interface ConfiguredAutoCompleteProps<
+  Multiple extends boolean | undefined = false,
+> {
+  multiple?: Multiple;
+  options: Option[];
+  inputLabel: string;
+  configurationUpdater: <T extends keyof typeof filterTypes>(
+    configuration: ModularFilterConfiguration<T>,
+    newValue: Option[] | Option | undefined
+  ) => ModularFilterConfiguration<T>;
+
+  getSetting: <T extends keyof typeof filterTypes>(
+    configuration: ModularFilterConfiguration<T>
+  ) => Multiple extends true ? Option[] : Option | undefined;
+
+  getDefaultValue: <T extends keyof typeof filterTypes>(
+    input: FilterModuleInput<T>
+  ) => Multiple extends true
+    ? Option[] | Option | undefined
+    : Option | undefined;
+
+  allowCreate?: boolean;
+}
+/**
+ *
+ * It is up to the caller to convert between the Option type and whatever
+ * the serialized // saved type is.
+ */
+export const ConfiguredAutoComplete: React.FC<ConfiguredAutoCompleteProps> = ({
+  options,
+  inputLabel,
+  configurationUpdater,
+  getSetting,
+  getDefaultValue,
+  allowCreate = false,
+  multiple = false,
+}) => {
+  const { getActiveFilterConfiguration, updateConfigurationForActiveFilter } =
+    useData();
+  const activeConfiguration = getActiveFilterConfiguration();
+  console.log("activeConfiguration", activeConfiguration);
+  const { input } = useFilterModule();
+
+  const currentSetting = getSetting(activeConfiguration);
+  const inputDefault = getDefaultValue(input);
+  const currentSelectedOptions = currentSetting ?? inputDefault;
+
+  const filter = createFilterOptions<Option>();
+
+  const computeAndSetNewConfig = (newValue: Option[] | Option | undefined) => {
+    const updatedConfig = configurationUpdater(activeConfiguration, newValue);
+    updateConfigurationForActiveFilter(updatedConfig);
+  };
+
+  return (
+    <Autocomplete
+      multiple={multiple}
+      freeSolo={allowCreate}
+      value={currentSelectedOptions}
+      onChange={(event, newValue) => {
+        if (typeof newValue === "string") {
+          configurationUpdater(
+            activeConfiguration,
+            multiple
+              ? [{ label: newValue, value: newValue }]
+              : { label: newValue, value: newValue }
+          );
+          return;
+        }
+
+        if (Array.isArray(newValue)) {
+          const updatedConfig: Option[] = newValue.map((value) => {
+            if (typeof value === "string") {
+              return { label: value, value };
+            }
+            return value;
+          });
+          computeAndSetNewConfig(updatedConfig);
+          return;
+        }
+
+        if (newValue && newValue?.inputValue) {
+          computeAndSetNewConfig({
+            label: newValue.inputValue,
+            value: newValue.inputValue,
+          });
+        } else if (newValue) {
+          computeAndSetNewConfig(newValue);
+        } else {
+          computeAndSetNewConfig(undefined);
+        }
+      }}
+      filterOptions={(options, params) => {
+        const newOptions = [...options];
+        const { inputValue } = params;
+
+        // Suggest the creation of a new value
+        const isExisting = options.some(
+          (option) => inputValue === option.label
+        );
+
+        if (inputValue !== "" && !isExisting) {
+          newOptions.push({
+            label: inputValue,
+            value: inputValue,
+          });
+        }
+
+        return newOptions;
+      }}
+      renderInput={(params) => <TextField {...params} label={inputLabel} />}
+      options={options}
+      getOptionLabel={(option) => {
+        // Value selected with enter, right from the input
+        if (typeof option === "string") {
+          return option;
+        }
+        // Add "xxx" option created dynamically
+        if (option.inputValue) {
+          return option.inputValue;
+        }
+
+        if (option?.label === undefined) {
+          console.log("option", option);
+          return "Select an option";
+        }
+        // Regular option
+        return option.label;
+      }}
+      renderOption={(props, option) => {
+        const { key, ...optionProps } = props;
+        const isNewValue = !options.some(
           (value: { value: string }) => value.value === option.value
         );
 
-        const selectText = isNewValue
-          ? `Add "${option.inputValue}"`
-          : option.label;
         return (
           <li key={key} {...optionProps}>
             {option.label || `Add "${option.inputValue}"`}

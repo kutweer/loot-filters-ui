@@ -12,43 +12,21 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import {
-  ModularFilterConfiguration,
-  ModularFilterConfigurationId,
-  ModularFilterId,
-  SetActiveFilters,
-  SetFilterConfiguration,
-  SetFilterConfigurationRemoved,
-  SetModularFilterRemoved,
-  SetNewImportedModularFilter,
-} from "../utils/storage";
 import { loadFilter } from "../utils/modularFilterLoader";
-import { UiModularFilter } from "../types/ModularFilter";
-import { filterTypes } from "../types/ModularFilterSpec";
-export const FilterSelector: React.FC<{
-  activeFilterId: ModularFilterId | undefined;
-  activeFilter: UiModularFilter | undefined;
-  activeConfiguration:
-    | ModularFilterConfiguration<keyof typeof filterTypes>
-    | undefined;
-  importedModularFilters: Record<string, UiModularFilter>;
-  setActiveFilters: SetActiveFilters;
-  setNewImportedModularFilter: SetNewImportedModularFilter;
-  setFilterConfiguration: SetFilterConfiguration;
-  setFilterConfigurationRemoved: SetFilterConfigurationRemoved;
-  setModularFilterRemoved: SetModularFilterRemoved;
-}> = ({
-  activeFilterId,
-  activeFilter,
-  importedModularFilters,
-  setActiveFilters,
-  setNewImportedModularFilter,
-  setFilterConfiguration,
-  setFilterConfigurationRemoved,
-  setModularFilterRemoved,
-}) => {
+import { ModularFilterId, useData } from "../utils/storage";
+
+export const FilterSelector: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [filterUrl, setFilterUrl] = useState("");
+  const {
+    data: { activeFilterId, importedModularFilters },
+    setActiveFilter,
+    addNewImportedModularFilter: setNewImportedModularFilter,
+    setModularFilterRemoved,
+    getActiveFilter,
+  } = useData();
+
+  const activeFilter = getActiveFilter();
 
   return (
     <Container>
@@ -80,15 +58,14 @@ export const FilterSelector: React.FC<{
             <Select
               value={activeFilterId}
               onChange={(e) => {
-                setActiveFilters(e.target.value as ModularFilterId);
+                setActiveFilter(e.target.value as ModularFilterId);
               }}
               renderValue={(value: number | string) => {
                 const filter = importedModularFilters[value];
-
-                if (typeof value === "string" || !filter) {
+                if (!filter) {
                   return "Select a filter";
                 }
-                return importedModularFilters[value].name;
+                return filter.name;
               }}
               displayEmpty
             >
@@ -112,7 +89,9 @@ export const FilterSelector: React.FC<{
               color="secondary"
               disabled={activeFilterId === undefined}
               onClick={() => {
-                setModularFilterRemoved(activeFilterId!!);
+                if (activeFilterId) {
+                  setModularFilterRemoved(activeFilterId);
+                }
               }}
             >
               Delete Filter

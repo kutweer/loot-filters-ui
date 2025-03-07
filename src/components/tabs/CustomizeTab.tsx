@@ -1,5 +1,19 @@
-import { Box, Paper, Stack, Typography } from "@mui/material";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Divider,
+  Grid2,
+  Stack,
+  Typography,
+} from "@mui/material";
+import React, { useState } from "react";
 import { groupBy } from "underscore";
+import {
+  FilterModuleProvider,
+  useFilterModule,
+} from "../../context/FilterModuleContext";
 import { colors } from "../../styles/MuiTheme";
 import {
   BooleanInput,
@@ -8,16 +22,12 @@ import {
   FilterModuleInput,
   filterTypes,
   IncludeExcludeListInput,
-  ModularFilter,
   NumberInput,
   StringListInput,
   StyleInput,
 } from "../../types/ModularFilterSpec";
-import {
-  DataContext,
-  ModularFilterConfiguration,
-  ModularFilterId,
-} from "../../utils/storage";
+import useSiteConfig from "../../utils/devmode";
+import { ModularFilterConfiguration, useData } from "../../utils/storage";
 import {
   BooleanInputComponent,
   EnumInputComponent,
@@ -26,79 +36,79 @@ import {
 } from "../inputs/BasicInputs";
 import { DisplayConfigurationInput } from "../inputs/DisplayConfigurationInput";
 import { IncludeExcludeListInputComponent } from "../inputs/IncludeExcludeListInputComponent";
+import { ItemLabelPreview } from "../Previews";
 
-const getInputComponent = (
-  input: FilterModuleInput<keyof typeof filterTypes>,
-  activeFilterId: ModularFilterId,
-  activeFilterConfiguration: ModularFilterConfiguration<
-    keyof typeof filterTypes
-  >,
-  dataContext: DataContext
-): React.ReactNode => {
+const InputComponent: React.FC = () => {
+  const { input } = useFilterModule();
+
   switch (input.type) {
     case "number":
       const numberInput = input as NumberInput;
-      return (
-        <NumberInputComponent
-          input={numberInput}
-          activeFilterConfiguration={activeFilterConfiguration}
-          activeFilterId={activeFilterId}
-          dataContext={dataContext}
-        />
-      );
+      return <NumberInputComponent input={numberInput} />;
     case "boolean":
-      return (
-        <BooleanInputComponent
-          input={input as BooleanInput}
-          activeFilterConfiguration={activeFilterConfiguration}
-          activeFilterId={activeFilterId}
-          dataContext={dataContext}
-        />
-      );
+      return <BooleanInputComponent input={input as BooleanInput} />;
     case "enumlist":
       const enumListInput = input as EnumListInput;
-      return (
-        <EnumInputComponent
-          input={enumListInput}
-          activeFilterConfiguration={activeFilterConfiguration}
-          activeFilterId={activeFilterId}
-          dataContext={dataContext}
-        />
-      );
+      return <EnumInputComponent input={enumListInput} />;
     case "stringlist":
-      return (
-        <StringListInputComponent
-          input={input as StringListInput}
-          activeFilterConfiguration={activeFilterConfiguration}
-          activeFilterId={activeFilterId}
-          dataContext={dataContext}
-        />
-      );
+      return <StringListInputComponent input={input as StringListInput} />;
     case "style":
+      return <DisplayConfigurationInput input={input as StyleInput} />;
+    default:
       return (
-        <DisplayConfigurationInput
-          input={input as StyleInput}
-          dataContext={dataContext}
+        <IncludeExcludeListInputComponent
+          input={input as IncludeExcludeListInput}
         />
       );
-    default:
-      return <IncludeExcludeListInputComponent
-          input={input as IncludeExcludeListInput}
-          activeFilterConfiguration={activeFilterConfiguration}
-          activeFilterId={activeFilterId}
-          dataContext={dataContext}
-        />
   }
+};
+
+const sizeOf = (input: FilterModuleInput<keyof typeof filterTypes>) => {
+  switch (input.type) {
+    case "number":
+      return 4;
+    case "boolean":
+      return 2;
+    case "style":
+      return 12;
+    case "includeExcludeList":
+      return 12;
+    default:
+      return 4;
+  }
+};
+
+const FirstCoupleLabels: React.FC<{
+  module: FilterModule;
+  activeFilterConfiguration: ModularFilterConfiguration<
+    keyof typeof filterTypes
+  >;
+}> = ({ module, activeFilterConfiguration }) => {
+  const styleInputs = module.inputs.filter((input) => input.type === "style");
+
+  return (
+    <Stack direction="row" spacing={2}>
+      {styleInputs.slice(0, 4).map((input) => (
+        <FilterModuleProvider key={input.macroName.toString()} input={input}>
+          <ItemLabelPreview
+            key={input.macroName.toString()}
+            itemName={input.label}
+          />
+        </FilterModuleProvider>
+      ))}
+    </Stack>
+  );
 };
 
 const ModuleSection: React.FC<{
   module: FilterModule;
-  activeFilterId: ModularFilterId;
-  activeFilterConfiguration: ModularFilterConfiguration<
-    keyof typeof filterTypes
-  >;
-  dataContext: DataContext;
-}> = ({ module, activeFilterId, activeFilterConfiguration, dataContext }) => {
+  expanded: boolean;
+  setExpanded: (expanded: boolean) => void;
+}> = ({ module, expanded, setExpanded }) => {
+  const { getActiveFilterConfiguration } = useData();
+
+  const activeFilterConfiguration = getActiveFilterConfiguration();
+
   const defaultGroupId = crypto.randomUUID();
   const groupedInputs = groupBy(
     module.inputs.map((input) => ({
@@ -109,72 +119,104 @@ const ModuleSection: React.FC<{
   );
 
   return (
-    <Paper elevation={3} sx={{ p: 2, pl: 4, pr: 4 }}>
-      <Typography variant="h4" color="primary">
-        Module: {module.name}
-      </Typography>
-      <Stack spacing={2} direction="column">
-        {Object.entries(groupedInputs).map(([group, inputs]) => {
-          return (
-            <Box key={group}>
-              {group !== defaultGroupId && (
-                <Typography variant="h6" color="primary">
-                  {group}
-                </Typography>
-              )}
-              {inputs.map((input) => {
-                return (
-                  <Box key={input.macroName.toString()}>
-                    <Typography variant="h6" color="primary">
-                      {input.label}
-                    </Typography>
-                    {getInputComponent(
-                      input,
-                      activeFilterId,
-                      activeFilterConfiguration,
-                      dataContext
-                    )}
-                  </Box>
-                );
-              })}
-            </Box>
-          );
-        })}
-      </Stack>
-    </Paper>
+    <Accordion
+      expanded={expanded}
+      sx={{
+        "&::before": {
+          backgroundColor: colors.rsDarkBrown,
+        },
+      }}
+    >
+      <AccordionSummary
+        onClick={() => setExpanded(!expanded)}
+        expandIcon={<ExpandMore />}
+      >
+        <Typography variant="h4" color="primary">
+          Module: {module.name}
+        </Typography>
+        <Stack direction="row" spacing={2}>
+          <FirstCoupleLabels
+            module={module}
+            activeFilterConfiguration={activeFilterConfiguration}
+          />
+        </Stack>
+      </AccordionSummary>
+      <AccordionDetails>
+        <Stack spacing={2} direction="column">
+          {Object.entries(groupedInputs).map(([group, inputs], index) => {
+            return (
+              <Grid2 container spacing={2} key={group}>
+                <Grid2 size={12}>
+                  <Divider>
+                    {group !== defaultGroupId ? (
+                      <Typography variant="h6" color="primary">
+                        {group}
+                      </Typography>
+                    ) : null}
+                  </Divider>
+                </Grid2>
+                {inputs
+                  .sort((a, b) => sizeOf(a) - sizeOf(b))
+                  .map((input) => {
+                    return (
+                      <Grid2
+                        key={input.macroName.toString()}
+                        size={sizeOf(input)}
+                      >
+                        <Typography variant="h6" color="primary">
+                          {input.label} {sizeOf(input)}
+                        </Typography>
+                        <FilterModuleProvider input={input}>
+                          <InputComponent />
+                        </FilterModuleProvider>
+                      </Grid2>
+                    );
+                  })}
+              </Grid2>
+            );
+          })}
+        </Stack>
+      </AccordionDetails>
+    </Accordion>
   );
 };
 
-export const CustomizeTab: React.FC<{
-  activeFilter: ModularFilter;
-  activeFilterId: ModularFilterId;
-  activeFilterConfiguration: ModularFilterConfiguration<
-    keyof typeof filterTypes
-  >;
-  dataContext: DataContext;
-}> = ({
-  activeFilter,
-  activeFilterId,
-  activeFilterConfiguration,
-  dataContext,
-}) => {
+export const CustomizeTab: React.FC = () => {
+  const [expandedModules, setExpandedModules] = useState<
+    Record<string, boolean>
+  >({});
+
+  const { getActiveFilter } = useData();
+
+  const activeFilter = getActiveFilter();
+
+  const [siteConfig, _] = useSiteConfig();
+
   if (!activeFilter) {
     return (
-      <Stack spacing={2} direction="column">
-        <Typography>No filter selected</Typography>
-      </Stack>
+      <Typography variant="h4" color="primary">
+        No filter selected
+      </Typography>
     );
   }
 
+  console.log("customizetab, activeFilter", activeFilter);
+
   return (
-    <Stack spacing={2} direction="column">
-      {activeFilter.modules.map((module, index) => (
+    <Stack spacing={2}>
+      {activeFilter?.modules.map((module) => (
         <ModuleSection
-          key={index}
+          key={module.name}
           module={module}
-          activeFilterId={activeFilterId}
-          activeFilterConfiguration={activeFilterConfiguration}
-          dataContext={dataContext}
+          expanded={
+            expandedModules[module.name] ?? (false || siteConfig.devMode)
+          }
+          setExpanded={(expanded) =>
+            setExpandedModules((prev) => ({
+              ...prev,
+              [module.name]: expanded,
+            }))
+          }
         />
       ))}
     </Stack>
