@@ -27,7 +27,8 @@ import {
   StyleInput,
 } from "../../types/ModularFilterSpec";
 import useSiteConfig from "../../utils/devmode";
-import { ModularFilterConfiguration, useData } from "../../utils/storage";
+import { ModularFilterConfiguration } from "../../utils/storage";
+import { useData } from "../../context/UiDataContext";
 import {
   BooleanInputComponent,
   EnumInputComponent,
@@ -115,7 +116,7 @@ const ModuleSection: React.FC<{
       ...input,
       group: input.group ?? defaultGroupId,
     })),
-    "group"
+    "group",
   );
 
   return (

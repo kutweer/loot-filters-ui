@@ -13,7 +13,8 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { loadFilter } from "../utils/modularFilterLoader";
-import { ModularFilterId, useData } from "../utils/storage";
+import { ModularFilterId } from "../utils/storage";
+import { useData } from "../context/UiDataContext";
 
 export const FilterSelector: React.FC = () => {
   const [open, setOpen] = useState(false);

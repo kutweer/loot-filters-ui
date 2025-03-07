@@ -1,11 +1,10 @@
 import { Box, SxProps } from "@mui/material";
 import { colors } from "../styles/MuiTheme";
 import { ArgbHexColor, argbHexToRgbaCss } from "../utils/Color";
-import { useData } from "../utils/storage";
 import { defaultOrConfigOrNone } from "./inputs/StyleInputHelprs";
 import { StyleInput } from "../types/ModularFilterSpec";
 import { useFilterModule } from "../context/FilterModuleContext";
-
+import { useData } from "../context/UiDataContext";
 export const ItemMenuPreview: React.FC<{
   itemName: string;
 }> = ({ itemName }) => {
@@ -13,7 +12,9 @@ export const ItemMenuPreview: React.FC<{
   const { input } = useFilterModule() as { input: StyleInput };
   const activeConf = getActiveFilterConfiguration();
 
-  const menuTextColor = argbHexToRgbaCss(defaultOrConfigOrNone("menuTextColor", input, activeConf));
+  const menuTextColor = argbHexToRgbaCss(
+    defaultOrConfigOrNone("menuTextColor", input, activeConf),
+  );
 
   return (
     <Box>
@@ -82,9 +83,15 @@ export const ItemLabelPreview: React.FC<{
   const { getActiveFilterConfiguration } = useData();
   const activeConf = getActiveFilterConfiguration();
 
-  const backgroundColor = argbHexToRgbaCss(defaultOrConfigOrNone("backgroundColor", input, activeConf));
-  const borderColor = argbHexToRgbaCss(defaultOrConfigOrNone("borderColor", input, activeConf));
-  const foregroundColor = argbHexToRgbaCss(defaultOrConfigOrNone("textColor", input, activeConf));
+  const backgroundColor = argbHexToRgbaCss(
+    defaultOrConfigOrNone("backgroundColor", input, activeConf),
+  );
+  const borderColor = argbHexToRgbaCss(
+    defaultOrConfigOrNone("borderColor", input, activeConf),
+  );
+  const foregroundColor = argbHexToRgbaCss(
+    defaultOrConfigOrNone("textColor", input, activeConf),
+  );
 
   return (
     <Box
