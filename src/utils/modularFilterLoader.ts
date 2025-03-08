@@ -31,7 +31,7 @@ export const loadFilter = async (
 
   validateFilterModuleInput({ ...filter, modules: [] }, false);
 
-  const resolvedModules: FilterModule[] = await Promise.all(
+  const resolvedModules: UiFilterModule[] = await Promise.all(
     filter.modules.map(
       async (
         moduleSource: ModuleSource | FilterModule

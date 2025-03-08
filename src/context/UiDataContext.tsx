@@ -7,14 +7,7 @@ import {
   useState,
 } from "react";
 import { UiModularFilter } from "../types/ModularFilter";
-import { filterTypes } from "../types/ModularFilterSpec";
-import {
-  loadData,
-  ModularFilterConfiguration,
-  ModularFilterId,
-  setData,
-  UiData,
-} from "../utils/storage";
+import { loadData, ModularFilterId, setData } from "../utils/storage";
 
 export type DataContext = {
   importedModularFilters: Record<ModularFilterId, UiModularFilter>;
@@ -47,30 +40,41 @@ interface DataProviderProps {
 }
 
 export const DataProvider = ({ children }: DataProviderProps) => {
-  const {
-    importedModularFilters: importedModularFiltersDefault,
-    activeFilterId: activeFilterIdDefault,
-  } = loadData("ui-data", (uiData) => {
-    return {
-      importedModularFilters: uiData.importedModularFilters || undefined,
-      activeFilterId: uiData.activeFilterId || undefined,
-    };
-  })!!;
+  const { importedModularFilters, activeFilterId } = loadData(
+    "ui-data",
+    (uiData) => {
+      return {
+        importedModularFilters: uiData.importedModularFilters || undefined,
+        activeFilterId: uiData.activeFilterId || undefined,
+      };
+    }
+  )!!;
 
-  const [importedModularFilters, setImportedModularFilters] = useState<
+  const [importedModularFiltersState, setImportedModularFilters] = useState<
     Record<ModularFilterId, UiModularFilter>
-  >(importedModularFiltersDefault);
+  >(importedModularFilters);
 
   useEffect(() => {
-    setData("ui-data", ["importedModularFilters"], importedModularFilters);
+    console.log(
+      "useEffect importedModularFiltersState",
+      importedModularFiltersState
+    );
+    setData("ui-data", (uiData) => ({
+      ...uiData,
+      importedModularFilters: importedModularFiltersState,
+    }));
   }, [importedModularFilters]);
 
-  const [activeFilterId, setActiveFilterId] = useState<
+  const [activeFilterIdState, setActiveFilterId] = useState<
     ModularFilterId | undefined
-  >(activeFilterIdDefault);
+  >(activeFilterId);
+
   useEffect(() => {
-    setData("ui-data", ["activeFilterId"], activeFilterId);
-  }, [activeFilterId]);
+    setData("ui-data", (uiData) => ({
+      ...uiData,
+      activeFilterId: activeFilterIdState,
+    }));
+  }, [activeFilterIdState]);
 
   const setActiveFilter = useCallback(
     (filterId?: ModularFilterId) => {
@@ -83,10 +87,7 @@ export const DataProvider = ({ children }: DataProviderProps) => {
     (id: ModularFilterId, filter: UiModularFilter) => {
       setImportedModularFilters((prev) => ({
         ...prev,
-        importedModularFilters: {
-          ...prev.importedModularFilters,
-          [id]: filter,
-        },
+        [id]: filter,
       }));
     },
     [setImportedModularFilters]
@@ -123,8 +124,8 @@ export const DataProvider = ({ children }: DataProviderProps) => {
   }, [importedModularFilters, activeFilterId]);
 
   const contextValue = {
-    importedModularFilters,
-    activeFilterId,
+    importedModularFilters: importedModularFiltersState,
+    activeFilterId: activeFilterIdState,
     setActiveFilter,
     addNewImportedModularFilter,
     removeFilterConfiguration,

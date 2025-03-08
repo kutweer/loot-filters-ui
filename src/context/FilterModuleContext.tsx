@@ -50,7 +50,7 @@ export const FilterModuleProvider = ({
     keyof typeof filterTypes
   > =
     loadData("ui-data", (uiData: UiData) => {
-      return uiData.filterConfigurations[activeFilterId];
+      return uiData?.filterConfigurations?.[activeFilterId];
     }) ?? {};
 
   const [activeConfig, setActiveConfig] =
@@ -59,7 +59,13 @@ export const FilterModuleProvider = ({
     );
 
   useEffect(() => {
-    setData("ui-data", ["filterConfigurations", activeFilterId], activeConfig);
+    setData("ui-data", (uiData) => ({
+      ...uiData,
+      filterConfigurations: {
+        ...uiData.filterConfigurations,
+        [activeFilterId]: activeConfig,
+      },
+    }));
   }, [activeConfig]);
 
   return (
