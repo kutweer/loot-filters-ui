@@ -1,26 +1,35 @@
-import { createContext, ReactNode, useContext, useState } from "react";
-import { FilterModuleInput, filterTypes } from "../types/ModularFilterSpec";
-import { ModularFilterConfiguration } from "../utils/storage";
-import { useData } from "./UiDataContext";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { FilterModule, filterTypes } from "../types/ModularFilterSpec";
+import {
+  loadData,
+  ModularFilterConfiguration,
+  ModularFilterId,
+  setData,
+  UiData,
+} from "../utils/storage";
 type FilterModuleContextType = {
-  input: FilterModuleInput<keyof typeof filterTypes>;
-  activeConfiguration: ModularFilterConfiguration<keyof typeof filterTypes>;
-  updateConfiguration: (
-    configuration: Partial<
-      ModularFilterConfiguration<keyof typeof filterTypes>
-    >,
+  activeConfig: ModularFilterConfiguration<keyof typeof filterTypes>;
+  setActiveConfig: (
+    activeConfig: ModularFilterConfiguration<keyof typeof filterTypes>
   ) => void;
+  module: FilterModule;
 };
 
 const FilterModuleContext = createContext<FilterModuleContextType | undefined>(
-  undefined,
+  undefined
 );
 
 export const useFilterModule = (): FilterModuleContextType => {
   const context = useContext(FilterModuleContext);
   if (context === undefined) {
     throw new Error(
-      "useFilterModule must be used within a FilterModuleProvider",
+      "useFilterModule must be used within a FilterModuleProvider"
     );
   }
   return context;
@@ -28,34 +37,35 @@ export const useFilterModule = (): FilterModuleContextType => {
 
 interface FilterModuleProviderProps {
   children: ReactNode;
-  input: FilterModuleInput<keyof typeof filterTypes>;
+  activeFilterId: ModularFilterId;
+  module: FilterModule;
 }
 
 export const FilterModuleProvider = ({
   children,
-  input,
+  activeFilterId,
+  module,
 }: FilterModuleProviderProps) => {
-  const { getActiveFilterConfiguration, updateConfigurationForActiveFilter } =
-    useData();
+  const activeConfigInitial: ModularFilterConfiguration<
+    keyof typeof filterTypes
+  > =
+    loadData("ui-data", (uiData: UiData) => {
+      return uiData.filterConfigurations[activeFilterId];
+    }) ?? {};
 
-  const activeConfiguration = getActiveFilterConfiguration();
+  const [activeConfig, setActiveConfig] =
+    useState<ModularFilterConfiguration<keyof typeof filterTypes>>(
+      activeConfigInitial
+    );
 
-  const updateConfiguration = (
-    configuration: Partial<
-      ModularFilterConfiguration<keyof typeof filterTypes>
-    >,
-  ) => {
-    updateConfigurationForActiveFilter(configuration);
-  };
-
-  const value = {
-    input,
-    activeConfiguration,
-    updateConfiguration,
-  };
+  useEffect(() => {
+    setData("ui-data", ["filterConfigurations", activeFilterId], activeConfig);
+  }, [activeConfig]);
 
   return (
-    <FilterModuleContext.Provider value={value}>
+    <FilterModuleContext.Provider
+      value={{ activeConfig, setActiveConfig, module }}
+    >
       {children}
     </FilterModuleContext.Provider>
   );

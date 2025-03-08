@@ -40,9 +40,10 @@ export const FilterSelector: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [filterUrl, setFilterUrl] = useState("");
   const {
-    data: { activeFilterId, importedModularFilters },
+    activeFilterId,
+    importedModularFilters,
     setActiveFilter,
-    addNewImportedModularFilter: setNewImportedModularFilter,
+    addNewImportedModularFilter,
     setModularFilterRemoved,
     getActiveFilter,
   } = useData();
@@ -173,7 +174,7 @@ export const FilterSelector: React.FC = () => {
                     loadFilter({
                       filterUrl: filterUrl,
                     }).then((filter) => {
-                      setNewImportedModularFilter(filter.id, filter);
+                      addNewImportedModularFilter(filter.id, filter);
                       setFilterUrl("");
                       setOpen(false);
                     });

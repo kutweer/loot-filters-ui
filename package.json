@@ -4,8 +4,8 @@
   "homepage": "https://kaqemeex.github.io/loot-filters-ui/",
   "private": true,
   "scripts": {
-    "start": "webpack serve --mode development",
-    "build": "webpack --mode production",
+    "start": "webpack serve --mode development --devtool source-map",
+    "build": "webpack --mode production --devtool source-map",
     "type-check": "tsc --noEmit",
     "eslint": "eslint src --ext .ts,.tsx --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",

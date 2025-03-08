@@ -1,19 +1,17 @@
 import { Box, SxProps } from "@mui/material";
-import { colors } from "../styles/MuiTheme";
-import { ArgbHexColor, argbHexToRgbaCss } from "../utils/Color";
-import { defaultOrConfigOrNone } from "./inputs/StyleInputHelprs";
-import { StyleInput } from "../types/ModularFilterSpec";
 import { useFilterModule } from "../context/FilterModuleContext";
-import { useData } from "../context/UiDataContext";
+import { colors } from "../styles/MuiTheme";
+import { StyleInput } from "../types/ModularFilterSpec";
+import { argbHexToRgbaCss } from "../utils/Color";
+import { defaultOrConfigOrNone } from "./inputs/StyleInputHelprs";
 export const ItemMenuPreview: React.FC<{
   itemName: string;
-}> = ({ itemName }) => {
-  const { getActiveFilterConfiguration } = useData();
-  const { input } = useFilterModule() as { input: StyleInput };
-  const activeConf = getActiveFilterConfiguration();
+  input: StyleInput;
+}> = ({ itemName, input }) => {
+  const { activeConfig } = useFilterModule();
 
   const menuTextColor = argbHexToRgbaCss(
-    defaultOrConfigOrNone("menuTextColor", input, activeConf),
+    defaultOrConfigOrNone("menuTextColor", input, activeConfig)
   );
 
   return (
@@ -77,20 +75,19 @@ export const ItemMenuPreview: React.FC<{
 
 export const ItemLabelPreview: React.FC<{
   itemName: string;
+  input: StyleInput;
   sx?: SxProps;
-}> = ({ itemName, sx }) => {
-  const { input } = useFilterModule() as { input: StyleInput };
-  const { getActiveFilterConfiguration } = useData();
-  const activeConf = getActiveFilterConfiguration();
+}> = ({ itemName, input, sx }) => {
+  const { activeConfig } = useFilterModule();
 
   const backgroundColor = argbHexToRgbaCss(
-    defaultOrConfigOrNone("backgroundColor", input, activeConf),
+    defaultOrConfigOrNone("backgroundColor", input, activeConfig)
   );
   const borderColor = argbHexToRgbaCss(
-    defaultOrConfigOrNone("borderColor", input, activeConf),
+    defaultOrConfigOrNone("borderColor", input, activeConfig)
   );
   const foregroundColor = argbHexToRgbaCss(
-    defaultOrConfigOrNone("textColor", input, activeConf),
+    defaultOrConfigOrNone("textColor", input, activeConfig)
   );
 
   return (

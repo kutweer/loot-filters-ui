@@ -1,47 +1,44 @@
 import { Box, Tab, Tabs } from "@mui/material";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { filter } from "underscore";
+import { useData } from "../context/UiDataContext";
 import { SiteConfig } from "../utils/devmode";
 import { FilterSelector } from "./FilterSelector";
 import { CustomizeTab } from "./tabs/CustomizeTab";
-import { useData } from "../context/UiDataContext";
+
 export const FilterTabs: React.FC<{
   sha: string;
   siteConfig: SiteConfig;
 }> = ({ sha, siteConfig }) => {
   const [activeTab, setActiveTab] = useState(1);
-  const { getActiveFilter, getActiveFilterConfiguration } = useData();
+  const { getActiveFilter } = useData();
 
   const activeFilter = getActiveFilter();
-  const activeFilterConfiguration = getActiveFilterConfiguration();
 
-  const tabs: {
-    label: string;
-    dev: boolean;
-    component: React.ReactNode;
-    disabled?: boolean;
-  }[] = [
-    {
-      label: `${activeFilter?.name || "Filter"} Preview`,
-      dev: false,
-      component: <></>,
-    },
-    {
-      label: `Customize ${activeFilter?.name}`,
-      disabled: activeFilter === null,
-      dev: false,
-      component: activeFilter ? <CustomizeTab /> : null,
-    },
-    // {
-    //   label: "Rendered Filter",
-    //   dev: true,
-    //   component: <RenderedFilterTab sha={sha} />,
-    // },
-  ];
+  const tabs = useMemo(() => {
+    return [
+      {
+        label: `${activeFilter?.name || "Filter"} Preview`,
+        dev: false,
+        component: <></>,
+      },
+      {
+        label: `Customize ${activeFilter?.name}`,
+        disabled: activeFilter === null,
+        dev: false,
+        component: activeFilter ? <CustomizeTab /> : null,
+      },
+      // {
+      //   label: "Rendered Filter",
+      //   dev: true,
+      //   component: <RenderedFilterTab sha={sha} />,
+      // },
+    ];
+  }, [activeFilter]);
 
-  const filteredTabs = filter(
-    tabs,
-    (tab) => siteConfig.devMode || tab.dev === false,
+  const filteredTabs = useMemo(
+    () => filter(tabs, (tab) => siteConfig.devMode || tab.dev === false),
+    [tabs, siteConfig.devMode]
   );
 
   return (
