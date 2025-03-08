@@ -132,7 +132,7 @@ export type StyleInput = FilterModuleInput<"style"> & {
 
 export const validateFilterModuleInput = (
   filter: ModularFilter,
-  checkModules = false,
+  checkModules = false
 ) => {
   assertString(filter, "name");
   assertString(filter, "description");
@@ -149,23 +149,24 @@ export const validateFilterModuleInput = (
 export const validateModule = (module: FilterModule) => {
   console.log("validateModule", module);
   module.inputs.forEach((input: FilterModuleInput<any>) => {
-
     if (Object.keys(input).includes("macroName")) {
       if (typeof input.macroName === "string") {
         if (input.macroName.length === 0) {
           throw new Error(`Module ${module.name} has empty macroName`);
         }
       } else if (typeof input.macroName === "object") {
-        checkObjectProperty(input.macroName, "includes", "string") && input.macroName.includes.length > 0;
-        checkObjectProperty(input.macroName, "excludes", "string") && input.macroName.excludes.length > 0;
+        checkObjectProperty(input.macroName, "includes", "string") &&
+          input.macroName.includes.length > 0;
+        checkObjectProperty(input.macroName, "excludes", "string") &&
+          input.macroName.excludes.length > 0;
       } else {
-        throw new Error(`Module ${module.name} has invalid macroName ${input.macroName} or the macroName is empty`);
+        throw new Error(
+          `Module ${module.name} has invalid macroName ${input.macroName} or the macroName is empty`
+        );
       }
-
     } else {
       throw new Error(`Module ${module.name} has no macroName`);
     }
-
 
     switch (input.type) {
       case "boolean":
@@ -183,11 +184,11 @@ export const validateModule = (module: FilterModule) => {
       case "includeExcludeList":
         checkArrayProperty(
           (input as IncludeExcludeListInput).default.includes,
-          "string",
+          "string"
         );
         checkArrayProperty(
           (input as IncludeExcludeListInput).default.excludes,
-          "string",
+          "string"
         );
         break;
       case "style":
@@ -242,23 +243,24 @@ const checkObjectProperty = (
   value: any,
   key: string,
   type: string,
-  optional = false,
+  optional = false
 ) => {
-  console.log("checkObjectProperty", value, key, type, optional);
   if (!isObject(value)) {
     throw new Error(`Value ${value} is not an object`);
   }
 
   if (!Object.keys(value).includes(key)) {
     if (!optional) {
-      throw new Error(`Value ${JSON.stringify(value)} has no property ${key} of type ${type}`);
+      throw new Error(
+        `Value ${JSON.stringify(value)} has no property ${key} of type ${type}`
+      );
     }
     return;
   }
 
   if (typeof value[key] !== type) {
     throw new Error(
-      `Value ${JSON.stringify(value)} has property ${key} of type ${typeof value[key]} instead of ${type}`,
+      `Value ${JSON.stringify(value)} has property ${key} of type ${typeof value[key]} instead of ${type}`
     );
   }
 

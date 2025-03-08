@@ -5,6 +5,7 @@ import { useData } from "../context/UiDataContext";
 import { SiteConfig } from "../utils/devmode";
 import { FilterSelector } from "./FilterSelector";
 import { CustomizeTab } from "./tabs/CustomizeTab";
+import { RenderedFilterTab } from "./tabs/RenderedFilterTab";
 
 export const FilterTabs: React.FC<{
   sha: string;
@@ -20,7 +21,7 @@ export const FilterTabs: React.FC<{
       {
         label: `${activeFilter?.name || "Filter"} Preview`,
         dev: false,
-        component: <></>,
+        component: <RenderedFilterTab sha={sha} />,
       },
       {
         label: `Customize ${activeFilter?.name}`,
@@ -28,11 +29,6 @@ export const FilterTabs: React.FC<{
         dev: false,
         component: activeFilter ? <CustomizeTab /> : null,
       },
-      // {
-      //   label: "Rendered Filter",
-      //   dev: true,
-      //   component: <RenderedFilterTab sha={sha} />,
-      // },
     ];
   }, [activeFilter]);
 

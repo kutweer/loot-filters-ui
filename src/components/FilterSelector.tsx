@@ -57,6 +57,8 @@ export const FilterSelector: React.FC = () => {
     ...COMMON_FILTERS,
   ];
 
+  console.log("importedModularFilters", importedModularFilters);
+
   return (
     <Container>
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -98,11 +100,14 @@ export const FilterSelector: React.FC = () => {
               }}
               displayEmpty
             >
-              {Object.values(importedModularFilters).map((filter, index) => (
-                <MenuItem key={index} value={filter.id}>
-                  {filter.name}
-                </MenuItem>
-              ))}
+              {Object.values(importedModularFilters).map((filter, index) => {
+                console.log("filter", filter);
+                return (
+                  <MenuItem key={index} value={filter.id}>
+                    {filter.name}
+                  </MenuItem>
+                );
+              })}
             </Select>
             <Button
               variant="outlined"

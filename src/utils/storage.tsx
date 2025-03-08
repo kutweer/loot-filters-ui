@@ -34,18 +34,12 @@ export const loadData = <T,>(localstorageKey: string, getter: Getter<T>): T | un
   }
 };
 
-export const setData = <T,>(localstorageKey: string, path: string[], value: T) => {
+export const setData = <T,>(localstorageKey: string, updater: (uiData: UiData) => UiData) => {
     const data = localStorage.getItem(localstorageKey);
     const parsedData = data ? JSON.parse(data) : {};
 
-    let current = parsedData;
-    for (let i = 0; i < path.length - 1; i++) {
-        if (!(path[i] in current)) {
-            current[path[i]] = {};
-        }
-        current = current[path[i]];
-    }
-    current[path[path.length - 1]] = value;
-    localStorage.setItem(localstorageKey, JSON.stringify(parsedData));
-    return parsedData;
+    const updatedData = updater(parsedData);
+    localStorage.setItem(localstorageKey, JSON.stringify(updatedData));
+    
+    return updatedData;
 }

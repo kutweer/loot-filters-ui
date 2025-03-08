@@ -24,11 +24,12 @@ export type ModuleSource =
  * like the rs2f text, and the source url.
  */
 
-export type UiModularFilter = ModularFilter & {
+export type UiModularFilter = {
   id: string;
   importedOn: string; // ISO string
   source?: FilterSource;
-};
+  modules: UiFilterModule[];
+} & ModularFilter;
 
 export type UiFilterModule = FilterModule & {
   rs2fText: string;
