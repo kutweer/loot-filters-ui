@@ -13,15 +13,17 @@ export type ModularFilter = {
 export type FilterModule = {
   name: string;
   description?: string;
-  inputs: (
-    | BooleanInput
-    | NumberInput
-    | StringListInput
-    | EnumListInput
-    | IncludeExcludeListInput
-    | StyleInput
-  )[];
+  rs2fText: string;
+  inputs: FilterModuleInputUnion[];
 };
+
+export type FilterModuleInputUnion =
+ | BooleanInput
+ | NumberInput
+ | StringListInput
+ | EnumListInput
+ | IncludeExcludeListInput
+ | StyleInput;
 
 /**
  * Inputs - the input types for the filter module
@@ -45,18 +47,22 @@ export type FilterModuleInput<T extends keyof typeof filterTypes> = {
 };
 
 export type BooleanInput = FilterModuleInput<"boolean"> & {
+  macroName: string;
   default: boolean;
 };
 
 export type NumberInput = FilterModuleInput<"number"> & {
+  macroName: string;
   default: number;
 };
 
 export type StringListInput = FilterModuleInput<"stringlist"> & {
+  macroName: string;
   default: string[];
 };
 
 export type EnumListInput = FilterModuleInput<"enumlist"> & {
+  macroName: string;
   default: string[];
   enum: string[];
 };
@@ -110,6 +116,7 @@ export const fontTypeFromOrdinal = (ordinal: number): FontType => {
 export type ArgbHexColor = `#${string}`;
 
 export type StyleInput = FilterModuleInput<"style"> & {
+  macroName: string;
   default: {
     textColor: ArgbHexColor;
     backgroundColor: ArgbHexColor;
@@ -266,3 +273,22 @@ const checkObjectProperty = (
 
   return value[key];
 };
+
+export const isBoolean = (input: FilterModuleInputUnion): input is BooleanInput =>
+  input.type === "boolean";
+
+export const isNumber = (input: FilterModuleInputUnion): input is NumberInput =>
+  input.type === "number";
+
+export const isStringList = (input: FilterModuleInputUnion): input is StringListInput =>
+  input.type === "stringlist";
+
+export const isEnumList = (input: FilterModuleInputUnion): input is EnumListInput =>
+  input.type === "enumlist";
+
+export const isIncludeExcludeList = (input: FilterModuleInputUnion): input is IncludeExcludeListInput =>
+  input.type === "includeExcludeList";
+
+export const isStyle = (input: FilterModuleInputUnion): input is StyleInput =>
+  input.type === "style";
+
