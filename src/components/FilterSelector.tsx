@@ -15,9 +15,9 @@ import {
 } from "@mui/material";
 import { useCallback, useMemo, useState } from "react";
 import { useUiStore } from "../store/store";
+import { FilterId } from "../types/ModularFilterSpec";
 import useSiteConfig from "../utils/devmode";
 import { loadFilter } from "../utils/modularFilterLoader";
-import { FilterId } from "../types/ModularFilterSpec";
 
 const COMMON_FILTERS = [
   {
@@ -34,6 +34,14 @@ const DEV_FILTERS = [
   {
     name: "Style Input Test",
     url: "https://raw.githubusercontent.com/Kaqemeex/example-configurable-filter/refs/heads/main/single_style_filter.json",
+  },
+  {
+    name: "Misc Filter",
+    url: "https://raw.githubusercontent.com/Kaqemeex/example-configurable-filter/refs/heads/main/misc_filter.json",
+  },
+  {
+    name: "Invalid Input Filter",
+    url: "https://raw.githubusercontent.com/Kaqemeex/example-configurable-filter/refs/heads/main/filter_with_invalid_input.json",
   },
 ];
 
@@ -59,6 +67,9 @@ export const FilterSelector: React.FC = () => {
     () => Object.values(importedModularFilters).find((filter) => filter.active),
     [importedModularFilters]
   );
+  const removeImportedModularFilter = useUiStore(
+    (state) => state.removeImportedModularFilter
+  );
 
   const handleFilterChange = useCallback(
     (e: SelectChangeEvent<string>) => {
@@ -70,8 +81,11 @@ export const FilterSelector: React.FC = () => {
   const handleDeleteFilter = useCallback(() => {
     if (activeFilter) {
       setActiveFilterId(activeFilter.id);
+      removeImportedModularFilter(activeFilter.id);
     }
-  }, [activeFilter, setActiveFilterId]);
+  }, [activeFilter, setActiveFilterId, removeImportedModularFilter]);
+
+  const [importError, setImportError] = useState("");
 
   return (
     <Container>
@@ -101,6 +115,7 @@ export const FilterSelector: React.FC = () => {
             size="small"
           >
             <Select
+              disabled={Object.keys(importedModularFilters).length === 0}
               value={activeFilter?.id ?? ""}
               onChange={handleFilterChange}
               renderValue={(value: number | string) => {
@@ -162,7 +177,10 @@ export const FilterSelector: React.FC = () => {
                       labelId="common-filter-select"
                       value={filterUrl}
                       displayEmpty
-                      onChange={(e) => setFilterUrl(e.target.value)}
+                      onChange={(e) => {
+                        setFilterUrl(e.target.value);
+                        setImportError("");
+                      }}
                     >
                       {filtersForImport.map((filter) => (
                         <MenuItem key={filter.url} value={filter.url}>
@@ -174,20 +192,34 @@ export const FilterSelector: React.FC = () => {
                   <TextField
                     label="Filter URL"
                     value={filterUrl}
-                    onChange={(e) => setFilterUrl(e.target.value)}
+                    onChange={(e) => {
+                      setFilterUrl(e.target.value);
+                      setImportError("");
+                    }}
+                    error={importError !== ""}
+                    helperText={importError}
                   />
                 </Box>
                 <Button
                   variant="contained"
                   color="primary"
+                  disabled={filterUrl === "" || importError !== ""}
                   onClick={() => {
+                    setImportError("");
                     loadFilter({
                       filterUrl: filterUrl,
-                    }).then((filter) => {
-                      addImportedModularFilter(filter);
-                      setFilterUrl("");
-                      setOpen(false);
-                    });
+                    })
+                      .catch((error) => {
+                        setImportError(error.message);
+                      })
+                      .then((filter) => {
+                        if (filter) {
+                          addImportedModularFilter(filter);
+                          setActiveFilterId(filter.id);
+                          setFilterUrl("");
+                          setOpen(false);
+                        }
+                      });
                   }}
                 >
                   Import

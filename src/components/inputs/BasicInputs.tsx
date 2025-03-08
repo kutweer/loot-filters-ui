@@ -9,23 +9,30 @@ import {
   StyleInput,
 } from "../../types/InputsSpec";
 import {
+  FilterId,
   ModularFilterConfiguration,
   readConfigValue,
   UiFilterModule,
 } from "../../types/ModularFilterSpec";
 
 export const NumberInputComponent: React.FC<{
+  activeFilterId: FilterId;
   module: UiFilterModule;
   input: NumberInput;
-}> = ({ module, input }) => {
+}> = ({ activeFilterId, module, input }) => {
   const activeConfig = useUiStore(
-    (state) => state.filterConfigurations[module.id]
+    (state) => state.filterConfigurations[activeFilterId]
   );
   const setFilterConfiguration = useUiStore(
     (state) => state.setFilterConfiguration
   );
 
-  const currentSetting = readConfigValue(input, activeConfig) ?? input.default;
+  const userConfigValue = readConfigValue<number>(
+    module.id,
+    input.macroName,
+    activeConfig
+  );
+  const currentSetting = userConfigValue ?? input.default;
 
   return (
     <TextField
@@ -33,26 +40,32 @@ export const NumberInputComponent: React.FC<{
       value={currentSetting}
       onChange={(event) => {
         const value = event.target.value;
-        setFilterConfiguration(module.id, {
-          [input.macroName]: parseInt(value),
-        });
+        setFilterConfiguration(
+          activeFilterId,
+          module.id,
+          input.macroName,
+          parseInt(value)
+        );
       }}
     />
   );
 };
 
 export const EnumInputComponent: React.FC<{
+  activeFilterId: FilterId;
   module: UiFilterModule;
   input: EnumListInput;
-}> = ({ module, input }) => {
+}> = ({ activeFilterId, module, input }) => {
   const activeConfig = useUiStore(
-    (state) => state.filterConfigurations[module.id]
+    (state) => state.filterConfigurations[activeFilterId]
   );
   const setFilterConfiguration = useUiStore(
     (state) => state.setFilterConfiguration
   );
 
-  const currentSetting = readConfigValue(input, activeConfig) ?? input.default;
+  const currentSetting =
+    readConfigValue<string[]>(module.id, input.macroName, activeConfig) ??
+    input.default;
 
   return (
     <Select
@@ -61,13 +74,16 @@ export const EnumInputComponent: React.FC<{
         const value = event.target.value;
 
         if (Array.isArray(value)) {
-          setFilterConfiguration(module.id, {
-            [input.macroName]: value,
-          });
+          setFilterConfiguration(
+            activeFilterId,
+            module.id,
+            input.macroName,
+            value
+          );
         } else {
-          setFilterConfiguration(module.id, {
-            [input.macroName]: [value.toString()],
-          });
+          setFilterConfiguration(activeFilterId, module.id, input.macroName, [
+            value.toString(),
+          ]);
         }
       }}
       displayEmpty
@@ -91,38 +107,45 @@ export const EnumInputComponent: React.FC<{
 };
 
 export const BooleanInputComponent: React.FC<{
+  activeFilterId: FilterId;
   module: UiFilterModule;
   input: BooleanInput;
-}> = ({ module, input }) => {
+}> = ({ activeFilterId, module, input }) => {
   const activeConfig: ModularFilterConfiguration = useUiStore(
-    (state) => state.filterConfigurations[module.id]
+    (state) => state.filterConfigurations[activeFilterId]
   );
   const setFilterConfiguration = useUiStore(
     (state) => state.setFilterConfiguration
   );
 
-  const currentSetting = readConfigValue(input, activeConfig) ?? input.default;
+  const currentSetting =
+    readConfigValue<boolean>(module.id, input.macroName, activeConfig) ??
+    input.default;
 
   return (
     <Checkbox
       checked={currentSetting}
       onChange={(event) => {
         const value = event.target.checked;
-        setFilterConfiguration(module.id, {
-          [input.macroName as string]: value,
-        });
+        setFilterConfiguration(
+          activeFilterId,
+          module.id,
+          input.macroName,
+          value
+        );
       }}
     />
   );
 };
 
 export const ListInputComponent: React.FC<{
+  activeFilterId: FilterId;
   module: UiFilterModule;
   input: StringListInput | IncludeExcludeListInput | EnumListInput | StyleInput;
   label?: string;
-}> = ({ module, input, label }) => {
+}> = ({ activeFilterId, module, input, label }) => {
   const activeConfig = useUiStore(
-    (state) => state.filterConfigurations[module.id]
+    (state) => state.filterConfigurations[activeFilterId]
   );
   const setFilterConfiguration = useUiStore(
     (state) => state.setFilterConfiguration

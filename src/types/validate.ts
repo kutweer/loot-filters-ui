@@ -11,7 +11,9 @@ import { FilterModule } from "./ModularFilterSpec";
 export const validateModule = (module: FilterModule) => {
   assertString(module, "name");
   assertString(module, "description", true);
+
   module.inputs.forEach((input) => {
+    assertString(input, "label");
     if (Object.keys(input).includes("macroName")) {
       if (typeof input.macroName === "string") {
         if (input.macroName.length === 0) {
@@ -108,6 +110,7 @@ const checkObjectProperty = (
   type: string,
   optional = false
 ) => {
+  console.log("checkObjectProperty", value, key, type, optional);
   if (!isObject(value)) {
     throw new Error(`Value ${value} is not an object`);
   }

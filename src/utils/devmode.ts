@@ -17,9 +17,17 @@ export const useSiteConfig = (): [
   const config = JSON.parse(
     localStorage.getItem("loot-filter-site-config") || "{}",
   );
+
   const isLocal =
     window.location.hostname === "localhost" ||
     window.location.hostname === "127.0.0.1";
+
+  const params = new URLSearchParams(window.location.search);
+  const devParam = params.get("dev");
+  if (devParam !== null) {
+    config.devMode = devParam === "true";
+  }
+
   const configWithDefaults = { ...defaultConfig, ...config, isLocal };
 
   const [configState, setConfigState] = useState(configWithDefaults);

@@ -1,18 +1,11 @@
 import { useUiStore } from "../../store/store";
 import { StyleInput } from "../../types/InputsSpec";
-import {
-  ModularFilterConfiguration,
-  UiFilterModule,
-} from "../../types/ModularFilterSpec";
+import { UiFilterModule } from "../../types/ModularFilterSpec";
 import { ArgbHexColor } from "../../utils/Color";
 import { ItemLabelPreview, ItemMenuPreview } from "../Previews";
 import { ListInputComponent } from "./BasicInputs";
 import { ColorPickerInput } from "./ColorPicker";
-import {
-  defaultOrConfigOrNone,
-  StyleConfig,
-  StyleConfigKey,
-} from "./StyleInputHelprs";
+import { StyleConfig, StyleConfigKey } from "./StyleInputHelpers";
 
 type Option = {
   label: string;
@@ -32,8 +25,17 @@ export const ItemLabelColorPicker: React.FC<{
   showExamples = true,
   labelLocation = "bottom",
 }) => {
-  const activeConfig: ModularFilterConfiguration = useUiStore(
-    (state) => state.filterConfigurations[module.id]
+  const activeFilterId = useUiStore((state) =>
+    Object.keys(state.importedModularFilters).find(
+      (id) => state.importedModularFilters[id].active
+    )
+  )!!;
+
+  const activeConfig = useUiStore(
+    (state) =>
+      state.filterConfigurations[activeFilterId][module.id][
+        input.macroName
+      ] as Partial<StyleConfig>
   );
 
   const setFilterConfiguration = useUiStore(
@@ -44,49 +46,56 @@ export const ItemLabelColorPicker: React.FC<{
     field: StyleConfigKey,
     value: StyleConfig[StyleConfigKey]
   ) => {
-    const update = { [field]: value } as Partial<StyleConfig>;
-    const full = { ...activeConfig, [input.macroName]: update };
-    setFilterConfiguration(module.id, full);
+    setFilterConfiguration(activeFilterId, module.id, input.macroName, {
+      [field]: value,
+    });
   };
 
   return (
     <div style={{ display: "flex", flexDirection: "row", gap: 8 }}>
       <ColorPickerInput
-        color={defaultOrConfigOrNone("textColor", input, activeConfig)}
+        color={activeConfig?.textColor ?? input.default?.textColor}
         labelText="Text Color"
-        onChange={(color: ArgbHexColor) => updateStyleField("textColor", color)}
+        onChange={(color?: ArgbHexColor) =>
+          updateStyleField("textColor", color)
+        }
         labelLocation={labelLocation}
       />
       <ColorPickerInput
-        color={defaultOrConfigOrNone("backgroundColor", input, activeConfig)}
+        color={activeConfig?.backgroundColor ?? input.default?.backgroundColor}
         labelText="Background"
-        onChange={(color: ArgbHexColor) =>
+        onChange={(color?: ArgbHexColor) =>
           updateStyleField("backgroundColor", color)
         }
         labelLocation={labelLocation}
       />
       <ColorPickerInput
-        color={defaultOrConfigOrNone("borderColor", input, activeConfig)}
+        color={activeConfig?.borderColor ?? input.default?.borderColor}
         labelText="Border"
-        onChange={(color: ArgbHexColor) =>
+        onChange={(color?: ArgbHexColor) =>
           updateStyleField("borderColor", color)
         }
         labelLocation={labelLocation}
       />
       <ColorPickerInput
-        color={defaultOrConfigOrNone("menuTextColor", input, activeConfig)}
+        color={activeConfig?.menuTextColor ?? input.default?.menuTextColor}
         labelText="Menu Text Color"
-        onChange={(color: ArgbHexColor) =>
+        onChange={(color?: ArgbHexColor) =>
           updateStyleField("menuTextColor", color)
         }
         labelLocation={labelLocation}
       />
-      <ListInputComponent module={module} input={input} label="Font Type" />
+      <ListInputComponent
+        activeFilterId={activeFilterId}
+        module={module}
+        input={input}
+        label="Font Type"
+      />
 
       <ColorPickerInput
-        color={defaultOrConfigOrNone("textAccentColor", input, activeConfig)}
+        color={activeConfig?.textAccentColor ?? input.default?.textAccentColor}
         labelText="Text Accent Color"
-        onChange={(color: ArgbHexColor) =>
+        onChange={(color?: ArgbHexColor) =>
           updateStyleField("textAccentColor", color)
         }
         labelLocation={labelLocation}
@@ -106,8 +115,8 @@ export const ItemLabelColorPicker: React.FC<{
       </Select> */}
       {showExamples && (
         <>
-          <ItemLabelPreview input={input} itemName={itemName} />
-          <ItemMenuPreview input={input} itemName={itemName} />
+          <ItemLabelPreview module={module} input={input} itemName={itemName} />
+          <ItemMenuPreview module={module} input={input} itemName={itemName} />
         </>
       )}
     </div>

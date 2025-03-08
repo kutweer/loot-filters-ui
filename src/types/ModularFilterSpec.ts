@@ -1,9 +1,4 @@
-import {
-  IncludeExcludeListInput,
-  IncludeExcludeListInputDefaults,
-  Input,
-  InputDefault,
-} from "./InputsSpec";
+import { Input, InputDefault, MacroName } from "./InputsSpec";
 
 // ### ### ### ### ###
 //
@@ -63,25 +58,18 @@ export type FilterModule = {
 //
 // ### ### ### ### ###
 
-// The key here is the MacroName - for inputs with multiple macro names each one has a unique key
-export type ModularFilterConfiguration = Record<string, Partial<InputDefault<Input>>>;
-
-// Helper function to get the correctly typed value from the configuration
-export const readConfigValue = <
-  T extends Exclude<Input, IncludeExcludeListInput>,
->(
-  input: T,
-  config: ModularFilterConfiguration
-): InputDefault<T> => {
-  return config?.[input.macroName] as InputDefault<T>;
+// TODO using moduleID here makes the 'update' process a bit more complex - but it ensures duplicate module names don't cause problems
+export type ModularFilterConfiguration = {
+  [key: ModuleId]: { [key: MacroName]: Partial<InputDefault<Input>> };
 };
 
-export const readConfigValueIncludeExcludeList = (
-  input: IncludeExcludeListInput,
-  field: "includes" | "excludes",
+// Helper function to get the correctly typed value from the configuration
+export const readConfigValue = <T extends Partial<InputDefault<Input>>>(
+  moduleId: ModuleId,
+  macroName: MacroName,
   config: ModularFilterConfiguration
-): IncludeExcludeListInputDefaults[typeof field] => {
-  return config?.[input.macroName[field]] as IncludeExcludeListInputDefaults[typeof field]
+): T | undefined => {
+  return config?.[moduleId]?.[macroName] as T;
 };
 
 // This is a 'loaded filter' before we add the ui specific information
@@ -118,9 +106,6 @@ export type UiModularFilter = {
   modules: UiFilterModule[];
   active: boolean;
 } & ModularFilter;
-
-
-
 
 export type UiFilterModule = {
   id: ModuleId;

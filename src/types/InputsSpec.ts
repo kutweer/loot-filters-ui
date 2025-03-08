@@ -18,7 +18,8 @@ export type Input =
   | StyleInput;
 export type FilterType = keyof typeof filterTypes;
 export type InputDefault<I extends Input> = I["default"];
-export type MacroName<I extends Input> = I["macroName"];
+export type ModuleName = string;
+export type MacroName = string;
 
 interface FilterModuleInputBase<T extends FilterType> {
   type: T;

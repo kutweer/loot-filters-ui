@@ -4,11 +4,10 @@ import { useUiStore } from "../../store/store";
 import {
   ModularFilterConfiguration,
   readConfigValue,
-  readConfigValueIncludeExcludeList,
   UiFilterModule,
   UiModularFilter,
 } from "../../types/ModularFilterSpec";
-import { StyleConfig } from "../inputs/StyleInputHelprs";
+import { StyleConfig } from "../inputs/StyleInputHelpers";
 
 const RenderFilterComponent: React.FC = () => {
   const activeFilter = useUiStore((state) =>
@@ -68,20 +67,25 @@ const renderModule = (
   for (const input of module.inputs) {
     switch (input.type) {
       case "boolean":
-        const bool = readConfigValue(input, config) ?? input.default;
+        const bool =
+          readConfigValue(module.id, input.macroName, config) ?? input.default;
         if (bool !== undefined) {
           updated = updateMacro(updated, input.macroName, bool.toString());
         }
         break;
       case "number":
-        const value = readConfigValue(input, config) ?? input.default;
+        const value =
+          readConfigValue<number>(module.id, input.macroName, config) ??
+          input.default;
         if (value !== undefined) {
           updated = updateMacro(updated, input.macroName, value.toString());
         }
         break;
       case "stringlist":
       case "enumlist":
-        const items = readConfigValue(input, config) ?? input.default;
+        const items =
+          readConfigValue<string[]>(module.id, input.macroName, config) ??
+          input.default;
         if (items !== undefined) {
           updated = updateMacro(
             updated,
@@ -92,11 +96,17 @@ const renderModule = (
         break;
       case "includeExcludeList":
         const includes =
-          readConfigValueIncludeExcludeList(input, "includes", config) ??
-          input.default.includes;
+          readConfigValue<string[]>(
+            module.id,
+            input.macroName["includes"],
+            config
+          ) ?? input.default.includes;
         const excludes =
-          readConfigValueIncludeExcludeList(input, "excludes", config) ??
-          input.default.excludes;
+          readConfigValue<string[]>(
+            module.id,
+            input.macroName["excludes"],
+            config
+          ) ?? input.default.excludes;
         if (includes !== undefined) {
           updated = updateMacro(
             updated,
@@ -115,7 +125,11 @@ const renderModule = (
       case "style":
         const style = config[input.macroName];
         if (style !== undefined) {
-          updated = updateMacro(updated, input.macroName, renderStyle(style as StyleConfig));
+          updated = updateMacro(
+            updated,
+            input.macroName,
+            renderStyle(style as StyleConfig)
+          );
         }
         break;
     }

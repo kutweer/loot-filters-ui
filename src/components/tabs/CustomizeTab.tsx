@@ -3,9 +3,12 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Box,
   Divider,
   Grid2,
   Stack,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
 } from "@mui/material";
 import React, { useMemo, useState } from "react";
@@ -23,7 +26,7 @@ import {
   StringListInput,
   StyleInput,
 } from "../../types/InputsSpec";
-import { FilterModule, UiFilterModule } from "../../types/ModularFilterSpec";
+import { FilterId, UiFilterModule } from "../../types/ModularFilterSpec";
 import useSiteConfig from "../../utils/devmode";
 import {
   BooleanInputComponent,
@@ -35,23 +38,44 @@ import { DisplayConfigurationInput } from "../inputs/DisplayConfigurationInput";
 import { IncludeExcludeListInputComponent } from "../inputs/IncludeExcludeListInputComponent";
 import { ItemLabelPreview } from "../Previews";
 const InputComponent: React.FC<{
+  activeFilterId: FilterId;
   module: UiFilterModule;
   input: Input;
-}> = ({ module, input }) => {
+}> = ({ activeFilterId, module, input }) => {
   switch (input.type as FilterType) {
     case "number":
       const numberInput = input as NumberInput;
-      return <NumberInputComponent input={numberInput} module={module} />;
+      return (
+        <NumberInputComponent
+          activeFilterId={activeFilterId}
+          input={numberInput}
+          module={module}
+        />
+      );
     case "boolean":
       return (
-        <BooleanInputComponent module={module} input={input as BooleanInput} />
+        <BooleanInputComponent
+          activeFilterId={activeFilterId}
+          module={module}
+          input={input as BooleanInput}
+        />
       );
     case "enumlist":
       const enumListInput = input as EnumListInput;
-      return <EnumInputComponent module={module} input={enumListInput} />;
+      return (
+        <EnumInputComponent
+          activeFilterId={activeFilterId}
+          module={module}
+          input={enumListInput}
+        />
+      );
     case "stringlist":
       return (
-        <ListInputComponent module={module} input={input as StringListInput} />
+        <ListInputComponent
+          activeFilterId={activeFilterId}
+          module={module}
+          input={input as StringListInput}
+        />
       );
     case "style":
       return (
@@ -63,14 +87,16 @@ const InputComponent: React.FC<{
     case "includeExcludeList":
       return (
         <IncludeExcludeListInputComponent
+          activeFilterId={activeFilterId}
           module={module}
           input={input as IncludeExcludeListInput}
         />
       );
     default:
       return (
-        <Typography variant="h6" color="primary">
-          {`placeholder: ${input.type}`}
+        <Typography variant="h6" color="secondary">
+          Unsupported input type:{" "}
+          <span style={{ color: colors.rsOrange }}>{input.type}</span>
         </Typography>
       );
   }
@@ -92,7 +118,7 @@ const sizeOf = (input: Input) => {
 };
 
 const FirstCoupleLabels: React.FC<{
-  module: FilterModule;
+  module: UiFilterModule;
 }> = ({ module }) => {
   const styleInputs: StyleInput[] = module.inputs.filter(
     (input) => input.type === "style"
@@ -107,6 +133,7 @@ const FirstCoupleLabels: React.FC<{
             key={macroName}
             itemName={input.label}
             input={input}
+            module={module}
           />
         );
       })}
@@ -115,10 +142,26 @@ const FirstCoupleLabels: React.FC<{
 };
 
 const ModuleSection: React.FC<{
+  activeFilterId: FilterId;
   expanded: boolean;
   setExpanded: (expanded: boolean) => void;
   module: UiFilterModule;
-}> = ({ expanded, setExpanded, module }) => {
+}> = ({ activeFilterId, expanded, setExpanded, module }) => {
+  const [siteConfig, _] = useSiteConfig();
+  const [showJson, setShowJson] = useState<"json" | "configJson" | "none">(
+    "none"
+  );
+
+  let json: string | null = null;
+  let configJson: string | null = null;
+  if (siteConfig.devMode) {
+    const activeConfig = useUiStore(
+      (state) => state.filterConfigurations[activeFilterId]
+    );
+    json = JSON.stringify(module, null, 2);
+    configJson = JSON.stringify(activeConfig, null, 2);
+  }
+
   const defaultGroupId = crypto.randomUUID();
   const groupedInputs = groupBy(
     module.inputs.map((input) => ({
@@ -151,6 +194,41 @@ const ModuleSection: React.FC<{
       </AccordionSummary>
       <AccordionDetails>
         <Stack spacing={2} direction="column">
+          {siteConfig.devMode ? (
+            <Box display="flex" justifyContent="flex-end">
+              <ToggleButtonGroup
+                value={showJson}
+                onChange={(event, value) => setShowJson(value)}
+                exclusive
+              >
+                <ToggleButton value="json">Show Module JSON</ToggleButton>
+                <ToggleButton value="configJson">Show Config JSON</ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
+          ) : null}
+          {showJson !== "none" && !!showJson ? (
+            <Box
+              sx={{
+                backgroundColor: "background.paper",
+                p: 2,
+                borderRadius: 1,
+              }}
+            >
+              <pre
+                style={{
+                  margin: 0,
+                  whiteSpace: "pre-wrap",
+                  wordWrap: "break-word",
+                }}
+              >
+                {showJson === "json"
+                  ? json
+                  : showJson === "configJson"
+                    ? configJson
+                    : null}
+              </pre>
+            </Box>
+          ) : null}
           {Object.entries(groupedInputs).map(([group, inputs], index) => {
             return (
               <Grid2 key={index} container spacing={2}>
@@ -171,7 +249,11 @@ const ModuleSection: React.FC<{
                         <Typography variant="h6" color="primary">
                           {input.label}
                         </Typography>
-                        <InputComponent module={module} input={input} />
+                        <InputComponent
+                          activeFilterId={activeFilterId}
+                          module={module}
+                          input={input}
+                        />
                       </Grid2>
                     );
                   })}
@@ -210,6 +292,7 @@ export const CustomizeTab: React.FC = () => {
       {activeFilter?.modules.map((module, index: number) => (
         <ModuleSection
           key={index}
+          activeFilterId={activeFilter.id}
           module={module}
           expanded={
             expandedModules[module.name] ?? (false || siteConfig.devMode)
