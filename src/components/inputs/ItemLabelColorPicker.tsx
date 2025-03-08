@@ -1,4 +1,5 @@
 import { useFilterModule } from "../../context/FilterModuleContext";
+import { useInput } from "../../context/InputContext";
 import { useData } from "../../context/UiDataContext";
 import {
   FontType,
@@ -31,34 +32,32 @@ export const ItemLabelColorPicker: React.FC<{
   showExamples = true,
   labelLocation = "bottom",
 }) => {
-  const { input } = useFilterModule() as { input: StyleInput };
-  const { getActiveFilterConfiguration, updateConfigurationForActiveFilter } =
-    useData();
-  const activeConf = getActiveFilterConfiguration();
+  const { input } = useInput() as { input: StyleInput };
+  const { activeConfig, setActiveConfig } = useFilterModule();
 
   const updateStyleField = (
     field: StyleConfigKey,
-    value: StyleConfig[StyleConfigKey],
+    value: StyleConfig[StyleConfigKey]
   ) => {
     updateStyleConfig(
       field,
       value,
       input,
-      activeConf,
-      updateConfigurationForActiveFilter,
+      activeConfig,
+      setActiveConfig
     );
   };
 
   return (
     <div style={{ display: "flex", flexDirection: "row", gap: 8 }}>
       <ColorPickerInput
-        color={defaultOrConfigOrNone("textColor", input, activeConf)}
+        color={defaultOrConfigOrNone("textColor", input, activeConfig)}
         labelText="Text Color"
         onChange={(color: ArgbHexColor) => updateStyleField("textColor", color)}
         labelLocation={labelLocation}
       />
       <ColorPickerInput
-        color={defaultOrConfigOrNone("backgroundColor", input, activeConf)}
+        color={defaultOrConfigOrNone("backgroundColor", input, activeConfig)}
         labelText="Background"
         onChange={(color: ArgbHexColor) =>
           updateStyleField("backgroundColor", color)
@@ -66,7 +65,7 @@ export const ItemLabelColorPicker: React.FC<{
         labelLocation={labelLocation}
       />
       <ColorPickerInput
-        color={defaultOrConfigOrNone("borderColor", input, activeConf)}
+        color={defaultOrConfigOrNone("borderColor", input, activeConfig)}
         labelText="Border"
         onChange={(color: ArgbHexColor) =>
           updateStyleField("borderColor", color)
@@ -74,7 +73,7 @@ export const ItemLabelColorPicker: React.FC<{
         labelLocation={labelLocation}
       />
       <ColorPickerInput
-        color={defaultOrConfigOrNone("menuTextColor", input, activeConf)}
+        color={defaultOrConfigOrNone("menuTextColor", input, activeConfig)}
         labelText="Menu Text Color"
         onChange={(color: ArgbHexColor) =>
           updateStyleField("menuTextColor", color)
@@ -87,12 +86,16 @@ export const ItemLabelColorPicker: React.FC<{
           value: fontType,
         }))}
         inputLabel="Font Type"
-        configurationUpdater={(configuration, newValue) => {
+        configurationUpdater={(configuration, macroName, newValue) => {
+          console.log("configurationUpdater", configuration, newValue);
           return {
             ...configuration,
-            fontType: newValue
-              ? fontTypeOrdinal((newValue as Option)?.value as FontType)
-              : undefined,
+            [macroName]: {
+              ...configuration[macroName],
+              fontType: newValue
+                ? fontTypeOrdinal((newValue as Option)?.value as FontType)
+                : undefined,
+            },
           };
         }}
         getSetting={(configuration) => {
@@ -112,7 +115,7 @@ export const ItemLabelColorPicker: React.FC<{
       />
 
       <ColorPickerInput
-        color={defaultOrConfigOrNone("textAccentColor", input, activeConf)}
+        color={defaultOrConfigOrNone("textAccentColor", input, activeConfig)}
         labelText="Text Accent Color"
         onChange={(color: ArgbHexColor) =>
           updateStyleField("textAccentColor", color)
@@ -134,8 +137,8 @@ export const ItemLabelColorPicker: React.FC<{
       </Select> */}
       {showExamples && (
         <>
-          <ItemLabelPreview itemName={itemName} />
-          <ItemMenuPreview itemName={itemName} />
+          <ItemLabelPreview input={input} itemName={itemName} />
+          <ItemMenuPreview input={input} itemName={itemName} />
         </>
       )}
     </div>

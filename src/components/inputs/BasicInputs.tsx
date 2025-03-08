@@ -20,17 +20,17 @@ import {
 } from "../../types/ModularFilterSpec";
 import { ModularFilterConfiguration } from "../../utils/storage";
 import { useData } from "../../context/UiDataContext";
+import { useInput } from "../../context/InputContext";
 export const NumberInputComponent: React.FC<{
   input: NumberInput;
 }> = ({ input }) => {
   const {
-    getActiveFilterConfiguration,
-    updateConfigurationForActiveFilter: setConfigurationForActiveFilter,
-  } = useData();
+    activeConfig,
+    setActiveConfig,
+  } = useFilterModule();
 
-  const activeConfiguration = getActiveFilterConfiguration();
   const currentSetting =
-    activeConfiguration?.[input.macroName as string] ?? input.default;
+    activeConfig?.[input.macroName as string] ?? input.default;
 
   return (
     <TextField
@@ -38,7 +38,7 @@ export const NumberInputComponent: React.FC<{
       value={currentSetting}
       onChange={(event) => {
         const value = event.target.value;
-        setConfigurationForActiveFilter({
+        setActiveConfig({
           [input.macroName as string]: isNumber(parseInt(value))
             ? parseInt(value)
             : value,
@@ -52,19 +52,18 @@ export const EnumInputComponent: React.FC<{
   input: EnumListInput;
 }> = ({ input }) => {
   const {
-    getActiveFilterConfiguration,
-    updateConfigurationForActiveFilter: setConfigurationForActiveFilter,
-  } = useData();
+    activeConfig,
+    setActiveConfig,
+  } = useFilterModule();
 
-  const activeConfiguration = getActiveFilterConfiguration();
   const currentSetting =
-    activeConfiguration?.[input.macroName as string] ?? input.default;
+    activeConfig?.[input.macroName as string] ?? input.default;
 
   return (
     <Select
       value={currentSetting ?? []}
       onChange={(event) => {
-        setConfigurationForActiveFilter({
+        setActiveConfig({
           [input.macroName as string]: Array.isArray(event.target.value)
             ? event.target.value
             : [event.target.value],
@@ -93,18 +92,16 @@ export const EnumInputComponent: React.FC<{
 export const BooleanInputComponent: React.FC<{
   input: BooleanInput;
 }> = ({ input }) => {
-  const { getActiveFilterConfiguration, updateConfigurationForActiveFilter } =
-    useData();
+  const { activeConfig, setActiveConfig } = useFilterModule();
 
-  const activeConfiguration = getActiveFilterConfiguration();
   const currentSetting =
-    activeConfiguration?.[input.macroName as string] ?? input.default;
+    activeConfig?.[input.macroName as string] ?? input.default;
   return (
     <Checkbox
       checked={currentSetting}
       onChange={(event) => {
         const value = event.target.checked;
-        updateConfigurationForActiveFilter({
+        setActiveConfig({
           [input.macroName as string]: value,
         });
       }}
@@ -117,10 +114,7 @@ export const StringListInputComponent: React.FC<{
   defaultField?: "includes" | "excludes";
   label?: string;
 }> = ({ input, defaultField, label }) => {
-  const { getActiveFilterConfiguration, updateConfigurationForActiveFilter } =
-    useData();
-
-  const activeConfiguration = getActiveFilterConfiguration();
+  const { activeConfig, setActiveConfig } = useFilterModule();
 
   const macroName =
     input.type === "includeExcludeList"
@@ -130,7 +124,7 @@ export const StringListInputComponent: React.FC<{
       : (input.macroName as string);
 
   const currentValues =
-    activeConfiguration?.[macroName] ??
+    activeConfig?.[macroName] ??
     (input.type === "includeExcludeList"
       ? (input.default as IncludeExcludeListInputDefaults)[defaultField!!]
       : input.default);
@@ -154,17 +148,17 @@ export const StringListInputComponent: React.FC<{
       value={currentValues}
       onChange={(event, newValue) => {
         if (typeof newValue === "string") {
-          updateConfigurationForActiveFilter({
+          setActiveConfig({
             [macroName as string]: [{ value: newValue, label: newValue }],
           });
         }
 
         if (newValue && (newValue as any)?.inputValue) {
-          updateConfigurationForActiveFilter({
+          setActiveConfig({
             [macroName as string]: newValue,
           });
         } else {
-          updateConfigurationForActiveFilter({
+          setActiveConfig({
             [macroName as string]: newValue,
           });
         }
@@ -228,6 +222,7 @@ export interface ConfiguredAutoCompleteProps<
   inputLabel: string;
   configurationUpdater: <T extends keyof typeof filterTypes>(
     configuration: ModularFilterConfiguration<T>,
+    macroName: string,
     newValue: Option[] | Option | undefined,
   ) => ModularFilterConfiguration<T>;
 
@@ -257,11 +252,9 @@ export const ConfiguredAutoComplete: React.FC<ConfiguredAutoCompleteProps> = ({
   allowCreate = false,
   multiple = false,
 }) => {
-  const { getActiveFilterConfiguration, updateConfigurationForActiveFilter } =
-    useData();
-  const activeConfiguration = getActiveFilterConfiguration();
-  console.log("activeConfiguration", activeConfiguration);
-  const { input } = useFilterModule();
+  const { activeConfig, setActiveConfig } = useFilterModule();
+  const activeConfiguration = activeConfig;
+  const { input } = useInput();
 
   const currentSetting = getSetting(activeConfiguration);
   const inputDefault = getDefaultValue(input);
@@ -270,8 +263,8 @@ export const ConfiguredAutoComplete: React.FC<ConfiguredAutoCompleteProps> = ({
   const filter = createFilterOptions<Option>();
 
   const computeAndSetNewConfig = (newValue: Option[] | Option | undefined) => {
-    const updatedConfig = configurationUpdater(activeConfiguration, newValue);
-    updateConfigurationForActiveFilter(updatedConfig);
+    const updatedConfig = configurationUpdater(activeConfiguration, input.macroName as string, newValue);
+    setActiveConfig(updatedConfig);
   };
 
   return (
@@ -283,6 +276,7 @@ export const ConfiguredAutoComplete: React.FC<ConfiguredAutoCompleteProps> = ({
         if (typeof newValue === "string") {
           configurationUpdater(
             activeConfiguration,
+            input.macroName as string,
             multiple
               ? [{ label: newValue, value: newValue }]
               : { label: newValue, value: newValue },
@@ -343,7 +337,6 @@ export const ConfiguredAutoComplete: React.FC<ConfiguredAutoCompleteProps> = ({
         }
 
         if (option?.label === undefined) {
-          console.log("option", option);
           return "Select an option";
         }
         // Regular option

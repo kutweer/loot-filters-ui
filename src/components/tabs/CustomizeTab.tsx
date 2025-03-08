@@ -14,6 +14,7 @@ import {
   FilterModuleProvider,
   useFilterModule,
 } from "../../context/FilterModuleContext";
+import { useData } from "../../context/UiDataContext";
 import { colors } from "../../styles/MuiTheme";
 import {
   BooleanInput,
@@ -27,8 +28,6 @@ import {
   StyleInput,
 } from "../../types/ModularFilterSpec";
 import useSiteConfig from "../../utils/devmode";
-import { ModularFilterConfiguration } from "../../utils/storage";
-import { useData } from "../../context/UiDataContext";
 import {
   BooleanInputComponent,
   EnumInputComponent,
@@ -38,9 +37,10 @@ import {
 import { DisplayConfigurationInput } from "../inputs/DisplayConfigurationInput";
 import { IncludeExcludeListInputComponent } from "../inputs/IncludeExcludeListInputComponent";
 import { ItemLabelPreview } from "../Previews";
+import { InputProvider, useInput } from "../../context/InputContext";
 
 const InputComponent: React.FC = () => {
-  const { input } = useFilterModule();
+  const { input } = useInput();
 
   switch (input.type) {
     case "number":
@@ -55,11 +55,17 @@ const InputComponent: React.FC = () => {
       return <StringListInputComponent input={input as StringListInput} />;
     case "style":
       return <DisplayConfigurationInput input={input as StyleInput} />;
-    default:
+    case "includeExcludeList":
       return (
         <IncludeExcludeListInputComponent
           input={input as IncludeExcludeListInput}
         />
+      );
+    default:
+      return (
+        <Typography variant="h6" color="primary">
+          {`placeholder: ${input.type}`}
+        </Typography>
       );
   }
 };
@@ -81,34 +87,29 @@ const sizeOf = (input: FilterModuleInput<keyof typeof filterTypes>) => {
 
 const FirstCoupleLabels: React.FC<{
   module: FilterModule;
-  activeFilterConfiguration: ModularFilterConfiguration<
-    keyof typeof filterTypes
-  >;
-}> = ({ module, activeFilterConfiguration }) => {
-  const styleInputs = module.inputs.filter((input) => input.type === "style");
+}> = ({ module }) => {
+  const styleInputs: StyleInput[] = module.inputs.filter(
+    (input) => input.type === "style"
+  ) as StyleInput[];
 
   return (
     <Stack direction="row" spacing={2}>
       {styleInputs.slice(0, 4).map((input) => (
-        <FilterModuleProvider key={input.macroName.toString()} input={input}>
-          <ItemLabelPreview
-            key={input.macroName.toString()}
-            itemName={input.label}
-          />
-        </FilterModuleProvider>
+        <ItemLabelPreview
+          key={input.macroName.toString()}
+          itemName={input.label}
+          input={input}
+        />
       ))}
     </Stack>
   );
 };
 
 const ModuleSection: React.FC<{
-  module: FilterModule;
   expanded: boolean;
   setExpanded: (expanded: boolean) => void;
-}> = ({ module, expanded, setExpanded }) => {
-  const { getActiveFilterConfiguration } = useData();
-
-  const activeFilterConfiguration = getActiveFilterConfiguration();
+}> = ({ expanded, setExpanded }) => {
+  const { module } = useFilterModule();
 
   const defaultGroupId = crypto.randomUUID();
   const groupedInputs = groupBy(
@@ -116,11 +117,12 @@ const ModuleSection: React.FC<{
       ...input,
       group: input.group ?? defaultGroupId,
     })),
-    "group",
+    "group"
   );
 
   return (
     <Accordion
+      slotProps={{ transition: { unmountOnExit: true } }}
       expanded={expanded}
       sx={{
         "&::before": {
@@ -136,10 +138,7 @@ const ModuleSection: React.FC<{
           Module: {module.name}
         </Typography>
         <Stack direction="row" spacing={2}>
-          <FirstCoupleLabels
-            module={module}
-            activeFilterConfiguration={activeFilterConfiguration}
-          />
+          <FirstCoupleLabels module={module} />
         </Stack>
       </AccordionSummary>
       <AccordionDetails>
@@ -158,19 +157,16 @@ const ModuleSection: React.FC<{
                 </Grid2>
                 {inputs
                   .sort((a, b) => sizeOf(a) - sizeOf(b))
-                  .map((input) => {
+                  .map((input, index) => {
                     return (
-                      <Grid2
-                        key={input.macroName.toString()}
-                        size={sizeOf(input)}
-                      >
-                        <Typography variant="h6" color="primary">
-                          {input.label} {sizeOf(input)}
-                        </Typography>
-                        <FilterModuleProvider input={input}>
+                      <InputProvider key={index} input={input}>
+                        <Grid2 key={index} size={sizeOf(input)}>
+                          <Typography variant="h6" color="primary">
+                            {input.label}
+                          </Typography>
                           <InputComponent />
-                        </FilterModuleProvider>
-                      </Grid2>
+                        </Grid2>
+                      </InputProvider>
                     );
                   })}
               </Grid2>
@@ -201,24 +197,27 @@ export const CustomizeTab: React.FC = () => {
     );
   }
 
-  console.log("customizetab, activeFilter", activeFilter);
-
   return (
     <Stack spacing={2}>
-      {activeFilter?.modules.map((module) => (
-        <ModuleSection
+      {activeFilter?.modules.map((module: FilterModule, index: number) => (
+        <FilterModuleProvider
           key={module.name}
+          activeFilterId={activeFilter.id}
           module={module}
-          expanded={
-            expandedModules[module.name] ?? (false || siteConfig.devMode)
-          }
-          setExpanded={(expanded) =>
-            setExpandedModules((prev) => ({
-              ...prev,
-              [module.name]: expanded,
-            }))
-          }
-        />
+        >
+          <ModuleSection
+            key={index}
+            expanded={
+              expandedModules[module.name] ?? (false || siteConfig.devMode)
+            }
+            setExpanded={(expanded) =>
+              setExpandedModules((prev) => ({
+                ...prev,
+                [module.name]: expanded,
+              }))
+            }
+          />
+        </FilterModuleProvider>
       ))}
     </Stack>
   );

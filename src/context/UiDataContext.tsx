@@ -1,35 +1,33 @@
-import { loadData, ModularFilterConfiguration } from "../utils/storage";
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { UiModularFilter } from "../types/ModularFilter";
-import { ModularFilterId } from "../utils/storage";
-import { UiData } from "../utils/storage";
 import { filterTypes } from "../types/ModularFilterSpec";
-import { useEffect } from "react";
-import { useState } from "react";
-import { ReactNode } from "react";
-import { useContext } from "react";
-import { createContext } from "react";
+import {
+  loadData,
+  ModularFilterConfiguration,
+  ModularFilterId,
+  setData,
+  UiData,
+} from "../utils/storage";
 
 export type DataContext = {
-  data: UiData;
+  importedModularFilters: Record<ModularFilterId, UiModularFilter>;
+  activeFilterId: ModularFilterId | undefined;
   setActiveFilter: (filterId?: ModularFilterId) => void;
 
   addNewImportedModularFilter: (
     id: ModularFilterId,
-    filter: UiModularFilter,
-  ) => void;
-
-  updateConfigurationForActiveFilter: (
-    configuration: Partial<
-      ModularFilterConfiguration<keyof typeof filterTypes>
-    >,
+    filter: UiModularFilter
   ) => void;
 
   removeFilterConfiguration: (filterId: ModularFilterId) => void;
   setModularFilterRemoved: (filterId: ModularFilterId) => void;
-
-  getActiveFilterConfiguration: () => ModularFilterConfiguration<
-    keyof typeof filterTypes
-  >;
 
   getActiveFilter: () => UiModularFilter | undefined;
 };
@@ -49,95 +47,92 @@ interface DataProviderProps {
 }
 
 export const DataProvider = ({ children }: DataProviderProps) => {
-  const [data, setData] = useState<UiData>(loadData());
+  const {
+    importedModularFilters: importedModularFiltersDefault,
+    activeFilterId: activeFilterIdDefault,
+  } = loadData("ui-data", (uiData) => {
+    return {
+      importedModularFilters: uiData.importedModularFilters || undefined,
+      activeFilterId: uiData.activeFilterId || undefined,
+    };
+  })!!;
+
+  const [importedModularFilters, setImportedModularFilters] = useState<
+    Record<ModularFilterId, UiModularFilter>
+  >(importedModularFiltersDefault);
 
   useEffect(() => {
-    localStorage.setItem("ui-data", JSON.stringify(data));
-  }, [data]);
+    setData("ui-data", ["importedModularFilters"], importedModularFilters);
+  }, [importedModularFilters]);
 
-  const setActiveFilter = (filterId?: ModularFilterId) => {
-    setData((prev) => ({
-      ...prev,
-      activeFilterId: filterId,
-    }));
-  };
+  const [activeFilterId, setActiveFilterId] = useState<
+    ModularFilterId | undefined
+  >(activeFilterIdDefault);
+  useEffect(() => {
+    setData("ui-data", ["activeFilterId"], activeFilterId);
+  }, [activeFilterId]);
 
-  const addNewImportedModularFilter = (
-    id: ModularFilterId,
-    filter: UiModularFilter,
-  ) => {
-    setData((prev) => ({
-      ...prev,
-      importedModularFilters: {
-        ...prev.importedModularFilters,
-        [id]: filter,
-      },
-    }));
-  };
+  const setActiveFilter = useCallback(
+    (filterId?: ModularFilterId) => {
+      setActiveFilterId(filterId);
+    },
+    [setActiveFilterId]
+  );
 
-  const updateConfigurationForActiveFilter = (
-    configuration: ModularFilterConfiguration<keyof typeof filterTypes>,
-  ) => {
-    setData((prev) => ({
-      ...prev,
-      filterConfigurations: {
-        ...prev.filterConfigurations,
-        [prev.activeFilterId!!]: {
-          ...(prev.filterConfigurations[prev.activeFilterId!!] ?? {}),
-          ...configuration,
+  const addNewImportedModularFilter = useCallback(
+    (id: ModularFilterId, filter: UiModularFilter) => {
+      setImportedModularFilters((prev) => ({
+        ...prev,
+        importedModularFilters: {
+          ...prev.importedModularFilters,
+          [id]: filter,
         },
-      },
-    }));
-  };
+      }));
+    },
+    [setImportedModularFilters]
+  );
 
-  const removeFilterConfiguration = (filterId: ModularFilterId) => {
-    setData((prev) => {
-      const newFilterConfigurations = {
-        ...prev.filterConfigurations,
-      };
-      delete newFilterConfigurations[filterId];
-      return {
-        ...prev,
-        filterConfigurations: newFilterConfigurations,
-      };
-    });
-  };
+  const removeFilterConfiguration = useCallback(
+    (filterId: ModularFilterId) => {
+      setImportedModularFilters(
+        (prev: Record<ModularFilterId, UiModularFilter>) => {
+          const newConfigurations = { ...prev };
+          delete newConfigurations[filterId];
+          return newConfigurations;
+        }
+      );
+    },
+    [setImportedModularFilters]
+  );
 
-  const setModularFilterRemoved = (filterId: ModularFilterId) => {
-    setData((prev) => {
-      const newImportedModularFilters = {
-        ...prev.importedModularFilters,
-      };
-      delete newImportedModularFilters[filterId];
-      return {
-        ...prev,
-        importedModularFilters: newImportedModularFilters,
-      };
-    });
-  };
+  const setModularFilterRemoved = useCallback(
+    (filterId: ModularFilterId) => {
+      setImportedModularFilters(
+        (prev: Record<ModularFilterId, UiModularFilter>) => {
+          const newImportedModularFilters = { ...prev };
+          delete newImportedModularFilters[filterId];
+          return newImportedModularFilters;
+        }
+      );
+    },
+    [setImportedModularFilters]
+  );
 
-  const getActiveFilterConfiguration = () => {
-    return data.activeFilterId
-      ? data.filterConfigurations[data.activeFilterId]
-      : {};
-  };
+  const getActiveFilter = useCallback(() => {
+    return activeFilterId ? importedModularFilters[activeFilterId] : undefined;
+  }, [importedModularFilters, activeFilterId]);
 
-  const getActiveFilter = () => {
-    return data.activeFilterId
-      ? data.importedModularFilters[data.activeFilterId]
-      : undefined;
-  };
-
-  const value = {
-    data,
+  const contextValue = {
+    importedModularFilters,
+    activeFilterId,
     setActiveFilter,
     addNewImportedModularFilter,
-    updateConfigurationForActiveFilter,
     removeFilterConfiguration,
     setModularFilterRemoved,
-    getActiveFilterConfiguration,
     getActiveFilter,
   };
 
-  return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
+  return (
+    <DataContext.Provider value={contextValue}>{children}</DataContext.Provider>
+  );
 };
