@@ -8,56 +8,62 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { groupBy } from "underscore";
-import {
-  FilterModuleProvider,
-  useFilterModule,
-} from "../../context/FilterModuleContext";
-import { useData } from "../../context/UiDataContext";
+import { useUiStore } from "../../store/store";
 import { colors } from "../../styles/MuiTheme";
+
 import {
   BooleanInput,
   EnumListInput,
-  FilterModule,
-  FilterModuleInput,
-  filterTypes,
+  FilterType,
   IncludeExcludeListInput,
+  Input,
   NumberInput,
   StringListInput,
   StyleInput,
-} from "../../types/ModularFilterSpec";
+} from "../../types/InputsSpec";
+import { FilterModule, UiFilterModule } from "../../types/ModularFilterSpec";
 import useSiteConfig from "../../utils/devmode";
 import {
   BooleanInputComponent,
   EnumInputComponent,
+  ListInputComponent,
   NumberInputComponent,
-  StringListInputComponent,
 } from "../inputs/BasicInputs";
 import { DisplayConfigurationInput } from "../inputs/DisplayConfigurationInput";
 import { IncludeExcludeListInputComponent } from "../inputs/IncludeExcludeListInputComponent";
 import { ItemLabelPreview } from "../Previews";
-import { InputProvider, useInput } from "../../context/InputContext";
-
-const InputComponent: React.FC = () => {
-  const { input } = useInput();
-
-  switch (input.type) {
+const InputComponent: React.FC<{
+  module: UiFilterModule;
+  input: Input;
+}> = ({ module, input }) => {
+  switch (input.type as FilterType) {
     case "number":
       const numberInput = input as NumberInput;
-      return <NumberInputComponent input={numberInput} />;
+      return <NumberInputComponent input={numberInput} module={module} />;
     case "boolean":
-      return <BooleanInputComponent input={input as BooleanInput} />;
+      return (
+        <BooleanInputComponent module={module} input={input as BooleanInput} />
+      );
     case "enumlist":
       const enumListInput = input as EnumListInput;
-      return <EnumInputComponent input={enumListInput} />;
+      return <EnumInputComponent module={module} input={enumListInput} />;
     case "stringlist":
-      return <StringListInputComponent input={input as StringListInput} />;
+      return (
+        <ListInputComponent module={module} input={input as StringListInput} />
+      );
     case "style":
-      return <DisplayConfigurationInput input={input as StyleInput} />;
+      return (
+        <DisplayConfigurationInput
+          module={module}
+          input={input as StyleInput}
+        />
+      );
     case "includeExcludeList":
       return (
         <IncludeExcludeListInputComponent
+          module={module}
           input={input as IncludeExcludeListInput}
         />
       );
@@ -70,7 +76,7 @@ const InputComponent: React.FC = () => {
   }
 };
 
-const sizeOf = (input: FilterModuleInput<keyof typeof filterTypes>) => {
+const sizeOf = (input: Input) => {
   switch (input.type) {
     case "number":
       return 4;
@@ -94,13 +100,16 @@ const FirstCoupleLabels: React.FC<{
 
   return (
     <Stack direction="row" spacing={2}>
-      {styleInputs.slice(0, 4).map((input) => (
-        <ItemLabelPreview
-          key={input.macroName.toString()}
-          itemName={input.label}
-          input={input}
-        />
-      ))}
+      {styleInputs.slice(0, 4).map((input) => {
+        const macroName = (input as StyleInput).macroName;
+        return (
+          <ItemLabelPreview
+            key={macroName}
+            itemName={input.label}
+            input={input}
+          />
+        );
+      })}
     </Stack>
   );
 };
@@ -108,9 +117,8 @@ const FirstCoupleLabels: React.FC<{
 const ModuleSection: React.FC<{
   expanded: boolean;
   setExpanded: (expanded: boolean) => void;
-}> = ({ expanded, setExpanded }) => {
-  const { module } = useFilterModule();
-
+  module: UiFilterModule;
+}> = ({ expanded, setExpanded, module }) => {
   const defaultGroupId = crypto.randomUUID();
   const groupedInputs = groupBy(
     module.inputs.map((input) => ({
@@ -145,7 +153,7 @@ const ModuleSection: React.FC<{
         <Stack spacing={2} direction="column">
           {Object.entries(groupedInputs).map(([group, inputs], index) => {
             return (
-              <Grid2 container spacing={2} key={group}>
+              <Grid2 key={index} container spacing={2}>
                 <Grid2 size={12}>
                   <Divider>
                     {group !== defaultGroupId ? (
@@ -156,17 +164,15 @@ const ModuleSection: React.FC<{
                   </Divider>
                 </Grid2>
                 {inputs
-                  .sort((a, b) => sizeOf(a) - sizeOf(b))
+                  .sort((a: Input, b: Input) => sizeOf(a) - sizeOf(b))
                   .map((input, index) => {
                     return (
-                      <InputProvider key={index} input={input}>
-                        <Grid2 key={index} size={sizeOf(input)}>
-                          <Typography variant="h6" color="primary">
-                            {input.label}
-                          </Typography>
-                          <InputComponent />
-                        </Grid2>
-                      </InputProvider>
+                      <Grid2 key={index} size={sizeOf(input)}>
+                        <Typography variant="h6" color="primary">
+                          {input.label}
+                        </Typography>
+                        <InputComponent module={module} input={input} />
+                      </Grid2>
                     );
                   })}
               </Grid2>
@@ -182,12 +188,14 @@ export const CustomizeTab: React.FC = () => {
   const [expandedModules, setExpandedModules] = useState<
     Record<string, boolean>
   >({});
-
-  const { getActiveFilter } = useData();
-
-  const activeFilter = getActiveFilter();
-
   const [siteConfig, _] = useSiteConfig();
+  const importedModularFilters = useUiStore(
+    (state) => state.importedModularFilters
+  );
+  const activeFilter = useMemo(
+    () => Object.values(importedModularFilters).find((filter) => filter.active),
+    [importedModularFilters]
+  );
 
   if (!activeFilter) {
     return (
@@ -199,25 +207,20 @@ export const CustomizeTab: React.FC = () => {
 
   return (
     <Stack spacing={2}>
-      {activeFilter?.modules.map((module: FilterModule, index: number) => (
-        <FilterModuleProvider
-          key={module.name}
-          activeFilterId={activeFilter.id}
+      {activeFilter?.modules.map((module, index: number) => (
+        <ModuleSection
+          key={index}
           module={module}
-        >
-          <ModuleSection
-            key={index}
-            expanded={
-              expandedModules[module.name] ?? (false || siteConfig.devMode)
-            }
-            setExpanded={(expanded) =>
-              setExpandedModules((prev) => ({
-                ...prev,
-                [module.name]: expanded,
-              }))
-            }
-          />
-        </FilterModuleProvider>
+          expanded={
+            expandedModules[module.name] ?? (false || siteConfig.devMode)
+          }
+          setExpanded={(expanded) =>
+            setExpandedModules((prev) => ({
+              ...prev,
+              [module.name]: expanded,
+            }))
+          }
+        />
       ))}
     </Stack>
   );

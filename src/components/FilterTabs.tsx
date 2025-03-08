@@ -1,20 +1,25 @@
 import { Box, Tab, Tabs } from "@mui/material";
 import { useMemo, useState } from "react";
 import { filter } from "underscore";
-import { useData } from "../context/UiDataContext";
 import { SiteConfig } from "../utils/devmode";
 import { FilterSelector } from "./FilterSelector";
 import { CustomizeTab } from "./tabs/CustomizeTab";
 import { RenderedFilterTab } from "./tabs/RenderedFilterTab";
+import { useUiStore } from "../store/store";
 
 export const FilterTabs: React.FC<{
   sha: string;
   siteConfig: SiteConfig;
 }> = ({ sha, siteConfig }) => {
   const [activeTab, setActiveTab] = useState(1);
-  const { getActiveFilter } = useData();
 
-  const activeFilter = getActiveFilter();
+  const importedModularFilters = useUiStore(
+    (state) => state.importedModularFilters
+  );
+  const activeFilter = useMemo(
+    () => Object.values(importedModularFilters).find((filter) => filter.active),
+    [importedModularFilters]
+  );
 
   const tabs = useMemo(() => {
     return [

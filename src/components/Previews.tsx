@@ -1,15 +1,17 @@
 import { Box, SxProps } from "@mui/material";
-import { useFilterModule } from "../context/FilterModuleContext";
+import { useUiStore } from "../store/store";
 import { colors } from "../styles/MuiTheme";
-import { StyleInput } from "../types/ModularFilterSpec";
+import { StyleInput } from "../types/InputsSpec";
 import { argbHexToRgbaCss } from "../utils/Color";
 import { defaultOrConfigOrNone } from "./inputs/StyleInputHelprs";
 export const ItemMenuPreview: React.FC<{
   itemName: string;
   input: StyleInput;
 }> = ({ itemName, input }) => {
-  const { activeConfig } = useFilterModule();
 
+  const activeConfig = useUiStore(
+    (state) => state.filterConfigurations[module.id]
+  );
   const menuTextColor = argbHexToRgbaCss(
     defaultOrConfigOrNone("menuTextColor", input, activeConfig)
   );
@@ -78,7 +80,9 @@ export const ItemLabelPreview: React.FC<{
   input: StyleInput;
   sx?: SxProps;
 }> = ({ itemName, input, sx }) => {
-  const { activeConfig } = useFilterModule();
+  const activeConfig = useUiStore(
+    (state) => state.filterConfigurations[module.id]
+  );
 
   const backgroundColor = argbHexToRgbaCss(
     defaultOrConfigOrNone("backgroundColor", input, activeConfig)

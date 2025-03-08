@@ -1,20 +1,12 @@
 import {
+  FilterDefinition,
+  FilterModule,
   FilterSource,
   ModuleSource,
   UiFilterModule,
   UiModularFilter,
-} from "../types/ModularFilter";
-import {
-  FilterModule,
-  validateFilterModuleInput,
-  validateModule,
 } from "../types/ModularFilterSpec";
-
-type FilterDefinition = {
-  name: string;
-  description: string;
-  modules: (ModuleSource | FilterModule)[];
-};
+import { assertString, validateModule } from "../types/validate";
 
 export const loadFilter = async (
   source: FilterSource | UiModularFilter
@@ -29,7 +21,8 @@ export const loadFilter = async (
     filter = source as FilterDefinition;
   }
 
-  validateFilterModuleInput({ ...filter, modules: [] }, false);
+  assertString(filter, "name");
+  assertString(filter, "description");
 
   const resolvedModules: UiFilterModule[] = await Promise.all(
     filter.modules.map(
@@ -46,6 +39,7 @@ export const loadFilter = async (
             ...moduleSource.moduleJson,
             rs2fText: moduleSource.moduleRs2fText,
             source: moduleSource,
+            id: crypto.randomUUID(),
           };
 
           validateModule(module);
@@ -66,6 +60,7 @@ export const loadFilter = async (
             ...moduleJson,
             rs2fText: moduleRs2fText,
             source: moduleSource,
+            id: crypto.randomUUID(),
           };
 
           validateModule(module);
@@ -86,5 +81,6 @@ export const loadFilter = async (
     description: filter.description,
     modules: resolvedModules,
     importedOn: new Date().toISOString(),
+    active: false,
   };
 };

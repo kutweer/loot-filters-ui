@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 import { colors } from "../../styles/MuiTheme";
-import { StyleInput } from "../../types/ModularFilterSpec";
+import { StyleInput } from "../../types/InputsSpec";
 import { ArgbHexColor, rgbHexToArgbHex } from "../../utils/Color";
 import useSiteConfig from "../../utils/devmode";
 import { ItemLabelPreview, ItemMenuPreview } from "../Previews";
@@ -22,14 +22,17 @@ import {
   StyleConfig,
   StyleConfigKey,
 } from "./StyleInputHelprs";
-import { useFilterModule } from "../../context/FilterModuleContext";
+import { useUiStore } from "../../store/store";
+import { UiFilterModule } from "../../types/ModularFilterSpec";
 
 export const DisplayConfigurationInput: React.FC<{
+  module: UiFilterModule;
   input: StyleInput;
-}> = ({ input }) => {
+}> = ({ module, input }) => {
   const styleInput = input as StyleInput;
   const [siteConfig, _] = useSiteConfig();
-  const { activeConfig, setActiveConfig } = useFilterModule();
+  const activeConfig = useUiStore((state) => state.filterConfigurations[module.id]);
+  const setFilterConfiguration = useUiStore((state) => state.setFilterConfiguration);
 
   const updateStyleField = (
     field: StyleConfigKey,
@@ -40,7 +43,7 @@ export const DisplayConfigurationInput: React.FC<{
       value,
       styleInput,
       activeConfig,
-      setActiveConfig
+      (config) => setFilterConfiguration(module.id, config)
     );
   };
 

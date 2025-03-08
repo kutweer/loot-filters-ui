@@ -9,14 +9,15 @@ import {
   FormHelperText,
   MenuItem,
   Select,
+  SelectChangeEvent,
   TextField,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
-import { useData } from "../context/UiDataContext";
-import { loadFilter } from "../utils/modularFilterLoader";
-import { ModularFilterId } from "../utils/storage";
+import { useCallback, useMemo, useState } from "react";
+import { useUiStore } from "../store/store";
 import useSiteConfig from "../utils/devmode";
+import { loadFilter } from "../utils/modularFilterLoader";
+import { FilterId } from "../types/ModularFilterSpec";
 
 const COMMON_FILTERS = [
   {
@@ -39,17 +40,6 @@ const DEV_FILTERS = [
 export const FilterSelector: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [filterUrl, setFilterUrl] = useState("");
-  const {
-    activeFilterId,
-    importedModularFilters,
-    setActiveFilter,
-    addNewImportedModularFilter,
-    setModularFilterRemoved,
-    getActiveFilter,
-  } = useData();
-
-  const activeFilter = getActiveFilter();
-
   const [siteConfig, _] = useSiteConfig();
 
   const filtersForImport = [
@@ -57,7 +47,31 @@ export const FilterSelector: React.FC = () => {
     ...COMMON_FILTERS,
   ];
 
-  console.log("importedModularFilters", importedModularFilters);
+  const importedModularFilters = useUiStore(
+    (state) => state.importedModularFilters
+  );
+  const addImportedModularFilter = useUiStore(
+    (state) => state.addImportedModularFilter
+  );
+  const setActiveFilterId = useUiStore((state) => state.setActiveFilterId);
+
+  const activeFilter = useMemo(
+    () => Object.values(importedModularFilters).find((filter) => filter.active),
+    [importedModularFilters]
+  );
+
+  const handleFilterChange = useCallback(
+    (e: SelectChangeEvent<string>) => {
+      setActiveFilterId(e.target.value as FilterId);
+    },
+    [setActiveFilterId]
+  );
+
+  const handleDeleteFilter = useCallback(() => {
+    if (activeFilter) {
+      setActiveFilterId(activeFilter.id);
+    }
+  }, [activeFilter, setActiveFilterId]);
 
   return (
     <Container>
@@ -87,10 +101,8 @@ export const FilterSelector: React.FC = () => {
             size="small"
           >
             <Select
-              value={activeFilterId}
-              onChange={(e) => {
-                setActiveFilter(e.target.value as ModularFilterId);
-              }}
+              value={activeFilter?.id ?? ""}
+              onChange={handleFilterChange}
               renderValue={(value: number | string) => {
                 const filter = importedModularFilters[value];
                 if (!filter) {
@@ -100,14 +112,11 @@ export const FilterSelector: React.FC = () => {
               }}
               displayEmpty
             >
-              {Object.values(importedModularFilters).map((filter, index) => {
-                console.log("filter", filter);
-                return (
-                  <MenuItem key={index} value={filter.id}>
-                    {filter.name}
-                  </MenuItem>
-                );
-              })}
+              {Object.values(importedModularFilters).map((filter, index) => (
+                <MenuItem key={index} value={filter.id}>
+                  {filter.name}
+                </MenuItem>
+              ))}
             </Select>
             <Button
               variant="outlined"
@@ -121,12 +130,8 @@ export const FilterSelector: React.FC = () => {
             <Button
               variant="outlined"
               color="secondary"
-              disabled={activeFilterId === undefined}
-              onClick={() => {
-                if (activeFilterId) {
-                  setModularFilterRemoved(activeFilterId);
-                }
-              }}
+              disabled={activeFilter === undefined}
+              onClick={handleDeleteFilter}
             >
               Delete Filter
             </Button>
@@ -179,7 +184,7 @@ export const FilterSelector: React.FC = () => {
                     loadFilter({
                       filterUrl: filterUrl,
                     }).then((filter) => {
-                      addNewImportedModularFilter(filter.id, filter);
+                      addImportedModularFilter(filter);
                       setFilterUrl("");
                       setOpen(false);
                     });
