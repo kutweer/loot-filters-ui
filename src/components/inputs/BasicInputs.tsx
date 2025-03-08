@@ -1,36 +1,38 @@
-import {
-  Autocomplete,
-  Checkbox,
-  createFilterOptions,
-  MenuItem,
-  Select,
-  TextField,
-} from "@mui/material";
-import { isNumber } from "underscore";
-import { useFilterModule } from "../../context/FilterModuleContext";
+import { Checkbox, MenuItem, Select, TextField } from "@mui/material";
+import { useUiStore } from "../../store/store";
 import {
   BooleanInput,
   EnumListInput,
-  FilterModuleInput,
-  filterTypes,
   IncludeExcludeListInput,
-  IncludeExcludeListInputDefaults,
   NumberInput,
   StringListInput,
+  StyleInput,
+} from "../../types/InputsSpec";
+import {
+  FilterId,
+  ModularFilterConfiguration,
+  readConfigValue,
+  UiFilterModule,
 } from "../../types/ModularFilterSpec";
-import { ModularFilterConfiguration } from "../../utils/storage";
-import { useData } from "../../context/UiDataContext";
-import { useInput } from "../../context/InputContext";
-export const NumberInputComponent: React.FC<{
-  input: NumberInput;
-}> = ({ input }) => {
-  const {
-    activeConfig,
-    setActiveConfig,
-  } = useFilterModule();
 
-  const currentSetting =
-    activeConfig?.[input.macroName as string] ?? input.default;
+export const NumberInputComponent: React.FC<{
+  activeFilterId: FilterId;
+  module: UiFilterModule;
+  input: NumberInput;
+}> = ({ activeFilterId, module, input }) => {
+  const activeConfig = useUiStore(
+    (state) => state.filterConfigurations[activeFilterId]
+  );
+  const setFilterConfiguration = useUiStore(
+    (state) => state.setFilterConfiguration
+  );
+
+  const userConfigValue = readConfigValue<number>(
+    module.id,
+    input.macroName,
+    activeConfig
+  );
+  const currentSetting = userConfigValue ?? input.default;
 
   return (
     <TextField
@@ -38,36 +40,51 @@ export const NumberInputComponent: React.FC<{
       value={currentSetting}
       onChange={(event) => {
         const value = event.target.value;
-        setActiveConfig({
-          [input.macroName as string]: isNumber(parseInt(value))
-            ? parseInt(value)
-            : value,
-        });
+        setFilterConfiguration(
+          activeFilterId,
+          module.id,
+          input.macroName,
+          parseInt(value)
+        );
       }}
     />
   );
 };
 
 export const EnumInputComponent: React.FC<{
+  activeFilterId: FilterId;
+  module: UiFilterModule;
   input: EnumListInput;
-}> = ({ input }) => {
-  const {
-    activeConfig,
-    setActiveConfig,
-  } = useFilterModule();
+}> = ({ activeFilterId, module, input }) => {
+  const activeConfig = useUiStore(
+    (state) => state.filterConfigurations[activeFilterId]
+  );
+  const setFilterConfiguration = useUiStore(
+    (state) => state.setFilterConfiguration
+  );
 
   const currentSetting =
-    activeConfig?.[input.macroName as string] ?? input.default;
+    readConfigValue<string[]>(module.id, input.macroName, activeConfig) ??
+    input.default;
 
   return (
     <Select
       value={currentSetting ?? []}
       onChange={(event) => {
-        setActiveConfig({
-          [input.macroName as string]: Array.isArray(event.target.value)
-            ? event.target.value
-            : [event.target.value],
-        });
+        const value = event.target.value;
+
+        if (Array.isArray(value)) {
+          setFilterConfiguration(
+            activeFilterId,
+            module.id,
+            input.macroName,
+            value
+          );
+        } else {
+          setFilterConfiguration(activeFilterId, module.id, input.macroName, [
+            value.toString(),
+          ]);
+        }
       }}
       displayEmpty
       multiple
@@ -90,270 +107,49 @@ export const EnumInputComponent: React.FC<{
 };
 
 export const BooleanInputComponent: React.FC<{
+  activeFilterId: FilterId;
+  module: UiFilterModule;
   input: BooleanInput;
-}> = ({ input }) => {
-  const { activeConfig, setActiveConfig } = useFilterModule();
+}> = ({ activeFilterId, module, input }) => {
+  const activeConfig: ModularFilterConfiguration = useUiStore(
+    (state) => state.filterConfigurations[activeFilterId]
+  );
+  const setFilterConfiguration = useUiStore(
+    (state) => state.setFilterConfiguration
+  );
 
   const currentSetting =
-    activeConfig?.[input.macroName as string] ?? input.default;
+    readConfigValue<boolean>(module.id, input.macroName, activeConfig) ??
+    input.default;
+
   return (
     <Checkbox
       checked={currentSetting}
       onChange={(event) => {
         const value = event.target.checked;
-        setActiveConfig({
-          [input.macroName as string]: value,
-        });
+        setFilterConfiguration(
+          activeFilterId,
+          module.id,
+          input.macroName,
+          value
+        );
       }}
     />
   );
 };
 
-export const StringListInputComponent: React.FC<{
-  input: StringListInput | IncludeExcludeListInput;
-  defaultField?: "includes" | "excludes";
+export const ListInputComponent: React.FC<{
+  activeFilterId: FilterId;
+  module: UiFilterModule;
+  input: StringListInput | IncludeExcludeListInput | EnumListInput | StyleInput;
   label?: string;
-}> = ({ input, defaultField, label }) => {
-  const { activeConfig, setActiveConfig } = useFilterModule();
-
-  const macroName =
-    input.type === "includeExcludeList"
-      ? (input.macroName as { includes: string; excludes: string })[
-          defaultField!!
-        ]
-      : (input.macroName as string);
-
-  const currentValues =
-    activeConfig?.[macroName] ??
-    (input.type === "includeExcludeList"
-      ? (input.default as IncludeExcludeListInputDefaults)[defaultField!!]
-      : input.default);
-
-  const options = currentValues.map(
-    (value: string | { label: string; value: string }) => {
-      if (typeof value === "string") {
-        return {
-          label: value,
-          value,
-        };
-      }
-      return value;
-    },
+}> = ({ activeFilterId, module, input, label }) => {
+  const activeConfig = useUiStore(
+    (state) => state.filterConfigurations[activeFilterId]
+  );
+  const setFilterConfiguration = useUiStore(
+    (state) => state.setFilterConfiguration
   );
 
-  return (
-    <Autocomplete
-      multiple
-      freeSolo
-      value={currentValues}
-      onChange={(event, newValue) => {
-        if (typeof newValue === "string") {
-          setActiveConfig({
-            [macroName as string]: [{ value: newValue, label: newValue }],
-          });
-        }
-
-        if (newValue && (newValue as any)?.inputValue) {
-          setActiveConfig({
-            [macroName as string]: newValue,
-          });
-        } else {
-          setActiveConfig({
-            [macroName as string]: newValue,
-          });
-        }
-      }}
-      filterOptions={(options, params) => {
-        const newOptions = [...options];
-        const { inputValue } = params;
-        // Suggest the creation of a new value
-        const isExisting = options.some(
-          (option) => inputValue === option.label,
-        );
-        if (inputValue !== "" && !isExisting) {
-          newOptions.push({
-            inputValue,
-            value: inputValue,
-          });
-        }
-
-        return newOptions;
-      }}
-      renderInput={(params) => (
-        <TextField {...params} label={label || input.label} />
-      )}
-      options={options}
-      getOptionLabel={(option) => {
-        // Value selected with enter, right from the input
-        if (typeof option === "string") {
-          return option;
-        }
-        // Add "xxx" option created dynamically
-        if (option.inputValue) {
-          return option.inputValue;
-        }
-        // Regular option
-        return option.label;
-      }}
-      renderOption={(props, option) => {
-        const { key, ...optionProps } = props;
-
-        return (
-          <li key={key} {...optionProps}>
-            {option.label || `Add "${option.inputValue}"`}
-          </li>
-        );
-      }}
-    />
-  );
-};
-
-export type Option = {
-  label: string;
-  value: string;
-  inputValue?: string;
-};
-
-export interface ConfiguredAutoCompleteProps<
-  Multiple extends boolean | undefined = false,
-> {
-  multiple?: Multiple;
-  options: Option[];
-  inputLabel: string;
-  configurationUpdater: <T extends keyof typeof filterTypes>(
-    configuration: ModularFilterConfiguration<T>,
-    macroName: string,
-    newValue: Option[] | Option | undefined,
-  ) => ModularFilterConfiguration<T>;
-
-  getSetting: <T extends keyof typeof filterTypes>(
-    configuration: ModularFilterConfiguration<T>,
-  ) => Multiple extends true ? Option[] : Option | undefined;
-
-  getDefaultValue: <T extends keyof typeof filterTypes>(
-    input: FilterModuleInput<T>,
-  ) => Multiple extends true
-    ? Option[] | Option | undefined
-    : Option | undefined;
-
-  allowCreate?: boolean;
-}
-/**
- *
- * It is up to the caller to convert between the Option type and whatever
- * the serialized // saved type is.
- */
-export const ConfiguredAutoComplete: React.FC<ConfiguredAutoCompleteProps> = ({
-  options,
-  inputLabel,
-  configurationUpdater,
-  getSetting,
-  getDefaultValue,
-  allowCreate = false,
-  multiple = false,
-}) => {
-  const { activeConfig, setActiveConfig } = useFilterModule();
-  const activeConfiguration = activeConfig;
-  const { input } = useInput();
-
-  const currentSetting = getSetting(activeConfiguration);
-  const inputDefault = getDefaultValue(input);
-  const currentSelectedOptions = currentSetting ?? inputDefault;
-
-  const filter = createFilterOptions<Option>();
-
-  const computeAndSetNewConfig = (newValue: Option[] | Option | undefined) => {
-    const updatedConfig = configurationUpdater(activeConfiguration, input.macroName as string, newValue);
-    setActiveConfig(updatedConfig);
-  };
-
-  return (
-    <Autocomplete
-      multiple={multiple}
-      freeSolo={allowCreate}
-      value={currentSelectedOptions}
-      onChange={(event, newValue) => {
-        if (typeof newValue === "string") {
-          configurationUpdater(
-            activeConfiguration,
-            input.macroName as string,
-            multiple
-              ? [{ label: newValue, value: newValue }]
-              : { label: newValue, value: newValue },
-          );
-          return;
-        }
-
-        if (Array.isArray(newValue)) {
-          const updatedConfig: Option[] = newValue.map((value) => {
-            if (typeof value === "string") {
-              return { label: value, value };
-            }
-            return value;
-          });
-          computeAndSetNewConfig(updatedConfig);
-          return;
-        }
-
-        if (newValue && newValue?.inputValue) {
-          computeAndSetNewConfig({
-            label: newValue.inputValue,
-            value: newValue.inputValue,
-          });
-        } else if (newValue) {
-          computeAndSetNewConfig(newValue);
-        } else {
-          computeAndSetNewConfig(undefined);
-        }
-      }}
-      filterOptions={(options, params) => {
-        const newOptions = [...options];
-        const { inputValue } = params;
-
-        // Suggest the creation of a new value
-        const isExisting = options.some(
-          (option) => inputValue === option.label,
-        );
-
-        if (inputValue !== "" && !isExisting) {
-          newOptions.push({
-            label: inputValue,
-            value: inputValue,
-          });
-        }
-
-        return newOptions;
-      }}
-      renderInput={(params) => <TextField {...params} label={inputLabel} />}
-      options={options}
-      getOptionLabel={(option) => {
-        // Value selected with enter, right from the input
-        if (typeof option === "string") {
-          return option;
-        }
-        // Add "xxx" option created dynamically
-        if (option.inputValue) {
-          return option.inputValue;
-        }
-
-        if (option?.label === undefined) {
-          return "Select an option";
-        }
-        // Regular option
-        return option.label;
-      }}
-      renderOption={(props, option) => {
-        const { key, ...optionProps } = props;
-        const isNewValue = !options.some(
-          (value: { value: string }) => value.value === option.value,
-        );
-
-        return (
-          <li key={key} {...optionProps}>
-            {option.label || `Add "${option.inputValue}"`}
-          </li>
-        );
-      }}
-    />
-  );
+  return <div>Placeholder input</div>;
 };

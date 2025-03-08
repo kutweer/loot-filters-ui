@@ -1,49 +1,60 @@
 import { FormControl, Tooltip, Typography } from "@mui/material";
 import React, { useState } from "react";
-import { ChromePicker, RGBColor } from "react-color";
+import { RgbaColorPicker } from "react-colorful";
+import { isNumber } from "underscore";
 import {
   ArgbHexColor,
-  argbHexToRgbaCss,
-  rGBColorToArgbHex,
+  argbHexColorToRGBColor,
+  colorHexToRgbaCss,
 } from "../../utils/Color";
+
+type RGBColor = {
+  a: number;
+  r: number;
+  g: number;
+  b: number;
+};
+
+const rGBColorToArgbHex = (color: RGBColor): ArgbHexColor => {
+  let alpha = color.a;
+  if (isNumber(alpha) && (!Number.isInteger(alpha) || alpha === 1)) {
+    alpha = Math.round(alpha * 255);
+  }
+
+  return `#${alpha?.toString(16).padStart(2, "0") || "00"}${color.r.toString(16).padStart(2, "0")}${color.g.toString(16).padStart(2, "0")}${color.b.toString(16).padStart(2, "0")}`;
+};
 
 const ColorPicker: React.FC<{
   color?: ArgbHexColor;
-  onChange: (color: ArgbHexColor) => void;
+  onChange: (color: ArgbHexColor | undefined) => void;
   labelText: string;
   labelLocation: "right" | "bottom";
   disabled: boolean;
 }> = ({ color, onChange, labelText, labelLocation, disabled }) => {
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
 
-  const handleClick = (displayColor: boolean) => {
-    setDisplayColorPicker(!displayColor);
+  const handleClick = (displayPicker?: boolean) => {
+    setDisplayColorPicker(displayPicker ?? !displayColorPicker);
   };
 
   const handleClose = () => {
     setDisplayColorPicker(false);
   };
 
-  const handleChange = (color: RGBColor) => {
-    onChange(rGBColorToArgbHex(color));
+  const handleChange = (newColor: RGBColor) => {
+    console.log("newColor", newColor);
+    const argbColor = rGBColorToArgbHex(newColor);
+    onChange(argbColor);
   };
 
   const unset = color === undefined;
 
-  const baseStyle = {
+  const style = {
     width: "36px",
     height: labelLocation == "right" ? "100%" : "14px",
     borderRadius: "2px",
+    ...(color ? { background: colorHexToRgbaCss(color) } : {}),
   };
-  const style = color
-    ? {
-        ...baseStyle,
-        background: disabled ? "#cccccc" : argbHexToRgbaCss(color),
-      }
-    : {
-        ...baseStyle,
-        // backgroundImage: "var(--checkerboard)",
-      };
 
   return (
     <div>
@@ -61,26 +72,27 @@ const ColorPicker: React.FC<{
             }
           >
             <div
-              style={
-                !unset
-                  ? {
-                      padding: "5px",
-                      background: "#fff",
-                      borderRadius: "1px",
-                      boxShadow: "0 0 0 1px rgba(0,0,0,.1)",
-                      display: "inline-block",
-                      cursor: disabled ? "not-allowed" : "pointer",
-                    }
-                  : undefined
-              }
-              className={unset ? "unset-color-picker" : ""}
-              onClick={() => {
-                if (!disabled) {
-                  handleClick(displayColorPicker);
+              style={{
+                padding: "5px",
+                background: "#fff",
+                borderRadius: "1px",
+                boxShadow: "0 0 0 1px rgba(0,0,0,.1)",
+                display: "inline-block",
+                cursor: disabled ? "not-allowed" : "pointer",
+              }}
+              onClick={(e) => {
+                if (e.shiftKey) {
+                  onChange(undefined);
+                  handleClick(false);
+                } else if (!disabled) {
+                  handleClick();
                 }
               }}
             >
-              <div style={style} />
+              <div
+                className={unset ? "unset-color-picker" : ""}
+                style={style}
+              />
             </div>
           </Tooltip>
           <Typography
@@ -107,10 +119,28 @@ const ColorPicker: React.FC<{
             }}
             onClick={() => handleClose()}
           />
-          <ChromePicker
-            color={color}
-            onChange={(color) => handleChange(color.rgb)}
-          />
+          <div
+            style={{
+              backgroundColor: "#fff",
+              padding: "16px",
+              borderRadius: "8px",
+              boxShadow: "0 0 0 1px rgba(0,0,0,.1), 0 8px 16px rgba(0,0,0,.1)",
+            }}
+          >
+            <RgbaColorPicker
+              color={
+                color
+                  ? argbHexColorToRGBColor(color)
+                  : {
+                      r: 0,
+                      g: 0,
+                      b: 0,
+                      a: 1, // range of 0-1
+                    }
+              }
+              onChange={handleChange}
+            />
+          </div>
         </div>
       ) : null}
     </div>
@@ -120,14 +150,15 @@ const ColorPicker: React.FC<{
 const ColorPickerInput: React.FC<{
   color?: ArgbHexColor;
   labelText: string;
-  onChange: (color: ArgbHexColor) => void;
+  onChange: (color: ArgbHexColor | undefined) => void;
   labelLocation?: "right" | "bottom";
   disabled?: boolean;
-}> = ({ color, onChange, labelText, labelLocation = "bottom", disabled }) => {
+}> = ({ color, onChange, labelText, labelLocation, disabled }) => {
+  const labelLocationValue = labelLocation ?? "bottom";
   return (
     <FormControl sx={{ marginTop: "auto", marginBottom: "auto" }}>
       <ColorPicker
-        labelLocation={labelLocation}
+        labelLocation={labelLocationValue}
         labelText={labelText}
         color={color}
         onChange={onChange}

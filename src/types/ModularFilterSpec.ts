@@ -1,294 +1,114 @@
-import { isArray, isObject } from "underscore";
-/**
- * Definitions - the actual filter data - extends beydon the schema.json in order to pipe through things
- * like the rs2f text, and the source url.
- */
+import { Input, InputDefault, MacroName } from "./InputsSpec";
 
+// ### ### ### ### ###
+//
+// MODULE SYSTEM SPEC
+// These types represent the files that get put into a repo that make up the filter.
+//
+// ### ### ### ### ###
+
+/**
+ * An importable filter - in the future this may also support a base64'd definition etc.
+ */
+export type FilterSource =
+  | {
+      filterUrl: string;
+    }
+  | FilterDefinition;
+
+/**
+ * A module source - this can be a url to a json file or a local file
+ */
+export type ModuleSource =
+  | {
+      name: string;
+      moduleJsonUrl: string;
+      moduleRs2fUrl: string;
+    }
+  | {
+      name: string;
+      moduleJson: FilterModule;
+      moduleRs2fText: string;
+    };
+
+/**
+ * A filter definition - this is the actual filter definition that you'll see in a repository
+ * In a typical use-case the modules property is a list of sources, but modules may be inlined as well.
+ */
+export type FilterDefinition = {
+  name: string;
+  description: string;
+  modules: (ModuleSource | FilterModule)[];
+};
+
+/**
+ * This is what you'd put in a moudle file
+ * Actual input definitions are in InputsSpec
+ */
+export type FilterModule = {
+  name: string;
+  description?: string;
+  inputs: Input[];
+};
+
+// ### ### ### ### ###
+//
+// UI TYPES
+// These types extends the above types to add UI specific information like Ids, configuration, types etc.
+//
+// ### ### ### ### ###
+
+// TODO using moduleID here makes the 'update' process a bit more complex - but it ensures duplicate module names don't cause problems
+export type ModularFilterConfiguration = {
+  [key: ModuleId]: { [key: MacroName]: Partial<InputDefault<Input>> };
+};
+
+// Helper function to get the correctly typed value from the configuration
+export const readConfigValue = <T extends Partial<InputDefault<Input>>>(
+  moduleId: ModuleId,
+  macroName: MacroName,
+  config: ModularFilterConfiguration
+): T | undefined => {
+  return config?.[moduleId]?.[macroName] as T;
+};
+
+// This is a 'loaded filter' before we add the ui specific information
+// Only used in the loader
 export type ModularFilter = {
   name: string;
   description: string;
   modules: FilterModule[];
 };
 
-export type FilterModule = {
-  name: string;
-  description?: string;
+// ### ### ### ### ###
+//
+// Persisted UI TYPES
+// These are the types we persist to localStorage; have some additional information
+// and are used by the UI for display purposes like which filter is 'active' etc.
+//
+// ### ### ### ### ###
+
+// Usually a UUID - allows for non-user-supplied unique keys
+/**
+ * @pattern ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+ */
+export type FilterId = string;
+
+/**
+ * @pattern ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+ */
+export type ModuleId = string;
+
+export type UiModularFilter = {
+  id: FilterId;
+  importedOn: string; // ISO string ie. new Date().toISOString()
+  source?: FilterSource; // The source we imported from. In the future will use this to check for updates etc.
+  modules: UiFilterModule[];
+  active: boolean;
+} & ModularFilter;
+
+export type UiFilterModule = {
+  id: ModuleId;
   rs2fText: string;
-  inputs: FilterModuleInputUnion[];
-};
-
-export type FilterModuleInputUnion =
- | BooleanInput
- | NumberInput
- | StringListInput
- | EnumListInput
- | IncludeExcludeListInput
- | StyleInput;
-
-/**
- * Inputs - the input types for the filter module
- */
-
-export const filterTypes = {
-  boolean: "boolean",
-  number: "number",
-  stringlist: "stringlist",
-  enumlist: "enumlist",
-  includeExcludeList: "includeExcludeList",
-  style: "style",
-} as const;
-
-export type FilterModuleInput<T extends keyof typeof filterTypes> = {
-  type: T;
-  macroName: string | { includes: string; excludes: string };
-  label: string;
-  default: any;
-  group?: string;
-};
-
-export type BooleanInput = FilterModuleInput<"boolean"> & {
-  macroName: string;
-  default: boolean;
-};
-
-export type NumberInput = FilterModuleInput<"number"> & {
-  macroName: string;
-  default: number;
-};
-
-export type StringListInput = FilterModuleInput<"stringlist"> & {
-  macroName: string;
-  default: string[];
-};
-
-export type EnumListInput = FilterModuleInput<"enumlist"> & {
-  macroName: string;
-  default: string[];
-  enum: string[];
-};
-
-export type IncludeExcludeListInputDefaults = {
-  includes: string[];
-  excludes: string[];
-};
-
-export type IncludeExcludeListInput =
-  FilterModuleInput<"includeExcludeList"> & {
-    macroName: {
-      includes: string;
-      excludes: string;
-    };
-    default: IncludeExcludeListInputDefaults;
-  };
-
-export enum TextAccent {
-  SHADOW = "shadow",
-  OUTLINE = "outline",
-  NONE = "none",
-  BOLD = "bold",
-}
-
-export const textAccentFromOrdinal = (ordinal: number): TextAccent => {
-  return Object.values(TextAccent)[ordinal];
-};
-
-export const textAccentOrdinal = (textAccent: TextAccent): number => {
-  return Object.values(TextAccent).indexOf(textAccent);
-};
-
-export enum FontType {
-  NORMAL = "normal",
-  LARGER = "larger",
-  BOLD = "bold",
-}
-
-export const fontTypeOrdinal = (fontType: FontType): number => {
-  return Object.values(FontType).indexOf(fontType);
-};
-
-export const fontTypeFromOrdinal = (ordinal: number): FontType => {
-  return Object.values(FontType)[ordinal];
-};
-
-/**
- * @pattern ^#([0-9a-fA-F]{8})$
- */
-export type ArgbHexColor = `#${string}`;
-
-export type StyleInput = FilterModuleInput<"style"> & {
-  macroName: string;
-  default: {
-    textColor: ArgbHexColor;
-    backgroundColor: ArgbHexColor;
-    borderColor: ArgbHexColor;
-    textAccent: number; // TextAccent;
-    textAccentColor: ArgbHexColor;
-    fontType: number; // FontType;
-    showLootbeam: boolean;
-    lootbeamColor: ArgbHexColor;
-    showValue: boolean;
-    showDespawn: boolean;
-    notify: boolean;
-    hideOverlay: boolean;
-    highlightTile: boolean;
-    menuTextColor: ArgbHexColor;
-    tileStrokeColor: ArgbHexColor;
-    tileFillColor: ArgbHexColor;
-  };
-};
-
-export const validateFilterModuleInput = (
-  filter: ModularFilter,
-  checkModules = false
-) => {
-  assertString(filter, "name");
-  assertString(filter, "description");
-
-  if (checkModules) {
-    filter.modules.forEach((module: FilterModule) => {
-      assertString(module, "name");
-      assertString(module, "description", true);
-      validateModule(module);
-    });
-  }
-};
-
-export const validateModule = (module: FilterModule) => {
-  console.log("validateModule", module);
-  module.inputs.forEach((input: FilterModuleInput<any>) => {
-    if (Object.keys(input).includes("macroName")) {
-      if (typeof input.macroName === "string") {
-        if (input.macroName.length === 0) {
-          throw new Error(`Module ${module.name} has empty macroName`);
-        }
-      } else if (typeof input.macroName === "object") {
-        checkObjectProperty(input.macroName, "includes", "string") &&
-          input.macroName.includes.length > 0;
-        checkObjectProperty(input.macroName, "excludes", "string") &&
-          input.macroName.excludes.length > 0;
-      } else {
-        throw new Error(
-          `Module ${module.name} has invalid macroName ${input.macroName} or the macroName is empty`
-        );
-      }
-    } else {
-      throw new Error(`Module ${module.name} has no macroName`);
-    }
-
-    switch (input.type) {
-      case "boolean":
-        checkObjectProperty(input as BooleanInput, "default", "boolean");
-        break;
-      case "number":
-        checkObjectProperty(input as NumberInput, "default", "number");
-        break;
-      case "stringlist":
-        checkArrayProperty((input as StringListInput).default, "string");
-        break;
-      case "enumlist":
-        checkArrayProperty((input as EnumListInput).default, "string");
-        break;
-      case "includeExcludeList":
-        checkArrayProperty(
-          (input as IncludeExcludeListInput).default.includes,
-          "string"
-        );
-        checkArrayProperty(
-          (input as IncludeExcludeListInput).default.excludes,
-          "string"
-        );
-        break;
-      case "style":
-        if (!isObject(input.default)) {
-          throw new Error(`Value ${input.default} is not an object`);
-        }
-        checkObjectProperty(input.default, "textColor", "string", true);
-        checkObjectProperty(input.default, "backgroundColor", "string", true);
-        checkObjectProperty(input.default, "borderColor", "string", true);
-        checkObjectProperty(input.default, "textAccent", "number", true);
-        checkObjectProperty(input.default, "textAccentColor", "string", true);
-        checkObjectProperty(input.default, "fontType", "number", true);
-        checkObjectProperty(input.default, "showLootbeam", "boolean", true);
-        checkObjectProperty(input.default, "lootbeamColor", "string", true);
-        checkObjectProperty(input.default, "showValue", "boolean", true);
-        checkObjectProperty(input.default, "showDespawn", "boolean", true);
-        checkObjectProperty(input.default, "notify", "boolean", true);
-        checkObjectProperty(input.default, "hideOverlay", "boolean", true);
-        checkObjectProperty(input.default, "highlightTile", "boolean", true);
-        checkObjectProperty(input.default, "menuTextColor", "string", true);
-        checkObjectProperty(input.default, "tileStrokeColor", "string", true);
-        checkObjectProperty(input.default, "tileFillColor", "string", true);
-        break;
-    }
-  });
-};
-
-const assertString = (value: any, key: string, optional = false) => {
-  checkObjectProperty(value, key, "string", optional);
-};
-
-const checkArrayProperty = (value: any, type: string, optional = false) => {
-  if (value === undefined || value === null) {
-    if (!optional) {
-      throw new Error(`Value ${value} is undefined`);
-    }
-    return;
-  }
-
-  if (!isArray(value)) {
-    throw new Error(`Value ${value} is not an array`);
-  }
-
-  value.forEach((item: any) => {
-    if (typeof item !== type) {
-      throw new Error(`Value ${item} is not of type ${type}`);
-    }
-  });
-};
-
-const checkObjectProperty = (
-  value: any,
-  key: string,
-  type: string,
-  optional = false
-) => {
-  if (!isObject(value)) {
-    throw new Error(`Value ${value} is not an object`);
-  }
-
-  if (!Object.keys(value).includes(key)) {
-    if (!optional) {
-      throw new Error(
-        `Value ${JSON.stringify(value)} has no property ${key} of type ${type}`
-      );
-    }
-    return;
-  }
-
-  if (typeof value[key] !== type) {
-    throw new Error(
-      `Value ${JSON.stringify(value)} has property ${key} of type ${typeof value[key]} instead of ${type}`
-    );
-  }
-
-  return value[key];
-};
-
-export const isBoolean = (input: FilterModuleInputUnion): input is BooleanInput =>
-  input.type === "boolean";
-
-export const isNumber = (input: FilterModuleInputUnion): input is NumberInput =>
-  input.type === "number";
-
-export const isStringList = (input: FilterModuleInputUnion): input is StringListInput =>
-  input.type === "stringlist";
-
-export const isEnumList = (input: FilterModuleInputUnion): input is EnumListInput =>
-  input.type === "enumlist";
-
-export const isIncludeExcludeList = (input: FilterModuleInputUnion): input is IncludeExcludeListInput =>
-  input.type === "includeExcludeList";
-
-export const isStyle = (input: FilterModuleInputUnion): input is StyleInput =>
-  input.type === "style";
-
+  source?: ModuleSource;
+} & FilterModule;

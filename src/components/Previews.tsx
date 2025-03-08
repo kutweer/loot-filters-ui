@@ -1,17 +1,32 @@
 import { Box, SxProps } from "@mui/material";
-import { useFilterModule } from "../context/FilterModuleContext";
+import { useUiStore } from "../store/store";
 import { colors } from "../styles/MuiTheme";
-import { StyleInput } from "../types/ModularFilterSpec";
-import { argbHexToRgbaCss } from "../utils/Color";
-import { defaultOrConfigOrNone } from "./inputs/StyleInputHelprs";
+import { StyleInput } from "../types/InputsSpec";
+import { UiFilterModule } from "../types/ModularFilterSpec";
+import { colorHexToRgbaCss } from "../utils/Color";
+import { StyleConfig } from "./inputs/StyleInputHelpers";
+
 export const ItemMenuPreview: React.FC<{
   itemName: string;
   input: StyleInput;
-}> = ({ itemName, input }) => {
-  const { activeConfig } = useFilterModule();
+  module: UiFilterModule;
+}> = ({ itemName, input, module }) => {
+  const activeFilterId = useUiStore(
+    (state) =>
+      Object.keys(state.importedModularFilters).find(
+        (id) => state.importedModularFilters[id].active
+      )!!
+  );
 
-  const menuTextColor = argbHexToRgbaCss(
-    defaultOrConfigOrNone("menuTextColor", input, activeConfig)
+  const activeConfig = useUiStore(
+    (state) =>
+      state.filterConfigurations?.[activeFilterId!!]?.[module.id]?.[
+        input.macroName
+      ] as Partial<StyleConfig>
+  );
+
+  const menuTextColor = colorHexToRgbaCss(
+    activeConfig?.menuTextColor ?? input.default?.menuTextColor
   );
 
   return (
@@ -76,18 +91,33 @@ export const ItemMenuPreview: React.FC<{
 export const ItemLabelPreview: React.FC<{
   itemName: string;
   input: StyleInput;
+  module: UiFilterModule;
   sx?: SxProps;
-}> = ({ itemName, input, sx }) => {
-  const { activeConfig } = useFilterModule();
+}> = ({ itemName, input, module, sx }) => {
+  const activeFilterId = useUiStore(
+    (state) =>
+      Object.keys(state.importedModularFilters).find(
+        (id) => state.importedModularFilters[id].active
+      )!!
+  );
 
-  const backgroundColor = argbHexToRgbaCss(
-    defaultOrConfigOrNone("backgroundColor", input, activeConfig)
+  const activeConfig = useUiStore(
+    (state) =>
+      state.filterConfigurations?.[activeFilterId!!]?.[module.id]?.[
+        input.macroName
+      ] as Partial<StyleConfig>
   );
-  const borderColor = argbHexToRgbaCss(
-    defaultOrConfigOrNone("borderColor", input, activeConfig)
+
+  console.log("activeConfig", activeConfig);
+
+  const backgroundColor = colorHexToRgbaCss(
+    activeConfig?.backgroundColor ?? input.default?.backgroundColor
   );
-  const foregroundColor = argbHexToRgbaCss(
-    defaultOrConfigOrNone("textColor", input, activeConfig)
+  const borderColor = colorHexToRgbaCss(
+    activeConfig?.borderColor ?? input.default?.borderColor
+  );
+  const foregroundColor = colorHexToRgbaCss(
+    activeConfig?.textColor ?? input.default?.textColor
   );
 
   return (

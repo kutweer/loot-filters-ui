@@ -9,14 +9,15 @@ import {
   FormHelperText,
   MenuItem,
   Select,
+  SelectChangeEvent,
   TextField,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
-import { useData } from "../context/UiDataContext";
-import { loadFilter } from "../utils/modularFilterLoader";
-import { ModularFilterId } from "../utils/storage";
+import { useCallback, useMemo, useState } from "react";
+import { useUiStore } from "../store/store";
+import { FilterId } from "../types/ModularFilterSpec";
 import useSiteConfig from "../utils/devmode";
+import { loadFilter } from "../utils/modularFilterLoader";
 
 const COMMON_FILTERS = [
   {
@@ -34,22 +35,19 @@ const DEV_FILTERS = [
     name: "Style Input Test",
     url: "https://raw.githubusercontent.com/Kaqemeex/example-configurable-filter/refs/heads/main/single_style_filter.json",
   },
+  {
+    name: "Misc Filter",
+    url: "https://raw.githubusercontent.com/Kaqemeex/example-configurable-filter/refs/heads/main/misc_filter.json",
+  },
+  {
+    name: "Invalid Input Filter",
+    url: "https://raw.githubusercontent.com/Kaqemeex/example-configurable-filter/refs/heads/main/filter_with_invalid_input.json",
+  },
 ];
 
 export const FilterSelector: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [filterUrl, setFilterUrl] = useState("");
-  const {
-    activeFilterId,
-    importedModularFilters,
-    setActiveFilter,
-    addNewImportedModularFilter,
-    setModularFilterRemoved,
-    getActiveFilter,
-  } = useData();
-
-  const activeFilter = getActiveFilter();
-
   const [siteConfig, _] = useSiteConfig();
 
   const filtersForImport = [
@@ -57,7 +55,37 @@ export const FilterSelector: React.FC = () => {
     ...COMMON_FILTERS,
   ];
 
-  console.log("importedModularFilters", importedModularFilters);
+  const importedModularFilters = useUiStore(
+    (state) => state.importedModularFilters
+  );
+  const addImportedModularFilter = useUiStore(
+    (state) => state.addImportedModularFilter
+  );
+  const setActiveFilterId = useUiStore((state) => state.setActiveFilterId);
+
+  const activeFilter = useMemo(
+    () => Object.values(importedModularFilters).find((filter) => filter.active),
+    [importedModularFilters]
+  );
+  const removeImportedModularFilter = useUiStore(
+    (state) => state.removeImportedModularFilter
+  );
+
+  const handleFilterChange = useCallback(
+    (e: SelectChangeEvent<string>) => {
+      setActiveFilterId(e.target.value as FilterId);
+    },
+    [setActiveFilterId]
+  );
+
+  const handleDeleteFilter = useCallback(() => {
+    if (activeFilter) {
+      setActiveFilterId(activeFilter.id);
+      removeImportedModularFilter(activeFilter.id);
+    }
+  }, [activeFilter, setActiveFilterId, removeImportedModularFilter]);
+
+  const [importError, setImportError] = useState("");
 
   return (
     <Container>
@@ -87,10 +115,9 @@ export const FilterSelector: React.FC = () => {
             size="small"
           >
             <Select
-              value={activeFilterId}
-              onChange={(e) => {
-                setActiveFilter(e.target.value as ModularFilterId);
-              }}
+              disabled={Object.keys(importedModularFilters).length === 0}
+              value={activeFilter?.id ?? ""}
+              onChange={handleFilterChange}
               renderValue={(value: number | string) => {
                 const filter = importedModularFilters[value];
                 if (!filter) {
@@ -100,14 +127,11 @@ export const FilterSelector: React.FC = () => {
               }}
               displayEmpty
             >
-              {Object.values(importedModularFilters).map((filter, index) => {
-                console.log("filter", filter);
-                return (
-                  <MenuItem key={index} value={filter.id}>
-                    {filter.name}
-                  </MenuItem>
-                );
-              })}
+              {Object.values(importedModularFilters).map((filter, index) => (
+                <MenuItem key={index} value={filter.id}>
+                  {filter.name}
+                </MenuItem>
+              ))}
             </Select>
             <Button
               variant="outlined"
@@ -121,12 +145,8 @@ export const FilterSelector: React.FC = () => {
             <Button
               variant="outlined"
               color="secondary"
-              disabled={activeFilterId === undefined}
-              onClick={() => {
-                if (activeFilterId) {
-                  setModularFilterRemoved(activeFilterId);
-                }
-              }}
+              disabled={activeFilter === undefined}
+              onClick={handleDeleteFilter}
             >
               Delete Filter
             </Button>
@@ -157,7 +177,10 @@ export const FilterSelector: React.FC = () => {
                       labelId="common-filter-select"
                       value={filterUrl}
                       displayEmpty
-                      onChange={(e) => setFilterUrl(e.target.value)}
+                      onChange={(e) => {
+                        setFilterUrl(e.target.value);
+                        setImportError("");
+                      }}
                     >
                       {filtersForImport.map((filter) => (
                         <MenuItem key={filter.url} value={filter.url}>
@@ -169,20 +192,34 @@ export const FilterSelector: React.FC = () => {
                   <TextField
                     label="Filter URL"
                     value={filterUrl}
-                    onChange={(e) => setFilterUrl(e.target.value)}
+                    onChange={(e) => {
+                      setFilterUrl(e.target.value);
+                      setImportError("");
+                    }}
+                    error={importError !== ""}
+                    helperText={importError}
                   />
                 </Box>
                 <Button
                   variant="contained"
                   color="primary"
+                  disabled={filterUrl === "" || importError !== ""}
                   onClick={() => {
+                    setImportError("");
                     loadFilter({
                       filterUrl: filterUrl,
-                    }).then((filter) => {
-                      addNewImportedModularFilter(filter.id, filter);
-                      setFilterUrl("");
-                      setOpen(false);
-                    });
+                    })
+                      .catch((error) => {
+                        setImportError(error.message);
+                      })
+                      .then((filter) => {
+                        if (filter) {
+                          addImportedModularFilter(filter);
+                          setActiveFilterId(filter.id);
+                          setFilterUrl("");
+                          setOpen(false);
+                        }
+                      });
                   }}
                 >
                   Import

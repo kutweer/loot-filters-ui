@@ -1,47 +1,41 @@
 import { Editor } from "@monaco-editor/react";
 import { Typography } from "@mui/material";
+import { useUiStore } from "../../store/store";
 import {
-  RenderFilterProvider,
-  useRenderContext,
-} from "../../context/RenderFilterContext";
-import { ModularFilterConfiguration } from "../../utils/storage";
-import { StyleConfig } from "../inputs/StyleInputHelprs";
-import { UiFilterModule, UiModularFilter } from "../../types/ModularFilter";
-import {
-  filterTypes,
-  isBoolean,
-  isNumber,
-  isStringList,
-  isEnumList,
-  isIncludeExcludeList,
-  isStyle,
+  ModularFilterConfiguration,
+  readConfigValue,
+  UiFilterModule,
+  UiModularFilter,
 } from "../../types/ModularFilterSpec";
+import { StyleConfig } from "../inputs/StyleInputHelpers";
 
 const RenderFilterComponent: React.FC = () => {
-  const { activeFilter, activeConfig } = useRenderContext();
+  const activeFilter = useUiStore((state) =>
+    Object.values(state.importedModularFilters).find((f) => f.active)
+  );
+  const activeConfig = useUiStore((state) =>
+    activeFilter ? state.filterConfigurations[activeFilter.id] : undefined
+  );
 
   return (
     <>
       <Typography color="text.secondary">Copy and paste it for now.</Typography>
-      {activeFilter?.modules.map((module) => {
-        return (
-          <div key={module.name}>
-            {module.name}
-            <Editor
-              height="70vh"
-              language="cpp"
-              theme="vs-dark"
-              options={{
-                minimap: {
-                  enabled: false,
-                },
-                readOnly: true,
-              }}
-              value={renderFilter(activeFilter, activeConfig)}
-            />
-          </div>
-        );
-      })}
+      <Editor
+        height="70vh"
+        language="cpp"
+        theme="vs-dark"
+        options={{
+          minimap: {
+            enabled: false,
+          },
+          readOnly: true,
+        }}
+        value={
+          activeFilter
+            ? renderFilter(activeFilter, activeConfig)
+            : "no filter selected"
+        }
+      />
     </>
   );
 };
@@ -49,66 +43,103 @@ const RenderFilterComponent: React.FC = () => {
 export const RenderedFilterTab: React.FC<{
   sha: string;
 }> = ({ sha }) => {
-  return (
-    <RenderFilterProvider>
-      <RenderFilterComponent />
-    </RenderFilterProvider>
-  );
+  return <RenderFilterComponent />;
 };
 
 const renderFilter = (
   filter: UiModularFilter,
-  activeConfig: ModularFilterConfiguration<keyof typeof filterTypes> | undefined,
+  activeConfig: ModularFilterConfiguration | undefined
 ): string => {
-  return filter.modules.map(m => {
-    return activeConfig !== undefined
-      ? renderModule(m, activeConfig)
-      : m.rs2fText;
-  }).join('\n');
-}
+  return filter.modules
+    .map((m) => {
+      return activeConfig !== undefined
+        ? renderModule(m, activeConfig)
+        : m.rs2fText;
+    })
+    .join("\n");
+};
 
 const renderModule = (
   module: UiFilterModule,
-  config: ModularFilterConfiguration<keyof typeof filterTypes>,
+  config: ModularFilterConfiguration
 ): string => {
   let updated = module.rs2fText;
   for (const input of module.inputs) {
-    if (isBoolean(input)) {
-      const bool = config[input.macroName];
-      if (bool !== undefined) {
-        updated = updateMacro(updated, input.macroName, bool.toString());
-      }
-    } else if (isNumber(input)) {
-      const value = config[input.macroName];
-      if (value !== undefined) {
-        updated = updateMacro(updated, input.macroName, value.toString());
-      }
-    } else if (isStringList(input) || isEnumList(input)) {
-      const items = config[input.macroName];
-      if (items !== undefined) {
-        updated = updateMacro(updated, input.macroName, renderStringList(items));
-      }
-    } else if (isIncludeExcludeList(input)) {
-      const includes = config[input.macroName.includes];
-      const excludes = config[input.macroName.excludes];
-      if (includes !== undefined) {
-        updated = updateMacro(updated, input.macroName.includes, renderStringList(includes));
-      }
-      if (excludes !== undefined) {
-        updated = updateMacro(updated, input.macroName.excludes, renderStringList(excludes));
-      }
-    } else if (isStyle(input)) {
-      const style = config[input.macroName];
-      if (style !== undefined) {
-        updated = updateMacro(updated, input.macroName, renderStyle(style));
-      }
+    switch (input.type) {
+      case "boolean":
+        const bool =
+          readConfigValue(module.id, input.macroName, config) ?? input.default;
+        if (bool !== undefined) {
+          updated = updateMacro(updated, input.macroName, bool.toString());
+        }
+        break;
+      case "number":
+        const value =
+          readConfigValue<number>(module.id, input.macroName, config) ??
+          input.default;
+        if (value !== undefined) {
+          updated = updateMacro(updated, input.macroName, value.toString());
+        }
+        break;
+      case "stringlist":
+      case "enumlist":
+        const items =
+          readConfigValue<string[]>(module.id, input.macroName, config) ??
+          input.default;
+        if (items !== undefined) {
+          updated = updateMacro(
+            updated,
+            input.macroName,
+            renderStringList(items)
+          );
+        }
+        break;
+      case "includeExcludeList":
+        const includes =
+          readConfigValue<string[]>(
+            module.id,
+            input.macroName["includes"],
+            config
+          ) ?? input.default.includes;
+        const excludes =
+          readConfigValue<string[]>(
+            module.id,
+            input.macroName["excludes"],
+            config
+          ) ?? input.default.excludes;
+        if (includes !== undefined) {
+          updated = updateMacro(
+            updated,
+            input.macroName.includes,
+            renderStringList(includes)
+          );
+        }
+        if (excludes !== undefined) {
+          updated = updateMacro(
+            updated,
+            input.macroName.excludes,
+            renderStringList(excludes)
+          );
+        }
+        break;
+      case "style":
+        const style = config[input.macroName];
+        if (style !== undefined) {
+          updated = updateMacro(
+            updated,
+            input.macroName,
+            renderStyle(style as StyleConfig)
+          );
+        }
+        break;
     }
   }
 
   return updated;
-}
+};
 
-const renderStringList = (list: string[]): string => `[${list.map(quote).join(",")}]`;
+const renderStringList = (list: string[]): string =>
+  `[${list.map(quote).join(",")}]`;
 
 const quote = (v: string): string => `"${v}"`;
 
@@ -145,8 +176,15 @@ const renderStyleBool = (name: string, value: boolean | undefined): string =>
 const isTargetMacro = (line: string, target: string): boolean =>
   line.startsWith(`#define ${target} `) || line === `#define ${target}`;
 
-const updateMacro = (filter: string, macro: string, replace: string): string => {
-  return filter.split('\n')
-    .map(line => isTargetMacro(line, macro) ? "#define " + macro + " " + replace : line)
-    .join('\n');
-}
+const updateMacro = (
+  filter: string,
+  macro: string,
+  replace: string
+): string => {
+  return filter
+    .split("\n")
+    .map((line) =>
+      isTargetMacro(line, macro) ? "#define " + macro + " " + replace : line
+    )
+    .join("\n");
+};

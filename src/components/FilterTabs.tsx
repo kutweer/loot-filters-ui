@@ -1,7 +1,7 @@
-import { Box, Tab, Tabs } from "@mui/material";
+import { Box, Tab, Tabs, Typography } from "@mui/material";
 import { useMemo, useState } from "react";
 import { filter } from "underscore";
-import { useData } from "../context/UiDataContext";
+import { useUiStore } from "../store/store";
 import { SiteConfig } from "../utils/devmode";
 import { FilterSelector } from "./FilterSelector";
 import { CustomizeTab } from "./tabs/CustomizeTab";
@@ -11,23 +11,29 @@ export const FilterTabs: React.FC<{
   sha: string;
   siteConfig: SiteConfig;
 }> = ({ sha, siteConfig }) => {
-  const [activeTab, setActiveTab] = useState(1);
-  const { getActiveFilter } = useData();
+  const [activeTab, setActiveTab] = useState(0);
 
-  const activeFilter = getActiveFilter();
+  const importedModularFilters = useUiStore(
+    (state) => state.importedModularFilters
+  );
+  const activeFilter = useMemo(
+    () => Object.values(importedModularFilters).find((filter) => filter.active),
+    [importedModularFilters]
+  );
 
   const tabs = useMemo(() => {
     return [
       {
-        label: `${activeFilter?.name || "Filter"} Preview`,
+        label: `Customize ${activeFilter?.name ?? "Filter"}`,
+        disabled: !activeFilter,
         dev: false,
-        component: <RenderedFilterTab sha={sha} />,
+        component: activeFilter ? <CustomizeTab /> : <Typography variant="h6" color="secondary">No filter selected, select or import a filter</Typography>,
       },
       {
-        label: `Customize ${activeFilter?.name}`,
-        disabled: activeFilter === null,
+        label: `${activeFilter?.name || "Filter"} Preview`,
+        disabled: !activeFilter,
         dev: false,
-        component: activeFilter ? <CustomizeTab /> : null,
+        component: <RenderedFilterTab sha={sha} />,
       },
     ];
   }, [activeFilter]);

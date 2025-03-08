@@ -1,20 +1,25 @@
 import { Box } from "@mui/material";
-import { IncludeExcludeListInput } from "../../types/ModularFilterSpec";
-import { StringListInputComponent } from "./BasicInputs";
+import { IncludeExcludeListInput } from "../../types/InputsSpec";
+import { FilterId, UiFilterModule } from "../../types/ModularFilterSpec";
+import { ListInputComponent } from "./BasicInputs";
 
 export const IncludeExcludeListInputComponent: React.FC<{
+  activeFilterId: FilterId;
+  module: UiFilterModule;
   input: IncludeExcludeListInput;
-}> = ({ input }) => {
+}> = ({ activeFilterId, module, input }) => {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-      <StringListInputComponent
+      <ListInputComponent
+        activeFilterId={activeFilterId}
+        module={module}
         input={input}
-        defaultField="includes"
         label={`${input.label} includes`}
       />
-      <StringListInputComponent
+      <ListInputComponent
+        activeFilterId={activeFilterId}
+        module={module}
         input={input}
-        defaultField="excludes"
         label={`${input.label} excludes`}
       />
     </Box>

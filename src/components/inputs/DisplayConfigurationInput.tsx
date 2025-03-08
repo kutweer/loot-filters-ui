@@ -8,45 +8,58 @@ import {
   FormControlLabel,
   Grid2 as Grid,
 } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
+import { useUiStore } from "../../store/store";
 import { colors } from "../../styles/MuiTheme";
-import { StyleInput } from "../../types/ModularFilterSpec";
-import { ArgbHexColor, rgbHexToArgbHex } from "../../utils/Color";
+import { StyleInput } from "../../types/InputsSpec";
+import { UiFilterModule } from "../../types/ModularFilterSpec";
+import { ArgbHexColor } from "../../utils/Color";
 import useSiteConfig from "../../utils/devmode";
 import { ItemLabelPreview, ItemMenuPreview } from "../Previews";
 import { ColorPickerInput } from "./ColorPicker";
 import { ItemLabelColorPicker } from "./ItemLabelColorPicker";
-import {
-  updateStyleConfig,
-  defaultOrConfigOrNone,
-  StyleConfig,
-  StyleConfigKey,
-} from "./StyleInputHelprs";
-import { useFilterModule } from "../../context/FilterModuleContext";
+import { StyleConfig } from "./StyleInputHelpers";
 
 export const DisplayConfigurationInput: React.FC<{
+  module: UiFilterModule;
   input: StyleInput;
-}> = ({ input }) => {
-  const styleInput = input as StyleInput;
+}> = ({ module, input }) => {
   const [siteConfig, _] = useSiteConfig();
-  const { activeConfig, setActiveConfig } = useFilterModule();
 
-  const updateStyleField = (
-    field: StyleConfigKey,
-    value: StyleConfig[StyleConfigKey]
-  ) => {
-    updateStyleConfig(
-      field,
-      value,
-      styleInput,
-      activeConfig,
-      setActiveConfig
-    );
-  };
+  const activeFilterId = useUiStore(
+    (state) =>
+      Object.keys(state.importedModularFilters).find(
+        (id) => state.importedModularFilters[id].active
+      )!!
+  );
+
+  const styleConfig: Partial<StyleConfig> = useUiStore(
+    (state) =>
+      state.filterConfigurations?.[activeFilterId]?.[module.id]?.[
+        input.macroName
+      ] as Partial<StyleConfig>
+  );
+
+  const setFilterConfiguration = useUiStore(
+    (state) => state.setFilterConfiguration
+  );
+
+  if (styleConfig === undefined) {
+    // forces the creation of the style config
+    // for some reason returning a default value in the selector causes an infinite loop
+    // By calling this set here we then re-render with the empty object and everything works
+    setFilterConfiguration(activeFilterId, module.id, input.macroName, {});
+    return null;
+  }
 
   const itemLabelColorPicker = (
     <Grid size={12} sx={{ display: "flex", padding: 1 }}>
-      <ItemLabelColorPicker showExamples={false} labelLocation="right" />
+      <ItemLabelColorPicker
+        showExamples={false}
+        labelLocation="right"
+        module={module}
+        input={input}
+      />
     </Grid>
   );
 
@@ -56,23 +69,28 @@ export const DisplayConfigurationInput: React.FC<{
         label="Lootbeam"
         control={
           <Checkbox
-            checked={defaultOrConfigOrNone(
-              "showLootbeam",
-              styleInput,
-              activeConfig
-            )}
-            onChange={(e) => updateStyleField("showLootbeam", e.target.checked)}
+            checked={styleConfig.showLootbeam ?? input.default?.showLootbeam}
+            onChange={(e) =>
+              setFilterConfiguration(
+                activeFilterId,
+                module.id,
+                input.macroName,
+                { showLootbeam: e.target.checked }
+              )
+            }
           />
         }
       />
       <ColorPickerInput
-        color={defaultOrConfigOrNone("lootbeamColor", styleInput, activeConfig)}
-        onChange={(color: ArgbHexColor) =>
-          updateStyleField("lootbeamColor", color)
+        disabled={!(styleConfig.showLootbeam ?? input.default?.showLootbeam)}
+        color={styleConfig.lootbeamColor ?? input.default?.lootbeamColor}
+        onChange={(color?: ArgbHexColor) =>
+          setFilterConfiguration(activeFilterId, module.id, input.macroName, {
+            lootbeamColor: color,
+          })
         }
         labelText={"Lootbeam Color"}
         labelLocation="right"
-        disabled={defaultOrConfigOrNone("showLootbeam", styleInput, activeConfig)}
       />
     </Grid>
   );
@@ -82,8 +100,12 @@ export const DisplayConfigurationInput: React.FC<{
       label="Show Item Value"
       control={
         <Checkbox
-          checked={defaultOrConfigOrNone("showValue", styleInput, activeConfig)}
-          onChange={(e) => updateStyleField("showValue", e.target.checked)}
+          checked={styleConfig.showValue ?? input.default?.showValue}
+          onChange={(e) =>
+            setFilterConfiguration(activeFilterId, module.id, input.macroName, {
+              showValue: e.target.checked,
+            })
+          }
         />
       }
     />
@@ -94,22 +116,28 @@ export const DisplayConfigurationInput: React.FC<{
       label="Show Despawn Timer"
       control={
         <Checkbox
-          checked={defaultOrConfigOrNone("showDespawn", styleInput, activeConfig)}
-          onChange={(e) => updateStyleField("showDespawn", e.target.checked)}
+          checked={styleConfig.showDespawn ?? input.default?.showDespawn}
+          onChange={(e) =>
+            setFilterConfiguration(activeFilterId, module.id, input.macroName, {
+              showDespawn: e.target.checked,
+            })
+          }
         />
       }
     />
   );
-  const [notify, setNotify] = useState<boolean>(
-    styleInput.default?.notify || false
-  );
+
   const notifyComponent = (
     <FormControlLabel
       label="Notify on Drop"
       control={
         <Checkbox
-          checked={notify}
-          onChange={(e) => setNotify(e.target.checked)}
+          checked={styleConfig.notify ?? input.default?.notify}
+          onChange={(e) =>
+            setFilterConfiguration(activeFilterId, module.id, input.macroName, {
+              notify: e.target.checked,
+            })
+          }
         />
       }
     />
@@ -120,8 +148,12 @@ export const DisplayConfigurationInput: React.FC<{
       label="Hide Overlay"
       control={
         <Checkbox
-          checked={defaultOrConfigOrNone("hideOverlay", styleInput, activeConfig)}
-          onChange={(e) => updateStyleField("hideOverlay", e.target.checked)}
+          checked={styleConfig.hideOverlay ?? input.default?.hideOverlay}
+          onChange={(e) =>
+            setFilterConfiguration(activeFilterId, module.id, input.macroName, {
+              hideOverlay: e.target.checked,
+            })
+          }
         />
       }
     />
@@ -133,38 +165,39 @@ export const DisplayConfigurationInput: React.FC<{
         label="Highlight Tile"
         control={
           <Checkbox
-            checked={defaultOrConfigOrNone(
-              "highlightTile",
-              styleInput,
-              activeConfig
-            )}
+            checked={styleConfig.highlightTile ?? input.default?.highlightTile}
             onChange={(e) =>
-              updateStyleField("highlightTile", e.target.checked)
+              setFilterConfiguration(
+                activeFilterId,
+                module.id,
+                input.macroName,
+                { highlightTile: e.target.checked }
+              )
             }
           />
         }
       />
       <ColorPickerInput
-        color={defaultOrConfigOrNone("tileStrokeColor", styleInput, activeConfig)}
-        onChange={(color: ArgbHexColor) =>
-          updateStyleField("tileStrokeColor", color)
+        color={styleConfig.tileStrokeColor ?? input.default?.tileStrokeColor}
+        onChange={(color?: ArgbHexColor) =>
+          setFilterConfiguration(activeFilterId, module.id, input.macroName, {
+            tileStrokeColor: color,
+          })
         }
         labelText={"Tile Stroke Color"}
         labelLocation="right"
-        disabled={
-          !defaultOrConfigOrNone("highlightTile", styleInput, activeConfig)
-        }
+        disabled={!(styleConfig.highlightTile ?? input.default?.highlightTile)}
       />
       <ColorPickerInput
-        color={defaultOrConfigOrNone("tileFillColor", styleInput, activeConfig)}
-        onChange={(color: ArgbHexColor) =>
-          updateStyleField("tileFillColor", color)
+        color={styleConfig.tileFillColor ?? input.default?.tileFillColor}
+        onChange={(color?: ArgbHexColor) =>
+          setFilterConfiguration(activeFilterId, module.id, input.macroName, {
+            tileFillColor: color,
+          })
         }
         labelText={"Tile Fill Color"}
         labelLocation="right"
-        disabled={
-          !defaultOrConfigOrNone("highlightTile", styleInput, activeConfig)
-        }
+        disabled={!(styleConfig.highlightTile ?? input.default?.highlightTile)}
       />
     </Grid>
   );
@@ -194,8 +227,16 @@ export const DisplayConfigurationInput: React.FC<{
         expandIcon={<ExpandMore />}
       >
         <Box sx={{ display: "flex", gap: 2 }}>
-          <ItemLabelPreview input={input} itemName={input.label} />
-          <ItemMenuPreview input={input} itemName={input.label} />
+          <ItemLabelPreview
+            module={module}
+            input={input}
+            itemName={input.label}
+          />
+          <ItemMenuPreview
+            module={module}
+            input={input}
+            itemName={input.label}
+          />
         </Box>
       </AccordionSummary>
       <AccordionDetails>
