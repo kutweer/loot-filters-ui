@@ -11,7 +11,6 @@ import {
 import {
   FilterId,
   ModularFilterConfiguration,
-  readConfigValue,
   UiFilterModule,
 } from "../../types/ModularFilterSpec";
 
@@ -27,11 +26,8 @@ export const NumberInputComponent: React.FC<{
     (state) => state.setFilterConfiguration
   );
 
-  const userConfigValue = readConfigValue<number>(
-    module.id,
-    input.macroName,
-    activeConfig
-  );
+  const userConfigValue =
+    activeConfig?.[module.id]?.[input.macroName] ?? input.default;
   const currentSetting = userConfigValue ?? input.default;
 
   return (
@@ -64,8 +60,7 @@ export const EnumInputComponent: React.FC<{
   );
 
   const currentSetting =
-    readConfigValue<string[]>(module.id, input.macroName, activeConfig) ??
-    input.default;
+    activeConfig?.[module.id]?.[input.macroName] ?? input.default;
 
   return (
     <Select
@@ -119,8 +114,9 @@ export const BooleanInputComponent: React.FC<{
   );
 
   const currentSetting =
-    readConfigValue<boolean>(module.id, input.macroName, activeConfig) ??
-    input.default;
+    (activeConfig?.[module.id]?.[input.macroName] as boolean | undefined) ??
+    input.default ??
+    false;
 
   return (
     <Checkbox

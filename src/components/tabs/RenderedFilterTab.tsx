@@ -1,9 +1,9 @@
 import { Editor } from "@monaco-editor/react";
 import { Typography } from "@mui/material";
 import { useUiStore } from "../../store/store";
+import { Input, InputDefault, MacroName } from "../../types/InputsSpec";
 import {
   ModularFilterConfiguration,
-  readConfigValue,
   UiFilterModule,
   UiModularFilter,
 } from "../../types/ModularFilterSpec";
@@ -53,7 +53,7 @@ const renderFilter = (
   return filter.modules
     .map((m) => {
       return activeConfig !== undefined
-        ? renderModule(m, activeConfig)
+        ? renderModule(m, activeConfig[m.id])
         : m.rs2fText;
     })
     .join("\n");
@@ -61,31 +61,26 @@ const renderFilter = (
 
 const renderModule = (
   module: UiFilterModule,
-  config: ModularFilterConfiguration
+  config: { [key: MacroName]: Partial<InputDefault<Input>> }
 ): string => {
   let updated = module.rs2fText;
   for (const input of module.inputs) {
     switch (input.type) {
       case "boolean":
-        const bool =
-          readConfigValue(module.id, input.macroName, config) ?? input.default;
+        const bool = config?.[input.macroName] ?? input.default;
         if (bool !== undefined) {
           updated = updateMacro(updated, input.macroName, bool.toString());
         }
         break;
       case "number":
-        const value =
-          readConfigValue<number>(module.id, input.macroName, config) ??
-          input.default;
+        const value = config?.[input.macroName] ?? input.default;
         if (value !== undefined) {
           updated = updateMacro(updated, input.macroName, value.toString());
         }
         break;
       case "stringlist":
       case "enumlist":
-        const items =
-          readConfigValue<string[]>(module.id, input.macroName, config) ??
-          input.default;
+        const items = (config?.[input.macroName] ?? input.default) as string[];
         if (items !== undefined) {
           updated = updateMacro(
             updated,
@@ -95,18 +90,10 @@ const renderModule = (
         }
         break;
       case "includeExcludeList":
-        const includes =
-          readConfigValue<string[]>(
-            module.id,
-            input.macroName["includes"],
-            config
-          ) ?? input.default.includes;
-        const excludes =
-          readConfigValue<string[]>(
-            module.id,
-            input.macroName["excludes"],
-            config
-          ) ?? input.default.excludes;
+        const includes = (config?.[input.macroName.includes] ??
+          input.default.includes) as string[];
+        const excludes = (config?.[input.macroName.excludes] ??
+          input.default.excludes) as string[];
         if (includes !== undefined) {
           updated = updateMacro(
             updated,
@@ -123,7 +110,7 @@ const renderModule = (
         }
         break;
       case "style":
-        const style = config[input.macroName];
+        const style = config?.[input.macroName];
         if (style !== undefined) {
           updated = updateMacro(
             updated,

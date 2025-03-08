@@ -63,14 +63,6 @@ export type ModularFilterConfiguration = {
   [key: ModuleId]: { [key: MacroName]: Partial<InputDefault<Input>> };
 };
 
-// Helper function to get the correctly typed value from the configuration
-export const readConfigValue = <T extends Partial<InputDefault<Input>>>(
-  moduleId: ModuleId,
-  macroName: MacroName,
-  config: ModularFilterConfiguration
-): T | undefined => {
-  return config?.[moduleId]?.[macroName] as T;
-};
 
 // This is a 'loaded filter' before we add the ui specific information
 // Only used in the loader

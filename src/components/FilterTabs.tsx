@@ -11,7 +11,7 @@ export const FilterTabs: React.FC<{
   sha: string;
   siteConfig: SiteConfig;
 }> = ({ sha, siteConfig }) => {
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(1);
 
   const importedModularFilters = useUiStore(
     (state) => state.importedModularFilters
@@ -27,7 +27,13 @@ export const FilterTabs: React.FC<{
         label: `Customize ${activeFilter?.name ?? "Filter"}`,
         disabled: !activeFilter,
         dev: false,
-        component: activeFilter ? <CustomizeTab /> : <Typography variant="h6" color="secondary">No filter selected, select or import a filter</Typography>,
+        component: activeFilter ? (
+          <CustomizeTab />
+        ) : (
+          <Typography variant="h6" color="secondary">
+            No filter selected, select or import a filter
+          </Typography>
+        ),
       },
       {
         label: `${activeFilter?.name || "Filter"} Preview`,
