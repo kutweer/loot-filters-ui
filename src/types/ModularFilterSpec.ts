@@ -64,7 +64,7 @@ export type FilterModule = {
 // ### ### ### ### ###
 
 // The key here is the MacroName - for inputs with multiple macro names each one has a unique key
-export type ModularFilterConfiguration = Record<string, InputDefault<Input>>;
+export type ModularFilterConfiguration = Record<string, Partial<InputDefault<Input>>>;
 
 // Helper function to get the correctly typed value from the configuration
 export const readConfigValue = <
@@ -73,7 +73,7 @@ export const readConfigValue = <
   input: T,
   config: ModularFilterConfiguration
 ): InputDefault<T> => {
-  return config[input.macroName] as InputDefault<T>;
+  return config?.[input.macroName] as InputDefault<T>;
 };
 
 export const readConfigValueIncludeExcludeList = (
@@ -81,7 +81,7 @@ export const readConfigValueIncludeExcludeList = (
   field: "includes" | "excludes",
   config: ModularFilterConfiguration
 ): IncludeExcludeListInputDefaults[typeof field] => {
-  return config[input.macroName[field]] as IncludeExcludeListInputDefaults[typeof field]
+  return config?.[input.macroName[field]] as IncludeExcludeListInputDefaults[typeof field]
 };
 
 // This is a 'loaded filter' before we add the ui specific information

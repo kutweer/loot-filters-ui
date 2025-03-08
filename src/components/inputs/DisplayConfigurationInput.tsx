@@ -17,7 +17,6 @@ import { ItemLabelPreview, ItemMenuPreview } from "../Previews";
 import { ColorPickerInput } from "./ColorPicker";
 import { ItemLabelColorPicker } from "./ItemLabelColorPicker";
 import {
-  updateStyleConfig,
   defaultOrConfigOrNone,
   StyleConfig,
   StyleConfigKey,
@@ -38,18 +37,14 @@ export const DisplayConfigurationInput: React.FC<{
     field: StyleConfigKey,
     value: StyleConfig[StyleConfigKey]
   ) => {
-    updateStyleConfig(
-      field,
-      value,
-      styleInput,
-      activeConfig,
-      (config) => setFilterConfiguration(module.id, config)
-    );
+    const update = { [field]: value } as Partial<StyleConfig>;
+    const full = { ...activeConfig, [input.macroName]: update };
+    setFilterConfiguration(module.id, full);
   };
 
   const itemLabelColorPicker = (
     <Grid size={12} sx={{ display: "flex", padding: 1 }}>
-      <ItemLabelColorPicker showExamples={false} labelLocation="right" />
+      <ItemLabelColorPicker showExamples={false} labelLocation="right" module={module} input={input} />
     </Grid>
   );
 

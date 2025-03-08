@@ -1,11 +1,9 @@
 import { mapObject } from "underscore";
 import { create, StateCreator, StoreApi, useStore } from "zustand";
 import { devtools, persist } from "zustand/middleware";
-import {
-  FilterId,
-  ModularFilterConfiguration,
-  UiModularFilter,
-} from "../types/ModularFilterSpec";
+import { FilterId, ModularFilterConfiguration, UiModularFilter } from "../types/ModularFilterSpec";
+
+
 
 export interface ImportedFilterSlice {
   importedModularFilters: Record<string, UiModularFilter>;
@@ -14,7 +12,10 @@ export interface ImportedFilterSlice {
 }
 
 export interface FilterConfigurationSlice {
-  filterConfigurations: Record<FilterId, ModularFilterConfiguration>;
+  filterConfigurations: Record<
+    FilterId,
+    ModularFilterConfiguration
+  >;
   setFilterConfiguration: (
     filterId: FilterId,
     configuration: ModularFilterConfiguration

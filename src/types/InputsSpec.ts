@@ -20,7 +20,6 @@ export type FilterType = keyof typeof filterTypes;
 export type InputDefault<I extends Input> = I["default"];
 export type MacroName<I extends Input> = I["macroName"];
 
-
 interface FilterModuleInputBase<T extends FilterType> {
   type: T;
   // The label of the input in the UI
@@ -33,7 +32,6 @@ interface FilterModuleInputBase<T extends FilterType> {
 
 export interface FilterModuleInput<T extends FilterType>
   extends FilterModuleInputBase<T> {
-
   // This is overridden by child types
   default: never;
 }
@@ -126,5 +124,6 @@ export type StyleInput = Omit<FilterModuleInput<"style">, "default"> & {
     menuTextColor: ArgbHexColor;
     tileStrokeColor: ArgbHexColor;
     tileFillColor: ArgbHexColor;
+    tileHighlightColor: ArgbHexColor;
   };
 };

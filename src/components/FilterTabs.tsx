@@ -1,11 +1,11 @@
 import { Box, Tab, Tabs } from "@mui/material";
 import { useMemo, useState } from "react";
 import { filter } from "underscore";
+import { useUiStore } from "../store/store";
 import { SiteConfig } from "../utils/devmode";
 import { FilterSelector } from "./FilterSelector";
 import { CustomizeTab } from "./tabs/CustomizeTab";
 import { RenderedFilterTab } from "./tabs/RenderedFilterTab";
-import { useUiStore } from "../store/store";
 
 export const FilterTabs: React.FC<{
   sha: string;

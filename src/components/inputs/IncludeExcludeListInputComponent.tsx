@@ -12,13 +12,11 @@ export const IncludeExcludeListInputComponent: React.FC<{
       <ListInputComponent
         module={module}
         input={input}
-        defaultField="includes"
         label={`${input.label} includes`}
       />
       <ListInputComponent
         module={module}
         input={input}
-        defaultField="excludes"
         label={`${input.label} excludes`}
       />
     </Box>

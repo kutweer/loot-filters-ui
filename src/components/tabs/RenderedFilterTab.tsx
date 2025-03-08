@@ -115,7 +115,7 @@ const renderModule = (
       case "style":
         const style = config[input.macroName];
         if (style !== undefined) {
-          updated = updateMacro(updated, input.macroName, renderStyle(style));
+          updated = updateMacro(updated, input.macroName, renderStyle(style as StyleConfig));
         }
         break;
     }

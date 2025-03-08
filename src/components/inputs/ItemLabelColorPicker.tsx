@@ -1,21 +1,17 @@
-import { useFilterModule } from "../../context/FilterModuleContext";
-import { useInput } from "../../context/InputContext";
-import { useData } from "../../context/UiDataContext";
+import { useUiStore } from "../../store/store";
+import { StyleInput } from "../../types/InputsSpec";
 import {
-  FontType,
-  fontTypeFromOrdinal,
-  fontTypeOrdinal,
-  StyleInput,
+  ModularFilterConfiguration,
+  UiFilterModule,
 } from "../../types/ModularFilterSpec";
 import { ArgbHexColor } from "../../utils/Color";
 import { ItemLabelPreview, ItemMenuPreview } from "../Previews";
-import { ConfiguredAutoComplete } from "./BasicInputs";
+import { ListInputComponent } from "./BasicInputs";
 import { ColorPickerInput } from "./ColorPicker";
 import {
   defaultOrConfigOrNone,
   StyleConfig,
   StyleConfigKey,
-  updateStyleConfig,
 } from "./StyleInputHelprs";
 
 type Option = {
@@ -24,28 +20,33 @@ type Option = {
 };
 
 export const ItemLabelColorPicker: React.FC<{
+  module: UiFilterModule;
+  input: StyleInput;
   itemName?: string;
   showExamples?: boolean;
   labelLocation?: "right" | "bottom";
 }> = ({
+  module,
+  input,
   itemName = "Example",
   showExamples = true,
   labelLocation = "bottom",
 }) => {
-  const { input } = useInput() as { input: StyleInput };
-  const { activeConfig, setActiveConfig } = useFilterModule();
+  const activeConfig: ModularFilterConfiguration = useUiStore(
+    (state) => state.filterConfigurations[module.id]
+  );
+
+  const setFilterConfiguration = useUiStore(
+    (state) => state.setFilterConfiguration
+  );
 
   const updateStyleField = (
     field: StyleConfigKey,
     value: StyleConfig[StyleConfigKey]
   ) => {
-    updateStyleConfig(
-      field,
-      value,
-      input,
-      activeConfig,
-      setActiveConfig
-    );
+    const update = { [field]: value } as Partial<StyleConfig>;
+    const full = { ...activeConfig, [input.macroName]: update };
+    setFilterConfiguration(module.id, full);
   };
 
   return (
@@ -80,39 +81,7 @@ export const ItemLabelColorPicker: React.FC<{
         }
         labelLocation={labelLocation}
       />
-      <ConfiguredAutoComplete
-        options={Object.values(FontType).map((fontType) => ({
-          label: fontType,
-          value: fontType,
-        }))}
-        inputLabel="Font Type"
-        configurationUpdater={(configuration, macroName, newValue) => {
-          console.log("configurationUpdater", configuration, newValue);
-          return {
-            ...configuration,
-            [macroName]: {
-              ...configuration[macroName],
-              fontType: newValue
-                ? fontTypeOrdinal((newValue as Option)?.value as FontType)
-                : undefined,
-            },
-          };
-        }}
-        getSetting={(configuration) => {
-          return configuration?.fontType
-            ? {
-                label: fontTypeFromOrdinal(configuration.fontType),
-                value: fontTypeFromOrdinal(configuration.fontType),
-              }
-            : undefined;
-        }}
-        getDefaultValue={(input) => {
-          return {
-            label: fontTypeFromOrdinal(input?.default?.fontType),
-            value: fontTypeFromOrdinal(input?.default?.fontType),
-          };
-        }}
-      />
+      <ListInputComponent module={module} input={input} label="Font Type" />
 
       <ColorPickerInput
         color={defaultOrConfigOrNone("textAccentColor", input, activeConfig)}

@@ -6,6 +6,7 @@ import {
   IncludeExcludeListInput,
   NumberInput,
   StringListInput,
+  StyleInput,
 } from "../../types/InputsSpec";
 import {
   ModularFilterConfiguration,
@@ -117,10 +118,9 @@ export const BooleanInputComponent: React.FC<{
 
 export const ListInputComponent: React.FC<{
   module: UiFilterModule;
-  input: StringListInput | IncludeExcludeListInput;
-  defaultField?: "includes" | "excludes";
+  input: StringListInput | IncludeExcludeListInput | EnumListInput | StyleInput;
   label?: string;
-}> = ({ module, input, defaultField, label }) => {
+}> = ({ module, input, label }) => {
   const activeConfig = useUiStore(
     (state) => state.filterConfigurations[module.id]
   );

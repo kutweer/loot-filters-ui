@@ -1,4 +1,4 @@
-import { StyleInput } from "../../types/ModularFilterSpec";
+import { StyleInput } from "../../types/InputsSpec";
 
 export type StyleConfig = Partial<StyleInput["default"]>;
 export type StyleConfigKey = keyof StyleConfig & string;
@@ -21,20 +21,3 @@ export const defaultOrConfigOrNone = <T extends StyleConfigKey>(
   return undefined;
 };
 
-export const updateStyleConfig = (
-  styleKey: StyleConfigKey,
-  value: StyleConfig[StyleConfigKey],
-  styleInput: StyleInput,
-  activeConfiguration: StyleConfig,
-  updateConfigurationForActiveFilter: (configuration: StyleConfig) => void,
-) => {
-  const newConfiguration = {
-    ...activeConfiguration,
-    [styleInput.macroName as string]: {
-      ...(activeConfiguration[styleInput.macroName as string] || {}),
-      [styleKey]: value,
-    },
-  };
-
-  updateConfigurationForActiveFilter(newConfiguration);
-};
