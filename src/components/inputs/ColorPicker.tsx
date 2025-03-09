@@ -42,7 +42,6 @@ const ColorPicker: React.FC<{
   };
 
   const handleChange = (newColor: RGBColor) => {
-    console.log("newColor", newColor);
     const argbColor = rGBColorToArgbHex(newColor);
     onChange(argbColor);
   };

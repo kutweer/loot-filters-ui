@@ -47,6 +47,7 @@ While module content can be in-lined, the best way to include module files is to
 ```
 
 ### Writing a module
+
 Eventually there will be more docs here, but for now:
 
 If you're an examples-based learner go read through either of the example filters [Filterscape](https://github.com/riktenx/filterscape/) [Typical Whack's filter for Persnickety Irons](https://github.com/typical-whack/loot-filters-modules).
@@ -54,3 +55,8 @@ If you're an examples-based learner go read through either of the example filter
 If you learn by reading specs and docs then right now the best we've got is the TypeScript type definitions the UI uses Modules and Filter types are defined in [ModularFilterSpec.ts](https://github.com/Kaqemeex/loot-filters-ui/blob/main/src/types/ModularFilterSpec.ts) and the supported inputs are in [InputSpec.ts](https://github.com/Kaqemeex/loot-filters-ui/blob/main/src/types/InputsSpec.ts).
 
 Filters are best hosted in GitHub both because they provide free hosting, and because you can version the content
+
+#### Optional modules
+
+For some filters you may want to include a module that's optional, maybe for a boss or some other custom styling.
+All modules can be disabled in the UI, but if you want it disabled by default set `enabled: false` at the top level of your module definition.

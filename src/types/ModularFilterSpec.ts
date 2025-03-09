@@ -48,6 +48,8 @@ export type FilterDefinition = {
 export type FilterModule = {
   name: string;
   description?: string;
+  // default to true
+  enabled?: boolean;
   inputs: Input[];
 };
 
@@ -60,7 +62,9 @@ export type FilterModule = {
 
 // TODO using moduleID here makes the 'update' process a bit more complex - but it ensures duplicate module names don't cause problems
 export type ModularFilterConfiguration = {
-  [key: ModuleId]: { [key: MacroName]: Partial<InputDefault<Input>> };
+  [key: ModuleId]: { [key: MacroName]: Partial<InputDefault<Input>> } & {
+    enabled?: boolean;
+  };
 };
 
 // This is a 'loaded filter' before we add the ui specific information

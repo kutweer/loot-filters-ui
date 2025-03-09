@@ -110,7 +110,6 @@ const checkObjectProperty = (
   type: string,
   optional = false,
 ) => {
-  console.log("checkObjectProperty", value, key, type, optional);
   if (!isObject(value)) {
     throw new Error(`Value ${value} is not an object`);
   }

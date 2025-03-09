@@ -67,6 +67,7 @@ const renderFilter = (
   activeConfig: ModularFilterConfiguration | undefined,
 ): string => {
   return filter.modules
+    .filter((m) => activeConfig?.[m.id]?.enabled ?? (m.enabled ?? true))
     .map((m) => renderModule(m, activeConfig?.[m.id]))
     .join("\n");
 };

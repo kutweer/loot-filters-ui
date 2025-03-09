@@ -4,8 +4,10 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
+  Button,
   Divider,
   Grid2,
+  Paper,
   Stack,
   ToggleButton,
   ToggleButtonGroup,
@@ -121,17 +123,17 @@ const FirstCoupleLabels: React.FC<{
   module: UiFilterModule;
 }> = ({ module }) => {
   const styleInputs: StyleInput[] = module.inputs.filter(
-    (input) => input.type === "style",
+    (input) => input.type === "style"
   ) as StyleInput[];
 
   const activeFilterId = useUiStore(
     (state) =>
       Object.keys(state.importedModularFilters).find(
-        (id) => state.importedModularFilters[id].active,
-      )!!,
+        (id) => state.importedModularFilters[id].active
+      )!!
   );
   const configForModule = useUiStore(
-    (state) => state.filterConfigurations?.[activeFilterId]?.[module.id],
+    (state) => state.filterConfigurations?.[activeFilterId]?.[module.id]
   );
 
   const visibleStyleInputs = styleInputs.filter((input) => {
@@ -164,32 +166,69 @@ const ModuleSection: React.FC<{
 }> = ({ activeFilterId, expanded, setExpanded, module }) => {
   const { siteConfig } = useUiStore();
   const [showJson, setShowJson] = useState<"json" | "configJson" | "none">(
-    "none",
+    "none"
   );
   const activeConfig = useUiStore(
-    (state) => state.filterConfigurations[activeFilterId],
+    (state) => state.filterConfigurations[activeFilterId]
   );
+
+  const setActiveConfig = useUiStore((state) => state.setFilterConfiguration);
 
   let json: string | null = null;
   let configJson: string | null = null;
+
   if (siteConfig.devMode) {
     json = JSON.stringify(module, null, 2);
     configJson = JSON.stringify(activeConfig, null, 2);
   }
 
   const defaultGroupId = crypto.randomUUID();
+
   const groupedInputs = groupBy(
     module.inputs.map((input) => ({
       ...input,
       group: input.group ?? defaultGroupId,
     })),
-    "group",
+    "group"
   );
+
+  const moduleEnabledDefaultValue = module?.enabled ?? true;
+  const configuredEnableValue = activeConfig?.[module.id]?.enabled;
+  const enabled = configuredEnableValue ?? moduleEnabledDefaultValue;
+
+  if (!enabled) {
+    return (
+      <Paper sx={{ pl: 2, pr: 2, pt: 1, pb: 1 }}>
+        <Grid2 container spacing={2}>
+          <Grid2 size={10}>
+            <Typography variant="h4" color="primary">
+              {module.name} is disabled
+            </Typography>
+          </Grid2>
+          <Grid2
+            sx={{ marginLeft: "auto", display: "flex", alignItems: "center" }}
+            size={1}
+          >
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => {
+                setActiveConfig(activeFilterId, module.id, "enabled", !enabled);
+              }}
+            >
+              {module.enabled ? "Disable" : "Enable"}
+            </Button>
+          </Grid2>
+        </Grid2>
+      </Paper>
+    );
+  }
 
   return (
     <Accordion
       slotProps={{ transition: { unmountOnExit: true } }}
-      expanded={expanded}
+      expanded={expanded && enabled}
+      disabled={!enabled}
       onChange={() => setExpanded(!expanded)}
       sx={{
         "&::before": {
@@ -199,11 +238,12 @@ const ModuleSection: React.FC<{
     >
       <AccordionSummary expandIcon={<ExpandMore />}>
         <Typography variant="h4" color="primary" sx={{ mr: 2 }}>
-          Module: {module.name}
+          {module.name} {enabled ? "(Enabled)" : "(Disabled)"}
         </Typography>
         <Stack direction="row" spacing={2}>
           <FirstCoupleLabels module={module} />
         </Stack>
+        <Box sx={{ marginLeft: "auto" }}></Box>
       </AccordionSummary>
       <AccordionDetails>
         <Stack spacing={2} direction="column">
@@ -254,6 +294,22 @@ const ModuleSection: React.FC<{
                     ) : null}
                   </Divider>
                 </Grid2>
+                <Grid2 size={1}>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => {
+                      setActiveConfig(
+                        activeFilterId,
+                        module.id,
+                        "enabled",
+                        !enabled
+                      );
+                    }}
+                  >
+                    {enabled ? "Disable Module" : "Enable"}
+                  </Button>
+                </Grid2>
                 {inputs
                   .sort((a: Input, b: Input) => sizeOf(a) - sizeOf(b))
                   .map((input, index) => {
@@ -282,7 +338,7 @@ const ModuleSection: React.FC<{
 export const CustomizeTab: React.FC = () => {
   const { siteConfig } = useUiStore();
   const importedModularFilters = useUiStore(
-    (state) => state.importedModularFilters,
+    (state) => state.importedModularFilters
   );
   const [expandedModules, setExpandedModules] = useState<
     Record<string, boolean>
@@ -290,7 +346,7 @@ export const CustomizeTab: React.FC = () => {
 
   const activeFilter = useMemo(
     () => Object.values(importedModularFilters).find((filter) => filter.active),
-    [importedModularFilters],
+    [importedModularFilters]
   );
 
   const setAllExpanded = (expanded: boolean) => {
