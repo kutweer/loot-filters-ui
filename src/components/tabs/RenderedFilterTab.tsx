@@ -11,10 +11,10 @@ import { StyleConfig } from "../inputs/StyleInputHelpers";
 
 const RenderFilterComponent: React.FC = () => {
   const activeFilter = useUiStore((state) =>
-    Object.values(state.importedModularFilters).find((f) => f.active)
+    Object.values(state.importedModularFilters).find((f) => f.active),
   );
   const activeConfig = useUiStore((state) =>
-    activeFilter ? state.filterConfigurations[activeFilter.id] : undefined
+    activeFilter ? state.filterConfigurations[activeFilter.id] : undefined,
   );
 
   return (
@@ -64,7 +64,7 @@ export const RenderedFilterTab: React.FC<{
 
 const renderFilter = (
   filter: UiModularFilter,
-  activeConfig: ModularFilterConfiguration | undefined
+  activeConfig: ModularFilterConfiguration | undefined,
 ): string => {
   return filter.modules
     .map((m) => renderModule(m, activeConfig?.[m.id]))
@@ -73,7 +73,7 @@ const renderFilter = (
 
 const renderModule = (
   module: UiFilterModule,
-  config: { [key: MacroName]: Partial<InputDefault<Input>> } | undefined
+  config: { [key: MacroName]: Partial<InputDefault<Input>> } | undefined,
 ): string => {
   let updated = module.rs2fText;
 
@@ -98,7 +98,7 @@ const renderModule = (
           updated = updateMacro(
             updated,
             input.macroName,
-            renderStringList(items)
+            renderStringList(items),
           );
         }
         break;
@@ -111,14 +111,14 @@ const renderModule = (
           updated = updateMacro(
             updated,
             input.macroName.includes,
-            renderStringList(includes)
+            renderStringList(includes),
           );
         }
         if (excludes !== undefined) {
           updated = updateMacro(
             updated,
             input.macroName.excludes,
-            renderStringList(excludes)
+            renderStringList(excludes),
           );
         }
         break;
@@ -130,7 +130,7 @@ const renderModule = (
           updated = updateMacro(
             updated,
             input.macroName,
-            renderStyle(mergedStyle as StyleConfig)
+            renderStyle(mergedStyle as StyleConfig),
           );
         }
         break;
@@ -180,12 +180,12 @@ const isTargetMacro = (line: string, target: string): boolean =>
 const updateMacro = (
   filter: string,
   macro: string,
-  replace: string
+  replace: string,
 ): string => {
   return filter
     .split("\n")
     .map((line) =>
-      isTargetMacro(line, macro) ? "#define " + macro + " " + replace : line
+      isTargetMacro(line, macro) ? "#define " + macro + " " + replace : line,
     )
     .join("\n");
 };

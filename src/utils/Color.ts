@@ -91,7 +91,7 @@ type RGBAColor = {
 };
 
 export const argbHexColorToRGBColor = (
-  hex?: ArgbHexColor
+  hex?: ArgbHexColor,
 ): RGBAColor | undefined => {
   const argbHex = normalizeHex(hex);
   if (!argbHex) {

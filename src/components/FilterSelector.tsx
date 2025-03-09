@@ -57,19 +57,19 @@ export const FilterSelector: React.FC = () => {
   ];
 
   const importedModularFilters = useUiStore(
-    (state) => state.importedModularFilters
+    (state) => state.importedModularFilters,
   );
   const addImportedModularFilter = useUiStore(
-    (state) => state.addImportedModularFilter
+    (state) => state.addImportedModularFilter,
   );
   const setActiveFilterId = useUiStore((state) => state.setActiveFilterId);
 
   const activeFilter = useMemo(
     () => Object.values(importedModularFilters).find((filter) => filter.active),
-    [importedModularFilters]
+    [importedModularFilters],
   );
   const removeImportedModularFilter = useUiStore(
-    (state) => state.removeImportedModularFilter
+    (state) => state.removeImportedModularFilter,
   );
 
   const handleFilterChange = useCallback(
@@ -78,7 +78,7 @@ export const FilterSelector: React.FC = () => {
         setActiveFilterId(newValue.value);
       }
     },
-    [setActiveFilterId]
+    [setActiveFilterId],
   );
 
   const handleDeleteFilter = useCallback(() => {
@@ -91,7 +91,7 @@ export const FilterSelector: React.FC = () => {
   const [importError, setImportError] = useState("");
 
   const filterOptions: Option<FilterId>[] = Object.values(
-    importedModularFilters
+    importedModularFilters,
   ).map((filter) => ({
     label: filter.name,
     value: filter.id,
@@ -111,7 +111,7 @@ export const FilterSelector: React.FC = () => {
         setImportError("");
       }
     },
-    []
+    [],
   );
 
   return (

@@ -20,11 +20,11 @@ export const FilterTabs: React.FC<{ sha: string }> = ({ sha }) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const importedModularFilters = useUiStore(
-    (state) => state.importedModularFilters
+    (state) => state.importedModularFilters,
   );
   const activeFilter = useMemo(
     () => Object.values(importedModularFilters).find((filter) => filter.active),
-    [importedModularFilters]
+    [importedModularFilters],
   );
 
   const tabs = useMemo(() => {
@@ -52,7 +52,7 @@ export const FilterTabs: React.FC<{ sha: string }> = ({ sha }) => {
 
   const filteredTabs = useMemo(
     () => filter(tabs, (tab) => siteConfig.devMode || tab.dev === false),
-    [tabs, siteConfig.devMode]
+    [tabs, siteConfig.devMode],
   );
 
   return (
@@ -60,7 +60,7 @@ export const FilterTabs: React.FC<{ sha: string }> = ({ sha }) => {
       <Box>
         <FilterSelector />
       </Box>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2, mt: 2}}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2, mt: 2 }}>
         <Tabs
           value={activeTab}
           onChange={(e, newValue) => setActiveTab(newValue)}

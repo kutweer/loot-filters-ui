@@ -9,10 +9,10 @@ export const NumberInputComponent: React.FC<{
   input: NumberInput;
 }> = ({ activeFilterId, module, input }) => {
   const activeConfig = useUiStore(
-    (state) => state.filterConfigurations[activeFilterId]
+    (state) => state.filterConfigurations[activeFilterId],
   );
   const setFilterConfiguration = useUiStore(
-    (state) => state.setFilterConfiguration
+    (state) => state.setFilterConfiguration,
   );
 
   const userConfigValue =
@@ -29,7 +29,7 @@ export const NumberInputComponent: React.FC<{
           activeFilterId,
           module.id,
           input.macroName,
-          parseInt(value)
+          parseInt(value),
         );
       }}
     />
