@@ -27,16 +27,16 @@ import {
   StyleInput,
 } from "../../types/InputsSpec";
 import { FilterId, UiFilterModule } from "../../types/ModularFilterSpec";
-import useSiteConfig from "../../utils/devmode";
-import {
-  BooleanInputComponent,
-  EnumInputComponent,
-  ListInputComponent,
-  NumberInputComponent,
-} from "../inputs/BasicInputs";
+
+import { BooleanInputComponent } from "../inputs/BooleanInputComponent";
 import { DisplayConfigurationInput } from "../inputs/DisplayConfigurationInput";
+import { EnumInputComponent } from "../inputs/EnumInputComponent";
 import { IncludeExcludeListInputComponent } from "../inputs/IncludeExcludeListInputComponent";
+import { NumberInputComponent } from "../inputs/NumberInputComponent";
+import { StringListInputComponent } from "../inputs/StringListInputComponent";
+import { StyleConfig } from "../inputs/StyleInputHelpers";
 import { ItemLabelPreview } from "../Previews";
+
 const InputComponent: React.FC<{
   activeFilterId: FilterId;
   module: UiFilterModule;
@@ -71,7 +71,7 @@ const InputComponent: React.FC<{
       );
     case "stringlist":
       return (
-        <ListInputComponent
+        <StringListInputComponent
           activeFilterId={activeFilterId}
           module={module}
           input={input as StringListInput}
@@ -109,7 +109,7 @@ const sizeOf = (input: Input) => {
     case "boolean":
       return 2;
     case "style":
-      return 12;
+      return 16;
     case "includeExcludeList":
       return 12;
     default:
@@ -124,9 +124,24 @@ const FirstCoupleLabels: React.FC<{
     (input) => input.type === "style"
   ) as StyleInput[];
 
+  const activeFilterId = useUiStore(
+    (state) =>
+      Object.keys(state.importedModularFilters).find(
+        (id) => state.importedModularFilters[id].active
+      )!!
+  );
+  const configForModule = useUiStore(
+    (state) => state.filterConfigurations?.[activeFilterId]?.[module.id]
+  );
+
+  const visibleStyleInputs = styleInputs.filter((input) => {
+    const config = configForModule?.[input.macroName] as Partial<StyleConfig>;
+    return !(config?.hideOverlay ?? input.default?.hideOverlay ?? false);
+  });
+
   return (
     <Stack direction="row" spacing={2}>
-      {styleInputs.slice(0, 4).map((input) => {
+      {visibleStyleInputs.slice(0, 4).map((input) => {
         const macroName = (input as StyleInput).macroName;
         return (
           <ItemLabelPreview
@@ -147,17 +162,17 @@ const ModuleSection: React.FC<{
   setExpanded: (expanded: boolean) => void;
   module: UiFilterModule;
 }> = ({ activeFilterId, expanded, setExpanded, module }) => {
-  const [siteConfig, _] = useSiteConfig();
+  const { siteConfig } = useUiStore();
   const [showJson, setShowJson] = useState<"json" | "configJson" | "none">(
     "none"
+  );
+  const activeConfig = useUiStore(
+    (state) => state.filterConfigurations[activeFilterId]
   );
 
   let json: string | null = null;
   let configJson: string | null = null;
   if (siteConfig.devMode) {
-    const activeConfig = useUiStore(
-      (state) => state.filterConfigurations[activeFilterId]
-    );
     json = JSON.stringify(module, null, 2);
     configJson = JSON.stringify(activeConfig, null, 2);
   }
@@ -175,17 +190,15 @@ const ModuleSection: React.FC<{
     <Accordion
       slotProps={{ transition: { unmountOnExit: true } }}
       expanded={expanded}
+      onChange={() => setExpanded(!expanded)}
       sx={{
         "&::before": {
           backgroundColor: colors.rsDarkBrown,
         },
       }}
     >
-      <AccordionSummary
-        onClick={() => setExpanded(!expanded)}
-        expandIcon={<ExpandMore />}
-      >
-        <Typography variant="h4" color="primary">
+      <AccordionSummary expandIcon={<ExpandMore />}>
+        <Typography variant="h4" color="primary" sx={{ mr: 2 }}>
           Module: {module.name}
         </Typography>
         <Stack direction="row" spacing={2}>
@@ -267,17 +280,38 @@ const ModuleSection: React.FC<{
 };
 
 export const CustomizeTab: React.FC = () => {
-  const [expandedModules, setExpandedModules] = useState<
-    Record<string, boolean>
-  >({});
-  const [siteConfig, _] = useSiteConfig();
+  const { siteConfig } = useUiStore();
   const importedModularFilters = useUiStore(
     (state) => state.importedModularFilters
   );
+  const [expandedModules, setExpandedModules] = useState<
+    Record<string, boolean>
+  >({});
+
   const activeFilter = useMemo(
     () => Object.values(importedModularFilters).find((filter) => filter.active),
     [importedModularFilters]
   );
+
+  const setAllExpanded = (expanded: boolean) => {
+    if (!activeFilter) return;
+    const newExpandedModules: Record<string, boolean> = {};
+    activeFilter.modules.forEach((module) => {
+      newExpandedModules[module.name] = expanded;
+    });
+    setExpandedModules(newExpandedModules);
+  };
+
+  React.useEffect(() => {
+    const handleExpandAll = (event: CustomEvent) => {
+      setAllExpanded(event.detail);
+    };
+
+    window.addEventListener("expandAll", handleExpandAll as EventListener);
+    return () => {
+      window.removeEventListener("expandAll", handleExpandAll as EventListener);
+    };
+  }, [activeFilter]);
 
   if (!activeFilter) {
     return (

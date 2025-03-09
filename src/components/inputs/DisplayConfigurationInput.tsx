@@ -5,16 +5,16 @@ import {
   AccordionSummary,
   Box,
   Checkbox,
+  Divider,
   FormControlLabel,
   Grid2 as Grid,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import { useUiStore } from "../../store/store";
 import { colors } from "../../styles/MuiTheme";
 import { StyleInput } from "../../types/InputsSpec";
 import { UiFilterModule } from "../../types/ModularFilterSpec";
 import { ArgbHexColor } from "../../utils/Color";
-import useSiteConfig from "../../utils/devmode";
 import { ItemLabelPreview, ItemMenuPreview } from "../Previews";
 import { ColorPickerInput } from "./ColorPicker";
 import { ItemLabelColorPicker } from "./ItemLabelColorPicker";
@@ -24,7 +24,8 @@ export const DisplayConfigurationInput: React.FC<{
   module: UiFilterModule;
   input: StyleInput;
 }> = ({ module, input }) => {
-  const [siteConfig, _] = useSiteConfig();
+  const { siteConfig } = useUiStore();
+  const [expanded, setExpanded] = useState(siteConfig.devMode);
 
   const activeFilterId = useUiStore(
     (state) =>
@@ -53,7 +54,7 @@ export const DisplayConfigurationInput: React.FC<{
   }
 
   const itemLabelColorPicker = (
-    <Grid size={12} sx={{ display: "flex", padding: 1 }}>
+    <Grid size={{ xs: 12, md: 12 }} sx={{ display: "flex", padding: 1 }}>
       <ItemLabelColorPicker
         showExamples={false}
         labelLocation="right"
@@ -64,7 +65,7 @@ export const DisplayConfigurationInput: React.FC<{
   );
 
   const lootbeamComponent = (
-    <Grid size={4} sx={{ display: "flex", padding: 1 }}>
+    <Grid size={3} sx={{ display: "flex", padding: 1 }}>
       <FormControlLabel
         label="Lootbeam"
         control={
@@ -160,7 +161,7 @@ export const DisplayConfigurationInput: React.FC<{
   );
 
   const highlightTileComponent = (
-    <Grid size={8} sx={{ display: "flex", gap: 2, padding: 1 }}>
+    <Grid size={5} sx={{ display: "flex", gap: 2, padding: 1 }}>
       <FormControlLabel
         label="Highlight Tile"
         control={
@@ -202,10 +203,28 @@ export const DisplayConfigurationInput: React.FC<{
     </Grid>
   );
 
+  const divider = (
+    <Grid size={1} sx={{ display: "flex", padding: 1 }}>
+      <Divider
+        sx={{
+          marginLeft: "auto",
+          marginRight: "auto",
+          borderColor: colors.rsLightBrown,
+        }}
+        orientation="vertical"
+        flexItem
+      />
+    </Grid>
+  );
+
   const inputComponents = [
+    // Row 1
     itemLabelColorPicker,
+    // Row 2
     lootbeamComponent,
+    <Grid size={2}></Grid>,
     highlightTileComponent,
+    <Grid size={2}></Grid>,
     valueComponent,
     despawnComponent,
     notifyComponent,
@@ -218,15 +237,16 @@ export const DisplayConfigurationInput: React.FC<{
         backgroundColor: colors.rsLightBrown,
       }}
       slotProps={{ transition: { unmountOnExit: true } }}
-      defaultExpanded={siteConfig.devMode}
+      expanded={expanded}
+      onChange={() => setExpanded(!expanded)}
     >
       <AccordionSummary
         sx={{
-          backgroundColor: colors.rsLightBrown,
+          backgroundColor: colors.rsLighterBrown,
         }}
         expandIcon={<ExpandMore />}
       >
-        <Box sx={{ display: "flex", gap: 2 }}>
+        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
           <ItemLabelPreview
             module={module}
             input={input}
@@ -239,7 +259,11 @@ export const DisplayConfigurationInput: React.FC<{
           />
         </Box>
       </AccordionSummary>
-      <AccordionDetails>
+      <AccordionDetails
+        sx={{
+          backgroundColor: colors.rsLighterBrown,
+        }}
+      >
         <Grid container spacing={2}>
           {inputComponents.map((component, index) => {
             if (component.type.muiName === "Grid") {
@@ -248,7 +272,7 @@ export const DisplayConfigurationInput: React.FC<{
               });
             }
             return (
-              <Grid sx={{ padding: 1 }} size={4} key={index}>
+              <Grid sx={{ padding: 1 }} size={3} key={index}>
                 {component}
               </Grid>
             );

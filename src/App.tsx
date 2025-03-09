@@ -1,19 +1,24 @@
 import { Container } from "@mui/material";
-import React from "react";
-
 import { ThemeProvider } from "@mui/material/styles";
 import { Header } from "./components/AppHeader";
 import { FilterTabs } from "./components/FilterTabs";
 import { MuiRsTheme } from "./styles/MuiTheme";
-import useSiteConfig from "./utils/devmode";
 
-export const App: React.FC<{ sha: string }> = ({ sha = "main" }) => {
-  const [siteConfig, setSiteConfig] = useSiteConfig();
+export const App = ({ sha = "main" }: { sha?: string }) => {
   return (
     <ThemeProvider theme={MuiRsTheme}>
-      <Container className="rs-container" maxWidth="lg">
-        <Header siteConfig={siteConfig} setSiteConfig={setSiteConfig} />
-        <FilterTabs siteConfig={siteConfig} sha={sha} />
+      <span style={{ display: "hidden", fontFamily: "RuneScape" }}>
+        runescape
+      </span>
+      <span style={{ display: "hidden", fontFamily: "RuneScapeBold" }}>
+        RuneScapeBold
+      </span>
+      <span style={{ display: "hidden", fontFamily: "RuneScapeSmall" }}>
+        RuneScapeSmall
+      </span>
+      <Container className="rs-container" maxWidth="xl">
+        <Header />
+        <FilterTabs sha={sha} />
       </Container>
     </ThemeProvider>
   );

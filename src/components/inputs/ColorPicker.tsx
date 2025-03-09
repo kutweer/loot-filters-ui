@@ -153,7 +153,8 @@ const ColorPickerInput: React.FC<{
   onChange: (color: ArgbHexColor | undefined) => void;
   labelLocation?: "right" | "bottom";
   disabled?: boolean;
-}> = ({ color, onChange, labelText, labelLocation, disabled }) => {
+  helpText?: string;
+}> = ({ color, onChange, labelText, labelLocation, disabled, helpText }) => {
   const labelLocationValue = labelLocation ?? "bottom";
   return (
     <FormControl sx={{ marginTop: "auto", marginBottom: "auto" }}>
@@ -164,6 +165,19 @@ const ColorPickerInput: React.FC<{
         onChange={onChange}
         disabled={disabled || false}
       />
+      {helpText && (
+        <Typography
+          sx={{
+            color: "#ff0000",
+            fontFamily: "RuneScape",
+            fontSize: "20px",
+            marginTop: "2px",
+            whiteSpace: "pre-wrap",
+          }}
+        >
+          {helpText}
+        </Typography>
+      )}
     </FormControl>
   );
 };

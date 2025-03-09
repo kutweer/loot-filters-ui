@@ -1,7 +1,13 @@
 import { Box, SxProps } from "@mui/material";
 import { useUiStore } from "../store/store";
 import { colors } from "../styles/MuiTheme";
-import { StyleInput } from "../types/InputsSpec";
+import {
+  FontType,
+  fontTypeFromOrdinal,
+  StyleInput,
+  TextAccent,
+  textAccentFromOrdinal,
+} from "../types/InputsSpec";
 import { UiFilterModule } from "../types/ModularFilterSpec";
 import { colorHexToRgbaCss } from "../utils/Color";
 import { StyleConfig } from "./inputs/StyleInputHelpers";
@@ -65,7 +71,7 @@ export const ItemMenuPreview: React.FC<{
               <span
                 style={{
                   color: colors.rsWhite,
-                  fontFamily: "RuneScape",
+                  fontFamily: "RuneScapeSmall",
                   fontSize: "24px",
                 }}
               >
@@ -74,7 +80,7 @@ export const ItemMenuPreview: React.FC<{
               <span
                 style={{
                   color: menuTextColor,
-                  fontFamily: "RuneScape",
+                  fontFamily: "RuneScapeSmall",
                   fontSize: "24px",
                 }}
               >
@@ -108,8 +114,6 @@ export const ItemLabelPreview: React.FC<{
       ] as Partial<StyleConfig>
   );
 
-  console.log("activeConfig", activeConfig);
-
   const backgroundColor = colorHexToRgbaCss(
     activeConfig?.backgroundColor ?? input.default?.backgroundColor
   );
@@ -120,22 +124,91 @@ export const ItemLabelPreview: React.FC<{
     activeConfig?.textColor ?? input.default?.textColor
   );
 
+  const hidden =
+    activeConfig?.hideOverlay ?? input.default?.hideOverlay ?? false;
+
+  const fontType = activeConfig?.fontType ?? input.default?.fontType;
+  const fontFamily =
+    fontTypeFromOrdinal(fontType) === FontType.NORMAL
+      ? "RuneScapeSmall"
+      : fontTypeFromOrdinal(fontType) === FontType.BOLD
+        ? "RuneScapeBold"
+        : fontTypeFromOrdinal(fontType) === FontType.LARGER
+          ? "RuneScape"
+          : "RuneScapeSmall";
+
+  const textAccentOrdinal =
+    activeConfig?.textAccent ?? input.default?.textAccent;
+  const textAccent =
+    textAccentFromOrdinal(textAccentOrdinal) ?? TextAccent.NONE;
+
+  const textAccentColor = activeConfig?.textAccentColor ?? input.default?.textAccentColor;
+
+  let textAccentStyle: React.CSSProperties & {
+    "-webkit-text-stroke"?: string;
+  } = {};
+  switch (textAccent) {
+    case TextAccent.SHADOW:
+      textAccentStyle = {
+        textShadow: "1px 1px #000000",
+      };
+      break;
+    case TextAccent.OUTLINE:
+      textAccentStyle = {
+        "-webkit-text-stroke": `1px ${colorHexToRgbaCss(textAccentColor) ?? "rgb(0,0,0,0)"}`,
+      };
+      break;
+    case TextAccent.SHADOW_BOLD:
+      textAccentStyle = {
+        textShadow: "2px 2px #000000",
+      };
+      break;
+    case TextAccent.NONE:
+      textAccentStyle = {};
+      break;
+  }
+
   return (
     <Box
       sx={{
         border: "3px solid black",
         backgroundColor: "#dddddd",
+        height: "min-content",
+        position: "relative",
         ...sx,
       }}
     >
+      {hidden && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "rgba(0,0,0,0.3)",
+            color: "#ffffff",
+            fontFamily: "RuneScapeSmall",
+            fontSize: "20px",
+            pointerEvents: "none",
+            zIndex: 1,
+          }}
+        >
+          Hidden
+        </div>
+      )}
       <div
         style={{
-          margin: "10px",
+          margin: "6px",
           display: "flex",
           alignItems: "center",
           gap: 2,
           backgroundColor: backgroundColor,
           border: `1px solid ${borderColor}`,
+          ...textAccentStyle,
         }}
       >
         <span
@@ -143,7 +216,7 @@ export const ItemLabelPreview: React.FC<{
             padding: "4px",
             color: foregroundColor,
             fontSize: "24px",
-            fontFamily: "RuneScape",
+            fontFamily: fontFamily,
           }}
         >
           {itemName || "Item Name"}

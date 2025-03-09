@@ -3,6 +3,16 @@
   src: url("../fonts/runescape.ttf") format("truetype");
 }
 
+@font-face {
+  font-family: "RuneScapeBold";
+  src: url("../fonts/runescape_bold.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "RuneScapeSmall";
+  src: url("../fonts/runescape_small.ttf") format("truetype");
+}
+
 :root {
   --color-rs-black: #000000;
   --color-rs-dark-brown: #2c2721;
@@ -40,3 +50,7 @@ body {
   background-size: 10px 10px;
   background-repeat: repeat;
 }
+
+/* .MuiGrid2-root {
+  border: 1px solid red;
+} */

@@ -82,7 +82,7 @@ export enum TextAccent {
   SHADOW = "shadow",
   OUTLINE = "outline",
   NONE = "none",
-  BOLD = "bold",
+  SHADOW_BOLD = "shadow_bold",
 }
 
 // Enum ordinal needs to match what is supported in the plugin
@@ -95,9 +95,9 @@ export const fontTypeFromOrdinal = (ordinal: number): FontType => {
   return Object.values(FontType)[ordinal];
 };
 export enum FontType {
-  NORMAL = "normal",
-  LARGER = "larger",
-  BOLD = "bold",
+  NORMAL = "Normal",
+  LARGER = "Larger",
+  BOLD = "Bold",
 }
 
 /**
