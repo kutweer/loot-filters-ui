@@ -16,10 +16,12 @@ import {
   FilterDefinition,
   FilterId,
   FilterModule,
+  FilterSource,
   ModuleSource,
 } from "../types/ModularFilterSpec";
 import { loadFilter } from "../utils/modularFilterLoader";
 import { Option, UISelect } from "./inputs/UISelect";
+import { DEV_FILTERS } from "../utils/devFilters";
 
 const COMMON_FILTERS = [
   {
@@ -30,49 +32,6 @@ const COMMON_FILTERS = [
     name: "Typical Whack's Loot Filter for Persnickity Irons",
     url: "https://raw.githubusercontent.com/typical-whack/loot-filters-modules/refs/heads/main/filter.json",
   },
-];
-
-const DEV_FILTERS = [
-  {
-    name: "[Dev] Style Input",
-    url: "https://raw.githubusercontent.com/Kaqemeex/loot-filters-ui/refs/heads/main/module-system-docs/site-testing-filters/single_style_filter.json",
-  },
-  {
-    name: "[Dev] Number, Bool & Unsupported inputs",
-    url: "https://raw.githubusercontent.com/Kaqemeex/loot-filters-ui/refs/heads/main/module-system-docs/site-testing-filters/misc_filter.json",
-  },
-  {
-    name: "[Dev] List Input",
-    url: "https://raw.githubusercontent.com/Kaqemeex/loot-filters-ui/refs/heads/main/module-system-docs/site-testing-filters/list_filter.json",
-  },
-  {
-    name: "[Dev] Invalid Filter",
-    url: "https://raw.githubusercontent.com/Kaqemeex/loot-filters-ui/refs/heads/main/module-system-docs/site-testing-filters/filter_with_invalid_input.json",
-  },
-  {
-    type: "filter",
-    name: "[Dev] Enable Disable Module Test",
-    description: "A descriptive description of the filter",
-    modules: [
-      {
-        name: "Enable Disable Module Test",
-        moduleJson: {
-          name: "Enable Disable Module Test",
-          description: "A medium size description of the module",
-          enabled: false,
-          inputs: [
-            {
-              type: "boolean",
-              label: "A simple input",
-              macroName: "INPUT_TEST",
-              default: false,
-            },
-          ],
-        },
-        moduleRs2fText: "#define INPUT_TEST",
-      },
-    ],
-  } as FilterDefinition,
 ];
 
 export const FilterSelector: React.FC = () => {
@@ -119,14 +78,14 @@ export const FilterSelector: React.FC = () => {
 
   const [importError, setImportError] = useState("");
 
-  const filterSelectOptions: Option<FilterId>[] = Object.values(
+  const filterOptions: Option<FilterId>[] = Object.values(
     importedModularFilters
   ).map((filter) => ({
     label: filter.name,
     value: filter.id,
   }));
 
-  const selectedFilterOption = activeFilter
+  const selectedFilter = activeFilter
     ? {
         label: activeFilter.name,
         value: activeFilter.id,
@@ -172,8 +131,8 @@ export const FilterSelector: React.FC = () => {
           >
             <UISelect<FilterId>
               sx={{ width: "200px" }}
-              options={filterSelectOptions}
-              value={selectedFilterOption}
+              options={filterOptions}
+              value={selectedFilter}
               onChange={handleFilterChange}
               label="Select a filter"
               disabled={Object.keys(importedModularFilters).length === 0}

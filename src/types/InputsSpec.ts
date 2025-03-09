@@ -46,17 +46,19 @@ export type NumberInput = {
 } & Omit<FilterModuleInput<"number">, "default">;
 
 export type StringListInput = {
-  default: string[];
+  default: string[] | ListOption[];
 } & Omit<FilterModuleInput<"stringlist">, "default">;
 
+export type ListOption = { label: string; value: string };
 export type EnumListInput = {
+  // always just values not labels avoids needing to redefine the enum
   default: string[];
-  enum: string[];
+  enum: string[] | ListOption[];
 } & Omit<FilterModuleInput<"enumlist">, "default">;
 
 export type IncludeExcludeListInputDefaults = {
-  includes: string[];
-  excludes: string[];
+  includes: string[] | ListOption[];
+  excludes: string[] | ListOption[];
 };
 
 export type IncludeExcludeListInput = Omit<

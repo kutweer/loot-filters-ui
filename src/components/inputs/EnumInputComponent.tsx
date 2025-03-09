@@ -9,27 +9,38 @@ export const EnumInputComponent: React.FC<{
   input: EnumListInput;
 }> = ({ activeFilterId, module, input }) => {
   const activeConfig = useUiStore(
-    (state) => state.filterConfigurations[activeFilterId],
+    (state) => state.filterConfigurations[activeFilterId]
   );
   const setFilterConfiguration = useUiStore(
-    (state) => state.setFilterConfiguration,
+    (state) => state.setFilterConfiguration
   );
 
-  const currentSetting =
-    activeConfig?.[module.id]?.[input.macroName] ?? input.default;
+  const currentSetting: string[] =
+    (activeConfig?.[module.id]?.[input.macroName] as string[]) ?? input.default;
 
-  const options: Option<string>[] = input.enum.map((enumValue) => ({
-    label: enumValue,
-    value: enumValue,
-  }));
+  const options: Option<string>[] = input.enum.map((enumValue) => {
+    if (typeof enumValue === "string") {
+      return {
+        label: enumValue,
+        value: enumValue,
+      };
+    }
+    return enumValue;
+  });
 
   const selectedOptions = Array.isArray(currentSetting)
     ? currentSetting
         .filter((value): value is string => typeof value === "string")
-        .map((value) => ({
-          label: value,
-          value: value,
-        }))
+        .map((value) => {
+          const found = options.find((o) => o.value === value);
+          if (found) {
+            return found;
+          }
+          return {
+            label: value,
+            value: value,
+          };
+        })
     : [];
 
   return (
@@ -41,7 +52,7 @@ export const EnumInputComponent: React.FC<{
           activeFilterId,
           module.id,
           input.macroName,
-          newValue ? newValue.map((option) => option.value) : [],
+          newValue ? newValue.map((option) => option.value) : []
         );
       }}
       multiple
