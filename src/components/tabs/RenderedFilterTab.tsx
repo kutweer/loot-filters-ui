@@ -126,12 +126,14 @@ const renderModule = (
         }
         break;
       case "style":
-        const style = config[input.macroName];
-        if (style !== undefined) {
+        const style = config[input.macroName] as StyleConfig | undefined;
+        const defaultStyle = input.default as StyleConfig;
+        const mergedStyle = { ...(defaultStyle ?? {}), ...(style ?? {}) };
+        if (Object.keys(mergedStyle).length > 0) {
           updated = updateMacro(
             updated,
             input.macroName,
-            renderStyle(style as StyleConfig)
+            renderStyle(mergedStyle as StyleConfig)
           );
         }
         break;
