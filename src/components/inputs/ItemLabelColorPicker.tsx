@@ -1,16 +1,19 @@
 import { useUiStore } from "../../store/store";
-import { StyleInput } from "../../types/InputsSpec";
+import {
+  FontType,
+  fontTypeFromOrdinal,
+  fontTypeOrdinal,
+  StyleInput,
+  TextAccent,
+  textAccentFromOrdinal,
+  textAccentOrdinal,
+} from "../../types/InputsSpec";
 import { UiFilterModule } from "../../types/ModularFilterSpec";
 import { ArgbHexColor } from "../../utils/Color";
 import { ItemLabelPreview, ItemMenuPreview } from "../Previews";
-import { ListInputComponent } from "./BasicInputs";
 import { ColorPickerInput } from "./ColorPicker";
 import { StyleConfig, StyleConfigKey } from "./StyleInputHelpers";
-
-type Option = {
-  label: string;
-  value: string;
-};
+import { Option, UISelect } from "./UISelect";
 
 export const ItemLabelColorPicker: React.FC<{
   module: UiFilterModule;
@@ -51,6 +54,20 @@ export const ItemLabelColorPicker: React.FC<{
     });
   };
 
+  const fontTypeOptions: Option<number>[] = Object.values(FontType).map(
+    (type) => ({
+      label: type.charAt(0).toUpperCase() + type.slice(1),
+      value: fontTypeOrdinal(type),
+    })
+  );
+
+  const textAccentOptions: Option<number>[] = Object.values(TextAccent).map(
+    (accent) => ({
+      label: accent.charAt(0).toUpperCase() + accent.slice(1),
+      value: textAccentOrdinal(accent),
+    })
+  );
+
   return (
     <div style={{ display: "flex", flexDirection: "row", gap: 8 }}>
       <ColorPickerInput
@@ -77,6 +94,28 @@ export const ItemLabelColorPicker: React.FC<{
         }
         labelLocation={labelLocation}
       />
+
+      <UISelect<number>
+        options={fontTypeOptions}
+        label="Overlay Font Type"
+        multiple={false}
+        freeSolo={false}
+        value={
+          activeConfig?.fontType !== undefined
+            ? {
+                label: fontTypeFromOrdinal(activeConfig.fontType),
+                value: activeConfig.fontType,
+              }
+            : null
+        }
+        onChange={(newValue) => {
+          if (newValue === null) {
+            updateStyleField("fontType", undefined);
+          } else {
+            updateStyleField("fontType", newValue.value);
+          }
+        }}
+      />
       <ColorPickerInput
         color={activeConfig?.menuTextColor ?? input.default?.menuTextColor}
         labelText="Menu Text Color"
@@ -84,12 +123,6 @@ export const ItemLabelColorPicker: React.FC<{
           updateStyleField("menuTextColor", color)
         }
         labelLocation={labelLocation}
-      />
-      <ListInputComponent
-        activeFilterId={activeFilterId}
-        module={module}
-        input={input}
-        label="Font Type"
       />
 
       <ColorPickerInput
@@ -101,18 +134,28 @@ export const ItemLabelColorPicker: React.FC<{
         labelLocation={labelLocation}
       />
 
-      {/* <Select
-        size="small"
-        value={defaultOrConfigOrNone("fontType", input, activeConf)}
-        
-        onChange={(event) =>
-          updateStyleField("fontType", event.target.value as FontType)
+      <UISelect<number>
+        options={textAccentOptions}
+        label="Text Accent"
+        multiple={false}
+        freeSolo={false}
+        value={
+          activeConfig?.textAccent !== undefined
+            ? {
+                label: textAccentFromOrdinal(activeConfig.textAccent),
+                value: activeConfig.textAccent,
+              }
+            : null
         }
-      >
-        <MenuItem value={FontType.NORMAL}>Normal</MenuItem>
-        <MenuItem value={FontType.LARGER}>Larger</MenuItem>
-        <MenuItem value={FontType.BOLD}>Bold</MenuItem>
-      </Select> */}
+        onChange={(newValue) => {
+          if (newValue === null) {
+            updateStyleField("textAccent", undefined);
+          } else {
+            updateStyleField("textAccent", newValue.value);
+          }
+        }}
+      />
+
       {showExamples && (
         <>
           <ItemLabelPreview module={module} input={input} itemName={itemName} />

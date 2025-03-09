@@ -11,7 +11,7 @@ export const FilterTabs: React.FC<{
   sha: string;
   siteConfig: SiteConfig;
 }> = ({ sha, siteConfig }) => {
-  const [activeTab, setActiveTab] = useState(1);
+  const [activeTab, setActiveTab] = useState(0);
 
   const importedModularFilters = useUiStore(
     (state) => state.importedModularFilters

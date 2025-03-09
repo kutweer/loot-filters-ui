@@ -7,9 +7,6 @@ import {
   DialogTitle,
   FormControl,
   FormHelperText,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
   TextField,
   Typography,
 } from "@mui/material";
@@ -18,6 +15,7 @@ import { useUiStore } from "../store/store";
 import { FilterId } from "../types/ModularFilterSpec";
 import useSiteConfig from "../utils/devmode";
 import { loadFilter } from "../utils/modularFilterLoader";
+import { Option, UISelect } from "./inputs/UISelect";
 
 const COMMON_FILTERS = [
   {
@@ -32,15 +30,19 @@ const COMMON_FILTERS = [
 
 const DEV_FILTERS = [
   {
-    name: "Style Input Test",
+    name: "[Dev] Style Input",
     url: "https://raw.githubusercontent.com/Kaqemeex/example-configurable-filter/refs/heads/main/single_style_filter.json",
   },
   {
-    name: "Misc Filter",
+    name: "[Dev] Number, Bool & Unsupported inputs",
     url: "https://raw.githubusercontent.com/Kaqemeex/example-configurable-filter/refs/heads/main/misc_filter.json",
   },
   {
-    name: "Invalid Input Filter",
+    name: "[Dev] List Input",
+    url: "https://raw.githubusercontent.com/Kaqemeex/example-configurable-filter/refs/heads/main/list_filter.json",
+  },
+  {
+    name: "[Dev] Invalid Filter",
     url: "https://raw.githubusercontent.com/Kaqemeex/example-configurable-filter/refs/heads/main/filter_with_invalid_input.json",
   },
 ];
@@ -72,8 +74,10 @@ export const FilterSelector: React.FC = () => {
   );
 
   const handleFilterChange = useCallback(
-    (e: SelectChangeEvent<string>) => {
-      setActiveFilterId(e.target.value as FilterId);
+    (newValue: Option<FilterId> | null) => {
+      if (newValue) {
+        setActiveFilterId(newValue.value);
+      }
     },
     [setActiveFilterId]
   );
@@ -86,6 +90,30 @@ export const FilterSelector: React.FC = () => {
   }, [activeFilter, setActiveFilterId, removeImportedModularFilter]);
 
   const [importError, setImportError] = useState("");
+
+  const filterOptions: Option<FilterId>[] = Object.values(
+    importedModularFilters
+  ).map((filter) => ({
+    label: filter.name,
+    value: filter.id,
+  }));
+
+  const selectedFilter = activeFilter
+    ? {
+        label: activeFilter.name,
+        value: activeFilter.id,
+      }
+    : null;
+
+  const handleImportFilterChange = useCallback(
+    (newValue: Option<string> | null) => {
+      if (newValue) {
+        setFilterUrl(newValue.value);
+        setImportError("");
+      }
+    },
+    []
+  );
 
   return (
     <Container>
@@ -114,25 +142,15 @@ export const FilterSelector: React.FC = () => {
             }}
             size="small"
           >
-            <Select
-              disabled={Object.keys(importedModularFilters).length === 0}
-              value={activeFilter?.id ?? ""}
+            <UISelect<FilterId>
+              sx={{ width: "200px" }}
+              options={filterOptions}
+              value={selectedFilter}
               onChange={handleFilterChange}
-              renderValue={(value: number | string) => {
-                const filter = importedModularFilters[value];
-                if (!filter) {
-                  return "Select a filter";
-                }
-                return filter.name;
-              }}
-              displayEmpty
-            >
-              {Object.values(importedModularFilters).map((filter, index) => (
-                <MenuItem key={index} value={filter.id}>
-                  {filter.name}
-                </MenuItem>
-              ))}
-            </Select>
+              label="Select a filter"
+              disabled={Object.keys(importedModularFilters).length === 0}
+              multiple={false}
+            />
             <Button
               variant="outlined"
               color="secondary"
@@ -172,22 +190,20 @@ export const FilterSelector: React.FC = () => {
                     <FormHelperText sx={{ fontSize: "24px" }}>
                       Select a commonly used filter or paste a URL below
                     </FormHelperText>
-                    <Select
-                      color="secondary"
-                      labelId="common-filter-select"
-                      value={filterUrl}
-                      displayEmpty
-                      onChange={(e) => {
-                        setFilterUrl(e.target.value);
-                        setImportError("");
-                      }}
-                    >
-                      {filtersForImport.map((filter) => (
-                        <MenuItem key={filter.url} value={filter.url}>
-                          {filter.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
+                    <UISelect<string>
+                      options={filtersForImport.map((filter) => ({
+                        label: filter.name,
+                        value: filter.url,
+                      }))}
+                      value={
+                        filterUrl
+                          ? { label: filterUrl, value: filterUrl }
+                          : null
+                      }
+                      onChange={handleImportFilterChange}
+                      label="Select a filter"
+                      multiple={false}
+                    />
                   </FormControl>
                   <TextField
                     label="Filter URL"

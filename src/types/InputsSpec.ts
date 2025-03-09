@@ -95,9 +95,9 @@ export const fontTypeFromOrdinal = (ordinal: number): FontType => {
   return Object.values(FontType)[ordinal];
 };
 export enum FontType {
-  NORMAL = "normal",
-  LARGER = "larger",
-  BOLD = "bold",
+  NORMAL = "Normal",
+  LARGER = "Larger",
+  BOLD = "Bold",
 }
 
 /**

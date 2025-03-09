@@ -90,9 +90,14 @@ const createFilterConfigurationSlice: StateCreator<
         thisModulesConfig[macroName] ?? {};
 
       let newConfig: Partial<InputDefault<Input>>;
-      if (typeof data === "object" && !!data) {
+      if (Array.isArray(data)) {
+        // For arrays, replace the entire value
+        newConfig = data;
+      } else if (typeof data === "object" && data !== null) {
+        // For objects, merge with existing config
         newConfig = { ...(thisMacrosConfig as object), ...data };
       } else {
+        // For primitives (string, number, boolean), use the value directly
         newConfig = data;
       }
 

@@ -28,15 +28,15 @@ import {
 } from "../../types/InputsSpec";
 import { FilterId, UiFilterModule } from "../../types/ModularFilterSpec";
 import useSiteConfig from "../../utils/devmode";
-import {
-  BooleanInputComponent,
-  EnumInputComponent,
-  ListInputComponent,
-  NumberInputComponent,
-} from "../inputs/BasicInputs";
+
+import { BooleanInputComponent } from "../inputs/BooleanInputComponent";
 import { DisplayConfigurationInput } from "../inputs/DisplayConfigurationInput";
+import { EnumInputComponent } from "../inputs/EnumInputComponent";
 import { IncludeExcludeListInputComponent } from "../inputs/IncludeExcludeListInputComponent";
+import { NumberInputComponent } from "../inputs/NumberInputComponent";
+import { StringListInputComponent } from "../inputs/StringListInputComponent";
 import { ItemLabelPreview } from "../Previews";
+
 const InputComponent: React.FC<{
   activeFilterId: FilterId;
   module: UiFilterModule;
@@ -71,7 +71,7 @@ const InputComponent: React.FC<{
       );
     case "stringlist":
       return (
-        <ListInputComponent
+        <StringListInputComponent
           activeFilterId={activeFilterId}
           module={module}
           input={input as StringListInput}
