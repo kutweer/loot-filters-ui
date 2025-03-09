@@ -123,12 +123,13 @@ export const ItemLabelPreview: React.FC<{
       sx={{
         border: "3px solid black",
         backgroundColor: "#dddddd",
+        height: "min-content",
         ...sx,
       }}
     >
       <div
         style={{
-          margin: "10px",
+          margin: "6px",
           display: "flex",
           alignItems: "center",
           gap: 2,

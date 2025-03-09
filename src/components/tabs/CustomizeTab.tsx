@@ -182,7 +182,7 @@ const ModuleSection: React.FC<{
       }}
     >
       <AccordionSummary expandIcon={<ExpandMore />}>
-        <Typography variant="h4" color="primary">
+        <Typography variant="h4" color="primary" sx={{ mr: 2 }}>
           Module: {module.name}
         </Typography>
         <Stack direction="row" spacing={2}>
