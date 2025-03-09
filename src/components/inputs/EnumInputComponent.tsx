@@ -31,10 +31,16 @@ export const EnumInputComponent: React.FC<{
   const selectedOptions = Array.isArray(currentSetting)
     ? currentSetting
         .filter((value): value is string => typeof value === "string")
-        .map((value) => ({
-          label: value,
-          value: value,
-        }))
+        .map((value) => {
+          const found = options.find((o) => o.value === value);
+          if (found) {
+            return found;
+          }
+          return {
+            label: value,
+            value: value,
+          };
+        })
     : [];
 
   return (

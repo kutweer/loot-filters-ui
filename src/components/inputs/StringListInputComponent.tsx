@@ -9,11 +9,11 @@ export const StringListInputComponent: React.FC<{
   input: StringListInput;
 }> = ({ activeFilterId, module, input }) => {
   const setFilterConfiguration = useUiStore(
-    (state) => state.setFilterConfiguration,
+    (state) => state.setFilterConfiguration
   );
 
   const activeConfig = useUiStore(
-    (state) => state.filterConfigurations[activeFilterId],
+    (state) => state.filterConfigurations[activeFilterId]
   );
 
   const currentValues =
@@ -38,6 +38,10 @@ export const StringListInputComponent: React.FC<{
       freeSolo={true}
       value={currentValues.map((value: string | ListOption) => {
         if (typeof value === "string") {
+          const found = options.find((o) => o.value === value);
+          if (found) {
+            return found;
+          }
           return {
             label: value,
             value: value,
@@ -47,13 +51,13 @@ export const StringListInputComponent: React.FC<{
       })}
       onChange={(newValue) => {
         const values = ((newValue as Option[]) || []).map(
-          (option) => option.value,
+          (option) => option.value
         );
         setFilterConfiguration(
           activeFilterId,
           module.id,
           input.macroName,
-          values,
+          values
         );
       }}
     />
