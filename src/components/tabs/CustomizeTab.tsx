@@ -205,20 +205,16 @@ const ModuleSection: React.FC<{
               {module.name} is disabled
             </Typography>
           </Grid2>
-          <Grid2
-            sx={{ marginLeft: "auto", display: "flex", alignItems: "center" }}
-            size={1}
+          <Button
+            sx={{ marginLeft: "auto" }}
+            variant="outlined"
+            size="small"
+            onClick={() => {
+              setActiveConfig(activeFilterId, module.id, "enabled", !enabled);
+            }}
           >
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={() => {
-                setActiveConfig(activeFilterId, module.id, "enabled", !enabled);
-              }}
-            >
-              {module.enabled ? "Disable" : "Enable"}
-            </Button>
-          </Grid2>
+            {module.enabled ? "Disable" : "Enable Module"}
+          </Button>
         </Grid2>
       </Paper>
     );
@@ -236,14 +232,24 @@ const ModuleSection: React.FC<{
         },
       }}
     >
-      <AccordionSummary expandIcon={<ExpandMore />}>
+      <AccordionSummary component="div" expandIcon={<ExpandMore />}>
         <Typography variant="h4" color="primary" sx={{ mr: 2 }}>
           {module.name} {enabled ? "(Enabled)" : "(Disabled)"}
         </Typography>
         <Stack direction="row" spacing={2}>
           <FirstCoupleLabels module={module} />
         </Stack>
-        <Box sx={{ marginLeft: "auto" }}></Box>
+        <Box sx={{ marginLeft: "auto" }}>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => {
+              setActiveConfig(activeFilterId, module.id, "enabled", !enabled);
+            }}
+          >
+            {enabled ? "Disable Module" : "Enable"}
+          </Button>
+        </Box>
       </AccordionSummary>
       <AccordionDetails>
         <Stack spacing={2} direction="column">
@@ -293,22 +299,6 @@ const ModuleSection: React.FC<{
                       </Typography>
                     ) : null}
                   </Divider>
-                </Grid2>
-                <Grid2 size={1}>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => {
-                      setActiveConfig(
-                        activeFilterId,
-                        module.id,
-                        "enabled",
-                        !enabled
-                      );
-                    }}
-                  >
-                    {enabled ? "Disable Module" : "Enable"}
-                  </Button>
                 </Grid2>
                 {inputs
                   .sort((a: Input, b: Input) => sizeOf(a) - sizeOf(b))

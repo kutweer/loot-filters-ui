@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import { useUiStore } from "../../store/store";
-import { IncludeExcludeListInput } from "../../types/InputsSpec";
+import { IncludeExcludeListInput, ListOption } from "../../types/InputsSpec";
 import { FilterId, UiFilterModule } from "../../types/ModularFilterSpec";
 import { Option, UISelect } from "./UISelect";
 
@@ -27,17 +27,27 @@ export const IncludeExcludeListInputComponent: React.FC<{
       | undefined) ?? input.default.excludes;
 
   const includeOptions: Option[] = input.default.includes.map(
-    (option: string) => ({
-      label: option,
-      value: option,
-    }),
+    (option: string | ListOption) => {
+      if (typeof option === "string") {
+        return {
+          label: option,
+          value: option,
+        };
+      }
+      return option;
+    },
   );
 
   const excludeOptions: Option[] = input.default.excludes.map(
-    (option: string) => ({
-      label: option,
-      value: option,
-    }),
+    (option: string | ListOption) => {
+      if (typeof option === "string") {
+        return {
+          label: option,
+          value: option,
+        };
+      }
+      return option;
+    },
   );
 
   return (
@@ -47,10 +57,15 @@ export const IncludeExcludeListInputComponent: React.FC<{
         label={`${input.label} includes`}
         multiple={true}
         freeSolo={true}
-        value={currentIncludes.map((include: string) => ({
-          label: include,
-          value: include,
-        }))}
+        value={currentIncludes.map((include: string | ListOption) => {
+          if (typeof include === "string") {
+            return {
+              label: include,
+              value: include,
+            };
+          }
+          return include;
+        })}
         onChange={(newValue) => {
           const includes = ((newValue as Option[]) || []).map(
             (option) => option.value,
@@ -68,10 +83,15 @@ export const IncludeExcludeListInputComponent: React.FC<{
         label={`${input.label} excludes`}
         multiple={true}
         freeSolo={true}
-        value={currentExcludes.map((exclude: string) => ({
-          label: exclude,
-          value: exclude,
-        }))}
+        value={currentExcludes.map((exclude: string | ListOption) => {
+          if (typeof exclude === "string") {
+            return {
+              label: exclude,
+              value: exclude,
+            };
+          }
+          return exclude;
+        })}
         onChange={(newValue) => {
           const excludes = ((newValue as Option[]) || []).map(
             (option) => option.value,
