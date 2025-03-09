@@ -223,11 +223,11 @@ export const DisplayConfigurationInput: React.FC<{
     >
       <AccordionSummary
         sx={{
-          backgroundColor: colors.rsLightBrown,
+          backgroundColor: colors.rsLighterBrown,
         }}
         expandIcon={<ExpandMore />}
       >
-        <Box sx={{ display: "flex", gap: 2 }}>
+        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
           <ItemLabelPreview
             module={module}
             input={input}
@@ -240,7 +240,11 @@ export const DisplayConfigurationInput: React.FC<{
           />
         </Box>
       </AccordionSummary>
-      <AccordionDetails>
+      <AccordionDetails
+        sx={{
+          backgroundColor: colors.rsLighterBrown,
+        }}
+      >
         <Grid container spacing={2}>
           {inputComponents.map((component, index) => {
             if (component.type.muiName === "Grid") {
