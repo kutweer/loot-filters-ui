@@ -82,7 +82,7 @@ export enum TextAccent {
   SHADOW = "shadow",
   OUTLINE = "outline",
   NONE = "none",
-  BOLD = "bold",
+  SHADOW_BOLD = "shadow_bold",
 }
 
 // Enum ordinal needs to match what is supported in the plugin

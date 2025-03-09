@@ -34,6 +34,7 @@ import { EnumInputComponent } from "../inputs/EnumInputComponent";
 import { IncludeExcludeListInputComponent } from "../inputs/IncludeExcludeListInputComponent";
 import { NumberInputComponent } from "../inputs/NumberInputComponent";
 import { StringListInputComponent } from "../inputs/StringListInputComponent";
+import { StyleConfig } from "../inputs/StyleInputHelpers";
 import { ItemLabelPreview } from "../Previews";
 
 const InputComponent: React.FC<{
@@ -108,7 +109,7 @@ const sizeOf = (input: Input) => {
     case "boolean":
       return 2;
     case "style":
-      return 12;
+      return 16;
     case "includeExcludeList":
       return 12;
     default:
@@ -123,9 +124,24 @@ const FirstCoupleLabels: React.FC<{
     (input) => input.type === "style"
   ) as StyleInput[];
 
+  const activeFilterId = useUiStore(
+    (state) =>
+      Object.keys(state.importedModularFilters).find(
+        (id) => state.importedModularFilters[id].active
+      )!!
+  );
+  const configForModule = useUiStore(
+    (state) => state.filterConfigurations?.[activeFilterId]?.[module.id]
+  );
+
+  const visibleStyleInputs = styleInputs.filter((input) => {
+    const config = configForModule?.[input.macroName] as Partial<StyleConfig>;
+    return !(config?.hideOverlay ?? input.default?.hideOverlay ?? false);
+  });
+
   return (
     <Stack direction="row" spacing={2}>
-      {styleInputs.slice(0, 4).map((input) => {
+      {visibleStyleInputs.slice(0, 4).map((input) => {
         const macroName = (input as StyleInput).macroName;
         return (
           <ItemLabelPreview

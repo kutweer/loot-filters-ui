@@ -7,7 +7,16 @@ import { MuiRsTheme } from "./styles/MuiTheme";
 export const App = ({ sha = "main" }: { sha?: string }) => {
   return (
     <ThemeProvider theme={MuiRsTheme}>
-      <Container className="rs-container" maxWidth="lg">
+      <span style={{ display: "hidden", fontFamily: "RuneScape" }}>
+        runescape
+      </span>
+      <span style={{ display: "hidden", fontFamily: "RuneScapeBold" }}>
+        RuneScapeBold
+      </span>
+      <span style={{ display: "hidden", fontFamily: "RuneScapeSmall" }}>
+        RuneScapeSmall
+      </span>
+      <Container className="rs-container" maxWidth="xl">
         <Header />
         <FilterTabs sha={sha} />
       </Container>
