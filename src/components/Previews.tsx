@@ -20,19 +20,19 @@ export const ItemMenuPreview: React.FC<{
   const activeFilterId = useUiStore(
     (state) =>
       Object.keys(state.importedModularFilters).find(
-        (id) => state.importedModularFilters[id].active,
-      )!!,
+        (id) => state.importedModularFilters[id].active
+      )!!
   );
 
   const activeConfig = useUiStore(
     (state) =>
       state.filterConfigurations?.[activeFilterId!!]?.[module.id]?.[
         input.macroName
-      ] as Partial<StyleConfig>,
+      ] as Partial<StyleConfig>
   );
 
   const menuTextColor = colorHexToRgbaCss(
-    activeConfig?.menuTextColor ?? input.default?.menuTextColor,
+    activeConfig?.menuTextColor ?? input.default?.menuTextColor
   );
 
   return (
@@ -103,25 +103,25 @@ export const ItemLabelPreview: React.FC<{
   const activeFilterId = useUiStore(
     (state) =>
       Object.keys(state.importedModularFilters).find(
-        (id) => state.importedModularFilters[id].active,
-      )!!,
+        (id) => state.importedModularFilters[id].active
+      )!!
   );
 
   const activeConfig = useUiStore(
     (state) =>
       state.filterConfigurations?.[activeFilterId!!]?.[module.id]?.[
         input.macroName
-      ] as Partial<StyleConfig>,
+      ] as Partial<StyleConfig>
   );
 
   const backgroundColor = colorHexToRgbaCss(
-    activeConfig?.backgroundColor ?? input.default?.backgroundColor,
+    activeConfig?.backgroundColor ?? input.default?.backgroundColor
   );
   const borderColor = colorHexToRgbaCss(
-    activeConfig?.borderColor ?? input.default?.borderColor,
+    activeConfig?.borderColor ?? input.default?.borderColor
   );
   const foregroundColor = colorHexToRgbaCss(
-    activeConfig?.textColor ?? input.default?.textColor,
+    activeConfig?.textColor ?? input.default?.textColor
   );
 
   const hidden =
@@ -146,7 +146,7 @@ export const ItemLabelPreview: React.FC<{
     activeConfig?.textAccentColor ?? input.default?.textAccentColor;
 
   let textAccentStyle: React.CSSProperties & {
-    "-webkit-text-stroke"?: string;
+    webkitTextStroke?: string;
   } = {};
   switch (textAccent) {
     case TextAccent.SHADOW:
@@ -156,7 +156,7 @@ export const ItemLabelPreview: React.FC<{
       break;
     case TextAccent.OUTLINE:
       textAccentStyle = {
-        "-webkit-text-stroke": `1px ${colorHexToRgbaCss(textAccentColor) ?? "rgb(0,0,0,0)"}`,
+        WebkitTextStroke: `1px ${colorHexToRgbaCss(textAccentColor) ?? "rgb(0,0,0,0)"}`,
       };
       break;
     case TextAccent.SHADOW_BOLD:
