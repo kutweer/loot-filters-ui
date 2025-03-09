@@ -67,29 +67,26 @@ const renderFilter = (
   activeConfig: ModularFilterConfiguration | undefined
 ): string => {
   return filter.modules
-    .map((m) => {
-      return activeConfig !== undefined
-        ? renderModule(m, activeConfig[m.id])
-        : m.rs2fText;
-    })
+    .map((m) => renderModule(m, activeConfig?.[m.id]))
     .join("\n");
 };
 
 const renderModule = (
   module: UiFilterModule,
-  config: { [key: MacroName]: Partial<InputDefault<Input>> }
+  config: { [key: MacroName]: Partial<InputDefault<Input>> } | undefined
 ): string => {
   let updated = module.rs2fText;
+
   for (const input of module.inputs) {
     switch (input.type) {
       case "boolean":
-        const bool = config[input.macroName] ?? input.default;
+        const bool = config?.[input.macroName] ?? input.default;
         if (bool !== undefined) {
           updated = updateMacro(updated, input.macroName, bool.toString());
         }
         break;
       case "number":
-        const value = config[input.macroName] ?? input.default;
+        const value = config?.[input.macroName] ?? input.default;
         if (value !== undefined) {
           updated = updateMacro(updated, input.macroName, value.toString());
         }
@@ -106,9 +103,9 @@ const renderModule = (
         }
         break;
       case "includeExcludeList":
-        const includes = (config[input.macroName.includes] ??
+        const includes = (config?.[input.macroName.includes] ??
           input.default.includes) as string[];
-        const excludes = (config[input.macroName.excludes] ??
+        const excludes = (config?.[input.macroName.excludes] ??
           input.default.excludes) as string[];
         if (includes !== undefined) {
           updated = updateMacro(
@@ -126,7 +123,7 @@ const renderModule = (
         }
         break;
       case "style":
-        const style = config[input.macroName] as StyleConfig | undefined;
+        const style = config?.[input.macroName] as StyleConfig | undefined;
         const defaultStyle = input.default as StyleConfig;
         const mergedStyle = { ...(defaultStyle ?? {}), ...(style ?? {}) };
         if (Object.keys(mergedStyle).length > 0) {
@@ -139,7 +136,6 @@ const renderModule = (
         break;
     }
   }
-
   return updated;
 };
 
