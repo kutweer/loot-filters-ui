@@ -19,7 +19,23 @@ const RenderFilterComponent: React.FC = () => {
 
   return (
     <>
-      <Typography color="text.secondary">Copy and paste it for now.</Typography>
+      <Typography color="text.secondary">
+        Copy and paste into a file named{" "}
+        <span
+          style={{
+            color: "white",
+            fontSize: "16px",
+          }}
+        >
+          {activeFilter?.name.replace(/\s/g, "_")}.rs2f
+        </span>{" "}
+        in{" "}
+        <span style={{ color: "white", fontSize: "16px" }}>
+          .runelite/loot-filters/filters
+        </span>
+        .
+      </Typography>
+
       <Editor
         height="70vh"
         language="cpp"
@@ -67,13 +83,13 @@ const renderModule = (
   for (const input of module.inputs) {
     switch (input.type) {
       case "boolean":
-        const bool = config?.[input.macroName] ?? input.default;
+        const bool = config[input.macroName] ?? input.default;
         if (bool !== undefined) {
           updated = updateMacro(updated, input.macroName, bool.toString());
         }
         break;
       case "number":
-        const value = config?.[input.macroName] ?? input.default;
+        const value = config[input.macroName] ?? input.default;
         if (value !== undefined) {
           updated = updateMacro(updated, input.macroName, value.toString());
         }
@@ -90,9 +106,9 @@ const renderModule = (
         }
         break;
       case "includeExcludeList":
-        const includes = (config?.[input.macroName.includes] ??
+        const includes = (config[input.macroName.includes] ??
           input.default.includes) as string[];
-        const excludes = (config?.[input.macroName.excludes] ??
+        const excludes = (config[input.macroName.excludes] ??
           input.default.excludes) as string[];
         if (includes !== undefined) {
           updated = updateMacro(
@@ -110,7 +126,7 @@ const renderModule = (
         }
         break;
       case "style":
-        const style = config?.[input.macroName];
+        const style = config[input.macroName];
         if (style !== undefined) {
           updated = updateMacro(
             updated,
