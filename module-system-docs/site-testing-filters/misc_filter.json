@@ -1,0 +1,39 @@
+{
+  "type": "filter",
+  "name": "Misc Filter",
+  "description": "A descriptive description of the filter",
+  "modules": [
+    {
+      "name": "Non Style Non Dropdown Inputs",
+      "moduleJson": {
+        "type": "module",
+        "name": "Non Style Non Dropdown Inputs",
+        "description": "Non Style Non Dropdown Inputs",
+        "inputs": [
+          {
+            "type": "number",
+            "label": "Number Input",
+            "macroName": "NUMBER_INPUT",
+            "description": "A number input with no default values",
+            "default": 0
+          },
+          {
+            "type": "boolean",
+            "label": "Boolean Input",
+            "macroName": "BOOLEAN_INPUT",
+            "description": "A boolean input with no default values",
+            "default": false
+          },
+          {
+            "type": "string",
+            "label": "String Input",
+            "macroName": "STRING_INPUT",
+            "description": "A string input with no default values",
+            "default": ""
+          }
+        ]
+      },
+      "moduleRs2fText": "#define STYLE_INPUT_TEST nop;"
+    }
+  ]
+}

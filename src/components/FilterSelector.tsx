@@ -30,19 +30,19 @@ const COMMON_FILTERS = [
 const DEV_FILTERS = [
   {
     name: "[Dev] Style Input",
-    url: "https://raw.githubusercontent.com/Kaqemeex/example-configurable-filter/refs/heads/main/single_style_filter.json",
+    url: "https://raw.githubusercontent.com/Kaqemeex/loot-filters-ui/refs/heads/main/module-system-docs/site-testing-filters/single_style_filter.json",
   },
   {
     name: "[Dev] Number, Bool & Unsupported inputs",
-    url: "https://raw.githubusercontent.com/Kaqemeex/example-configurable-filter/refs/heads/main/misc_filter.json",
+    url: "https://raw.githubusercontent.com/Kaqemeex/loot-filters-ui/refs/heads/main/module-system-docs/site-testing-filters/misc_filter.json",
   },
   {
     name: "[Dev] List Input",
-    url: "https://raw.githubusercontent.com/Kaqemeex/example-configurable-filter/refs/heads/main/list_filter.json",
+    url: "https://raw.githubusercontent.com/Kaqemeex/loot-filters-ui/refs/heads/main/module-system-docs/site-testing-filters/list_filter.json",
   },
   {
     name: "[Dev] Invalid Filter",
-    url: "https://raw.githubusercontent.com/Kaqemeex/example-configurable-filter/refs/heads/main/filter_with_invalid_input.json",
+    url: "https://raw.githubusercontent.com/Kaqemeex/loot-filters-ui/refs/heads/main/module-system-docs/site-testing-filters/filter_with_invalid_input.json",
   },
 ];
 

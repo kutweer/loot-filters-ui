@@ -1,0 +1,65 @@
+{
+  "type": "filter",
+  "name": "List Filter",
+  "description": "A filter that allows you to select a list of items",
+  "modules": [
+    {
+      "name": "List Input",
+      "moduleJson": {
+        "type": "module",
+        "name": "List Input",
+        "description": "A list input with no default values",
+        "inputs": [
+          {
+            "type": "enumlist",
+            "macroName": "VAR_HERB_SHOW",
+            "label": "Herbs to always show regardless of value",
+            "enum": [
+              "guam leaf",
+              "marrentill",
+              "tarromin",
+              "harralander",
+              "ranarr weed",
+              "toadflax",
+              "irit leaf",
+              "avantoe",
+              "kwuarm",
+              "huasca",
+              "snapdragon",
+              "cadantine",
+              "lantadyme",
+              "dwarf weed",
+              "torstol"
+            ],
+            "default": []
+          },
+          {
+            "type": "stringlist",
+            "group": "addl-highlight",
+            "label": "ToA-specific item highlights",
+            "macroName": "VAR_TOA_HIGHLIGHT",
+            "default": ["example-item"]
+          },
+          {
+            "type": "includeExcludeList",
+            "macroName": {
+              "includes": "VAR_GENERAL_GRAARDOR_UNIQUES_SHOW",
+              "excludes": "VAR_GENERAL_GRAARDOR_UNIQUES_HIDE"
+            },
+            "label": "General Graardor uniques",
+            "default": {
+              "includes": [
+                "Bandos chestplate",
+                "Bandos tassets",
+                "Bandos boots",
+                "Bandos hilt"
+              ],
+              "excludes": []
+            }
+          }
+        ]
+      },
+      "moduleRs2fText": "#define STYLE_INPUT_TEST nop;"
+    }
+  ]
+}

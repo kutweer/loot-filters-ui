@@ -1,0 +1,24 @@
+{
+  "type": "filter",
+  "name": "Invalid Input Filter",
+  "description": "A filter with an invalid input",
+  "modules": [
+    {
+      "name": "Invalid Input",
+      "moduleJson": {
+        "type": "module",
+        "name": "Invalid Input",
+        "description": "Invalid Input",
+        "inputs": [
+          {
+            "type": "number",
+            "macroName": "NUMBER_INPUT",
+            "description": "A number input with no default values",
+            "default": 0
+          }
+        ]
+      },
+      "moduleRs2fText": "#define STYLE_INPUT_TEST nop;"
+    }
+  ]
+}
