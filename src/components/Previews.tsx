@@ -108,8 +108,6 @@ export const ItemLabelPreview: React.FC<{
       ] as Partial<StyleConfig>
   );
 
-  console.log("activeConfig", activeConfig);
-
   const backgroundColor = colorHexToRgbaCss(
     activeConfig?.backgroundColor ?? input.default?.backgroundColor
   );

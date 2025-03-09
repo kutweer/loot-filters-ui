@@ -8,6 +8,7 @@ import {
   ModuleId,
   UiModularFilter,
 } from "../types/ModularFilterSpec";
+import { SiteConfig } from "../types/SiteConfig";
 
 export interface ImportedFilterSlice {
   importedModularFilters: Record<string, UiModularFilter>;
@@ -140,12 +141,42 @@ const createDeleteFilterSlice: StateCreator<
     })),
 });
 
+export interface SiteConfigSlice {
+  siteConfig: SiteConfig;
+  setSiteConfig: (config: Partial<SiteConfig>) => void;
+}
+
+const createSiteConfigSlice: StateCreator<
+  SiteConfigSlice &
+    ImportedFilterSlice &
+    FilterConfigurationSlice &
+    DeleteFilterSlice,
+  [],
+  [],
+  SiteConfigSlice
+> = (set) => ({
+  siteConfig: {
+    devMode: false,
+    isLocal:
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1",
+  },
+  setSiteConfig: (config: Partial<SiteConfig>) =>
+    set((state) => ({
+      siteConfig: { ...state.siteConfig, ...config },
+    })),
+});
+
 const uiStore = create<
-  ImportedFilterSlice & FilterConfigurationSlice & DeleteFilterSlice
+  SiteConfigSlice &
+    ImportedFilterSlice &
+    FilterConfigurationSlice &
+    DeleteFilterSlice
 >()(
   devtools(
     persist(
       (...a) => ({
+        ...createSiteConfigSlice(...a),
         ...createImportedFilterSlice(...a),
         ...createFilterConfigurationSlice(...a),
         ...createDeleteFilterSlice(...a),

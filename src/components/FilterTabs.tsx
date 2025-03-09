@@ -1,16 +1,22 @@
-import { Box, Tab, Tabs, Typography } from "@mui/material";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import {
+  Box,
+  Tab,
+  Tabs,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from "@mui/material";
 import { useMemo, useState } from "react";
 import { filter } from "underscore";
 import { useUiStore } from "../store/store";
-import { SiteConfig } from "../utils/devmode";
 import { FilterSelector } from "./FilterSelector";
 import { CustomizeTab } from "./tabs/CustomizeTab";
 import { RenderedFilterTab } from "./tabs/RenderedFilterTab";
 
-export const FilterTabs: React.FC<{
-  sha: string;
-  siteConfig: SiteConfig;
-}> = ({ sha, siteConfig }) => {
+export const FilterTabs: React.FC<{ sha: string }> = ({ sha }) => {
+  const { siteConfig } = useUiStore();
   const [activeTab, setActiveTab] = useState(0);
 
   const importedModularFilters = useUiStore(
@@ -54,22 +60,47 @@ export const FilterTabs: React.FC<{
       <Box>
         <FilterSelector />
       </Box>
-      <Tabs
-        value={activeTab}
-        onChange={(e, newValue) => setActiveTab(newValue)}
-        aria-label="filter tabs"
-      >
-        {filteredTabs.map((tab, index) => (
-          <Tab
-            key={index}
-            label={tab.label}
-            disabled={tab.disabled}
-            sx={{
-              fontSize: "1.2rem",
-            }}
-          />
-        ))}
-      </Tabs>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2, mt: 2}}>
+        <Tabs
+          value={activeTab}
+          onChange={(e, newValue) => setActiveTab(newValue)}
+          aria-label="filter tabs"
+          sx={{ flex: 1 }}
+        >
+          {filteredTabs.map((tab, index) => (
+            <Tab
+              key={index}
+              label={tab.label}
+              disabled={tab.disabled}
+              sx={{
+                fontSize: "1.2rem",
+              }}
+            />
+          ))}
+        </Tabs>
+        {activeTab === 0 && activeFilter && (
+          <ToggleButtonGroup size="small" exclusive={false}>
+            <ToggleButton
+              value="expand"
+              onClick={() => {
+                const event = new CustomEvent("expandAll", { detail: true });
+                window.dispatchEvent(event);
+              }}
+            >
+              <ExpandMore />
+            </ToggleButton>
+            <ToggleButton
+              value="collapse"
+              onClick={() => {
+                const event = new CustomEvent("expandAll", { detail: false });
+                window.dispatchEvent(event);
+              }}
+            >
+              <ExpandLess />
+            </ToggleButton>
+          </ToggleButtonGroup>
+        )}
+      </Box>
       <Box sx={{ mt: 2 }}>{filteredTabs[activeTab].component}</Box>
     </Box>
   );

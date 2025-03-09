@@ -13,7 +13,6 @@ import {
 import { useCallback, useMemo, useState } from "react";
 import { useUiStore } from "../store/store";
 import { FilterId } from "../types/ModularFilterSpec";
-import useSiteConfig from "../utils/devmode";
 import { loadFilter } from "../utils/modularFilterLoader";
 import { Option, UISelect } from "./inputs/UISelect";
 
@@ -50,7 +49,7 @@ const DEV_FILTERS = [
 export const FilterSelector: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [filterUrl, setFilterUrl] = useState("");
-  const [siteConfig, _] = useSiteConfig();
+  const { siteConfig } = useUiStore();
 
   const filtersForImport = [
     ...(siteConfig.devMode ? DEV_FILTERS : []),

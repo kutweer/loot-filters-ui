@@ -7,13 +7,12 @@ import {
   Switch,
   Typography,
 } from "@mui/material";
+import { useUiStore } from "../store/store";
 import { colors } from "../styles/MuiTheme";
-import { SiteConfig } from "../utils/devmode";
 
-export const Header: React.FC<{
-  siteConfig: SiteConfig;
-  setSiteConfig: (config: SiteConfig) => void;
-}> = ({ siteConfig, setSiteConfig }) => {
+export const Header: React.FC = () => {
+  const { siteConfig, setSiteConfig } = useUiStore();
+
   return (
     <Box>
       <Box

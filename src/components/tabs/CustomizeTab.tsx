@@ -27,7 +27,6 @@ import {
   StyleInput,
 } from "../../types/InputsSpec";
 import { FilterId, UiFilterModule } from "../../types/ModularFilterSpec";
-import useSiteConfig from "../../utils/devmode";
 
 import { BooleanInputComponent } from "../inputs/BooleanInputComponent";
 import { DisplayConfigurationInput } from "../inputs/DisplayConfigurationInput";
@@ -147,17 +146,17 @@ const ModuleSection: React.FC<{
   setExpanded: (expanded: boolean) => void;
   module: UiFilterModule;
 }> = ({ activeFilterId, expanded, setExpanded, module }) => {
-  const [siteConfig, _] = useSiteConfig();
+  const { siteConfig } = useUiStore();
   const [showJson, setShowJson] = useState<"json" | "configJson" | "none">(
     "none"
+  );
+  const activeConfig = useUiStore(
+    (state) => state.filterConfigurations[activeFilterId]
   );
 
   let json: string | null = null;
   let configJson: string | null = null;
   if (siteConfig.devMode) {
-    const activeConfig = useUiStore(
-      (state) => state.filterConfigurations[activeFilterId]
-    );
     json = JSON.stringify(module, null, 2);
     configJson = JSON.stringify(activeConfig, null, 2);
   }
@@ -175,16 +174,14 @@ const ModuleSection: React.FC<{
     <Accordion
       slotProps={{ transition: { unmountOnExit: true } }}
       expanded={expanded}
+      onChange={() => setExpanded(!expanded)}
       sx={{
         "&::before": {
           backgroundColor: colors.rsDarkBrown,
         },
       }}
     >
-      <AccordionSummary
-        onClick={() => setExpanded(!expanded)}
-        expandIcon={<ExpandMore />}
-      >
+      <AccordionSummary expandIcon={<ExpandMore />}>
         <Typography variant="h4" color="primary">
           Module: {module.name}
         </Typography>
@@ -267,17 +264,38 @@ const ModuleSection: React.FC<{
 };
 
 export const CustomizeTab: React.FC = () => {
-  const [expandedModules, setExpandedModules] = useState<
-    Record<string, boolean>
-  >({});
-  const [siteConfig, _] = useSiteConfig();
+  const { siteConfig } = useUiStore();
   const importedModularFilters = useUiStore(
     (state) => state.importedModularFilters
   );
+  const [expandedModules, setExpandedModules] = useState<
+    Record<string, boolean>
+  >({});
+
   const activeFilter = useMemo(
     () => Object.values(importedModularFilters).find((filter) => filter.active),
     [importedModularFilters]
   );
+
+  const setAllExpanded = (expanded: boolean) => {
+    if (!activeFilter) return;
+    const newExpandedModules: Record<string, boolean> = {};
+    activeFilter.modules.forEach((module) => {
+      newExpandedModules[module.name] = expanded;
+    });
+    setExpandedModules(newExpandedModules);
+  };
+
+  React.useEffect(() => {
+    const handleExpandAll = (event: CustomEvent) => {
+      setAllExpanded(event.detail);
+    };
+
+    window.addEventListener("expandAll", handleExpandAll as EventListener);
+    return () => {
+      window.removeEventListener("expandAll", handleExpandAll as EventListener);
+    };
+  }, [activeFilter]);
 
   if (!activeFilter) {
     return (

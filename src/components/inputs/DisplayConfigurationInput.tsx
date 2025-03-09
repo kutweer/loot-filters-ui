@@ -8,13 +8,12 @@ import {
   FormControlLabel,
   Grid2 as Grid,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import { useUiStore } from "../../store/store";
 import { colors } from "../../styles/MuiTheme";
 import { StyleInput } from "../../types/InputsSpec";
 import { UiFilterModule } from "../../types/ModularFilterSpec";
 import { ArgbHexColor } from "../../utils/Color";
-import useSiteConfig from "../../utils/devmode";
 import { ItemLabelPreview, ItemMenuPreview } from "../Previews";
 import { ColorPickerInput } from "./ColorPicker";
 import { ItemLabelColorPicker } from "./ItemLabelColorPicker";
@@ -24,7 +23,8 @@ export const DisplayConfigurationInput: React.FC<{
   module: UiFilterModule;
   input: StyleInput;
 }> = ({ module, input }) => {
-  const [siteConfig, _] = useSiteConfig();
+  const { siteConfig } = useUiStore();
+  const [expanded, setExpanded] = useState(siteConfig.devMode);
 
   const activeFilterId = useUiStore(
     (state) =>
@@ -218,7 +218,8 @@ export const DisplayConfigurationInput: React.FC<{
         backgroundColor: colors.rsLightBrown,
       }}
       slotProps={{ transition: { unmountOnExit: true } }}
-      defaultExpanded={siteConfig.devMode}
+      expanded={expanded}
+      onChange={() => setExpanded(!expanded)}
     >
       <AccordionSummary
         sx={{
