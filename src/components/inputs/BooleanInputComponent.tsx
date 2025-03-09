@@ -13,10 +13,10 @@ export const BooleanInputComponent: React.FC<{
   input: BooleanInput;
 }> = ({ activeFilterId, module, input }) => {
   const activeConfig: ModularFilterConfiguration = useUiStore(
-    (state) => state.filterConfigurations[activeFilterId]
+    (state) => state.filterConfigurations[activeFilterId],
   );
   const setFilterConfiguration = useUiStore(
-    (state) => state.setFilterConfiguration
+    (state) => state.setFilterConfiguration,
   );
 
   const currentSetting =
@@ -33,7 +33,7 @@ export const BooleanInputComponent: React.FC<{
           activeFilterId,
           module.id,
           input.macroName,
-          value
+          value,
         );
       }}
     />

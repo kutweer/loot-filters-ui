@@ -55,7 +55,7 @@ export const UISelect = <T = string,>({
 
   const handleChange = (
     _: React.SyntheticEvent,
-    newValue: Option<T> | Option<T>[] | string | (string | Option<T>)[] | null
+    newValue: Option<T> | Option<T>[] | string | (string | Option<T>)[] | null,
   ) => {
     if (newValue === null) {
       onChange(null);
@@ -64,10 +64,10 @@ export const UISelect = <T = string,>({
 
     if (Array.isArray(newValue)) {
       const processedValue = newValue.map((item) =>
-        typeof item === "string" ? { label: item, value: item as T } : item
+        typeof item === "string" ? { label: item, value: item as T } : item,
       );
       (onChange as (value: Option<T>[] | null) => void)(
-        processedValue as Option<T>[]
+        processedValue as Option<T>[],
       );
       return;
     }

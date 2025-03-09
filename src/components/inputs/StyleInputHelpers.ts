@@ -6,5 +6,3 @@ import {
 
 export type StyleConfig = Partial<StyleInput["default"]>;
 export type StyleConfigKey = keyof StyleConfig & string;
-
-

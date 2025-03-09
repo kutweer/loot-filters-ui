@@ -11,10 +11,10 @@ import { StyleConfig } from "../inputs/StyleInputHelpers";
 
 const RenderFilterComponent: React.FC = () => {
   const activeFilter = useUiStore((state) =>
-    Object.values(state.importedModularFilters).find((f) => f.active)
+    Object.values(state.importedModularFilters).find((f) => f.active),
   );
   const activeConfig = useUiStore((state) =>
-    activeFilter ? state.filterConfigurations[activeFilter.id] : undefined
+    activeFilter ? state.filterConfigurations[activeFilter.id] : undefined,
   );
 
   return (
@@ -64,32 +64,29 @@ export const RenderedFilterTab: React.FC<{
 
 const renderFilter = (
   filter: UiModularFilter,
-  activeConfig: ModularFilterConfiguration | undefined
+  activeConfig: ModularFilterConfiguration | undefined,
 ): string => {
   return filter.modules
-    .map((m) => {
-      return activeConfig !== undefined
-        ? renderModule(m, activeConfig[m.id])
-        : m.rs2fText;
-    })
+    .map((m) => renderModule(m, activeConfig?.[m.id]))
     .join("\n");
 };
 
 const renderModule = (
   module: UiFilterModule,
-  config: { [key: MacroName]: Partial<InputDefault<Input>> }
+  config: { [key: MacroName]: Partial<InputDefault<Input>> } | undefined,
 ): string => {
   let updated = module.rs2fText;
+
   for (const input of module.inputs) {
     switch (input.type) {
       case "boolean":
-        const bool = config[input.macroName] ?? input.default;
+        const bool = config?.[input.macroName] ?? input.default;
         if (bool !== undefined) {
           updated = updateMacro(updated, input.macroName, bool.toString());
         }
         break;
       case "number":
-        const value = config[input.macroName] ?? input.default;
+        const value = config?.[input.macroName] ?? input.default;
         if (value !== undefined) {
           updated = updateMacro(updated, input.macroName, value.toString());
         }
@@ -101,45 +98,44 @@ const renderModule = (
           updated = updateMacro(
             updated,
             input.macroName,
-            renderStringList(items)
+            renderStringList(items),
           );
         }
         break;
       case "includeExcludeList":
-        const includes = (config[input.macroName.includes] ??
+        const includes = (config?.[input.macroName.includes] ??
           input.default.includes) as string[];
-        const excludes = (config[input.macroName.excludes] ??
+        const excludes = (config?.[input.macroName.excludes] ??
           input.default.excludes) as string[];
         if (includes !== undefined) {
           updated = updateMacro(
             updated,
             input.macroName.includes,
-            renderStringList(includes)
+            renderStringList(includes),
           );
         }
         if (excludes !== undefined) {
           updated = updateMacro(
             updated,
             input.macroName.excludes,
-            renderStringList(excludes)
+            renderStringList(excludes),
           );
         }
         break;
       case "style":
-        const style = config[input.macroName] as StyleConfig | undefined;
+        const style = config?.[input.macroName] as StyleConfig | undefined;
         const defaultStyle = input.default as StyleConfig;
         const mergedStyle = { ...(defaultStyle ?? {}), ...(style ?? {}) };
         if (Object.keys(mergedStyle).length > 0) {
           updated = updateMacro(
             updated,
             input.macroName,
-            renderStyle(mergedStyle as StyleConfig)
+            renderStyle(mergedStyle as StyleConfig),
           );
         }
         break;
     }
   }
-
   return updated;
 };
 
@@ -184,12 +180,12 @@ const isTargetMacro = (line: string, target: string): boolean =>
 const updateMacro = (
   filter: string,
   macro: string,
-  replace: string
+  replace: string,
 ): string => {
   return filter
     .split("\n")
     .map((line) =>
-      isTargetMacro(line, macro) ? "#define " + macro + " " + replace : line
+      isTargetMacro(line, macro) ? "#define " + macro + " " + replace : line,
     )
     .join("\n");
 };

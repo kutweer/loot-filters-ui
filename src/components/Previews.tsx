@@ -20,19 +20,19 @@ export const ItemMenuPreview: React.FC<{
   const activeFilterId = useUiStore(
     (state) =>
       Object.keys(state.importedModularFilters).find(
-        (id) => state.importedModularFilters[id].active
-      )!!
+        (id) => state.importedModularFilters[id].active,
+      )!!,
   );
 
   const activeConfig = useUiStore(
     (state) =>
       state.filterConfigurations?.[activeFilterId!!]?.[module.id]?.[
         input.macroName
-      ] as Partial<StyleConfig>
+      ] as Partial<StyleConfig>,
   );
 
   const menuTextColor = colorHexToRgbaCss(
-    activeConfig?.menuTextColor ?? input.default?.menuTextColor
+    activeConfig?.menuTextColor ?? input.default?.menuTextColor,
   );
 
   return (
@@ -103,25 +103,25 @@ export const ItemLabelPreview: React.FC<{
   const activeFilterId = useUiStore(
     (state) =>
       Object.keys(state.importedModularFilters).find(
-        (id) => state.importedModularFilters[id].active
-      )!!
+        (id) => state.importedModularFilters[id].active,
+      )!!,
   );
 
   const activeConfig = useUiStore(
     (state) =>
       state.filterConfigurations?.[activeFilterId!!]?.[module.id]?.[
         input.macroName
-      ] as Partial<StyleConfig>
+      ] as Partial<StyleConfig>,
   );
 
   const backgroundColor = colorHexToRgbaCss(
-    activeConfig?.backgroundColor ?? input.default?.backgroundColor
+    activeConfig?.backgroundColor ?? input.default?.backgroundColor,
   );
   const borderColor = colorHexToRgbaCss(
-    activeConfig?.borderColor ?? input.default?.borderColor
+    activeConfig?.borderColor ?? input.default?.borderColor,
   );
   const foregroundColor = colorHexToRgbaCss(
-    activeConfig?.textColor ?? input.default?.textColor
+    activeConfig?.textColor ?? input.default?.textColor,
   );
 
   const hidden =
@@ -142,7 +142,8 @@ export const ItemLabelPreview: React.FC<{
   const textAccent =
     textAccentFromOrdinal(textAccentOrdinal) ?? TextAccent.NONE;
 
-  const textAccentColor = activeConfig?.textAccentColor ?? input.default?.textAccentColor;
+  const textAccentColor =
+    activeConfig?.textAccentColor ?? input.default?.textAccentColor;
 
   let textAccentStyle: React.CSSProperties & {
     "-webkit-text-stroke"?: string;

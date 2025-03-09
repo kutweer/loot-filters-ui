@@ -26,7 +26,7 @@ export const validateModule = (module: FilterModule) => {
           input.macroName.excludes.length > 0;
       } else {
         throw new Error(
-          `Module ${module.name} has invalid macroName ${input.macroName} or the macroName is empty`
+          `Module ${module.name} has invalid macroName ${input.macroName} or the macroName is empty`,
         );
       }
     } else {
@@ -49,11 +49,11 @@ export const validateModule = (module: FilterModule) => {
       case "includeExcludeList":
         checkArrayProperty(
           (input as IncludeExcludeListInput).default.includes,
-          "string"
+          "string",
         );
         checkArrayProperty(
           (input as IncludeExcludeListInput).default.excludes,
-          "string"
+          "string",
         );
         break;
       case "style":
@@ -108,7 +108,7 @@ const checkObjectProperty = (
   value: any,
   key: string,
   type: string,
-  optional = false
+  optional = false,
 ) => {
   console.log("checkObjectProperty", value, key, type, optional);
   if (!isObject(value)) {
@@ -118,7 +118,7 @@ const checkObjectProperty = (
   if (!Object.keys(value).includes(key)) {
     if (!optional) {
       throw new Error(
-        `Value ${JSON.stringify(value)} has no property ${key} of type ${type}`
+        `Value ${JSON.stringify(value)} has no property ${key} of type ${type}`,
       );
     }
     return;
@@ -126,7 +126,7 @@ const checkObjectProperty = (
 
   if (typeof value[key] !== type) {
     throw new Error(
-      `Value ${JSON.stringify(value)} has property ${key} of type ${typeof value[key]} instead of ${type}`
+      `Value ${JSON.stringify(value)} has property ${key} of type ${typeof value[key]} instead of ${type}`,
     );
   }
 

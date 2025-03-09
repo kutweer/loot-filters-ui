@@ -9,7 +9,7 @@ import {
 import { assertString, validateModule } from "../types/validate";
 
 export const loadFilter = async (
-  source: FilterSource | UiModularFilter
+  source: FilterSource | UiModularFilter,
 ): Promise<UiModularFilter> => {
   let filter: FilterDefinition;
 
@@ -27,7 +27,7 @@ export const loadFilter = async (
   const resolvedModules: UiFilterModule[] = await Promise.all(
     filter.modules.map(
       async (
-        moduleSource: ModuleSource | FilterModule
+        moduleSource: ModuleSource | FilterModule,
       ): Promise<UiFilterModule> => {
         if (
           "moduleJson" in moduleSource &&
@@ -67,11 +67,11 @@ export const loadFilter = async (
           return module;
         } else {
           throw new Error(
-            `Invalid module source '${JSON.stringify(moduleSource)}', no moduleJson or moduleJsonUrl`
+            `Invalid module source '${JSON.stringify(moduleSource)}', no moduleJson or moduleJsonUrl`,
           );
         }
-      }
-    )
+      },
+    ),
   );
 
   return {

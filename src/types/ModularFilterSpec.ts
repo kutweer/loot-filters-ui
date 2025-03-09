@@ -63,7 +63,6 @@ export type ModularFilterConfiguration = {
   [key: ModuleId]: { [key: MacroName]: Partial<InputDefault<Input>> };
 };
 
-
 // This is a 'loaded filter' before we add the ui specific information
 // Only used in the loader
 export type ModularFilter = {

@@ -10,11 +10,11 @@ export const IncludeExcludeListInputComponent: React.FC<{
   input: IncludeExcludeListInput;
 }> = ({ activeFilterId, module, input }) => {
   const setFilterConfiguration = useUiStore(
-    (state) => state.setFilterConfiguration
+    (state) => state.setFilterConfiguration,
   );
 
   const activeConfig = useUiStore(
-    (state) => state.filterConfigurations[activeFilterId]
+    (state) => state.filterConfigurations[activeFilterId],
   );
 
   const currentIncludes =
@@ -30,14 +30,14 @@ export const IncludeExcludeListInputComponent: React.FC<{
     (option: string) => ({
       label: option,
       value: option,
-    })
+    }),
   );
 
   const excludeOptions: Option[] = input.default.excludes.map(
     (option: string) => ({
       label: option,
       value: option,
-    })
+    }),
   );
 
   return (
@@ -53,13 +53,13 @@ export const IncludeExcludeListInputComponent: React.FC<{
         }))}
         onChange={(newValue) => {
           const includes = ((newValue as Option[]) || []).map(
-            (option) => option.value
+            (option) => option.value,
           );
           setFilterConfiguration(
             activeFilterId,
             module.id,
             input.macroName.includes,
-            includes
+            includes,
           );
         }}
       />
@@ -74,13 +74,13 @@ export const IncludeExcludeListInputComponent: React.FC<{
         }))}
         onChange={(newValue) => {
           const excludes = ((newValue as Option[]) || []).map(
-            (option) => option.value
+            (option) => option.value,
           );
           setFilterConfiguration(
             activeFilterId,
             module.id,
             input.macroName.excludes,
-            excludes
+            excludes,
           );
         }}
       />

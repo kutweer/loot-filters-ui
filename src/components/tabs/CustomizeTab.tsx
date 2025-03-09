@@ -121,17 +121,17 @@ const FirstCoupleLabels: React.FC<{
   module: UiFilterModule;
 }> = ({ module }) => {
   const styleInputs: StyleInput[] = module.inputs.filter(
-    (input) => input.type === "style"
+    (input) => input.type === "style",
   ) as StyleInput[];
 
   const activeFilterId = useUiStore(
     (state) =>
       Object.keys(state.importedModularFilters).find(
-        (id) => state.importedModularFilters[id].active
-      )!!
+        (id) => state.importedModularFilters[id].active,
+      )!!,
   );
   const configForModule = useUiStore(
-    (state) => state.filterConfigurations?.[activeFilterId]?.[module.id]
+    (state) => state.filterConfigurations?.[activeFilterId]?.[module.id],
   );
 
   const visibleStyleInputs = styleInputs.filter((input) => {
@@ -164,10 +164,10 @@ const ModuleSection: React.FC<{
 }> = ({ activeFilterId, expanded, setExpanded, module }) => {
   const { siteConfig } = useUiStore();
   const [showJson, setShowJson] = useState<"json" | "configJson" | "none">(
-    "none"
+    "none",
   );
   const activeConfig = useUiStore(
-    (state) => state.filterConfigurations[activeFilterId]
+    (state) => state.filterConfigurations[activeFilterId],
   );
 
   let json: string | null = null;
@@ -183,7 +183,7 @@ const ModuleSection: React.FC<{
       ...input,
       group: input.group ?? defaultGroupId,
     })),
-    "group"
+    "group",
   );
 
   return (
@@ -282,7 +282,7 @@ const ModuleSection: React.FC<{
 export const CustomizeTab: React.FC = () => {
   const { siteConfig } = useUiStore();
   const importedModularFilters = useUiStore(
-    (state) => state.importedModularFilters
+    (state) => state.importedModularFilters,
   );
   const [expandedModules, setExpandedModules] = useState<
     Record<string, boolean>
@@ -290,7 +290,7 @@ export const CustomizeTab: React.FC = () => {
 
   const activeFilter = useMemo(
     () => Object.values(importedModularFilters).find((filter) => filter.active),
-    [importedModularFilters]
+    [importedModularFilters],
   );
 
   const setAllExpanded = (expanded: boolean) => {

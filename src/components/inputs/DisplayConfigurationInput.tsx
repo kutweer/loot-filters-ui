@@ -30,19 +30,19 @@ export const DisplayConfigurationInput: React.FC<{
   const activeFilterId = useUiStore(
     (state) =>
       Object.keys(state.importedModularFilters).find(
-        (id) => state.importedModularFilters[id].active
-      )!!
+        (id) => state.importedModularFilters[id].active,
+      )!!,
   );
 
   const styleConfig: Partial<StyleConfig> = useUiStore(
     (state) =>
       state.filterConfigurations?.[activeFilterId]?.[module.id]?.[
         input.macroName
-      ] as Partial<StyleConfig>
+      ] as Partial<StyleConfig>,
   );
 
   const setFilterConfiguration = useUiStore(
-    (state) => state.setFilterConfiguration
+    (state) => state.setFilterConfiguration,
   );
 
   if (styleConfig === undefined) {
@@ -76,7 +76,7 @@ export const DisplayConfigurationInput: React.FC<{
                 activeFilterId,
                 module.id,
                 input.macroName,
-                { showLootbeam: e.target.checked }
+                { showLootbeam: e.target.checked },
               )
             }
           />
@@ -172,7 +172,7 @@ export const DisplayConfigurationInput: React.FC<{
                 activeFilterId,
                 module.id,
                 input.macroName,
-                { highlightTile: e.target.checked }
+                { highlightTile: e.target.checked },
               )
             }
           />

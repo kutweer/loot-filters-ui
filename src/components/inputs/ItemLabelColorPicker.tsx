@@ -32,24 +32,24 @@ export const ItemLabelColorPicker: React.FC<{
 }) => {
   const activeFilterId = useUiStore((state) =>
     Object.keys(state.importedModularFilters).find(
-      (id) => state.importedModularFilters[id].active
-    )
+      (id) => state.importedModularFilters[id].active,
+    ),
   )!!;
 
   const activeConfig = useUiStore(
     (state) =>
       state.filterConfigurations[activeFilterId][module.id][
         input.macroName
-      ] as Partial<StyleConfig>
+      ] as Partial<StyleConfig>,
   );
 
   const setFilterConfiguration = useUiStore(
-    (state) => state.setFilterConfiguration
+    (state) => state.setFilterConfiguration,
   );
 
   const updateStyleField = (
     field: StyleConfigKey,
-    value: StyleConfig[StyleConfigKey]
+    value: StyleConfig[StyleConfigKey],
   ) => {
     setFilterConfiguration(activeFilterId, module.id, input.macroName, {
       [field]: value,
@@ -60,14 +60,14 @@ export const ItemLabelColorPicker: React.FC<{
     (type) => ({
       label: type.charAt(0).toUpperCase() + type.slice(1),
       value: fontTypeOrdinal(type),
-    })
+    }),
   );
 
   const textAccentOptions: Option<number>[] = Object.values(TextAccent).map(
     (accent) => ({
       label: accent.charAt(0).toUpperCase() + accent.slice(1),
       value: textAccentOrdinal(accent),
-    })
+    }),
   );
 
   return (
