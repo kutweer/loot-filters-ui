@@ -2,6 +2,10 @@
 
 A React-based user interface for creating and managing RuneLite loot filters for the plugin [RuneLite Loot Filters](https://github.com/runelite/plugin-hub/tree/main/loot-filters-ui).
 
+## Writing Filters
+
+If you want to write a customizable filter, see [these docs](./module-system-docs/Readme.md)
+
 ## Development
 
 Running it locally first, `npm install` then `npm run start`.
