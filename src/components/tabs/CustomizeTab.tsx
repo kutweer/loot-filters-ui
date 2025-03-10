@@ -232,7 +232,15 @@ const ModuleSection: React.FC<{
         },
       }}
     >
-      <AccordionSummary component="div" expandIcon={<ExpandMore />}>
+      <AccordionSummary
+        component="div"
+        expandIcon={<ExpandMore />}
+        sx={{
+          "& .MuiAccordionSummary-content": {
+            alignItems: "center",
+          },
+        }}
+      >
         <Typography variant="h4" color="primary" sx={{ mr: 2 }}>
           {module.name}
         </Typography>
