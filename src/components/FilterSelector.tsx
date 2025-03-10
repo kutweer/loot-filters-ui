@@ -1,15 +1,15 @@
-import { IosShare } from "@mui/icons-material";
+import { Download, IosShare } from "@mui/icons-material";
 import {
   Alert,
   AlertColor,
   Box,
   Button,
-  Container,
   Dialog,
   DialogContent,
   DialogTitle,
   FormControl,
   FormHelperText,
+  Stack,
   TextField,
   Typography,
 } from "@mui/material";
@@ -22,9 +22,11 @@ import {
 } from "../types/ModularFilterSpec";
 import { copyToClipboard } from "../utils/clipboard";
 import { DEV_FILTERS } from "../utils/devFilters";
-import { loadFilter } from "../utils/modularFilterLoader";
-import { Option, UISelect } from "./inputs/UISelect";
+import { downloadFile } from "../utils/file";
 import { createLink } from "../utils/link";
+import { loadFilter } from "../utils/modularFilterLoader";
+import { renderFilter } from "../utils/render";
+import { Option, UISelect } from "./inputs/UISelect";
 
 const COMMON_FILTERS = [
   {
@@ -114,7 +116,7 @@ export const FilterSelector: React.FC = () => {
   );
 
   return (
-    <Container>
+    <>
       {alerts.map((alert, index) => (
         <Alert
           key={index}
@@ -127,15 +129,7 @@ export const FilterSelector: React.FC = () => {
           {alert.text}
         </Alert>
       ))}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-        <Typography sx={{ textAlign: "center" }} variant="h4" color="secondary">
-          {activeFilter?.name || "Select a filter"}
-          <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-            {activeFilter?.importedOn
-              ? `Imported on ${new Date(activeFilter?.importedOn).toLocaleDateString()}`
-              : null}
-          </Typography>
-        </Typography>
+      <Stack spacing={2}>
         <Box
           sx={{
             display: "flex",
@@ -153,7 +147,7 @@ export const FilterSelector: React.FC = () => {
             size="small"
           >
             <UISelect<FilterId>
-              sx={{ width: "200px" }}
+              sx={{ width: "300px" }}
               options={filterOptions}
               value={selectedFilter}
               onChange={handleFilterChange}
@@ -161,38 +155,7 @@ export const FilterSelector: React.FC = () => {
               disabled={Object.keys(importedModularFilters).length === 0}
               multiple={false}
             />
-            {activeFilter ? (
-              <Button
-                variant="outlined"
-                color="primary"
-                onClick={() => {
-                  createLink(activeFilter, activeFilterConfig)
-                    .then((link) => copyToClipboard(link))
-                    .then(() => {
-                      const alert = {
-                        text: "Link copied to clipboard",
-                        severity: "success",
-                      };
-                      setAlerts((prev) => [...prev, alert]);
-                      setTimeout(() => {
-                        setAlerts((prev) =>
-                          prev.filter((a) => a.text !== alert.text)
-                        );
-                      }, 3000);
-                    })
-                    .catch((error) => {
-                      const alert = {
-                        text: `Failed to copy link to clipboard: ${error}`,
-                        severity: "error",
-                      };
-                      setAlerts((prev) => [...prev, alert]);
-                    });
-                }}
-              >
-                <IosShare />
-                <span>Share Link</span>
-              </Button>
-            ) : null}
+          </FormControl>
             <Button
               variant="outlined"
               color="secondary"
@@ -210,6 +173,58 @@ export const FilterSelector: React.FC = () => {
             >
               Delete Filter
             </Button>
+            {activeFilter && (
+              <>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  startIcon={<Download />}
+                  onClick={() => {
+                    const renderedFilter = renderFilter(
+                      activeFilter,
+                      activeFilterConfig
+                    );
+                    const fileName = `${activeFilter.name}.rs2f`;
+                    const file = new File([renderedFilter], fileName, {
+                      type: "text/plain",
+                    });
+                    downloadFile(file);
+                  }}
+                >
+                  Download Filter
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  startIcon={<IosShare />}
+                  onClick={() => {
+                    createLink(activeFilter, activeFilterConfig)
+                      .then((link) => copyToClipboard(link))
+                      .then(() => {
+                        const alert = {
+                          text: "Link copied to clipboard",
+                          severity: "success",
+                        };
+                        setAlerts((prev) => [...prev, alert]);
+                        setTimeout(() => {
+                          setAlerts((prev) =>
+                            prev.filter((a) => a.text !== alert.text)
+                          );
+                        }, 3000);
+                      })
+                      .catch((error) => {
+                        const alert = {
+                          text: `Failed to copy link to clipboard: ${error}`,
+                          severity: "error",
+                        };
+                        setAlerts((prev) => [...prev, alert]);
+                      });
+                  }}
+                >
+                  Share Link
+                </Button>
+              </>
+            )}
             <Dialog
               fullWidth
               open={open}
@@ -306,9 +321,17 @@ export const FilterSelector: React.FC = () => {
                 </Button>
               </DialogContent>
             </Dialog>
-          </FormControl>
         </Box>
-      </Box>
-    </Container>
+
+        <Typography variant="h4" color="secondary">
+          {activeFilter?.name || "Select a filter"}
+          <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+            {activeFilter?.importedOn
+              ? `Imported on ${new Date(activeFilter?.importedOn).toLocaleDateString()}`
+              : null}
+          </Typography>
+        </Typography>
+      </Stack>
+    </>
   );
 };
