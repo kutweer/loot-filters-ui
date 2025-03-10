@@ -45,6 +45,7 @@ export const UISelect = <T = string,>({
   sx,
 }: UISelectProps<T>) => {
   const getOptionLabel = (option: Option<T> | string) => {
+    console.log("getOptionLabel", option);
     if (typeof option === "string") {
       const found = options.find((o) => o.value === option);
       if (found) {
