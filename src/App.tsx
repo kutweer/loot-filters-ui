@@ -1,21 +1,34 @@
-import { Container } from "@mui/material";
+import { Alert, AlertColor, Container } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
+import { useEffect, useState } from "react";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Header } from "./components/AppHeader";
 import { FilterTabs } from "./components/FilterTabs";
-import { MuiRsTheme } from "./styles/MuiTheme";
+import { ImportPage } from "./pages/ImportPage";
 import { useUiStore } from "./store/store";
+import { MuiRsTheme } from "./styles/MuiTheme";
 
-export const App = ({ sha = "main" }: { sha?: string }) => {
+const MainPage = ({ sha }: { sha: string }) => {
+  const [alerts, setAlerts] = useState<{ text: string; severity: string }[]>(
+    []
+  );
   const setSiteConfig = useUiStore((state) => state.setSiteConfig);
   const params = new URLSearchParams(window.location.search);
   const devMode = params.get("dev") === "true";
 
-  if (devMode) {
-    setSiteConfig({ devMode });
-  }
+  useEffect(() => {
+    if (devMode) {
+      setSiteConfig({ devMode });
+    }
+  }, [devMode, setSiteConfig]);
 
   return (
-    <ThemeProvider theme={MuiRsTheme}>
+    <>
+      {alerts.map((alert) => (
+        <Alert key={alert.text} severity={alert.severity as AlertColor}>
+          {alert.text}
+        </Alert>
+      ))}
       <span style={{ display: "none", fontFamily: "RuneScape" }}>
         runescape
       </span>
@@ -29,6 +42,20 @@ export const App = ({ sha = "main" }: { sha?: string }) => {
         <Header />
         <FilterTabs sha={sha} />
       </Container>
+    </>
+  );
+};
+
+export const App = ({ sha = "main" }: { sha?: string }) => {
+  return (
+    <ThemeProvider theme={MuiRsTheme}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<MainPage sha={sha} />} />
+          <Route path="/import/:importData" element={<ImportPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
     </ThemeProvider>
   );
 };
