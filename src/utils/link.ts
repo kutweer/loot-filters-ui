@@ -24,7 +24,7 @@ export const createLink = (
   }
 
   return Promise.resolve(
-    `${window.location.protocol}://${window.location.host}/import?importData=${component}`
+    `${window.location.protocol}//${window.location.host}/import?importData=${component}`
   );
 };
 
