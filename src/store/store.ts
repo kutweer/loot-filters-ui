@@ -25,6 +25,10 @@ export interface FilterConfigurationSlice {
     macroName: string,
     data: Partial<InputDefault<Input>>
   ) => void;
+  addFilterConfiguration: (
+    filterId: FilterId,
+    config: ModularFilterConfiguration
+  ) => void;
 }
 
 const createImportedFilterSlice: StateCreator<
@@ -113,6 +117,18 @@ const createFilterConfigurationSlice: StateCreator<
         },
       };
     });
+  },
+  addFilterConfiguration: (
+    filterId: FilterId,
+    config: ModularFilterConfiguration
+  ) => {
+    set((state) => ({
+      ...state,
+      filterConfigurations: {
+        ...state.filterConfigurations,
+        [filterId]: config,
+      },
+    }));
   },
 });
 
