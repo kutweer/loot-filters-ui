@@ -56,7 +56,7 @@ export const argbToParts = (hex?: ArgbHexColor) => {
   return [r, g, b, a];
 };
 
-const normalizeHex = (hex?: ArgbHexColor): ArgbHexColor | undefined => {
+export const normalizeHex = (hex?: ArgbHexColor): ArgbHexColor | undefined => {
   if (!hex) {
     return hex;
   }

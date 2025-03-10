@@ -1,4 +1,4 @@
-import { FormControl, Tooltip, Typography } from "@mui/material";
+import { FormControl, Popover, Tooltip, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { RgbaColorPicker } from "react-colorful";
 import { isNumber } from "underscore";
@@ -6,7 +6,17 @@ import {
   ArgbHexColor,
   argbHexColorToRGBColor,
   colorHexToRgbaCss,
+  normalizeHex,
 } from "../../utils/Color";
+
+const colorValid = (color?: ArgbHexColor) => {
+  try {
+    normalizeHex(color);
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
 
 type RGBColor = {
   a: number;
@@ -31,19 +41,36 @@ const ColorPicker: React.FC<{
   labelLocation: "right" | "bottom";
   disabled: boolean;
 }> = ({ color, onChange, labelText, labelLocation, disabled }) => {
-  const [displayColorPicker, setDisplayColorPicker] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
+  const open = Boolean(anchorEl);
 
-  const handleClick = (displayPicker?: boolean) => {
-    setDisplayColorPicker(displayPicker ?? !displayColorPicker);
+  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!disabled) {
+      setAnchorEl(event.currentTarget);
+    }
   };
 
   const handleClose = () => {
-    setDisplayColorPicker(false);
+    setAnchorEl(null);
   };
 
   const handleChange = (newColor: RGBColor) => {
     const argbColor = rGBColorToArgbHex(newColor);
     onChange(argbColor);
+  };
+
+  const [inputTextState, setInputTextState] = useState<string>(color ?? "#FF000000");
+
+  const handleHexChange = (newColor: string) => {
+    let error = false;
+    const valid = colorValid(newColor as ArgbHexColor);
+
+    setInputTextState(
+      valid ? normalizeHex(newColor as ArgbHexColor)!! : newColor,
+    );
+    if (valid) {
+      onChange(newColor as ArgbHexColor);
+    }
   };
 
   const unset = color === undefined;
@@ -52,7 +79,9 @@ const ColorPicker: React.FC<{
     width: "36px",
     height: labelLocation == "right" ? "100%" : "14px",
     borderRadius: "2px",
-    ...(color ? { background: colorHexToRgbaCss(color) } : {}),
+    ...(color && colorValid(color)
+      ? { background: colorHexToRgbaCss(color) }
+      : {}),
   };
 
   return (
@@ -82,9 +111,9 @@ const ColorPicker: React.FC<{
               onClick={(e) => {
                 if (e.shiftKey) {
                   onChange(undefined);
-                  handleClick(false);
-                } else if (!disabled) {
-                  handleClick();
+                  setAnchorEl(null);
+                } else {
+                  handleClick(e);
                 }
               }}
             >
@@ -106,42 +135,50 @@ const ColorPicker: React.FC<{
           </Typography>
         </div>
       </div>
-      {displayColorPicker ? (
-        <div style={{ position: "absolute", zIndex: "2" }}>
-          <div
-            style={{
-              position: "fixed",
-              top: "0px",
-              right: "0px",
-              bottom: "0px",
-              left: "0px",
-            }}
-            onClick={() => handleClose()}
+      <Popover
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+      >
+        <div
+          style={{
+            backgroundColor: "#fff",
+            padding: "16px",
+            borderRadius: "8px",
+          }}
+        >
+          <RgbaColorPicker
+            color={
+              color && colorValid(color)
+                ? argbHexColorToRGBColor(color)
+                : {
+                    r: 0,
+                    g: 0,
+                    b: 0,
+                    a: 1,
+                  }
+            }
+            onChange={handleChange}
           />
-          <div
-            style={{
-              backgroundColor: "#fff",
-              padding: "16px",
-              borderRadius: "8px",
-              boxShadow: "0 0 0 1px rgba(0,0,0,.1), 0 8px 16px rgba(0,0,0,.1)",
-            }}
-          >
-            <RgbaColorPicker
-              color={
-                color
-                  ? argbHexColorToRGBColor(color)
-                  : {
-                      r: 0,
-                      g: 0,
-                      b: 0,
-                      a: 1, // range of 0-1
-                    }
-              }
-              onChange={handleChange}
-            />
+          <input
+            type="text"
+            value={inputTextState}
+            style={{ fontFamily: "monospace" }}
+            onChange={(e) => handleHexChange(e.target.value)}
+          />
+          <div style={{ fontSize: "12px", color: "#000" }}>
+            <span style={{ fontFamily: "monospace" }}>#AARRGGBB</span>
           </div>
         </div>
-      ) : null}
+      </Popover>
     </div>
   );
 };
