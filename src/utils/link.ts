@@ -3,7 +3,6 @@ import {
   decompressFromEncodedURIComponent,
 } from "lz-string";
 import {
-  FilterSource,
   ModularFilterConfiguration,
   UiModularFilter,
 } from "../types/ModularFilterSpec";
@@ -13,22 +12,26 @@ export const createLink = (
   config: ModularFilterConfiguration | undefined
 ) => {
   const data = {
-    filterSource: filter.source,
-    config: config ?? {},
+    filter: filter,
+    config: config,
   };
 
   console.log("data", JSON.stringify(data));
   const component = compressToEncodedURIComponent(JSON.stringify(data));
-  console.log(component);
-  console.log(decompressFromEncodedURIComponent(component));
 
-  return `${window.location.protocol}://${window.location.host}/import/${component}`;
+  if (component.length >= 100 * 1024) {
+    return Promise.reject(new Error("Link is too long"));
+  }
+
+  return Promise.resolve(
+    `${window.location.protocol}://${window.location.host}/import?importData=${component}`
+  );
 };
 
 export const parseComponent = (
   component: string
 ): {
-  filterSource: FilterSource;
+  filter: UiModularFilter;
   config: ModularFilterConfiguration;
 } => {
   const data = decompressFromEncodedURIComponent(component);

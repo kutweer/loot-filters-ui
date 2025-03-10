@@ -166,7 +166,8 @@ export const FilterSelector: React.FC = () => {
                 variant="outlined"
                 color="primary"
                 onClick={() => {
-                  copyToClipboard(createLink(activeFilter, activeFilterConfig))
+                  createLink(activeFilter, activeFilterConfig)
+                    .then((link) => copyToClipboard(link))
                     .then(() => {
                       const alert = {
                         text: "Link copied to clipboard",
@@ -179,9 +180,9 @@ export const FilterSelector: React.FC = () => {
                         );
                       }, 3000);
                     })
-                    .catch(() => {
+                    .catch((error) => {
                       const alert = {
-                        text: "Failed to copy link to clipboard",
+                        text: `Failed to copy link to clipboard: ${error}`,
                         severity: "error",
                       };
                       setAlerts((prev) => [...prev, alert]);

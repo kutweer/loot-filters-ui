@@ -52,7 +52,7 @@ export const App = ({ sha = "main" }: { sha?: string }) => {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<MainPage sha={sha} />} />
-          <Route path="/import/:importData" element={<ImportPage />} />
+          <Route path="/import" element={<ImportPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
