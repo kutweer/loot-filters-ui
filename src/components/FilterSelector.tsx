@@ -1,4 +1,4 @@
-import { IosShare } from "@mui/icons-material";
+import { Download, IosShare } from "@mui/icons-material";
 import {
   Alert,
   AlertColor,
@@ -21,8 +21,10 @@ import {
 } from "../types/ModularFilterSpec";
 import { copyToClipboard } from "../utils/clipboard";
 import { DEV_FILTERS } from "../utils/devFilters";
+import { downloadFile } from "../utils/file";
 import { createLink } from "../utils/link";
 import { loadFilter } from "../utils/modularFilterLoader";
+import { renderFilter } from "../utils/render";
 import { Option, UISelect } from "./inputs/UISelect";
 
 const COMMON_FILTERS = [
@@ -178,36 +180,55 @@ export const FilterSelector: React.FC = () => {
               Delete Filter
             </Button>
             {activeFilter && (
-              <Button
-                variant="outlined"
-                color="primary"
-                startIcon={<IosShare />}
-                onClick={() => {
-                  createLink(activeFilter, activeFilterConfig)
-                    .then((link) => copyToClipboard(link))
-                    .then(() => {
-                      const alert = {
-                        text: "Link copied to clipboard",
-                        severity: "success",
-                      };
-                      setAlerts((prev) => [...prev, alert]);
-                      setTimeout(() => {
-                        setAlerts((prev) =>
-                          prev.filter((a) => a.text !== alert.text)
-                        );
-                      }, 3000);
-                    })
-                    .catch((error) => {
-                      const alert = {
-                        text: `Failed to copy link to clipboard: ${error}`,
-                        severity: "error",
-                      };
-                      setAlerts((prev) => [...prev, alert]);
+              <>
+                <Button
+                  variant="outlined"
+                  startIcon={<Download />}
+                  onClick={() => {
+                    const renderedFilter = renderFilter(
+                      activeFilter,
+                      activeFilterConfig
+                    );
+                    const fileName = `${activeFilter.name}.rs2f`;
+                    const file = new File([renderedFilter], fileName, {
+                      type: "text/plain",
                     });
-                }}
-              >
-                Share Link
-              </Button>
+                    downloadFile(file);
+                  }}
+                >
+                  Download Filter
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  startIcon={<IosShare />}
+                  onClick={() => {
+                    createLink(activeFilter, activeFilterConfig)
+                      .then((link) => copyToClipboard(link))
+                      .then(() => {
+                        const alert = {
+                          text: "Link copied to clipboard",
+                          severity: "success",
+                        };
+                        setAlerts((prev) => [...prev, alert]);
+                        setTimeout(() => {
+                          setAlerts((prev) =>
+                            prev.filter((a) => a.text !== alert.text)
+                          );
+                        }, 3000);
+                      })
+                      .catch((error) => {
+                        const alert = {
+                          text: `Failed to copy link to clipboard: ${error}`,
+                          severity: "error",
+                        };
+                        setAlerts((prev) => [...prev, alert]);
+                      });
+                  }}
+                >
+                  Share Link
+                </Button>
+              </>
             )}
             <Dialog
               fullWidth
