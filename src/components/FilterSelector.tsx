@@ -4,7 +4,6 @@ import {
   AlertColor,
   Box,
   Button,
-  Container,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -22,9 +21,9 @@ import {
 } from "../types/ModularFilterSpec";
 import { copyToClipboard } from "../utils/clipboard";
 import { DEV_FILTERS } from "../utils/devFilters";
+import { createLink } from "../utils/link";
 import { loadFilter } from "../utils/modularFilterLoader";
 import { Option, UISelect } from "./inputs/UISelect";
-import { createLink } from "../utils/link";
 
 const COMMON_FILTERS = [
   {
@@ -114,7 +113,7 @@ export const FilterSelector: React.FC = () => {
   );
 
   return (
-    <Container>
+    <>
       {alerts.map((alert, index) => (
         <Alert
           key={index}
@@ -161,10 +160,28 @@ export const FilterSelector: React.FC = () => {
               disabled={Object.keys(importedModularFilters).length === 0}
               multiple={false}
             />
-            {activeFilter ? (
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => {
+                setOpen(true);
+              }}
+            >
+              Import Filter
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              disabled={activeFilter === undefined}
+              onClick={handleDeleteFilter}
+            >
+              Delete Filter
+            </Button>
+            {activeFilter && (
               <Button
                 variant="outlined"
                 color="primary"
+                startIcon={<IosShare />}
                 onClick={() => {
                   createLink(activeFilter, activeFilterConfig)
                     .then((link) => copyToClipboard(link))
@@ -189,27 +206,9 @@ export const FilterSelector: React.FC = () => {
                     });
                 }}
               >
-                <IosShare />
-                <span>Share Link</span>
+                Share Link
               </Button>
-            ) : null}
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={() => {
-                setOpen(true);
-              }}
-            >
-              Import Filter
-            </Button>
-            <Button
-              variant="outlined"
-              color="secondary"
-              disabled={activeFilter === undefined}
-              onClick={handleDeleteFilter}
-            >
-              Delete Filter
-            </Button>
+            )}
             <Dialog
               fullWidth
               open={open}
@@ -309,6 +308,6 @@ export const FilterSelector: React.FC = () => {
           </FormControl>
         </Box>
       </Box>
-    </Container>
+    </>
   );
 };
