@@ -1,7 +1,4 @@
-import { IosShare } from "@mui/icons-material";
 import {
-  Alert,
-  AlertColor,
   Box,
   Button,
   Container,
@@ -13,18 +10,18 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useUiStore } from "../store/store";
 import {
+  FilterDefinition,
   FilterId,
   FilterModule,
+  FilterSource,
   ModuleSource,
 } from "../types/ModularFilterSpec";
-import { copyToClipboard } from "../utils/clipboard";
-import { DEV_FILTERS } from "../utils/devFilters";
 import { loadFilter } from "../utils/modularFilterLoader";
 import { Option, UISelect } from "./inputs/UISelect";
-import { createLink } from "../utils/link";
+import { DEV_FILTERS } from "../utils/devFilters";
 
 const COMMON_FILTERS = [
   {
@@ -41,9 +38,6 @@ export const FilterSelector: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [filterUrl, setFilterUrl] = useState("");
   const { siteConfig } = useUiStore();
-  const [alerts, setAlerts] = useState<{ text: string; severity: string }[]>(
-    []
-  );
 
   const filtersForImport = [
     ...(siteConfig.devMode ? DEV_FILTERS : []),
@@ -62,11 +56,6 @@ export const FilterSelector: React.FC = () => {
     () => Object.values(importedModularFilters).find((filter) => filter.active),
     [importedModularFilters]
   );
-
-  const activeFilterConfig = useUiStore(
-    (state) => activeFilter && state.filterConfigurations?.[activeFilter.id]
-  );
-
   const removeImportedModularFilter = useUiStore(
     (state) => state.removeImportedModularFilter
   );
@@ -115,18 +104,6 @@ export const FilterSelector: React.FC = () => {
 
   return (
     <Container>
-      {alerts.map((alert, index) => (
-        <Alert
-          key={index}
-          sx={{ bgcolor: "background.paper" }}
-          severity={alert.severity as AlertColor}
-          onClose={() => {
-            setAlerts((prev) => prev.filter((_, i) => i !== index));
-          }}
-        >
-          {alert.text}
-        </Alert>
-      ))}
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
         <Typography sx={{ textAlign: "center" }} variant="h4" color="secondary">
           {activeFilter?.name || "Select a filter"}
@@ -161,37 +138,6 @@ export const FilterSelector: React.FC = () => {
               disabled={Object.keys(importedModularFilters).length === 0}
               multiple={false}
             />
-            {activeFilter ? (
-              <Button
-                variant="outlined"
-                color="primary"
-                onClick={() => {
-                  copyToClipboard(createLink(activeFilter, activeFilterConfig))
-                    .then(() => {
-                      const alert = {
-                        text: "Link copied to clipboard",
-                        severity: "success",
-                      };
-                      setAlerts((prev) => [...prev, alert]);
-                      setTimeout(() => {
-                        setAlerts((prev) =>
-                          prev.filter((a) => a.text !== alert.text)
-                        );
-                      }, 3000);
-                    })
-                    .catch(() => {
-                      const alert = {
-                        text: "Failed to copy link to clipboard",
-                        severity: "error",
-                      };
-                      setAlerts((prev) => [...prev, alert]);
-                    });
-                }}
-              >
-                <IosShare />
-                <span>Share Link</span>
-              </Button>
-            ) : null}
             <Button
               variant="outlined"
               color="secondary"
