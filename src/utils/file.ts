@@ -3,8 +3,8 @@ export const downloadFile = (file: File) => {
 
   try {
     const href = URL.createObjectURL(file);
-    link.setAttribute('href', href)
-    link.setAttribute('download', file.name)
+    link.setAttribute("href", href);
+    link.setAttribute("download", file.name);
     document.body.appendChild(link);
     link.click();
   } catch (error) {

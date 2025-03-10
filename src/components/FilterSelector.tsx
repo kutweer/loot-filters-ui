@@ -183,6 +183,7 @@ export const FilterSelector: React.FC = () => {
               <>
                 <Button
                   variant="outlined"
+                  color="primary"
                   startIcon={<Download />}
                   onClick={() => {
                     const renderedFilter = renderFilter(
