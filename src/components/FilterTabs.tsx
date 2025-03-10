@@ -30,7 +30,7 @@ export const FilterTabs: React.FC<{ sha: string }> = ({ sha }) => {
   const tabs = useMemo(() => {
     return [
       {
-        label: `Customize ${activeFilter?.name ?? "Filter"}`,
+        label: "Customize",
         disabled: !activeFilter,
         dev: false,
         component: activeFilter ? (
@@ -42,7 +42,7 @@ export const FilterTabs: React.FC<{ sha: string }> = ({ sha }) => {
         ),
       },
       {
-        label: `${activeFilter?.name || "Filter"} Preview`,
+        label: "Preview",
         disabled: !activeFilter,
         dev: false,
         component: <RenderedFilterTab sha={sha} />,
@@ -56,7 +56,7 @@ export const FilterTabs: React.FC<{ sha: string }> = ({ sha }) => {
   );
 
   return (
-    <Box sx={{ mt: 3, p: 2, borderRadius: 5 }}>
+    <Box sx={{ mt: 3 }}>
       <Box>
         <FilterSelector />
       </Box>

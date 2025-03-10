@@ -9,6 +9,7 @@ import {
   DialogTitle,
   FormControl,
   FormHelperText,
+  Stack,
   TextField,
   Typography,
 } from "@mui/material";
@@ -128,15 +129,7 @@ export const FilterSelector: React.FC = () => {
           {alert.text}
         </Alert>
       ))}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-        <Typography sx={{ textAlign: "center" }} variant="h4" color="secondary">
-          {activeFilter?.name || "Select a filter"}
-          <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-            {activeFilter?.importedOn
-              ? `Imported on ${new Date(activeFilter?.importedOn).toLocaleDateString()}`
-              : null}
-          </Typography>
-        </Typography>
+      <Stack spacing={2}>
         <Box
           sx={{
             display: "flex",
@@ -154,7 +147,7 @@ export const FilterSelector: React.FC = () => {
             size="small"
           >
             <UISelect<FilterId>
-              sx={{ width: "200px" }}
+              sx={{ width: "300px" }}
               options={filterOptions}
               value={selectedFilter}
               onChange={handleFilterChange}
@@ -162,6 +155,7 @@ export const FilterSelector: React.FC = () => {
               disabled={Object.keys(importedModularFilters).length === 0}
               multiple={false}
             />
+          </FormControl>
             <Button
               variant="outlined"
               color="secondary"
@@ -327,9 +321,17 @@ export const FilterSelector: React.FC = () => {
                 </Button>
               </DialogContent>
             </Dialog>
-          </FormControl>
         </Box>
-      </Box>
+
+        <Typography variant="h4" color="secondary">
+          {activeFilter?.name || "Select a filter"}
+          <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+            {activeFilter?.importedOn
+              ? `Imported on ${new Date(activeFilter?.importedOn).toLocaleDateString()}`
+              : null}
+          </Typography>
+        </Typography>
+      </Stack>
     </>
   );
 };
