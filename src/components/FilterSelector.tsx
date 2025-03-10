@@ -33,7 +33,7 @@ const COMMON_FILTERS = [
   },
   {
     name: "Joe's Loot Filter for Persnickety Irons",
-    url: "https://raw.githubusercontent.com/typical-whack/loot-filters-modules/644908ddfbe28e0283896f1c51738dabe7762220/filter.json",
+    url: "https://raw.githubusercontent.com/typical-whack/loot-filters-modules/679554a14c69d0e5785f479138e47e0bb9e7582c/filter.json",
   },
 ];
 
