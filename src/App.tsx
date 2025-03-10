@@ -10,7 +10,7 @@ import { MuiRsTheme } from "./styles/MuiTheme";
 
 const MainPage = ({ sha }: { sha: string }) => {
   const [alerts, setAlerts] = useState<{ text: string; severity: string }[]>(
-    []
+    [],
   );
   const setSiteConfig = useUiStore((state) => state.setSiteConfig);
   const params = new URLSearchParams(window.location.search);

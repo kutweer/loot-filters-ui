@@ -23,11 +23,11 @@ export interface FilterConfigurationSlice {
     filterId: FilterId,
     moduleId: ModuleId,
     macroName: string,
-    data: Partial<InputDefault<Input>>
+    data: Partial<InputDefault<Input>>,
   ) => void;
   addFilterConfiguration: (
     filterId: FilterId,
-    config: ModularFilterConfiguration
+    config: ModularFilterConfiguration,
   ) => void;
 }
 
@@ -49,13 +49,13 @@ const createImportedFilterSlice: StateCreator<
     set((state) => ({
       importedModularFilters: Object.fromEntries(
         Object.entries(state.importedModularFilters).filter(
-          ([key]) => key !== filterId
-        )
+          ([key]) => key !== filterId,
+        ),
       ),
       filterConfigurations: Object.fromEntries(
         Object.entries(state.filterConfigurations).filter(
-          ([key]) => key !== filterId
-        )
+          ([key]) => key !== filterId,
+        ),
       ),
     })),
   setActiveFilterId: (filterId: FilterId) =>
@@ -80,7 +80,7 @@ const createFilterConfigurationSlice: StateCreator<
     filterId: FilterId,
     moduleId: ModuleId,
     macroName: string,
-    data: Partial<InputDefault<Input>>
+    data: Partial<InputDefault<Input>>,
   ) => {
     set((state) => {
       const allConfigs: { [key: FilterId]: ModularFilterConfiguration } =
@@ -120,7 +120,7 @@ const createFilterConfigurationSlice: StateCreator<
   },
   addFilterConfiguration: (
     filterId: FilterId,
-    config: ModularFilterConfiguration
+    config: ModularFilterConfiguration,
   ) => {
     set((state) => ({
       ...state,
@@ -146,13 +146,13 @@ const createDeleteFilterSlice: StateCreator<
     set((state) => ({
       importedModularFilters: Object.fromEntries(
         Object.entries(state.importedModularFilters).filter(
-          ([key]) => key !== filterId
-        )
+          ([key]) => key !== filterId,
+        ),
       ),
       filterConfigurations: Object.fromEntries(
         Object.entries(state.filterConfigurations).filter(
-          ([key]) => key !== filterId
-        )
+          ([key]) => key !== filterId,
+        ),
       ),
     })),
 });
@@ -201,14 +201,14 @@ const uiStore = create<
       }),
       {
         name: "modular-filter-storage",
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 const createBoundedUseStore = ((store) => (selector) =>
   useStore(store, selector)) as <S extends StoreApi<unknown>>(
-  store: S
+  store: S,
 ) => {
   (): ExtractState<S>;
   <T>(selector: (state: ExtractState<S>) => T): T;

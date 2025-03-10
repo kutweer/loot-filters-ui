@@ -7,18 +7,18 @@ import { parseComponent } from "../utils/link";
 export const ImportPage = () => {
   const navigate = useNavigate();
   const addImportedModularFilter = useUiStore(
-    (state) => state.addImportedModularFilter
+    (state) => state.addImportedModularFilter,
   );
   const setActiveFilterId = useUiStore((state) => state.setActiveFilterId);
   const [alerts, setAlerts] = useState<{ text: string; severity: string }[]>(
-    []
+    [],
   );
 
   const params = new URLSearchParams(window.location.search);
   const importData = params.get("importData");
 
   const addFilterConfiguration = useUiStore(
-    (state) => state.addFilterConfiguration
+    (state) => state.addFilterConfiguration,
   );
 
   useEffect(() => {
