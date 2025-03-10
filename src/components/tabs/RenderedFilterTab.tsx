@@ -27,7 +27,7 @@ const RenderFilterComponent: React.FC = () => {
             fontSize: "16px",
           }}
         >
-          {activeFilter?.name.replace(/\s/g, "_")}.rs2f
+          {activeFilter?.name.replace(/[\s\/]/g, "_")}.rs2f
         </span>{" "}
         in{" "}
         <span style={{ color: "white", fontSize: "16px" }}>
