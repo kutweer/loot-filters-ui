@@ -8,7 +8,10 @@ const enableDisableModuleFilter: FilterDefinition = {
       name: "Enable Disable Module Test",
       moduleJson: {
         name: "Enable Disable Module Test",
-        description: "A medium size description of the module",
+        subtitle: "A good sized subtitle with a long description",
+        description:
+          "A long description of the input, no longer. Longer than 400px so long it wraps around. Maybe longer. Excessively long so that we can test the limits of chrome. Nope that's not enough we need more.",
+
         enabled: false,
         inputs: [
           {

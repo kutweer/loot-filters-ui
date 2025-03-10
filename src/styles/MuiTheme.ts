@@ -8,6 +8,7 @@ export const colors = {
   rsLightDarkBrown: "#3d3429",
   rsLightBrown: "#564e43",
   rsLighterBrown: "#706657",
+  rsLightestBrown: "#d7c9b5",
   rsMediumBrown: "#4a4036",
   rsWhite: "#ffffff",
   rsBlack: "#000000",

@@ -242,7 +242,24 @@ const ModuleSection: React.FC<{
         }}
       >
         <Typography variant="h4" color="primary" sx={{ mr: 2 }}>
-          {module.name}
+          {module.name}{" "}
+          {module?.description ? (
+            <Typography
+              variant="h6"
+              component="span"
+              color="secondary"
+              sx={{
+                ml: 1,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                maxWidth: "400px",
+                display: "inline-block",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {module.subtitle}
+            </Typography>
+          ) : null}
         </Typography>
         <Stack direction="row" spacing={2}>
           <FirstCoupleLabels module={module} />
@@ -261,6 +278,17 @@ const ModuleSection: React.FC<{
       </AccordionSummary>
       <AccordionDetails>
         <Stack spacing={2} direction="column">
+          <Typography
+            variant="h6"
+            component="span"
+            color={colors.rsLightestBrown}
+            sx={{
+              ml: 1,
+              display: "inline-block",
+            }}
+          >
+            {module.description}
+          </Typography>
           {siteConfig.devMode ? (
             <Box display="flex" justifyContent="flex-end">
               <ToggleButtonGroup
