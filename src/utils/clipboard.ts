@@ -1,4 +1,3 @@
-
 /**
  * Copies the provided text to the user's clipboard
  */

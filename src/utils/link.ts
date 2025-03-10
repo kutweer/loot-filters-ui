@@ -9,7 +9,7 @@ import {
 
 export const createLink = (
   filter: UiModularFilter,
-  config: ModularFilterConfiguration | undefined
+  config: ModularFilterConfiguration | undefined,
 ) => {
   const data = {
     filter: filter,
@@ -24,12 +24,12 @@ export const createLink = (
   }
 
   return Promise.resolve(
-    `${window.location.protocol}//${window.location.host}/import?importData=${component}`
+    `${window.location.protocol}//${window.location.host}/import?importData=${component}`,
   );
 };
 
 export const parseComponent = (
-  component: string
+  component: string,
 ): {
   filter: UiModularFilter;
   config: ModularFilterConfiguration;

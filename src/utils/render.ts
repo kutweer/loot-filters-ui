@@ -8,7 +8,7 @@ import {
 
 export const renderFilter = (
   filter: UiModularFilter,
-  activeConfig: ModularFilterConfiguration | undefined
+  activeConfig: ModularFilterConfiguration | undefined,
 ): string => {
   return filter.modules
     .filter((m) => activeConfig?.[m.id]?.enabled ?? m.enabled ?? true)
@@ -18,7 +18,7 @@ export const renderFilter = (
 
 const renderModule = (
   module: UiFilterModule,
-  config: { [key: MacroName]: Partial<InputDefault<Input>> } | undefined
+  config: { [key: MacroName]: Partial<InputDefault<Input>> } | undefined,
 ): string => {
   let updated = module.rs2fText;
 
@@ -45,7 +45,7 @@ const renderModule = (
           updated = updateMacro(
             updated,
             input.macroName,
-            renderStringList(items)
+            renderStringList(items),
           );
         }
         break;
@@ -59,14 +59,14 @@ const renderModule = (
           updated = updateMacro(
             updated,
             input.macroName.includes,
-            renderStringList(includes)
+            renderStringList(includes),
           );
         }
         if (excludes !== undefined) {
           updated = updateMacro(
             updated,
             input.macroName.excludes,
-            renderStringList(excludes)
+            renderStringList(excludes),
           );
         }
         break;
@@ -79,7 +79,7 @@ const renderModule = (
           updated = updateMacro(
             updated,
             input.macroName,
-            renderStyle(mergedStyle as StyleConfig)
+            renderStyle(mergedStyle as StyleConfig),
           );
         }
         break;
@@ -130,12 +130,12 @@ const isTargetMacro = (line: string, target: string): boolean =>
 const updateMacro = (
   filter: string,
   macro: string,
-  replace: string
+  replace: string,
 ): string => {
   return filter
     .split("\n")
     .map((line) =>
-      isTargetMacro(line, macro) ? "#define " + macro + " " + replace : line
+      isTargetMacro(line, macro) ? "#define " + macro + " " + replace : line,
     )
     .join("\n");
 };
