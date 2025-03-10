@@ -47,6 +47,9 @@ export type FilterDefinition = {
  */
 export type FilterModule = {
   name: string;
+  // Short text displayed in the UI in the accordion header
+  subtitle?: string;
+  // Long text displayed in the UI _inside_ the accordion
   description?: string;
   // default to true
   enabled?: boolean;
