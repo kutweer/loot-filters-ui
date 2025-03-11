@@ -25,7 +25,7 @@ const COMMON_FILTERS = [
     url: "https://raw.githubusercontent.com/riktenx/filterscape/refs/heads/main/index.json",
   },
   {
-    name: "Joe's Loot Filter for Persnickety Irons",
+    name: "Joe's Filter for Persnickety Irons",
     url: "https://raw.githubusercontent.com/typical-whack/loot-filters-modules/refs/heads/main/filter.json",
   },
 ];
