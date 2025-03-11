@@ -10,7 +10,11 @@ import {
 } from "@mui/material";
 import React, { useCallback, useState } from "react";
 import { useUiStore } from "../store/store";
-import { FilterModule, ModuleSource } from "../types/ModularFilterSpec";
+import {
+  FilterModule,
+  ModuleSource,
+  UiModularFilter,
+} from "../types/ModularFilterSpec";
 import { loadFilter } from "../utils/modularFilterLoader";
 import { Option, UISelect } from "./inputs/UISelect";
 
@@ -41,6 +45,10 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
       }
     },
     []
+  );
+
+  const [loadedFilter, setLoadedFilter] = useState<UiModularFilter | null>(
+    null
   );
 
   const handleClose = () => {
@@ -87,48 +95,73 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
             error={importError !== ""}
             helperText={importError}
           />
+          <TextField
+            label="Filter Name"
+            value={loadedFilter?.name ?? ""}
+            onChange={(e) => {
+              setLoadedFilter({
+                ...loadedFilter!!,
+                name: e.target.value,
+              });
+            }}
+          />
         </Box>
-        <Button
-          variant="contained"
-          color="primary"
-          disabled={filterUrl === "" || importError !== ""}
-          onClick={() => {
-            setImportError("");
-            if (filterUrl.startsWith("http")) {
-              loadFilter({
-                filterUrl: filterUrl,
-              })
-                .catch((error) => {
-                  setImportError(error.message);
+        <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
+          <Button
+            variant="outlined"
+            color="primary"
+            disabled={filterUrl === "" || importError !== ""}
+            onClick={() => {
+              setImportError("");
+              if (filterUrl.startsWith("http")) {
+                loadFilter({
+                  filterUrl: filterUrl,
                 })
-                .then((filter) => {
-                  if (filter) {
-                    addImportedModularFilter(filter);
-                    setActiveFilterId(filter.id);
-                    setFilterUrl("");
-                    handleClose();
-                  }
-                });
-            } else {
-              const filter = {
-                ...JSON.parse(filterUrl),
-                id: crypto.randomUUID(),
-              };
+                  .catch((error) => {
+                    setImportError(error.message);
+                  })
+                  .then((filter) => {
+                    if (filter) {
+                      setLoadedFilter(filter);
+                    }
+                  });
+              } else {
+                const filter = {
+                  ...JSON.parse(filterUrl),
+                  id: crypto.randomUUID(),
+                };
 
-              filter.modules = filter.modules.map((module: ModuleSource) => ({
-                ...(module as { moduleJson: FilterModule }).moduleJson,
-                id: crypto.randomUUID(),
-              }));
+                filter.modules = filter.modules.map((module: ModuleSource) => ({
+                  ...(module as { moduleJson: FilterModule }).moduleJson,
+                  id: crypto.randomUUID(),
+                }));
 
-              addImportedModularFilter(filter);
-              setActiveFilterId(filter.id);
-              setFilterUrl("");
-              handleClose();
-            }
-          }}
-        >
-          Import
-        </Button>
+                setLoadedFilter(filter);
+
+                setFilterUrl("");
+                handleClose();
+              }
+            }}
+          >
+            Fetch
+          </Button>
+          <Button
+            disabled={loadedFilter === null}
+            variant="outlined"
+            color="primary"
+            onClick={() => {
+              if (loadedFilter) {
+                addImportedModularFilter(loadedFilter);
+                setActiveFilterId(loadedFilter.id);
+                setFilterUrl("");
+                setLoadedFilter(null);
+                handleClose();
+              }
+            }}
+          >
+            Import
+          </Button>
+        </Box>
       </DialogContent>
     </Dialog>
   );
