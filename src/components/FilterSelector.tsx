@@ -4,28 +4,19 @@ import {
   AlertColor,
   Box,
   Button,
-  Dialog,
-  DialogContent,
-  DialogTitle,
   FormControl,
-  FormHelperText,
   Stack,
-  TextField,
   Typography,
 } from "@mui/material";
 import React, { useCallback, useMemo, useState } from "react";
 import { useUiStore } from "../store/store";
-import {
-  FilterId,
-  FilterModule,
-  ModuleSource,
-} from "../types/ModularFilterSpec";
+import { FilterId } from "../types/ModularFilterSpec";
 import { copyToClipboard } from "../utils/clipboard";
 import { DEV_FILTERS } from "../utils/devFilters";
 import { downloadFile } from "../utils/file";
 import { createLink } from "../utils/link";
-import { loadFilter } from "../utils/modularFilterLoader";
 import { renderFilter } from "../utils/render";
+import { ImportFilterDialog } from "./ImportFilterDialog";
 import { Option, UISelect } from "./inputs/UISelect";
 
 const COMMON_FILTERS = [
@@ -41,10 +32,9 @@ const COMMON_FILTERS = [
 
 export const FilterSelector: React.FC = () => {
   const [open, setOpen] = useState(false);
-  const [filterUrl, setFilterUrl] = useState("");
   const { siteConfig } = useUiStore();
   const [alerts, setAlerts] = useState<{ text: string; severity: string }[]>(
-    [],
+    []
   );
 
   const filtersForImport = [
@@ -53,24 +43,21 @@ export const FilterSelector: React.FC = () => {
   ];
 
   const importedModularFilters = useUiStore(
-    (state) => state.importedModularFilters,
-  );
-  const addImportedModularFilter = useUiStore(
-    (state) => state.addImportedModularFilter,
+    (state) => state.importedModularFilters
   );
   const setActiveFilterId = useUiStore((state) => state.setActiveFilterId);
 
   const activeFilter = useMemo(
     () => Object.values(importedModularFilters).find((filter) => filter.active),
-    [importedModularFilters],
+    [importedModularFilters]
   );
 
   const activeFilterConfig = useUiStore(
-    (state) => activeFilter && state.filterConfigurations?.[activeFilter.id],
+    (state) => activeFilter && state.filterConfigurations?.[activeFilter.id]
   );
 
   const removeImportedModularFilter = useUiStore(
-    (state) => state.removeImportedModularFilter,
+    (state) => state.removeImportedModularFilter
   );
 
   const handleFilterChange = useCallback(
@@ -79,7 +66,7 @@ export const FilterSelector: React.FC = () => {
         setActiveFilterId(newValue.value);
       }
     },
-    [setActiveFilterId],
+    [setActiveFilterId]
   );
 
   const handleDeleteFilter = useCallback(() => {
@@ -89,10 +76,8 @@ export const FilterSelector: React.FC = () => {
     }
   }, [activeFilter, setActiveFilterId, removeImportedModularFilter]);
 
-  const [importError, setImportError] = useState("");
-
   const filterOptions: Option<FilterId>[] = Object.values(
-    importedModularFilters,
+    importedModularFilters
   ).map((filter) => ({
     label: filter.name,
     value: filter.id,
@@ -104,16 +89,6 @@ export const FilterSelector: React.FC = () => {
         value: activeFilter.id,
       }
     : null;
-
-  const handleImportFilterChange = useCallback(
-    (newValue: Option<string> | null) => {
-      if (newValue) {
-        setFilterUrl(newValue.value);
-        setImportError("");
-      }
-    },
-    [],
-  );
 
   return (
     <>
@@ -182,7 +157,7 @@ export const FilterSelector: React.FC = () => {
                 onClick={() => {
                   const renderedFilter = renderFilter(
                     activeFilter,
-                    activeFilterConfig,
+                    activeFilterConfig
                   );
                   const fileName = `${activeFilter.name}.rs2f`;
                   const file = new File([renderedFilter], fileName, {
@@ -209,7 +184,7 @@ export const FilterSelector: React.FC = () => {
                         setAlerts((prev) => [...prev, alert]);
                         setTimeout(() => {
                           setAlerts((prev) =>
-                            prev.filter((a) => a.text !== alert.text),
+                            prev.filter((a) => a.text !== alert.text)
                           );
                         }, 3000);
                       })
@@ -227,99 +202,6 @@ export const FilterSelector: React.FC = () => {
               ) : null}
             </>
           )}
-          <Dialog
-            fullWidth
-            open={open}
-            onClose={() => {
-              setFilterUrl("");
-              setOpen(false);
-            }}
-          >
-            <DialogTitle>Import Filter</DialogTitle>
-            <DialogContent>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 2,
-                  marginBottom: 2,
-                }}
-              >
-                <FormControl>
-                  <FormHelperText sx={{ fontSize: "24px" }}>
-                    Select a commonly used filter or paste a URL below
-                  </FormHelperText>
-                  <UISelect<string>
-                    options={filtersForImport.map((filter) => ({
-                      label: filter.name,
-                      value: filter.hasOwnProperty("url")
-                        ? (filter as { url: string }).url
-                        : JSON.stringify(filter),
-                    }))}
-                    value={
-                      filterUrl ? { label: filterUrl, value: filterUrl } : null
-                    }
-                    onChange={handleImportFilterChange}
-                    label="Select a filter"
-                    multiple={false}
-                  />
-                </FormControl>
-                <TextField
-                  label="Filter URL"
-                  value={filterUrl}
-                  onChange={(e) => {
-                    setFilterUrl(e.target.value);
-                    setImportError("");
-                  }}
-                  error={importError !== ""}
-                  helperText={importError}
-                />
-              </Box>
-              <Button
-                variant="contained"
-                color="primary"
-                disabled={filterUrl === "" || importError !== ""}
-                onClick={() => {
-                  setImportError("");
-                  if (filterUrl.startsWith("http")) {
-                    loadFilter({
-                      filterUrl: filterUrl,
-                    })
-                      .catch((error) => {
-                        setImportError(error.message);
-                      })
-                      .then((filter) => {
-                        if (filter) {
-                          addImportedModularFilter(filter);
-                          setActiveFilterId(filter.id);
-                          setFilterUrl("");
-                          setOpen(false);
-                        }
-                      });
-                  } else {
-                    const filter = {
-                      ...JSON.parse(filterUrl),
-                      id: crypto.randomUUID(),
-                    };
-
-                    filter.modules = filter.modules.map(
-                      (module: ModuleSource) => ({
-                        ...(module as { moduleJson: FilterModule }).moduleJson,
-                        id: crypto.randomUUID(),
-                      }),
-                    );
-
-                    addImportedModularFilter(filter);
-                    setActiveFilterId(filter.id);
-                    setFilterUrl("");
-                    setOpen(false);
-                  }
-                }}
-              >
-                Import
-              </Button>
-            </DialogContent>
-          </Dialog>
         </Box>
 
         <Typography variant="h4" color="secondary">
@@ -331,6 +213,12 @@ export const FilterSelector: React.FC = () => {
           </Typography>
         </Typography>
       </Stack>
+
+      <ImportFilterDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        filtersForImport={filtersForImport}
+      />
     </>
   );
 };
