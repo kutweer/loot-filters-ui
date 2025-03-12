@@ -1,41 +1,41 @@
 import {
-  compressToEncodedURIComponent,
-  decompressFromEncodedURIComponent,
-} from "lz-string";
+    compressToEncodedURIComponent,
+    decompressFromEncodedURIComponent,
+} from 'lz-string'
 import {
-  ModularFilterConfiguration,
-  UiModularFilter,
-} from "../types/ModularFilterSpec";
+    ModularFilterConfiguration,
+    UiModularFilter,
+} from '../types/ModularFilterSpec'
 
 export const createLink = (
-  filter: UiModularFilter,
-  config: ModularFilterConfiguration | undefined,
+    filter: UiModularFilter,
+    config: ModularFilterConfiguration | undefined
 ) => {
-  const data = {
-    filter: filter,
-    config: config,
-  };
+    const data = {
+        filter: filter,
+        config: config,
+    }
 
-  console.log("data", JSON.stringify(data));
-  const component = compressToEncodedURIComponent(JSON.stringify(data));
+    console.log('data', JSON.stringify(data))
+    const component = compressToEncodedURIComponent(JSON.stringify(data))
 
-  if (component.length >= 100 * 1024) {
-    return Promise.reject(new Error("Link is too long"));
-  }
+    if (component.length >= 100 * 1024) {
+        return Promise.reject(new Error('Link is too long'))
+    }
 
-  return Promise.resolve(
-    `${window.location.protocol}//${window.location.host}/import?importData=${component}`,
-  );
-};
+    return Promise.resolve(
+        `${window.location.protocol}//${window.location.host}/import?importData=${component}`
+    )
+}
 
 export const parseComponent = (
-  component: string,
+    component: string
 ): {
-  filter: UiModularFilter;
-  config: ModularFilterConfiguration;
+    filter: UiModularFilter
+    config: ModularFilterConfiguration
 } => {
-  const data = decompressFromEncodedURIComponent(component);
-  console.log("data", data);
-  const parsedData = JSON.parse(data);
-  return parsedData;
-};
+    const data = decompressFromEncodedURIComponent(component)
+    console.log('data', data)
+    const parsedData = JSON.parse(data)
+    return parsedData
+}

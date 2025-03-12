@@ -34,15 +34,15 @@ While module content can be in-lined, the best way to include module files is to
 
 ```json
 {
-  "name": "my fancy filter",
-  "description": "For my fans",
-  "modules": [
-    {
-      "name": "Vorkath",
-      "moduleJsonUrl": "https://example.com/vorkath.json",
-      "moduleRs2fUrl": "https://example.com/vorkath.rs2f"
-    }
-  ]
+    "name": "my fancy filter",
+    "description": "For my fans",
+    "modules": [
+        {
+            "name": "Vorkath",
+            "moduleJsonUrl": "https://example.com/vorkath.json",
+            "moduleRs2fUrl": "https://example.com/vorkath.rs2f"
+        }
+    ]
 }
 ```
 

@@ -1,53 +1,53 @@
-import { createTheme } from "@mui/material";
+import { createTheme } from '@mui/material'
 
 export const colors = {
-  rsYellow: "#ffff00",
-  rsOrange: "#ff9300",
-  rsDarkOrange: "#b2813d",
-  rsDarkBrown: "#2c2721",
-  rsLightDarkBrown: "#3d3429",
-  rsLightBrown: "#564e43",
-  rsLighterBrown: "#706657",
-  rsLightestBrown: "#d7c9b5",
-  rsMediumBrown: "#4a4036",
-  rsWhite: "#ffffff",
-  rsBlack: "#000000",
+    rsYellow: '#ffff00',
+    rsOrange: '#ff9300',
+    rsDarkOrange: '#b2813d',
+    rsDarkBrown: '#2c2721',
+    rsLightDarkBrown: '#3d3429',
+    rsLightBrown: '#564e43',
+    rsLighterBrown: '#706657',
+    rsLightestBrown: '#d7c9b5',
+    rsMediumBrown: '#4a4036',
+    rsWhite: '#ffffff',
+    rsBlack: '#000000',
 
-  rsGrey: "#808080",
-};
+    rsGrey: '#808080',
+}
 
 const typography = {
-  fontFamily: "RuneScape",
-};
+    fontFamily: 'RuneScape',
+}
 
 export const MuiRsTheme = createTheme({
-  typography: {
-    fontFamily: "RuneScape",
-    fontSize: 18,
-  },
-  palette: {
-    primary: {
-      main: colors.rsOrange,
-      contrastText: colors.rsGrey,
+    typography: {
+        fontFamily: 'RuneScape',
+        fontSize: 18,
     },
-    secondary: {
-      main: colors.rsYellow,
-      contrastText: colors.rsGrey,
+    palette: {
+        primary: {
+            main: colors.rsOrange,
+            contrastText: colors.rsGrey,
+        },
+        secondary: {
+            main: colors.rsYellow,
+            contrastText: colors.rsGrey,
+        },
+        background: {
+            default: colors.rsDarkBrown,
+            paper: colors.rsLightDarkBrown,
+        },
+        divider: colors.rsWhite,
+        text: {
+            primary: colors.rsOrange,
+            secondary: colors.rsDarkOrange,
+            disabled: '#cccccc',
+        },
+        common: {
+            black: colors.rsBlack,
+            white: colors.rsWhite,
+        },
+        mode: 'dark',
     },
-    background: {
-      default: colors.rsDarkBrown,
-      paper: colors.rsLightDarkBrown,
-    },
-    divider: colors.rsWhite,
-    text: {
-      primary: colors.rsOrange,
-      secondary: colors.rsDarkOrange,
-      disabled: "#cccccc",
-    },
-    common: {
-      black: colors.rsBlack,
-      white: colors.rsWhite,
-    },
-    mode: "dark",
-  },
-});
+})
