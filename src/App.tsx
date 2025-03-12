@@ -1,20 +1,22 @@
-import { Alert, AlertColor, Container } from '@mui/material'
+import { Alert, Container, Snackbar } from '@mui/material'
 import { ThemeProvider } from '@mui/material/styles'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Header } from './components/AppHeader'
 import { FilterTabs } from './components/FilterTabs'
 import { ImportPage } from './pages/ImportPage'
+import { useAlertStore } from './store/alerts'
 import { useUiStore } from './store/store'
 import { MuiRsTheme } from './styles/MuiTheme'
 
 const MainPage = ({ sha }: { sha: string }) => {
-    const [alerts, setAlerts] = useState<{ text: string; severity: string }[]>(
-        []
-    )
     const setSiteConfig = useUiStore((state) => state.setSiteConfig)
     const params = new URLSearchParams(window.location.search)
     const devMode = params.get('dev') === 'true'
+
+    const alerts = useAlertStore((state) => state.alerts)
+    const isAlerts = Boolean(alerts.length)
+    const closeAlert = useAlertStore((state) => state.removeAlert)
 
     useEffect(() => {
         if (devMode) {
@@ -25,9 +27,15 @@ const MainPage = ({ sha }: { sha: string }) => {
     return (
         <>
             {alerts.map((alert) => (
-                <Alert key={alert.text} severity={alert.severity as AlertColor}>
-                    {alert.text}
-                </Alert>
+                <Snackbar
+                    key={alert.key}
+                    open={isAlerts}
+                    autoHideDuration={2000}
+                    onClose={() => closeAlert(0)}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                >
+                    <Alert {...alert} />
+                </Snackbar>
             ))}
             <span style={{ display: 'none', fontFamily: 'RuneScape' }}>
                 runescape

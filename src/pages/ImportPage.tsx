@@ -1,6 +1,6 @@
-import { Alert, AlertColor, Container } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAlertStore } from '../store/alerts'
 import { useUiStore } from '../store/store'
 import { parseComponent } from '../utils/link'
 
@@ -10,9 +10,6 @@ export const ImportPage = () => {
         (state) => state.addImportedModularFilter
     )
     const setActiveFilterId = useUiStore((state) => state.setActiveFilterId)
-    const [alerts, setAlerts] = useState<{ text: string; severity: string }[]>(
-        []
-    )
 
     const params = new URLSearchParams(window.location.search)
     const importData = params.get('importData')
@@ -21,6 +18,8 @@ export const ImportPage = () => {
         (state) => state.addFilterConfiguration
     )
 
+    const addAlert = useAlertStore((state) => state.addAlert)
+
     useEffect(() => {
         if (importData) {
             try {
@@ -28,35 +27,23 @@ export const ImportPage = () => {
                 addImportedModularFilter(filter)
                 setActiveFilterId(filter.id)
                 addFilterConfiguration(filter.id, config)
-                setAlerts([
-                    {
-                        text: 'Filter imported successfully redirecting...',
-                        severity: 'success',
-                    },
-                ])
+                addAlert({
+                    children: 'Filter imported successfully',
+                    severity: 'success',
+                })
                 // Redirect to home page after successful import
                 setTimeout(() => {
                     navigate('/')
                 }, 2000)
             } catch (error) {
                 console.error(error, importData)
-                setAlerts([
-                    {
-                        text: `Failed to parse import link: ${error}`,
-                        severity: 'error',
-                    },
-                ])
+                addAlert({
+                    children: `Failed to parse import link: ${error}`,
+                    severity: 'error',
+                })
             }
         }
     }, [importData, addImportedModularFilter, setActiveFilterId, navigate])
 
-    return (
-        <Container>
-            {alerts.map((alert) => (
-                <Alert key={alert.text} severity={alert.severity as AlertColor}>
-                    {alert.text}
-                </Alert>
-            ))}
-        </Container>
-    )
+    return null
 }
