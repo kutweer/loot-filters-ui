@@ -1,25 +1,25 @@
 {
-  "type": "filter",
-  "name": "Style Input Test",
-  "description": "A descriptive description of the filter",
-  "modules": [
-    {
-      "name": "Style Module",
-      "moduleJson": {
-        "type": "module",
-        "name": "Style Input Test",
-        "description": "A medium size description of the module",
-        "inputs": [
-          {
-            "type": "style",
-            "label": "Style Input Test",
-            "macroName": "STYLE_INPUT_TEST",
-            "description": "A style input with no default values",
-            "default": {}
-          }
-        ]
-      },
-      "moduleRs2fText": "#define STYLE_INPUT_TEST nop;"
-    }
-  ]
+    "type": "filter",
+    "name": "Style Input Test",
+    "description": "A descriptive description of the filter",
+    "modules": [
+        {
+            "name": "Style Module",
+            "moduleJson": {
+                "type": "module",
+                "name": "Style Input Test",
+                "description": "A medium size description of the module",
+                "inputs": [
+                    {
+                        "type": "style",
+                        "label": "Style Input Test",
+                        "macroName": "STYLE_INPUT_TEST",
+                        "description": "A style input with no default values",
+                        "default": {}
+                    }
+                ]
+            },
+            "moduleRs2fText": "#define STYLE_INPUT_TEST nop;"
+        }
+    ]
 }

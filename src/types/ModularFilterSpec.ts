@@ -1,4 +1,4 @@
-import { Input, InputDefault, MacroName } from "./InputsSpec";
+import { Input, InputDefault, MacroName } from './InputsSpec'
 
 // ### ### ### ### ###
 //
@@ -11,50 +11,50 @@ import { Input, InputDefault, MacroName } from "./InputsSpec";
  * An importable filter - in the future this may also support a base64'd definition etc.
  */
 export type FilterSource =
-  | {
-      filterUrl: string;
-    }
-  | FilterDefinition;
+    | {
+          filterUrl: string
+      }
+    | FilterDefinition
 
 /**
  * A module source - this can be a url to a json file or a local file
  */
 export type ModuleSource =
-  | {
-      name: string;
-      moduleJsonUrl: string;
-      moduleRs2fUrl: string;
-    }
-  | {
-      name: string;
-      moduleJson: FilterModule;
-      moduleRs2fText: string;
-    };
+    | {
+          name: string
+          moduleJsonUrl: string
+          moduleRs2fUrl: string
+      }
+    | {
+          name: string
+          moduleJson: FilterModule
+          moduleRs2fText: string
+      }
 
 /**
  * A filter definition - this is the actual filter definition that you'll see in a repository
  * In a typical use-case the modules property is a list of sources, but modules may be inlined as well.
  */
 export type FilterDefinition = {
-  name: string;
-  description: string;
-  modules: (ModuleSource | FilterModule)[];
-};
+    name: string
+    description: string
+    modules: (ModuleSource | FilterModule)[]
+}
 
 /**
  * This is what you'd put in a moudle file
  * Actual input definitions are in InputsSpec
  */
 export type FilterModule = {
-  name: string;
-  // Short text displayed in the UI in the accordion header
-  subtitle?: string;
-  // Long text displayed in the UI _inside_ the accordion
-  description?: string;
-  // default to true
-  enabled?: boolean;
-  inputs: Input[];
-};
+    name: string
+    // Short text displayed in the UI in the accordion header
+    subtitle?: string
+    // Long text displayed in the UI _inside_ the accordion
+    description?: string
+    // default to true
+    enabled?: boolean
+    inputs: Input[]
+}
 
 // ### ### ### ### ###
 //
@@ -65,18 +65,18 @@ export type FilterModule = {
 
 // TODO using moduleID here makes the 'update' process a bit more complex - but it ensures duplicate module names don't cause problems
 export type ModularFilterConfiguration = {
-  [key: ModuleId]: { [key: MacroName]: Partial<InputDefault<Input>> } & {
-    enabled?: boolean;
-  };
-};
+    [key: ModuleId]: { [key: MacroName]: Partial<InputDefault<Input>> } & {
+        enabled?: boolean
+    }
+}
 
 // This is a 'loaded filter' before we add the ui specific information
 // Only used in the loader
 export type ModularFilter = {
-  name: string;
-  description: string;
-  modules: FilterModule[];
-};
+    name: string
+    description: string
+    modules: FilterModule[]
+}
 
 // ### ### ### ### ###
 //
@@ -90,23 +90,23 @@ export type ModularFilter = {
 /**
  * @pattern ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
  */
-export type FilterId = string;
+export type FilterId = string
 
 /**
  * @pattern ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
  */
-export type ModuleId = string;
+export type ModuleId = string
 
 export type UiModularFilter = {
-  id: FilterId;
-  importedOn: string; // ISO string ie. new Date().toISOString()
-  source?: FilterSource; // The source we imported from. In the future will use this to check for updates etc.
-  modules: UiFilterModule[];
-  active: boolean;
-} & ModularFilter;
+    id: FilterId
+    importedOn: string // ISO string ie. new Date().toISOString()
+    source?: FilterSource // The source we imported from. In the future will use this to check for updates etc.
+    modules: UiFilterModule[]
+    active: boolean
+} & ModularFilter
 
 export type UiFilterModule = {
-  id: ModuleId;
-  rs2fText: string;
-  source?: ModuleSource;
-} & FilterModule;
+    id: ModuleId
+    rs2fText: string
+    source?: ModuleSource
+} & FilterModule
