@@ -12,11 +12,12 @@ import {
     ToggleButton,
     ToggleButtonGroup,
     Typography,
+    useMediaQuery,
 } from '@mui/material'
 import React, { useMemo, useState } from 'react'
 import { groupBy } from 'underscore'
 import { useUiStore } from '../../store/store'
-import { colors } from '../../styles/MuiTheme'
+import { colors, MuiRsTheme } from '../../styles/MuiTheme'
 
 import {
     BooleanInput,
@@ -119,9 +120,7 @@ const sizeOf = (input: Input) => {
     }
 }
 
-const FirstCoupleLabels: React.FC<{
-    module: UiFilterModule
-}> = ({ module }) => {
+const getPreviews = ({ module }: { module: UiFilterModule }) => {
     const styleInputs: StyleInput[] = module.inputs.filter(
         (input) => input.type === 'style'
     ) as StyleInput[]
@@ -143,21 +142,17 @@ const FirstCoupleLabels: React.FC<{
         return !(config?.hideOverlay ?? input.default?.hideOverlay ?? false)
     })
 
-    return (
-        <Stack direction="row" spacing={2}>
-            {visibleStyleInputs.slice(0, 4).map((input) => {
-                const macroName = (input as StyleInput).macroName
-                return (
-                    <ItemLabelPreview
-                        key={macroName}
-                        itemName={input.label}
-                        input={input}
-                        module={module}
-                    />
-                )
-            })}
-        </Stack>
-    )
+    return visibleStyleInputs.slice(0, 4).map((input) => {
+        const macroName = (input as StyleInput).macroName
+        return (
+            <ItemLabelPreview
+                key={macroName}
+                itemName={input.label}
+                input={input}
+                module={module}
+            />
+        )
+    })
 }
 
 const ModuleSection: React.FC<{
@@ -197,6 +192,9 @@ const ModuleSection: React.FC<{
     const moduleEnabledDefaultValue = module?.enabled ?? true
     const configuredEnableValue = activeConfig?.[module.id]?.enabled
     const enabled = configuredEnableValue ?? moduleEnabledDefaultValue
+
+    const showPreviews = useMediaQuery(MuiRsTheme.breakpoints.up('sm'))
+    const previews = getPreviews({ module })
 
     if (!enabled) {
         return (
@@ -245,48 +243,54 @@ const ModuleSection: React.FC<{
                 sx={{
                     '& .MuiAccordionSummary-content': {
                         alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '16px',
                     },
                 }}
             >
-                <Typography variant="h4" color="primary" sx={{ mr: 2 }}>
-                    {module.name}{' '}
-                    {module?.description ? (
+                <Stack>
+                    <Typography variant="h4" color="primary">
+                        {module.name}
+                    </Typography>
+                    {module?.subtitle && (
                         <Typography
                             variant="h6"
                             component="span"
                             color="secondary"
-                            sx={{
-                                ml: 1,
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                maxWidth: '400px',
-                                display: 'inline-block',
-                                whiteSpace: 'nowrap',
-                            }}
                         >
-                            {module.subtitle}
+                            {module?.subtitle}
                         </Typography>
-                    ) : null}
-                </Typography>
-                <Stack direction="row" spacing={2}>
-                    <FirstCoupleLabels module={module} />
+                    )}
                 </Stack>
-                <Box sx={{ marginLeft: 'auto' }}>
-                    <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={() => {
-                            setActiveConfig(
-                                activeFilterId,
-                                module.id,
-                                'enabled',
-                                !enabled
-                            )
+                {showPreviews && (
+                    <Stack
+                        direction="row"
+                        sx={{
+                            flex: '1',
+                            flexWrap: 'wrap',
+                            justifyContent: 'flex-end',
+                            gap: '8px',
+                            alignItems: 'center',
                         }}
                     >
-                        {enabled ? 'Disable Module' : 'Enable'}
-                    </Button>
-                </Box>
+                        {previews}
+                    </Stack>
+                )}
+                <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => {
+                        setActiveConfig(
+                            activeFilterId,
+                            module.id,
+                            'enabled',
+                            !enabled
+                        )
+                    }}
+                    sx={{ whiteSpace: 'nowrap', minWidth: 'max-content' }}
+                >
+                    {enabled ? 'Disable Module' : 'Enable'}
+                </Button>
             </AccordionSummary>
             <AccordionDetails>
                 <Stack spacing={2} direction="column">
