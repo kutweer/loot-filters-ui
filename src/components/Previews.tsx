@@ -84,7 +84,7 @@ export const ItemMenuPreview: React.FC<{
                                     fontSize: '24px',
                                 }}
                             >
-                                {itemName}
+                                {input.exampleItem || itemName || 'Item Name'}
                             </span>
                         </div>
                     </div>
@@ -220,7 +220,7 @@ export const ItemLabelPreview: React.FC<{
                         fontFamily: fontFamily,
                     }}
                 >
-                    {itemName || 'Item Name'}
+                    {input.exampleItem || itemName || 'Item Name'}
                 </span>
             </div>
         </Box>
