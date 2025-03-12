@@ -1,7 +1,6 @@
-import { Alert, AlertColor, Container } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useUiStore } from '../store/store'
+import { useAlertStore, useUiStore } from '../store/store'
 import { parseComponent } from '../utils/link'
 
 export const ImportPage = () => {
@@ -21,6 +20,9 @@ export const ImportPage = () => {
         (state) => state.addFilterConfiguration
     )
 
+    const alertsList = useAlertStore((state) => state.alerts)
+    const addAlert = useAlertStore((state) => state.addAlert)
+
     useEffect(() => {
         if (importData) {
             try {
@@ -28,35 +30,23 @@ export const ImportPage = () => {
                 addImportedModularFilter(filter)
                 setActiveFilterId(filter.id)
                 addFilterConfiguration(filter.id, config)
-                setAlerts([
-                    {
-                        text: 'Filter imported successfully redirecting...',
-                        severity: 'success',
-                    },
-                ])
+                addAlert({
+                    children: 'Filter imported successfully',
+                    severity: 'success',
+                })
                 // Redirect to home page after successful import
                 setTimeout(() => {
                     navigate('/')
                 }, 2000)
             } catch (error) {
                 console.error(error, importData)
-                setAlerts([
-                    {
-                        text: `Failed to parse import link: ${error}`,
-                        severity: 'error',
-                    },
-                ])
+                addAlert({
+                    children: `Failed to parse import link: ${error}`,
+                    severity: 'error',
+                })
             }
         }
     }, [importData, addImportedModularFilter, setActiveFilterId, navigate])
 
-    return (
-        <Container>
-            {alerts.map((alert) => (
-                <Alert key={alert.text} severity={alert.severity as AlertColor}>
-                    {alert.text}
-                </Alert>
-            ))}
-        </Container>
-    )
+    return <></>
 }

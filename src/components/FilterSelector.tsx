@@ -1,18 +1,9 @@
 import { Download, IosShare } from '@mui/icons-material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import {
-    Alert,
-    AlertColor,
-    Box,
-    Button,
-    FormControl,
-    Stack,
-    Typography,
-} from '@mui/material'
+import { Box, Button, FormControl, Stack, Typography } from '@mui/material'
 import React, { useCallback, useMemo, useState } from 'react'
-import { useUiStore } from '../store/store'
+import { useAlertStore, useUiStore } from '../store/store'
 import { FilterId } from '../types/ModularFilterSpec'
-import { copyToClipboard } from '../utils/clipboard'
 import { DEV_FILTERS } from '../utils/devFilters'
 import { downloadFile } from '../utils/file'
 import { createLink } from '../utils/link'
@@ -34,9 +25,6 @@ const COMMON_FILTERS = [
 export const FilterSelector: React.FC = () => {
     const [open, setOpen] = useState(false)
     const { siteConfig } = useUiStore()
-    const [alerts, setAlerts] = useState<{ text: string; severity: string }[]>(
-        []
-    )
 
     const filtersForImport = [
         ...(siteConfig.devMode ? DEV_FILTERS : []),
@@ -94,20 +82,11 @@ export const FilterSelector: React.FC = () => {
           }
         : null
 
+    const alertsList = useAlertStore((state) => state.alerts)
+    const addAlert = useAlertStore((state) => state.addAlert)
+
     return (
         <>
-            {alerts.map((alert, index) => (
-                <Alert
-                    key={index}
-                    sx={{ bgcolor: 'background.paper' }}
-                    severity={alert.severity as AlertColor}
-                    onClose={() => {
-                        setAlerts((prev) => prev.filter((_, i) => i !== index))
-                    }}
-                >
-                    {alert.text}
-                </Alert>
-            ))}
             <Stack spacing={2}>
                 <Box
                     sx={{
@@ -165,9 +144,22 @@ export const FilterSelector: React.FC = () => {
                                         activeFilter,
                                         activeFilterConfig
                                     )
-                                    navigator.clipboard.writeText(
-                                        renderedFilter
-                                    )
+                                    navigator.clipboard
+                                        .writeText(renderedFilter)
+                                        .then(() => {
+                                            addAlert({
+                                                children:
+                                                    'Filter copied to clipboard',
+                                                severity: 'success',
+                                            })
+                                        })
+                                        .catch((error) => {
+                                            addAlert({
+                                                children:
+                                                    'Failed to copy filter to clipboard',
+                                                severity: 'error',
+                                            })
+                                        })
                                 }}
                             >
                                 Copy to clipboard
@@ -203,39 +195,24 @@ export const FilterSelector: React.FC = () => {
                                         createLink(
                                             activeFilter,
                                             activeFilterConfig
+                                        ).then((link) =>
+                                            navigator.clipboard
+                                                .writeText(link)
+                                                .then(() => {
+                                                    addAlert({
+                                                        children:
+                                                            'Filter link copied to clipboard',
+                                                        severity: 'success',
+                                                    })
+                                                })
+                                                .catch((error) => {
+                                                    addAlert({
+                                                        children:
+                                                            'Failed to copy filter link to clipboard',
+                                                        severity: 'error',
+                                                    })
+                                                })
                                         )
-                                            .then((link) =>
-                                                copyToClipboard(link)
-                                            )
-                                            .then(() => {
-                                                const alert = {
-                                                    text: 'Link copied to clipboard',
-                                                    severity: 'success',
-                                                }
-                                                setAlerts((prev) => [
-                                                    ...prev,
-                                                    alert,
-                                                ])
-                                                setTimeout(() => {
-                                                    setAlerts((prev) =>
-                                                        prev.filter(
-                                                            (a) =>
-                                                                a.text !==
-                                                                alert.text
-                                                        )
-                                                    )
-                                                }, 3000)
-                                            })
-                                            .catch((error) => {
-                                                const alert = {
-                                                    text: `Failed to copy link to clipboard: ${error}`,
-                                                    severity: 'error',
-                                                }
-                                                setAlerts((prev) => [
-                                                    ...prev,
-                                                    alert,
-                                                ])
-                                            })
                                     }}
                                 >
                                     Share Link
