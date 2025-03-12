@@ -1,4 +1,3 @@
-import { AlertProps } from '@mui/material'
 import { mapObject } from 'underscore'
 import { create, StateCreator, StoreApi, useStore } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
@@ -212,12 +211,6 @@ const uiStore = create<
     )
 )
 
-interface AlertStoreState {
-    alerts: AlertProps[]
-    addAlert: (alert: AlertProps) => void
-    removeAlert: (index: number) => void
-}
-
 const createBoundedUseStore = ((store) => (selector) =>
     useStore(store, selector)) as <S extends StoreApi<unknown>>(
     store: S
@@ -229,14 +222,3 @@ const createBoundedUseStore = ((store) => (selector) =>
 type ExtractState<S> = S extends { getState: () => infer X } ? X : never
 
 export const useUiStore = createBoundedUseStore(uiStore)
-export const useAlertStore = create<AlertStoreState>()(
-    devtools((set) => ({
-        alerts: [],
-        addAlert: (alert) =>
-            set((state) => ({ alerts: [...state.alerts, alert] })),
-        removeAlert: (alert_index) =>
-            set((state) => ({
-                alerts: state.alerts.filter((n, i) => i !== alert_index),
-            })),
-    }))
-)

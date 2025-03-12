@@ -5,7 +5,8 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Header } from './components/AppHeader'
 import { FilterTabs } from './components/FilterTabs'
 import { ImportPage } from './pages/ImportPage'
-import { useAlertStore, useUiStore } from './store/store'
+import { useAlertStore } from './store/alerts'
+import { useUiStore } from './store/store'
 import { MuiRsTheme } from './styles/MuiTheme'
 
 const MainPage = ({ sha }: { sha: string }) => {
@@ -13,8 +14,8 @@ const MainPage = ({ sha }: { sha: string }) => {
     const params = new URLSearchParams(window.location.search)
     const devMode = params.get('dev') === 'true'
 
-    const alertsList = useAlertStore((state) => state.alerts)
-    const isAlerts = Boolean(alertsList.length)
+    const alerts = useAlertStore((state) => state.alerts)
+    const isAlerts = Boolean(alerts.length)
     const closeAlert = useAlertStore((state) => state.removeAlert)
 
     useEffect(() => {
@@ -25,8 +26,9 @@ const MainPage = ({ sha }: { sha: string }) => {
 
     return (
         <>
-            {alertsList.map((alert) => (
+            {alerts.map((alert) => (
                 <Snackbar
+                    key={alert.key}
                     open={isAlerts}
                     autoHideDuration={2000}
                     onClose={() => closeAlert(0)}

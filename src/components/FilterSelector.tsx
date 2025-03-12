@@ -2,7 +2,8 @@ import { Download, IosShare } from '@mui/icons-material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import { Box, Button, FormControl, Stack, Typography } from '@mui/material'
 import React, { useCallback, useMemo, useState } from 'react'
-import { useAlertStore, useUiStore } from '../store/store'
+import { useAlertStore } from '../store/alerts'
+import { useUiStore } from '../store/store'
 import { FilterId } from '../types/ModularFilterSpec'
 import { DEV_FILTERS } from '../utils/devFilters'
 import { downloadFile } from '../utils/file'
@@ -82,7 +83,6 @@ export const FilterSelector: React.FC = () => {
           }
         : null
 
-    const alertsList = useAlertStore((state) => state.alerts)
     const addAlert = useAlertStore((state) => state.addAlert)
 
     return (
@@ -153,7 +153,7 @@ export const FilterSelector: React.FC = () => {
                                                 severity: 'success',
                                             })
                                         })
-                                        .catch((error) => {
+                                        .catch(() => {
                                             addAlert({
                                                 children:
                                                     'Failed to copy filter to clipboard',

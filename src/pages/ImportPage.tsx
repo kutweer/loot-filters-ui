@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAlertStore, useUiStore } from '../store/store'
+import { useAlertStore } from '../store/alerts'
+import { useUiStore } from '../store/store'
 import { parseComponent } from '../utils/link'
 
 export const ImportPage = () => {
@@ -9,9 +10,6 @@ export const ImportPage = () => {
         (state) => state.addImportedModularFilter
     )
     const setActiveFilterId = useUiStore((state) => state.setActiveFilterId)
-    const [alerts, setAlerts] = useState<{ text: string; severity: string }[]>(
-        []
-    )
 
     const params = new URLSearchParams(window.location.search)
     const importData = params.get('importData')
@@ -20,7 +18,6 @@ export const ImportPage = () => {
         (state) => state.addFilterConfiguration
     )
 
-    const alertsList = useAlertStore((state) => state.alerts)
     const addAlert = useAlertStore((state) => state.addAlert)
 
     useEffect(() => {
@@ -48,5 +45,5 @@ export const ImportPage = () => {
         }
     }, [importData, addImportedModularFilter, setActiveFilterId, navigate])
 
-    return <></>
+    return null
 }
