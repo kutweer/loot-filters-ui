@@ -192,7 +192,7 @@ export const FilterSelector: React.FC = () => {
                                     downloadFile(file)
                                 }}
                             >
-                                Download Filter
+                                Download
                             </Button>
                             {siteConfig.devMode ? (
                                 <Button
