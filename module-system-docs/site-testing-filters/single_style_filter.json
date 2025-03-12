@@ -15,7 +15,8 @@
                         "label": "Style Input Test",
                         "macroName": "STYLE_INPUT_TEST",
                         "description": "A style input with no default values",
-                        "default": {}
+                        "default": {},
+                        "exampleItem": "Example item"
                     }
                 ]
             },
