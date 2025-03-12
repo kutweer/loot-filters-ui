@@ -190,6 +190,63 @@ const createSiteConfigSlice: StateCreator<
         })),
 })
 
+type V0PersistedState = Pick<SiteConfigSlice, "siteConfig"> &
+  Pick<ImportedFilterSlice, "importedModularFilters"> &
+  Pick<FilterConfigurationSlice, "filterConfigurations"> &
+  Pick<DeleteFilterSlice, "deleteFilter">;
+
+type V1PersistedState = Pick<SiteConfigSlice, "siteConfig"> &
+  Pick<ImportedFilterSlice, "importedModularFilters"> & {
+    filterConfigurationsV1: {
+      [key: FilterId]: {
+        [key: MacroName]: Partial<InputDefault<Input>>;
+      };
+    };
+  };
+
+const v0toV1Migration = (
+  persistedState: V0PersistedState
+): V1PersistedState => {
+  console.log("Migrating v0 to v1", persistedState);
+
+  const updatedFilterConfigurations: {
+    [key: FilterId]: { [key: MacroName]: Partial<InputDefault<Input>> };
+  } = {};
+
+  const macroAssignments: {
+    [filterId: FilterId]: { [key: MacroName]: Partial<InputDefault<Input>> };
+  } = {};
+
+  Object.entries(persistedState.filterConfigurations).forEach(
+    ([filterId, config]) => {
+      macroAssignments[filterId] = {};
+      Object.entries(config).forEach(([moduleId, macros]) => {
+        Object.entries(macros).forEach(([macroName, data]) => {
+          macroAssignments[filterId][macroName] = data;
+        });
+      });
+    }
+  );
+
+  delete (persistedState as any).filterConfigurations;
+  (persistedState as any)["filterConfigurationsV1"] = macroAssignments;
+  console.log("Updated", persistedState);
+
+  return persistedState as unknown as V1PersistedState;
+};
+
+const migrate = (
+  persistedState: unknown,
+  version: number
+): V1PersistedState => {
+  let state = persistedState as any;
+  if (version <= 0) {
+    state = v0toV1Migration(persistedState as unknown as V0PersistedState);
+  }
+  console.warn("No migration found for persisted state", persistedState);
+  return state as V1PersistedState;
+};
+
 const uiStore = create<
     SiteConfigSlice &
         ImportedFilterSlice &
