@@ -1,4 +1,5 @@
 import { Download, IosShare } from '@mui/icons-material'
+import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import {
     Alert,
     AlertColor,
@@ -155,6 +156,22 @@ export const FilterSelector: React.FC = () => {
                     </Button>
                     {activeFilter && (
                         <>
+                            <Button
+                                variant="outlined"
+                                color="primary"
+                                startIcon={<ContentCopyIcon />}
+                                onClick={() => {
+                                    const renderedFilter = renderFilter(
+                                        activeFilter,
+                                        activeFilterConfig
+                                    )
+                                    navigator.clipboard.writeText(
+                                        renderedFilter
+                                    )
+                                }}
+                            >
+                                Copy to clipboard
+                            </Button>
                             <Button
                                 variant="outlined"
                                 color="primary"
