@@ -140,7 +140,7 @@ export const ItemLabelPreview: React.FC<{
     const textAccentOrdinal =
         activeConfig?.textAccent ?? input.default?.textAccent
     const textAccent =
-        textAccentFromOrdinal(textAccentOrdinal) ?? TextAccent.NONE
+        textAccentFromOrdinal(textAccentOrdinal) ?? TextAccent.SHADOW
 
     const textAccentColor =
         activeConfig?.textAccentColor ?? input.default?.textAccentColor
@@ -215,7 +215,7 @@ export const ItemLabelPreview: React.FC<{
                 <span
                     style={{
                         padding: '4px',
-                        color: foregroundColor,
+                        color: foregroundColor ?? '#ffffff',
                         fontSize: '24px',
                         fontFamily: fontFamily,
                     }}
