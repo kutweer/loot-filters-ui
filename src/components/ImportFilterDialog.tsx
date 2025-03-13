@@ -122,7 +122,6 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                                             }
                                             addImportedModularFilter(filter)
                                             setActiveFilterId(filter.id)
-                                            setFilterUrl('')
                                             handleClose()
                                         }
                                     })
@@ -148,7 +147,6 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
 
                                 addImportedModularFilter(filter)
                                 setActiveFilterId(filter.id)
-                                setFilterUrl('')
                                 handleClose()
                             }
                         }}
