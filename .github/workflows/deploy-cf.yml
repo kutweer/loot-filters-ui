@@ -1,0 +1,37 @@
+name: Deploy
+
+on:
+    push:
+        branches: [main, '*']
+        # Only run for specific users
+        if: |
+            github.actor == 'kaqemeex' ||
+            github.actor == 'typical-whack' ||
+            github.actor == 'Omniforce'
+jobs:
+    buildAndDeploy:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Setup Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: '18'
+            - name: Install dependencies
+              run: npm install
+            - name: Save Git SHA
+              run: |
+                  echo '{"gitSha": "${{ github.sha }}"}' > src/build-info.json
+            - name: Prettier Check
+              run: npm run prettier:check
+            - name: Build
+              run: npm run build
+              env:
+                  NODE_ENV: production
+            - name: Deploy
+              uses: cloudflare/wrangler-action@v3
+              with:
+                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  command: pages deploy dist --project-name=loot-filters-ui
+                  gitHubToken: ${{ secrets.GITHUB_TOKEN }}
