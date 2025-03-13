@@ -18,11 +18,11 @@ export const IncludeExcludeListInputComponent: React.FC<{
     )
 
     const currentIncludes =
-        (activeConfig?.[module.id]?.[input.macroName.includes] as
+        (activeConfig?.inputConfigs?.[input.macroName.includes] as
             | string[]
             | undefined) ?? input.default.includes
     const currentExcludes =
-        (activeConfig?.[module.id]?.[input.macroName.excludes] as
+        (activeConfig?.inputConfigs?.[input.macroName.excludes] as
             | string[]
             | undefined) ?? input.default.excludes
 
@@ -78,7 +78,6 @@ export const IncludeExcludeListInputComponent: React.FC<{
                     )
                     setFilterConfiguration(
                         activeFilterId,
-                        module.id,
                         input.macroName.includes,
                         includes
                     )
@@ -110,7 +109,6 @@ export const IncludeExcludeListInputComponent: React.FC<{
                     )
                     setFilterConfiguration(
                         activeFilterId,
-                        module.id,
                         input.macroName.excludes,
                         excludes
                     )

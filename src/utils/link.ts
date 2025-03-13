@@ -3,13 +3,13 @@ import {
     decompressFromEncodedURIComponent,
 } from 'lz-string'
 import {
-    ModularFilterConfiguration,
+    ModularFilterConfigurationV2,
     UiModularFilter,
 } from '../types/ModularFilterSpec'
 
 export const createLink = (
     filter: UiModularFilter,
-    config: ModularFilterConfiguration | undefined
+    config: ModularFilterConfigurationV2 | undefined
 ) => {
     const data = {
         filter: filter,
@@ -32,7 +32,7 @@ export const parseComponent = (
     component: string
 ): {
     filter: UiModularFilter
-    config: ModularFilterConfiguration
+    config: ModularFilterConfigurationV2
 } => {
     const data = decompressFromEncodedURIComponent(component)
     console.log('data', data)

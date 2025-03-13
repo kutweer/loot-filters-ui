@@ -3,7 +3,6 @@ import { useUiStore } from '../../store/store'
 import { BooleanInput } from '../../types/InputsSpec'
 import {
     FilterId,
-    ModularFilterConfiguration,
     UiFilterModule,
 } from '../../types/ModularFilterSpec'
 
@@ -12,7 +11,7 @@ export const BooleanInputComponent: React.FC<{
     module: UiFilterModule
     input: BooleanInput
 }> = ({ activeFilterId, module, input }) => {
-    const activeConfig: ModularFilterConfiguration = useUiStore(
+    const activeConfig = useUiStore(
         (state) => state.filterConfigurations[activeFilterId]
     )
     const setFilterConfiguration = useUiStore(
@@ -20,7 +19,7 @@ export const BooleanInputComponent: React.FC<{
     )
 
     const currentSetting =
-        (activeConfig?.[module.id]?.[input.macroName] as boolean | undefined) ??
+        (activeConfig?.inputConfigs?.[input.macroName] as boolean | undefined) ??
         input.default ??
         false
 
@@ -31,7 +30,6 @@ export const BooleanInputComponent: React.FC<{
                 const value = event.target.checked
                 setFilterConfiguration(
                     activeFilterId,
-                    module.id,
                     input.macroName,
                     value
                 )

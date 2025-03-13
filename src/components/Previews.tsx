@@ -26,7 +26,7 @@ export const ItemMenuPreview: React.FC<{
 
     const activeConfig = useUiStore(
         (state) =>
-            state.filterConfigurations?.[activeFilterId!!]?.[module.id]?.[
+            state.filterConfigurations?.[activeFilterId!!]?.inputConfigs?.[
                 input.macroName
             ] as Partial<StyleConfig>
     )
@@ -109,7 +109,7 @@ export const ItemLabelPreview: React.FC<{
 
     const activeConfig = useUiStore(
         (state) =>
-            state.filterConfigurations?.[activeFilterId!!]?.[module.id]?.[
+            state.filterConfigurations?.[activeFilterId!!]?.inputConfigs?.[
                 input.macroName
             ] as Partial<StyleConfig>
     )

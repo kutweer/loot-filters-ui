@@ -17,7 +17,7 @@ export const StringListInputComponent: React.FC<{
     )
 
     const currentValues =
-        (activeConfig?.[module.id]?.[input.macroName] as
+        (activeConfig?.inputConfigs?.[input.macroName] as
             | string[]
             | undefined) ?? input.default
 
@@ -58,7 +58,6 @@ export const StringListInputComponent: React.FC<{
                 )
                 setFilterConfiguration(
                     activeFilterId,
-                    module.id,
                     input.macroName,
                     values
                 )

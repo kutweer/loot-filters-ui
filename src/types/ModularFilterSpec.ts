@@ -70,6 +70,14 @@ export type ModularFilterConfiguration = {
     }
 }
 
+
+export type ModularFilterConfigurationV2 = {
+    enabledModules: { [key: ModuleId]: boolean }
+    inputConfigs: {
+        [key: MacroName]: Partial<InputDefault<Input>>
+    }
+}
+
 // This is a 'loaded filter' before we add the ui specific information
 // Only used in the loader
 export type ModularFilter = {

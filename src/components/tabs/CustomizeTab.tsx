@@ -132,7 +132,7 @@ const getPreviews = ({ module }: { module: UiFilterModule }) => {
             )!!
     )
     const configForModule = useUiStore(
-        (state) => state.filterConfigurations?.[activeFilterId]?.[module.id]
+        (state) => state.filterConfigurations?.[activeFilterId]?.inputConfigs
     )
 
     const visibleStyleInputs = styleInputs.filter((input) => {
@@ -169,7 +169,7 @@ const ModuleSection: React.FC<{
         (state) => state.filterConfigurations[activeFilterId]
     )
 
-    const setActiveConfig = useUiStore((state) => state.setFilterConfiguration)
+    const setEnabledModule = useUiStore((state) => state.setEnabledModule)
 
     let json: string | null = null
     let configJson: string | null = null
@@ -190,7 +190,9 @@ const ModuleSection: React.FC<{
     )
 
     const moduleEnabledDefaultValue = module?.enabled ?? true
-    const configuredEnableValue = activeConfig?.[module.id]?.enabled
+    const configuredEnableValue = useUiStore(
+        (state) => state.filterConfigurations[activeFilterId]?.enabledModules[module.id]
+    )
     const enabled = configuredEnableValue ?? moduleEnabledDefaultValue
 
     const showPreviews = useMediaQuery(MuiRsTheme.breakpoints.up('sm'))
@@ -210,12 +212,7 @@ const ModuleSection: React.FC<{
                         variant="outlined"
                         size="small"
                         onClick={() => {
-                            setActiveConfig(
-                                activeFilterId,
-                                module.id,
-                                'enabled',
-                                !enabled
-                            )
+                            setEnabledModule(activeFilterId, module.id, !enabled)
                         }}
                     >
                         {module.enabled ? 'Disable' : 'Enable Module'}
@@ -280,12 +277,7 @@ const ModuleSection: React.FC<{
                     variant="outlined"
                     size="small"
                     onClick={() => {
-                        setActiveConfig(
-                            activeFilterId,
-                            module.id,
-                            'enabled',
-                            !enabled
-                        )
+                        setEnabledModule(activeFilterId, module.id, !enabled)
                     }}
                     sx={{ whiteSpace: 'nowrap', minWidth: 'max-content' }}
                 >

@@ -16,7 +16,7 @@ export const EnumInputComponent: React.FC<{
     )
 
     const currentSetting: string[] =
-        (activeConfig?.[module.id]?.[input.macroName] as string[]) ??
+        (activeConfig?.inputConfigs?.[input.macroName] as string[]) ??
         input.default
 
     const options: Option<string>[] = input.enum.map((enumValue) => {
@@ -51,7 +51,6 @@ export const EnumInputComponent: React.FC<{
             onChange={(newValue: Option<string>[] | null) => {
                 setFilterConfiguration(
                     activeFilterId,
-                    module.id,
                     input.macroName,
                     newValue ? newValue.map((option) => option.value) : []
                 )
