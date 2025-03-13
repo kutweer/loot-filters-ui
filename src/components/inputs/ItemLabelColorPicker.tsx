@@ -3,13 +3,10 @@ import { useUiStore } from '../../store/store'
 import { colors } from '../../styles/MuiTheme'
 import {
     FontType,
-    fontTypeFromOrdinal,
-    fontTypeOrdinal,
+    fontType,
     StyleInput,
     TextAccent,
-    textAccentFromOrdinal,
-    textAccentOrdinal,
-    uiSelectFromOrdinal
+    textAccent,
 } from '../../types/InputsSpec'
 import { UiFilterModule } from '../../types/ModularFilterSpec'
 import { ArgbHexColor } from '../../utils/Color'
@@ -57,20 +54,24 @@ export const ItemLabelColorPicker: React.FC<{
         })
     }
 
-    const fontTypeOptions: Option<number>[] = Object.values(FontType).map(
-        (type) => ({
-            label: type.charAt(0).toUpperCase() + type.slice(1),
-            value: fontTypeOrdinal(type),
-        })
-    )
+    const fontTypeOptions: Option<FontType>[] = Object.keys(fontType)
+        .map((type) => type as unknown as FontType)
+        .map((type) => ({
+            label: fontType[type],
+            value: type,
+        }))
 
-    const textAccentOptions: Option<number>[] = Object.values(TextAccent).map(
-        (accent) => ({
-            label: accent.charAt(0).toUpperCase() + accent.slice(1),
-            value: textAccentOrdinal(accent),
-        })
-    )
+    const textAccentOptions: Option<TextAccent>[] = Object.keys(textAccent)
+        .map((accent) => accent as unknown as TextAccent)
+        .map((accent) => ({
+            label: textAccent[accent],
+            value: accent,
+        }))
 
+    console.log(typeof activeConfig.textAccent, typeof input.default.textAccent)
+    console.log(
+        (activeConfig.textAccent ?? input.default.textAccent) == 3 /* NONE */
+    )
     return (
         <div
             style={{
@@ -130,21 +131,25 @@ export const ItemLabelColorPicker: React.FC<{
                         label="Overlay Font Type"
                         multiple={false}
                         freeSolo={false}
-                        value={
-                            activeConfig?.fontType !== undefined
-                                ? {
-                                      label: fontTypeFromOrdinal(
-                                          activeConfig.fontType
-                                      ),
-                                      value: activeConfig.fontType,
-                                  }
-                                : null
-                        }
+                        value={{
+                            label: fontType[
+                                activeConfig.fontType ??
+                                    input.default.fontType ??
+                                    1 // Default to small
+                            ],
+                            value:
+                                activeConfig.fontType ??
+                                input.default.fontType ??
+                                1,
+                        }}
                         onChange={(newValue) => {
                             if (newValue === null) {
                                 updateStyleField('fontType', undefined)
                             } else {
-                                updateStyleField('fontType', newValue.value)
+                                updateStyleField(
+                                    'fontType',
+                                    newValue.value as FontType
+                                )
                             }
                         }}
                     />
@@ -180,12 +185,9 @@ export const ItemLabelColorPicker: React.FC<{
                     }
                     labelLocation={labelLocation}
                     helpText={
-                        (activeConfig?.textAccent === undefined ||
-                            textAccentFromOrdinal(activeConfig.textAccent) ===
-                                TextAccent.NONE) &&
-                        (input.default?.textAccent === undefined ||
-                            textAccentFromOrdinal(input.default.textAccent) ===
-                                TextAccent.NONE)
+                        (activeConfig.textAccent ?? input.default.textAccent) ==
+                            3 /* must be == not === idk why */ &&
+                        activeConfig.textAccentColor !== undefined
                             ? 'Warning: Text accent color is set but text accent is None'
                             : undefined
                     }
@@ -198,14 +200,25 @@ export const ItemLabelColorPicker: React.FC<{
                     label="Text Accent"
                     multiple={false}
                     freeSolo={false}
-                    value={
-                        uiSelectFromOrdinal(activeConfig?.textAccent) ?? uiSelectFromOrdinal(input.default?.textAccent)
-                    }
+                    value={{
+                        label: textAccent[
+                            activeConfig.textAccent ??
+                                input.default.textAccent ??
+                                1 // Default to shadow
+                        ],
+                        value:
+                            activeConfig.textAccent ??
+                            input.default.textAccent ??
+                            1, // Default to shadow
+                    }}
                     onChange={(newValue) => {
                         if (newValue === null) {
                             updateStyleField('textAccent', undefined)
                         } else {
-                            updateStyleField('textAccent', newValue.value)
+                            updateStyleField(
+                                'textAccent',
+                                newValue.value as TextAccent
+                            )
                         }
                     }}
                 />
