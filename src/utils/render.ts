@@ -1,18 +1,18 @@
 import { StyleConfig } from '../components/inputs/StyleInputHelpers'
 import { Input, InputDefault, MacroName } from '../types/InputsSpec'
 import {
-    ModularFilterConfiguration,
+    ModularFilterConfigurationV2,
     UiFilterModule,
     UiModularFilter,
 } from '../types/ModularFilterSpec'
 
 export const renderFilter = (
     filter: UiModularFilter,
-    activeConfig: ModularFilterConfiguration | undefined
+    activeConfig: ModularFilterConfigurationV2 | undefined
 ): string => {
     return filter.modules
-        .filter((m) => activeConfig?.[m.id]?.enabled ?? m.enabled ?? true)
-        .map((m) => renderModule(m, activeConfig?.[m.id]))
+        .filter((m) => activeConfig?.enabledModules?.[m.id] ?? m.enabled ?? true)
+        .map((m) => renderModule(m, activeConfig?.inputConfigs))
         .join('\n')
 }
 

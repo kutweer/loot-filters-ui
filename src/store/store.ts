@@ -4,7 +4,7 @@ import { devtools, persist } from 'zustand/middleware'
 import { Input, InputDefault, MacroName } from '../types/InputsSpec'
 import {
     FilterId,
-    ModularFilterConfiguration,
+    ModularFilterConfigurationV2,
     ModuleId,
     UiModularFilter,
 } from '../types/ModularFilterSpec'
@@ -18,16 +18,20 @@ export interface ImportedFilterSlice {
 }
 
 export interface FilterConfigurationSlice {
-    filterConfigurations: { [key: FilterId]: ModularFilterConfiguration }
-    setFilterConfiguration: (
+    filterConfigurations: { [key: FilterId]: ModularFilterConfigurationV2 }
+    setEnabledModule: (
         filterId: FilterId,
         moduleId: ModuleId,
+        enabled: boolean
+    ) => void
+    setFilterConfiguration: (
+        filterId: FilterId,
         macroName: string,
         data: Partial<InputDefault<Input>>
     ) => void
     addFilterConfiguration: (
         filterId: FilterId,
-        config: ModularFilterConfiguration
+        config: ModularFilterConfigurationV2
     ) => void
 }
 
@@ -78,62 +82,74 @@ const createFilterConfigurationSlice: StateCreator<
     filterConfigurations: {},
     setFilterConfiguration: (
         filterId: FilterId,
-        moduleId: ModuleId,
         macroName: string,
         data: Partial<InputDefault<Input>>
     ) => {
         set((state) => {
-            const allConfigs: { [key: FilterId]: ModularFilterConfiguration } =
-                state.filterConfigurations
-            const thisFiltersConfig: {
-                [key: ModuleId]: {
-                    [key: MacroName]: Partial<InputDefault<Input>>
-                }
-            } = allConfigs[filterId] ?? {}
-            const thisModulesConfig: {
-                [key: MacroName]: Partial<InputDefault<Input>>
-            } = thisFiltersConfig[moduleId] ?? {}
-            const thisMacrosConfig: Partial<InputDefault<Input>> =
-                thisModulesConfig[macroName] ?? {}
-
-            let newConfig: Partial<InputDefault<Input>>
+            let newConfig = data
             if (Array.isArray(data)) {
                 // For arrays, replace the entire value
                 newConfig = data
             } else if (typeof data === 'object' && data !== null) {
+                const currentData =
+                    state.filterConfigurations?.[filterId]?.inputConfigs?.[
+                        macroName
+                    ] ?? {}
                 // For objects, merge with existing config
-                newConfig = { ...(thisMacrosConfig as object), ...data }
+                newConfig = { ...(currentData as object), ...data }
             } else {
                 // For primitives (string, number, boolean), use the value directly
                 newConfig = data
             }
 
             return {
-                ...state,
                 filterConfigurations: {
-                    ...allConfigs,
+                    ...state.filterConfigurations,
                     [filterId]: {
-                        ...thisFiltersConfig,
-                        [moduleId]: {
-                            ...thisModulesConfig,
+                        ...(state.filterConfigurations[filterId] ?? {}),
+                        inputConfigs: {
+                            ...(state.filterConfigurations[filterId]
+                                ?.inputConfigs ?? {}),
                             [macroName]: newConfig,
                         },
                     },
                 },
-            }
+            } as Partial<FilterConfigurationSlice>
         })
     },
     addFilterConfiguration: (
         filterId: FilterId,
-        config: ModularFilterConfiguration
+        config: ModularFilterConfigurationV2
     ) => {
         set((state) => ({
-            ...state,
             filterConfigurations: {
                 ...state.filterConfigurations,
                 [filterId]: config,
             },
         }))
+    },
+    setEnabledModule: (
+        filterId: FilterId,
+        moduleId: ModuleId,
+        enabled: boolean
+    ) => {
+        console.log('setEnabledModule', moduleId, enabled)
+        set(
+            (state) =>
+                ({
+                    filterConfigurations: {
+                        ...state.filterConfigurations,
+                        [filterId]: {
+                            ...state.filterConfigurations[filterId],
+                            enabledModules: {
+                                ...(state.filterConfigurations[filterId]
+                                    ?.enabledModules ?? {}),
+                                [moduleId]: enabled,
+                            },
+                        },
+                    },
+                }) as Partial<FilterConfigurationSlice>
+        )
     },
 })
 
@@ -190,62 +206,78 @@ const createSiteConfigSlice: StateCreator<
         })),
 })
 
-type V0PersistedState = Pick<SiteConfigSlice, "siteConfig"> &
-  Pick<ImportedFilterSlice, "importedModularFilters"> &
-  Pick<FilterConfigurationSlice, "filterConfigurations"> &
-  Pick<DeleteFilterSlice, "deleteFilter">;
+type V0PersistedState = Pick<SiteConfigSlice, 'siteConfig'> &
+    Pick<ImportedFilterSlice, 'importedModularFilters'> &
+    Pick<FilterConfigurationSlice, 'filterConfigurations'> &
+    Pick<DeleteFilterSlice, 'deleteFilter'>
 
-type V1PersistedState = Pick<SiteConfigSlice, "siteConfig"> &
-  Pick<ImportedFilterSlice, "importedModularFilters"> & {
-    filterConfigurationsV1: {
-      [key: FilterId]: {
-        [key: MacroName]: Partial<InputDefault<Input>>;
-      };
-    };
-  };
+type V1PersistedState = Pick<SiteConfigSlice, 'siteConfig'> &
+    Pick<ImportedFilterSlice, 'importedModularFilters'> & {
+        filterConfigurations: {
+            [key: FilterId]: ModularFilterConfigurationV2
+        }
+    }
 
 const v0toV1Migration = (
-  persistedState: V0PersistedState
+    persistedState: V0PersistedState
 ): V1PersistedState => {
-  console.log("Migrating v0 to v1", persistedState);
+    console.log('Migrating v0 to v1', persistedState)
 
-  const updatedFilterConfigurations: {
-    [key: FilterId]: { [key: MacroName]: Partial<InputDefault<Input>> };
-  } = {};
-
-  const macroAssignments: {
-    [filterId: FilterId]: { [key: MacroName]: Partial<InputDefault<Input>> };
-  } = {};
-
-  Object.entries(persistedState.filterConfigurations).forEach(
-    ([filterId, config]) => {
-      macroAssignments[filterId] = {};
-      Object.entries(config).forEach(([moduleId, macros]) => {
-        Object.entries(macros).forEach(([macroName, data]) => {
-          macroAssignments[filterId][macroName] = data;
-        });
-      });
+    const newState = {
+        ...persistedState,
+        filterConfigurations: {},
     }
-  );
 
-  delete (persistedState as any).filterConfigurations;
-  (persistedState as any)["filterConfigurationsV1"] = macroAssignments;
-  console.log("Updated", persistedState);
+    Object.entries(persistedState.filterConfigurations).forEach(
+        ([filterId, config]) => {
+            const enabledModules = Object.entries(config)
+                .filter(([_, macros]) => {
+                    return macros.enabled
+                })
+                .map(([moduleId]) => moduleId)
 
-  return persistedState as unknown as V1PersistedState;
-};
+            const inputConfigs: {
+                [key: MacroName]: Partial<InputDefault<Input>>
+            }[] = Object.values(config).map((macros) => {
+                return Object.entries(macros)
+                    .map(
+                        ([macroName, data]: [
+                            MacroName,
+                            Partial<InputDefault<Input>>,
+                        ]) => {
+                            return {
+                                [macroName]: data,
+                            }
+                        }
+                    )
+                    .reduce((acc, curr) => {
+                        return { ...acc, ...curr }
+                    }, {})
+            })
+
+            ;(newState as V1PersistedState).filterConfigurations[filterId] = {
+                enabledModules,
+                inputConfigs: inputConfigs.reduce((acc, curr) => {
+                    return { ...acc, ...curr }
+                }, {}),
+            } as unknown as ModularFilterConfigurationV2
+        }
+    )
+
+    return newState as V1PersistedState
+}
 
 const migrate = (
-  persistedState: unknown,
-  version: number
+    persistedState: unknown,
+    version: number
 ): V1PersistedState => {
-  let state = persistedState as any;
-  if (version <= 0) {
-    state = v0toV1Migration(persistedState as unknown as V0PersistedState);
-  }
-  console.warn("No migration found for persisted state", persistedState);
-  return state as V1PersistedState;
-};
+    let state = persistedState as any
+    if (version <= 0) {
+        state = v0toV1Migration(persistedState as unknown as V0PersistedState)
+    }
+    console.warn('No migration found for persisted state', persistedState)
+    return state as V1PersistedState
+}
 
 const uiStore = create<
     SiteConfigSlice &
@@ -263,6 +295,8 @@ const uiStore = create<
             }),
             {
                 name: 'modular-filter-storage',
+                version: 1,
+                migrate,
             }
         )
     )

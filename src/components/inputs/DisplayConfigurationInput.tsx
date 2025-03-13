@@ -1,4 +1,4 @@
-import { ExpandMore } from '@mui/icons-material'
+import { ExpandMore, MacroOff } from '@mui/icons-material'
 import {
     Accordion,
     AccordionDetails,
@@ -36,22 +36,14 @@ export const DisplayConfigurationInput: React.FC<{
 
     const styleConfig: Partial<StyleConfig> = useUiStore(
         (state) =>
-            state.filterConfigurations?.[activeFilterId]?.[module.id]?.[
+            state.filterConfigurations?.[activeFilterId]?.inputConfigs?.[
                 input.macroName
             ] as Partial<StyleConfig>
-    )
+    ) ?? { [input.macroName]: {} }
 
     const setFilterConfiguration = useUiStore(
         (state) => state.setFilterConfiguration
     )
-
-    if (styleConfig === undefined) {
-        // forces the creation of the style config
-        // for some reason returning a default value in the selector causes an infinite loop
-        // By calling this set here we then re-render with the empty object and everything works
-        setFilterConfiguration(activeFilterId, module.id, input.macroName, {})
-        return null
-    }
 
     const itemLabelColorPicker = (
         <Grid size={{ xs: 12, md: 12 }} sx={{ display: 'flex', padding: 1 }}>
@@ -77,7 +69,6 @@ export const DisplayConfigurationInput: React.FC<{
                         onChange={(e) =>
                             setFilterConfiguration(
                                 activeFilterId,
-                                module.id,
                                 input.macroName,
                                 { showLootbeam: e.target.checked }
                             )
@@ -95,7 +86,6 @@ export const DisplayConfigurationInput: React.FC<{
                 onChange={(color?: ArgbHexColor) =>
                     setFilterConfiguration(
                         activeFilterId,
-                        module.id,
                         input.macroName,
                         {
                             lootbeamColor: color,
@@ -117,7 +107,6 @@ export const DisplayConfigurationInput: React.FC<{
                     onChange={(e) =>
                         setFilterConfiguration(
                             activeFilterId,
-                            module.id,
                             input.macroName,
                             {
                                 showValue: e.target.checked,
@@ -140,7 +129,6 @@ export const DisplayConfigurationInput: React.FC<{
                     onChange={(e) =>
                         setFilterConfiguration(
                             activeFilterId,
-                            module.id,
                             input.macroName,
                             {
                                 showDespawn: e.target.checked,
@@ -161,7 +149,6 @@ export const DisplayConfigurationInput: React.FC<{
                     onChange={(e) =>
                         setFilterConfiguration(
                             activeFilterId,
-                            module.id,
                             input.macroName,
                             {
                                 notify: e.target.checked,
@@ -184,7 +171,6 @@ export const DisplayConfigurationInput: React.FC<{
                     onChange={(e) =>
                         setFilterConfiguration(
                             activeFilterId,
-                            module.id,
                             input.macroName,
                             {
                                 hideOverlay: e.target.checked,
@@ -209,7 +195,6 @@ export const DisplayConfigurationInput: React.FC<{
                         onChange={(e) =>
                             setFilterConfiguration(
                                 activeFilterId,
-                                module.id,
                                 input.macroName,
                                 { highlightTile: e.target.checked }
                             )
@@ -225,7 +210,6 @@ export const DisplayConfigurationInput: React.FC<{
                 onChange={(color?: ArgbHexColor) =>
                     setFilterConfiguration(
                         activeFilterId,
-                        module.id,
                         input.macroName,
                         {
                             tileStrokeColor: color,
@@ -245,7 +229,6 @@ export const DisplayConfigurationInput: React.FC<{
                 onChange={(color?: ArgbHexColor) =>
                     setFilterConfiguration(
                         activeFilterId,
-                        module.id,
                         input.macroName,
                         {
                             tileFillColor: color,

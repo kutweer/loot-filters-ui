@@ -4,7 +4,7 @@ import { Box, Button, FormControl, Stack, Typography } from '@mui/material'
 import React, { useCallback, useMemo, useState } from 'react'
 import { useAlertStore } from '../store/alerts'
 import { useUiStore } from '../store/store'
-import { FilterId } from '../types/ModularFilterSpec'
+import { FilterId, ModularFilterConfigurationV2 } from '../types/ModularFilterSpec'
 import { DEV_FILTERS } from '../utils/devFilters'
 import { downloadFile } from '../utils/file'
 import { createLink } from '../utils/link'
@@ -45,7 +45,7 @@ export const FilterSelector: React.FC = () => {
         [importedModularFilters]
     )
 
-    const activeFilterConfig = useUiStore(
+    const activeFilterConfig : ModularFilterConfigurationV2 | undefined = useUiStore(
         (state) => activeFilter && state.filterConfigurations?.[activeFilter.id]
     )
 

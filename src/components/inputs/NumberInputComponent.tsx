@@ -16,7 +16,7 @@ export const NumberInputComponent: React.FC<{
     )
 
     const userConfigValue =
-        activeConfig?.[module.id]?.[input.macroName] ?? input.default
+        activeConfig?.inputConfigs?.[input.macroName] ?? input.default
     const currentSetting = userConfigValue ?? input.default
 
     return (
@@ -27,7 +27,6 @@ export const NumberInputComponent: React.FC<{
                 const value = event.target.value
                 setFilterConfiguration(
                     activeFilterId,
-                    module.id,
                     input.macroName,
                     parseInt(value)
                 )

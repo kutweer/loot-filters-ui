@@ -38,7 +38,7 @@ export const ItemLabelColorPicker: React.FC<{
 
     const activeConfig = useUiStore(
         (state) =>
-            state.filterConfigurations[activeFilterId][module.id][
+            state.filterConfigurations[activeFilterId]?.inputConfigs?.[
                 input.macroName
             ] as Partial<StyleConfig>
     )
@@ -51,7 +51,7 @@ export const ItemLabelColorPicker: React.FC<{
         field: StyleConfigKey,
         value: StyleConfig[StyleConfigKey]
     ) => {
-        setFilterConfiguration(activeFilterId, module.id, input.macroName, {
+        setFilterConfiguration(activeFilterId, input.macroName, {
             [field]: value,
         })
     }
