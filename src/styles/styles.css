@@ -51,6 +51,27 @@ body {
     background-repeat: repeat;
 }
 
+.preview {
+    border: 3px solid #2c2721;
+    /* background-color: #564e43;
+    background-image:
+        linear-gradient(45deg,
+            #3d3429 25%,
+            transparent 25%,
+            transparent 75%,
+            #3d3429 75%,
+            #3d3429),
+        linear-gradient(-45deg,
+            #3d3429 25%,
+            transparent 25%,
+            transparent 75%,
+            #3d3429 75%,
+            #3d3429);
+    background-size: 10px 10px; */
+    background-repeat: repeat;
+    background-image: url('https://oldschool.runescape.wiki/images/POH_Tropical_Wood_Ground_Textured.png')
+}
+
 /* .MuiGrid2-root {
   border: 1px solid red;
 } */

@@ -159,14 +159,8 @@ export const ItemLabelPreview: React.FC<{
     }
 
     return (
-        <Box
-            sx={{
-                border: '3px solid black',
-                backgroundColor: '#dddddd',
-                height: 'min-content',
-                position: 'relative',
-                ...sx,
-            }}
+        <div
+            className='preview'
         >
             {hidden && (
                 <div
@@ -212,6 +206,6 @@ export const ItemLabelPreview: React.FC<{
                     {input.exampleItem || itemName || 'Item Name'}
                 </span>
             </div>
-        </Box>
+        </div>
     )
 }
