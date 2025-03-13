@@ -71,9 +71,6 @@ export const ItemLabelColorPicker: React.FC<{
         })
     )
 
-    console.log(textAccentOptions)
-    console.log(activeConfig?.textAccent)
-
     return (
         <div
             style={{
