@@ -72,14 +72,31 @@ export type IncludeExcludeListInput = Omit<
     default: IncludeExcludeListInputDefaults
 }
 
-export type TextAccent = 1 | 2 | 3 | 4
-export const textAccent = [
-    null, // https://github.com/riktenx/loot-filters/blob/bec89ccfee8f85fab8c8b1dc9da49f972c2316fb/src/main/java/com/lootfilters/rule/FontType.java#L15
-    'Shadow',
-    'Outline',
-    'None',
-    'Shadow Bold',
-] as const
+/**
+ * @see https://github.com/riktenx/loot-filters/blob/bec89ccfee8f85fab8c8b1dc9da49f972c2316fb/src/main/java/com/lootfilters/rule/FontType.java#L15
+ */
+export const TextAccent = {
+    Shadow: 1,
+    Outline: 2,
+    None: 3,
+    ShadowBold: 4,
+} as const
+export type TextAccent = (typeof TextAccent)[keyof typeof TextAccent]
+
+export const textAccents = Object.values<TextAccent>(TextAccent)
+
+export const labelFromTextAccent = (textAccent: TextAccent) => {
+    switch (textAccent) {
+        case TextAccent.Shadow:
+            return 'Shadow'
+        case TextAccent.Outline:
+            return 'Outline'
+        case TextAccent.None:
+            return 'None'
+        case TextAccent.ShadowBold:
+            return 'Bold Shadow'
+    }
+}
 
 export const fontFamilyFromFontType = (fontType?: FontType) => {
     switch (fontType) {
@@ -94,13 +111,29 @@ export const fontFamilyFromFontType = (fontType?: FontType) => {
     }
 }
 
-export type FontType = 1 | 2 | 3
-export const fontType = [
-    null, // https://github.com/riktenx/loot-filters/blob/bec89ccfee8f85fab8c8b1dc9da49f972c2316fb/src/main/java/com/lootfilters/rule/TextAccent.java#L18
-    'Small',
-    'Normal',
-    'Bold',
-] as const
+/**
+ * @see https://github.com/riktenx/loot-filters/blob/bec89ccfee8f85fab8c8b1dc9da49f972c2316fb/src/main/java/com/lootfilters/rule/FontType.java#L15
+
+ */
+export const FontType = {
+    Small: 1,
+    Normal: 2,
+    Bold: 3,
+} as const
+export type FontType = (typeof FontType)[keyof typeof FontType]
+
+export const fontTypes = Object.values<FontType>(FontType)
+
+export const labelFromFontType = (fontType: FontType) => {
+    switch (fontType) {
+        case FontType.Small:
+            return 'Small'
+        case FontType.Normal:
+            return 'Normal'
+        case FontType.Bold:
+            return 'Bold'
+    }
+}
 
 /**
  * @pattern ^#([0-9a-fA-F]{8})$
