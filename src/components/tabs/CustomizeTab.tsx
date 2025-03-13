@@ -191,7 +191,10 @@ const ModuleSection: React.FC<{
 
     const moduleEnabledDefaultValue = module?.enabled ?? true
     const configuredEnableValue = useUiStore(
-        (state) => state.filterConfigurations[activeFilterId]?.enabledModules[module.id]
+        (state) =>
+            state.filterConfigurations[activeFilterId]?.enabledModules[
+                module.id
+            ]
     )
     const enabled = configuredEnableValue ?? moduleEnabledDefaultValue
 
@@ -212,7 +215,11 @@ const ModuleSection: React.FC<{
                         variant="outlined"
                         size="small"
                         onClick={() => {
-                            setEnabledModule(activeFilterId, module.id, !enabled)
+                            setEnabledModule(
+                                activeFilterId,
+                                module.id,
+                                !enabled
+                            )
                         }}
                     >
                         {module.enabled ? 'Disable' : 'Enable Module'}

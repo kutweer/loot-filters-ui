@@ -11,7 +11,9 @@ export const renderFilter = (
     activeConfig: ModularFilterConfigurationV2 | undefined
 ): string => {
     return filter.modules
-        .filter((m) => activeConfig?.enabledModules?.[m.id] ?? m.enabled ?? true)
+        .filter(
+            (m) => activeConfig?.enabledModules?.[m.id] ?? m.enabled ?? true
+        )
         .map((m) => renderModule(m, activeConfig?.inputConfigs))
         .join('\n')
 }

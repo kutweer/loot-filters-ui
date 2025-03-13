@@ -84,13 +84,9 @@ export const DisplayConfigurationInput: React.FC<{
                     styleConfig.lootbeamColor ?? input.default?.lootbeamColor
                 }
                 onChange={(color?: ArgbHexColor) =>
-                    setFilterConfiguration(
-                        activeFilterId,
-                        input.macroName,
-                        {
-                            lootbeamColor: color,
-                        }
-                    )
+                    setFilterConfiguration(activeFilterId, input.macroName, {
+                        lootbeamColor: color,
+                    })
                 }
                 labelText={'Lootbeam Color'}
                 labelLocation="right"
@@ -208,13 +204,9 @@ export const DisplayConfigurationInput: React.FC<{
                     input.default?.tileStrokeColor
                 }
                 onChange={(color?: ArgbHexColor) =>
-                    setFilterConfiguration(
-                        activeFilterId,
-                        input.macroName,
-                        {
-                            tileStrokeColor: color,
-                        }
-                    )
+                    setFilterConfiguration(activeFilterId, input.macroName, {
+                        tileStrokeColor: color,
+                    })
                 }
                 labelText={'Tile Stroke Color'}
                 labelLocation="right"
@@ -227,13 +219,9 @@ export const DisplayConfigurationInput: React.FC<{
                     styleConfig.tileFillColor ?? input.default?.tileFillColor
                 }
                 onChange={(color?: ArgbHexColor) =>
-                    setFilterConfiguration(
-                        activeFilterId,
-                        input.macroName,
-                        {
-                            tileFillColor: color,
-                        }
-                    )
+                    setFilterConfiguration(activeFilterId, input.macroName, {
+                        tileFillColor: color,
+                    })
                 }
                 labelText={'Tile Fill Color'}
                 labelLocation="right"

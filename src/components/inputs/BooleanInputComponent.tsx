@@ -1,10 +1,7 @@
 import { Checkbox } from '@mui/material'
 import { useUiStore } from '../../store/store'
 import { BooleanInput } from '../../types/InputsSpec'
-import {
-    FilterId,
-    UiFilterModule,
-} from '../../types/ModularFilterSpec'
+import { FilterId, UiFilterModule } from '../../types/ModularFilterSpec'
 
 export const BooleanInputComponent: React.FC<{
     activeFilterId: FilterId
@@ -19,7 +16,9 @@ export const BooleanInputComponent: React.FC<{
     )
 
     const currentSetting =
-        (activeConfig?.inputConfigs?.[input.macroName] as boolean | undefined) ??
+        (activeConfig?.inputConfigs?.[input.macroName] as
+            | boolean
+            | undefined) ??
         input.default ??
         false
 
@@ -28,11 +27,7 @@ export const BooleanInputComponent: React.FC<{
             checked={currentSetting}
             onChange={(event) => {
                 const value = event.target.checked
-                setFilterConfiguration(
-                    activeFilterId,
-                    input.macroName,
-                    value
-                )
+                setFilterConfiguration(activeFilterId, input.macroName, value)
             }}
         />
     )

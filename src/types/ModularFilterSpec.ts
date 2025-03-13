@@ -70,7 +70,6 @@ export type ModularFilterConfiguration = {
     }
 }
 
-
 export type ModularFilterConfigurationV2 = {
     enabledModules: { [key: ModuleId]: boolean }
     inputConfigs: {

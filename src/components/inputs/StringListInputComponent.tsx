@@ -56,11 +56,7 @@ export const StringListInputComponent: React.FC<{
                 const values = ((newValue as Option[]) || []).map(
                     (option) => option.value
                 )
-                setFilterConfiguration(
-                    activeFilterId,
-                    input.macroName,
-                    values
-                )
+                setFilterConfiguration(activeFilterId, input.macroName, values)
             }}
         />
     )
