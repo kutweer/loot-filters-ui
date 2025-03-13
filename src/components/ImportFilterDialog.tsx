@@ -10,10 +10,7 @@ import {
 } from '@mui/material'
 import React, { useCallback, useState } from 'react'
 import { useUiStore } from '../store/store'
-import {
-    FilterModule,
-    ModuleSource
-} from '../types/ModularFilterSpec'
+import { FilterModule, ModuleSource } from '../types/ModularFilterSpec'
 import { loadFilter } from '../utils/modularFilterLoader'
 import { Option, UISelect } from './inputs/UISelect'
 
