@@ -103,7 +103,7 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
                     <Button
-                        disabled={!filterUrl.startsWith('http')}
+                        disabled={filterUrl.length === 0}
                         variant="outlined"
                         color="primary"
                         onClick={() => {
