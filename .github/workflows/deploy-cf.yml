@@ -7,7 +7,7 @@ on:
         if: |
             github.actor == 'kaqemeex' ||
             github.actor == 'typical-whack' ||
-            github.actor == 'Omniforce'
+            github.actor == 'omniforce'
 jobs:
     buildAndDeploy:
         runs-on: ubuntu-latest
@@ -33,5 +33,5 @@ jobs:
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  command: pages deploy dist --project-name=loot-filters-ui
+                  command: pages deploy dist --project-name=loot-filters-ui --branch="${{ github.actor }}"
                   gitHubToken: ${{ secrets.GITHUB_TOKEN }}
