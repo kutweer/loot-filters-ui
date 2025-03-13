@@ -11,6 +11,8 @@ on:
 jobs:
     buildAndDeploy:
         runs-on: ubuntu-latest
+        environment:
+            name: actions
         steps:
             - uses: actions/checkout@v4
             - name: Setup Node.js
