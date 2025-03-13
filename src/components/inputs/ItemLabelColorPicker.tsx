@@ -182,7 +182,8 @@ export const ItemLabelColorPicker: React.FC<{
                     labelLocation={labelLocation}
                     helpText={
                         (activeConfig?.textAccent ??
-                            input.default?.textAccent) == 3 /* must be == not === idk why */ &&
+                            input.default?.textAccent) ==
+                            3 /* must be == not === idk why */ &&
                         activeConfig?.textAccentColor !== undefined
                             ? 'Warning: Text accent color is set but text accent is None'
                             : undefined
