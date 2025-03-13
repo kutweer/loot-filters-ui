@@ -21,6 +21,13 @@ const typography = {
 }
 
 export const MuiRsTheme = createTheme({
+    components: {
+        MuiTextField: {
+            defaultProps: {
+                size: 'small',
+            },
+        },
+    },
     typography: {
         fontFamily: 'RuneScape',
         fontSize: 18,
