@@ -72,35 +72,35 @@ export type IncludeExcludeListInput = Omit<
     default: IncludeExcludeListInputDefaults
 }
 
-// Enum ordinal needs to match what is supported in the plugin
-export const textAccentFromOrdinal = (ordinal: number): TextAccent => {
-    return Object.values(TextAccent)[ordinal]
+export type TextAccent = 1 | 2 | 3 | 4
+export const textAccent = [
+    null, // https://github.com/riktenx/loot-filters/blob/bec89ccfee8f85fab8c8b1dc9da49f972c2316fb/src/main/java/com/lootfilters/rule/FontType.java#L15
+    'Shadow',
+    'Outline',
+    'None',
+    'Shadow Bold',
+] as const
+
+export const fontFamilyFromFontType = (fontType?: FontType) => {
+    switch (fontType) {
+        case 1:
+            return 'RuneScapeSmall'
+        case 2:
+            return 'RuneScape'
+        case 3:
+            return 'RuneScapeBold'
+        default:
+            return 'RuneScapeSmall'
+    }
 }
 
-export const textAccentOrdinal = (textAccent: TextAccent): number => {
-    return Object.values(TextAccent).indexOf(textAccent)
-}
-export enum TextAccent {
-    SHADOW = 'shadow',
-    OUTLINE = 'outline',
-    NONE = 'none',
-    SHADOW_BOLD = 'shadow_bold',
-}
-
-// Enum ordinal needs to match what is supported in the plugin
-
-export const fontTypeOrdinal = (fontType: FontType): number => {
-    return Object.values(FontType).indexOf(fontType)
-}
-
-export const fontTypeFromOrdinal = (ordinal: number): FontType => {
-    return Object.values(FontType)[ordinal]
-}
-export enum FontType {
-    NORMAL = 'Normal',
-    LARGER = 'Larger',
-    BOLD = 'Bold',
-}
+export type FontType = 1 | 2 | 3
+export const fontType = [
+    null, // https://github.com/riktenx/loot-filters/blob/bec89ccfee8f85fab8c8b1dc9da49f972c2316fb/src/main/java/com/lootfilters/rule/TextAccent.java#L18
+    'Small',
+    'Normal',
+    'Bold',
+] as const
 
 /**
  * @pattern ^#([0-9a-fA-F]{8})$
@@ -114,9 +114,9 @@ export type StyleInput = Omit<FilterModuleInput<'style'>, 'default'> & {
         textColor: ArgbHexColor
         backgroundColor: ArgbHexColor
         borderColor: ArgbHexColor
-        textAccent: number // TextAccent;
+        textAccent: TextAccent
         textAccentColor: ArgbHexColor
-        fontType: number // FontType;
+        fontType: FontType
         showLootbeam: boolean
         lootbeamColor: ArgbHexColor
         showValue: boolean

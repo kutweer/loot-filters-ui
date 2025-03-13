@@ -1,13 +1,7 @@
 import { Box, SxProps } from '@mui/material'
 import { useUiStore } from '../store/store'
 import { colors } from '../styles/MuiTheme'
-import {
-    FontType,
-    fontTypeFromOrdinal,
-    StyleInput,
-    TextAccent,
-    textAccentFromOrdinal,
-} from '../types/InputsSpec'
+import { fontFamilyFromFontType, StyleInput } from '../types/InputsSpec'
 import { UiFilterModule } from '../types/ModularFilterSpec'
 import { colorHexToRgbaCss } from '../utils/Color'
 import { StyleConfig } from './inputs/StyleInputHelpers'
@@ -128,19 +122,9 @@ export const ItemLabelPreview: React.FC<{
         activeConfig?.hideOverlay ?? input.default?.hideOverlay ?? false
 
     const fontType = activeConfig?.fontType ?? input.default?.fontType
-    const fontFamily =
-        fontTypeFromOrdinal(fontType) === FontType.NORMAL
-            ? 'RuneScapeSmall'
-            : fontTypeFromOrdinal(fontType) === FontType.BOLD
-              ? 'RuneScapeBold'
-              : fontTypeFromOrdinal(fontType) === FontType.LARGER
-                ? 'RuneScape'
-                : 'RuneScapeSmall'
+    const fontFamily = fontFamilyFromFontType(fontType)
 
-    const textAccentOrdinal =
-        activeConfig?.textAccent ?? input.default?.textAccent
-    const textAccent =
-        textAccentFromOrdinal(textAccentOrdinal) ?? TextAccent.SHADOW
+    const textAccent = activeConfig?.textAccent ?? input.default?.textAccent
 
     const textAccentColor =
         activeConfig?.textAccentColor ?? input.default?.textAccentColor
@@ -149,23 +133,28 @@ export const ItemLabelPreview: React.FC<{
         webkitTextStroke?: string
     } = {}
     switch (textAccent) {
-        case TextAccent.SHADOW:
-            textAccentStyle = {
-                textShadow: '1px 1px #000000',
-            }
-            break
-        case TextAccent.OUTLINE:
+        // Outline
+        case 2:
             textAccentStyle = {
                 WebkitTextStroke: `1px ${colorHexToRgbaCss(textAccentColor) ?? 'rgb(0,0,0,0)'}`,
             }
             break
-        case TextAccent.SHADOW_BOLD:
+        // None
+        case 3:
+            textAccentStyle = {}
+            break
+        // Shadow Bold
+        case 4:
             textAccentStyle = {
                 textShadow: '2px 2px #000000',
             }
             break
-        case TextAccent.NONE:
-            textAccentStyle = {}
+        // Shadow is default
+        case 1:
+        default:
+            textAccentStyle = {
+                textShadow: '1px 1px #000000',
+            }
             break
     }
 
