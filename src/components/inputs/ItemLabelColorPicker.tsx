@@ -1,5 +1,6 @@
 import { Divider } from '@mui/material'
 import { useUiStore } from '../../store/store'
+import { colors } from '../../styles/MuiTheme'
 import {
     FontType,
     fontTypeFromOrdinal,
@@ -8,6 +9,7 @@ import {
     TextAccent,
     textAccentFromOrdinal,
     textAccentOrdinal,
+    uiSelectFromOrdinal
 } from '../../types/InputsSpec'
 import { UiFilterModule } from '../../types/ModularFilterSpec'
 import { ArgbHexColor } from '../../utils/Color'
@@ -15,7 +17,6 @@ import { ItemLabelPreview, ItemMenuPreview } from '../Previews'
 import { ColorPickerInput } from './ColorPicker'
 import { StyleConfig, StyleConfigKey } from './StyleInputHelpers'
 import { Option, UISelect } from './UISelect'
-import { colors } from '../../styles/MuiTheme'
 
 export const ItemLabelColorPicker: React.FC<{
     module: UiFilterModule
@@ -69,6 +70,9 @@ export const ItemLabelColorPicker: React.FC<{
             value: textAccentOrdinal(accent),
         })
     )
+
+    console.log(textAccentOptions)
+    console.log(activeConfig?.textAccent)
 
     return (
         <div
@@ -182,8 +186,9 @@ export const ItemLabelColorPicker: React.FC<{
                         (activeConfig?.textAccent === undefined ||
                             textAccentFromOrdinal(activeConfig.textAccent) ===
                                 TextAccent.NONE) &&
-                        (activeConfig?.textAccentColor !== undefined ||
-                            input.default?.textAccentColor !== undefined)
+                        (input.default?.textAccent === undefined ||
+                            textAccentFromOrdinal(input.default.textAccent) ===
+                                TextAccent.NONE)
                             ? 'Warning: Text accent color is set but text accent is None'
                             : undefined
                     }
@@ -197,14 +202,7 @@ export const ItemLabelColorPicker: React.FC<{
                     multiple={false}
                     freeSolo={false}
                     value={
-                        activeConfig?.textAccent !== undefined
-                            ? {
-                                  label: textAccentFromOrdinal(
-                                      activeConfig.textAccent
-                                  ),
-                                  value: activeConfig.textAccent,
-                              }
-                            : null
+                        uiSelectFromOrdinal(activeConfig?.textAccent) ?? uiSelectFromOrdinal(input.default?.textAccent)
                     }
                     onChange={(newValue) => {
                         if (newValue === null) {

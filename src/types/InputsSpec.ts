@@ -74,12 +74,26 @@ export type IncludeExcludeListInput = Omit<
 
 // Enum ordinal needs to match what is supported in the plugin
 export const textAccentFromOrdinal = (ordinal: number): TextAccent => {
-    return Object.values(TextAccent)[ordinal]
+    return Object.values(TextAccent)[ordinal - 1]
 }
 
 export const textAccentOrdinal = (textAccent: TextAccent): number => {
-    return Object.values(TextAccent).indexOf(textAccent)
+    return Object.values(TextAccent).indexOf(textAccent) + 1
 }
+export const uiSelectFromOrdinal = (
+    textAccentOrdinal?: number
+): {
+    label: TextAccent
+    value: number
+} | null => {
+    return textAccentOrdinal !== undefined
+        ? {
+              label: textAccentFromOrdinal(textAccentOrdinal),
+              value: textAccentOrdinal,
+          }
+        : null
+}
+
 export enum TextAccent {
     SHADOW = 'shadow',
     OUTLINE = 'outline',
