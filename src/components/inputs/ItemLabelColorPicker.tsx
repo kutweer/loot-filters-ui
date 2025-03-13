@@ -68,10 +68,6 @@ export const ItemLabelColorPicker: React.FC<{
             value: accent,
         }))
 
-    console.log(typeof activeConfig.textAccent, typeof input.default.textAccent)
-    console.log(
-        (activeConfig.textAccent ?? input.default.textAccent) == 3 /* NONE */
-    )
     return (
         <div
             style={{
@@ -133,13 +129,13 @@ export const ItemLabelColorPicker: React.FC<{
                         freeSolo={false}
                         value={{
                             label: fontType[
-                                activeConfig.fontType ??
-                                    input.default.fontType ??
+                                activeConfig?.fontType ??
+                                    input.default?.fontType ??
                                     1 // Default to small
                             ],
                             value:
-                                activeConfig.fontType ??
-                                input.default.fontType ??
+                                activeConfig?.fontType ??
+                                input.default?.fontType ??
                                 1,
                         }}
                         onChange={(newValue) => {
@@ -185,9 +181,9 @@ export const ItemLabelColorPicker: React.FC<{
                     }
                     labelLocation={labelLocation}
                     helpText={
-                        (activeConfig.textAccent ?? input.default.textAccent) ==
-                            3 /* must be == not === idk why */ &&
-                        activeConfig.textAccentColor !== undefined
+                        (activeConfig?.textAccent ??
+                            input.default?.textAccent) == 3 /* must be == not === idk why */ &&
+                        activeConfig?.textAccentColor !== undefined
                             ? 'Warning: Text accent color is set but text accent is None'
                             : undefined
                     }
@@ -202,13 +198,13 @@ export const ItemLabelColorPicker: React.FC<{
                     freeSolo={false}
                     value={{
                         label: textAccent[
-                            activeConfig.textAccent ??
-                                input.default.textAccent ??
+                            activeConfig?.textAccent ??
+                                input.default?.textAccent ??
                                 1 // Default to shadow
                         ],
                         value:
-                            activeConfig.textAccent ??
-                            input.default.textAccent ??
+                            activeConfig?.textAccent ??
+                            input.default?.textAccent ??
                             1, // Default to shadow
                     }}
                     onChange={(newValue) => {
