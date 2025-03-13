@@ -159,9 +159,7 @@ export const ItemLabelPreview: React.FC<{
     }
 
     return (
-        <div
-            className='preview'
-        >
+        <div className="preview">
             {hidden && (
                 <div
                     style={{
