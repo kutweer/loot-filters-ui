@@ -80,7 +80,7 @@ export const colorHexToRgbaCss = (hex?: ArgbHexColor) => {
     }
 
     const [r, g, b, a] = argbToParts(argbHex) as number[]
-    return `rgba(${r}, ${g}, ${b}, ${a})`
+    return `rgba(${r}, ${g}, ${b}, ${a / 255})`
 }
 
 type RGBAColor = {
