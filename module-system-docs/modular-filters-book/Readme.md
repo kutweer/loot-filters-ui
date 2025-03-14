@@ -85,7 +85,7 @@ In that file put the following json structure.
     "name": "Hide Items",
     "subtitle": "Hides all items",
     "description": "My first module, its not much but it's mine",
-    "rs2f": { "path": "./my_module.rs2f" },
+    "rs2fPath": "./my_module.rs2f",
     "inputs": [
         {
             "type": "boolean",
@@ -124,13 +124,13 @@ The second line is `hidden=VAR_SHOW_ITEMS;` this line uses our macro to take the
 
 ## 3.3 Adding our module to our filter
 
-Now we need to update our filter to tell it about our moudle, we'll use the same relative path stuff to avoid having lots of things to update as we go. The new `filter.json` should be:
+Now we need to update our filter to tell it about our moudle, we'll use the same relative path feature. The new `filter.json` should be:
 
 ```json
 {
     "name": "My Filter",
     "description": "My first filter",
-    "modules": [{ "path": "./my_moudle.json" }]
+    "modules": [{ "modulePath": "my_moudle.json" }]
 }
 ```
 
@@ -139,3 +139,140 @@ With all of that done you can commit & push like we did in step 2.3. Grab the ne
 ![imported first filter](./images/ch_3-hide-items-module.png)
 
 Congratulations! You've built your first modular filter. From here it is all about applying the principals and patterns outlined in the first 3 chapters, to different kinds of inputs and RS2F configuration. Chapter 4 will go over each of the inputs, their configuration and how to use them. Chapter 5 will cover useful RS2F patterns or 'recipies' for getting certain kinds of results.
+
+# Chapter 4: Input Types
+
+## 4.1: Boolean
+
+Boolean inputs are the simplest input type. They create a checkbox in the UI that toggles between true and false. They are configured like this:
+
+```json
+{
+    "type": "boolean",
+    "label": "Show Items",
+    "default": true,
+    "macroName": "VAR_SHOW_ITEMS"
+}
+```
+
+## 4.2: Number
+
+Number inputs create a text box that only accepts whole integers. Here's how to configure a number input:
+
+```json
+{
+    "type": "number",
+    "label": "Value Threshold",
+    "default": 5000,
+    "macroName": "VAR_VALUE_THRESHOLD"
+}
+```
+
+## 4.3: Lists
+
+There are different kinds of list inputs for different situations. Currently 3 are supported.
+
+### 4.3.1: EnumList
+
+Provides a dropdown in the UI with a restricted set of options. The `enum` property defines the possible values,
+the `value` property is what will be rendered into the filter, the `label` property is a more nicely formated one for the UI to display in the dropdown.
+
+```json
+{
+    "type": "enumlist",
+    "macroName": "VAR_HERB_SHOW",
+    "label": "Herbs to always show regardless of value",
+    "enum": [
+        { "value": "guam leaf", "label": "Guam Leaf" },
+        { "value": "marrentill", "label": "Marrentill" },
+        { "value": "tarromin", "label": "Tarromin" },
+        { "value": "harralander", "label": "Harralander" },
+        { "value": "ranarr weed", "label": "Ranarr Weed" },
+        { "value": "toadflax", "label": "Toadflax" },
+        { "value": "irit leaf", "label": "Irit Leaf" },
+        { "value": "avantoe", "label": "Avantoe" },
+        { "value": "kwuarm", "label": "Kwuarm" },
+        { "value": "huasca", "label": "Huasca" },
+        { "value": "snapdragon", "label": "Snapdragon" },
+        { "value": "cadantine", "label": "Cadantine" },
+        { "value": "lantadyme", "label": "Lantadyme" },
+        { "value": "dwarf weed", "label": "Dwarf Weed" },
+        { "value": "torstol", "label": "Torstol" }
+    ],
+    "default": []
+}
+```
+
+### 4.3.2: StringList
+
+Provides a dropdown in the UI where you can put in any number of strings
+
+```json
+{
+    "type": "stringlist",
+    "macroName": "VAR_MY_STRINGS",
+    "label": "A list of strings",
+    "default": ["example-item"]
+}
+```
+
+### 4.3.3: IncludeExcludeList
+
+A specical input of paired lists, useful for times when you may want to allow both including and excluding values.
+
+```json
+{
+    "type": "includeExcludeList",
+    "macroName": {
+        "includes": "VAR_GENERAL_GRAARDOR_UNIQUES_SHOW",
+        "excludes": "VAR_GENERAL_GRAARDOR_UNIQUES_HIDE"
+    },
+    "label": "General Graardor uniques",
+    "default": {
+        "includes": [
+            "Bandos chestplate",
+            "Bandos tassets",
+            "Bandos boots",
+            "Bandos hilt"
+        ],
+        "excludes": []
+    }
+}
+```
+
+## 4.4: Style
+
+An input that allows configuring all the available style options. All colors are in the `#AARRGGBB` alpha rgb format. For a more complete list of values see the [loot filter plugin docs](https://github.com/riktenx/loot-filters/blob/userguide/filter-lang.md#display-settings).
+
+```json
+{
+    "type": "style",
+    "label": "Style Input Test",
+    "macroName": "STYLE_INPUT_TEST",
+    "description": "A style input with no default values",
+    "default": {
+        "textColor": "#FFFFFFFF",
+        "backgroundColor": "#00000000",
+        "borderColor": "#FFFFFFFF",
+        "textAccent": 1,
+        "textAccentColor": "#FFFFFFFF",
+        "fontType": 1,
+        "showLootbeam": false,
+        "lootbeamColor": "#FFFFFFFF",
+        "showValue": false,
+        "showDespawn": false,
+        "notify": false,
+        "hideOverlay": false,
+        "highlightTile": false,
+        "menuTextColor": "#FFFFFFFF",
+        "tileStrokeColor": "#FFFFFFFF",
+        "tileFillColor": "#00000000",
+        "tileHighlightColor": "#FFFFFFFF"
+    },
+    "exampleItem": "Example item"
+}
+```
+
+# Chapter 5: Useful Patterns
+
+To Do.
