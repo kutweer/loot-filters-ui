@@ -51,13 +51,6 @@ body {
     background-repeat: repeat;
 }
 
-.preview {
-    border: 3px solid #2c2721;
-    background-repeat: repeat;
-    background-position: center;
-    background-image: url('../images/grass.png');
-}
-
 /* .MuiGrid2-root {
   border: 1px solid red;
 } */

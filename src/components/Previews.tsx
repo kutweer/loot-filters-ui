@@ -1,4 +1,13 @@
 import { Box, SxProps } from '@mui/material'
+import AbyssalNexusImage from '../images/abyssal_nexus.png'
+import CatacombsOfKourendImage from '../images/catacombs_of_kourend.png'
+import ChambersOfXericImage from '../images/chambers_of_xeric.png'
+import GodWarsDungeonImage from '../images/god_wars_dungeon.png'
+import GrassImage from '../images/grass.png'
+import SandImage from '../images/sand.png'
+import TzhaarImage from '../images/tzhaar.png'
+
+import { useState } from 'react'
 import { useUiStore } from '../store/store'
 import { colors } from '../styles/MuiTheme'
 import { fontFamilyFromFontType, StyleInput } from '../types/InputsSpec'
@@ -88,6 +97,15 @@ export const ItemMenuPreview: React.FC<{
     )
 }
 
+const backgroundImages = [
+    GrassImage,
+    SandImage,
+    TzhaarImage,
+    GodWarsDungeonImage,
+    ChambersOfXericImage,
+    CatacombsOfKourendImage,
+    AbyssalNexusImage,
+]
 export const ItemLabelPreview: React.FC<{
     itemName: string
     input: StyleInput
@@ -158,8 +176,28 @@ export const ItemLabelPreview: React.FC<{
             break
     }
 
+    const [randomBackgroundImageIndex, setBackgroundImageIndex] = useState(
+        Math.floor(Math.random() * backgroundImages.length)
+    )
+
+    window.setTimeout(
+        () => {
+            setBackgroundImageIndex(
+                Math.floor(Math.random() * backgroundImages.length)
+            )
+        },
+        Math.floor(Math.random() * (60000 - 30000 + 1)) + 30000
+    )
+
     return (
-        <div className="preview">
+        <div
+            style={{
+                border: '3px solid #2c2721',
+                backgroundRepeat: 'repeat',
+                backgroundPosition: 'center',
+                backgroundImage: `url(${backgroundImages[randomBackgroundImageIndex]})`,
+            }}
+        >
             {hidden && (
                 <div
                     style={{
