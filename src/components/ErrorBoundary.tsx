@@ -1,8 +1,9 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react'
 import { Typography } from '@mui/material'
+import { Component, ErrorInfo, ReactNode } from 'react'
 
 interface Props {
     children: ReactNode
+    errorComponent?: ReactNode
 }
 
 interface State {
@@ -25,6 +26,9 @@ export class ErrorBoundary extends Component<Props, State> {
 
     public render() {
         if (this.state.hasError) {
+            if (this.props.errorComponent) {
+                return this.props.errorComponent
+            }
             return (
                 <Typography color="error" variant="body1">
                     Something went wrong. Please try refreshing the page.

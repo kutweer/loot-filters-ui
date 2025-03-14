@@ -8,6 +8,7 @@ import { ImportPage } from './pages/ImportPage'
 import { useAlertStore } from './store/alerts'
 import { useUiStore } from './store/store'
 import { MuiRsTheme } from './styles/MuiTheme'
+import { ErrorBoundary } from './components/ErrorBoundary'
 
 const MainPage = ({ sha }: { sha: string }) => {
     const setSiteConfig = useUiStore((state) => state.setSiteConfig)
@@ -48,7 +49,9 @@ const MainPage = ({ sha }: { sha: string }) => {
             </span>
             <Container className="rs-container" maxWidth="xl">
                 <div style={{ display: 'flex' }}>
-                    <Header />
+                    <ErrorBoundary>
+                        <Header />
+                    </ErrorBoundary>
                     <Typography
                         sx={{ marginLeft: 'auto' }}
                         variant="body2"
@@ -57,7 +60,9 @@ const MainPage = ({ sha }: { sha: string }) => {
                         version: {sha.slice(0, 7)}
                     </Typography>
                 </div>
-                <FilterTabs sha={sha} />
+                <ErrorBoundary errorComponent={<Typography>Error</Typography>}>
+                    <FilterTabs sha={sha} />
+                </ErrorBoundary>
             </Container>
         </>
     )
