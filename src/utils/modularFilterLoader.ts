@@ -79,21 +79,25 @@ export const loadFilter = async (
                     validateModule(module)
                     return module
                 } else if (
-                    'relativeModuleJsonUrl' in moduleSource &&
-                    moduleSource.relativeModuleJsonUrl &&
-                    'relativeModuleRs2fUrl' in moduleSource &&
-                    moduleSource.relativeModuleRs2fUrl &&
+                    'modulePath' in moduleSource &&
+                    moduleSource.modulePath &&
                     'filterUrl' in source &&
                     source.filterUrl
                 ) {
                     const baseUrl = trimUrl(source.filterUrl)
-                    const moduleJsonUrl = `${baseUrl}/${moduleSource.relativeModuleJsonUrl}`
-                    const moduleRs2fUrl = `${baseUrl}/${moduleSource.relativeModuleRs2fUrl}`
+                    const moduleJsonUrl = `${baseUrl}/${moduleSource.modulePath}`
 
                     const moduleJsonResponse = await fetch(moduleJsonUrl)
                     const moduleJson =
                         (await moduleJsonResponse.json()) as FilterModule
 
+                    if (!moduleJson.rs2fPath) {
+                        throw new Error(
+                            `Module ${moduleJson.name} has no rs2fPath`
+                        )
+                    }
+                    const moduleBaseUrl = trimUrl(moduleJsonUrl)
+                    const moduleRs2fUrl = `${moduleBaseUrl}/${moduleJson.rs2fPath}`
                     const moduleRs2fResponse = await fetch(moduleRs2fUrl)
                     const moduleRs2fText = await moduleRs2fResponse.text()
 
@@ -108,7 +112,7 @@ export const loadFilter = async (
                     return module
                 } else {
                     throw new Error(
-                        `Invalid module source '${JSON.stringify(moduleSource)}', no moduleJson or moduleJsonUrl, no relativeModuleJsonUrl or relativeModuleRs2fUrl`
+                        `Invalid module source '${JSON.stringify(moduleSource)}', no moduleJson or moduleJsonUrl, no modulePath`
                     )
                 }
             }
