@@ -1,5 +1,6 @@
 import { Box, SxProps } from '@mui/material'
 import AbyssalNexusImage from '../images/abyssal_nexus.png'
+import BareGroundImage from '../images/bare_ground.png'
 import CatacombsOfKourendImage from '../images/catacombs_of_kourend.png'
 import ChambersOfXericImage from '../images/chambers_of_xeric.png'
 import GodWarsDungeonImage from '../images/god_wars_dungeon.png'
@@ -111,6 +112,7 @@ const backgroundImages = [
     WildernessImage,
     ZanarisImage,
     ZulAndraImage,
+    BareGroundImage,
 ]
 export const ItemLabelPreview: React.FC<{
     itemName: string
