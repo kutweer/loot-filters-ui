@@ -42,7 +42,7 @@ export type FilterDefinition = {
 }
 
 /**
- * This is what you'd put in a moudle file
+ * This is what you'd put in a module file
  * Actual input definitions are in InputsSpec
  */
 export type FilterModule = {

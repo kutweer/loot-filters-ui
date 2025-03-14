@@ -75,7 +75,7 @@ But if all the steps have been followed correctly the filter should load, and be
 
 In this chapter we're going to create and add our first module. It won't be super useful, but it will serve as a starting point for future modules we want to add. Like with the filter we'll end by importing it into the UI and being able to see our progress.
 
-## 3.1 Moudle JSON
+## 3.1 Module JSON
 
 In the modular filter system modules have 2 parts. First, an json file which defines which UI inputs we'll be able to configure, and a second `rs2f` file with the actual filter configuration in it. Lets start with the JSON. Add a new file called `my_module.json`.
 In that file put the following json structure.
@@ -124,13 +124,13 @@ The second line is `hidden=VAR_SHOW_ITEMS;` this line uses our macro to take the
 
 ## 3.3 Adding our module to our filter
 
-Now we need to update our filter to tell it about our moudle, we'll use the same relative path feature. The new `filter.json` should be:
+Now we need to update our filter to tell it about our module, we'll use the same relative path feature. The new `filter.json` should be:
 
 ```json
 {
     "name": "My Filter",
     "description": "My first filter",
-    "modules": [{ "modulePath": "my_moudle.json" }]
+    "modules": [{ "modulePath": "my_module.json" }]
 }
 ```
 
