@@ -180,14 +180,20 @@ export const ItemLabelPreview: React.FC<{
         Math.floor(Math.random() * backgroundImages.length)
     )
 
-    window.setTimeout(
-        () => {
-            setBackgroundImageIndex(
-                Math.floor(Math.random() * backgroundImages.length)
-            )
-        },
-        Math.floor(Math.random() * (60000 - 30000 + 1)) + 30000
-    )
+    useEffect(() => {
+        const interval = window.setInterval(
+            () => {
+                setBackgroundImageIndex(
+                    Math.floor(Math.random() * backgroundImages.length)
+                )
+            },
+            Math.floor(Math.random() * (60000 - 30000 + 1)) + 30000
+        )
+
+        return () => {
+            clearInterval(interval)
+        }
+    }, [])
 
     return (
         <div
