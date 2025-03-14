@@ -1,4 +1,4 @@
-import { Alert, Container, Snackbar } from '@mui/material'
+import { Alert, Container, Snackbar, Typography } from '@mui/material'
 import { ThemeProvider } from '@mui/material/styles'
 import { useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
@@ -8,6 +8,7 @@ import { ImportPage } from './pages/ImportPage'
 import { useAlertStore } from './store/alerts'
 import { useUiStore } from './store/store'
 import { MuiRsTheme } from './styles/MuiTheme'
+import { ErrorBoundary } from './components/ErrorBoundary'
 
 const MainPage = ({ sha }: { sha: string }) => {
     const setSiteConfig = useUiStore((state) => state.setSiteConfig)
@@ -47,8 +48,21 @@ const MainPage = ({ sha }: { sha: string }) => {
                 RuneScapeSmall
             </span>
             <Container className="rs-container" maxWidth="xl">
-                <Header />
-                <FilterTabs sha={sha} />
+                <div style={{ display: 'flex' }}>
+                    <ErrorBoundary>
+                        <Header />
+                    </ErrorBoundary>
+                    <Typography
+                        sx={{ marginLeft: 'auto' }}
+                        variant="body2"
+                        color="text.secondary"
+                    >
+                        version: {sha.slice(0, 7)}
+                    </Typography>
+                </div>
+                <ErrorBoundary errorComponent={<Typography>Error</Typography>}>
+                    <FilterTabs sha={sha} />
+                </ErrorBoundary>
             </Container>
         </>
     )
