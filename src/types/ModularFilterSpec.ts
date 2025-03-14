@@ -21,6 +21,9 @@ export type FilterSource =
  */
 export type ModuleSource =
     | {
+          modulePath: string
+      }
+    | {
           name: string
           moduleJsonUrl: string
           moduleRs2fUrl: string
@@ -51,6 +54,8 @@ export type FilterModule = {
     subtitle?: string
     // Long text displayed in the UI _inside_ the accordion
     description?: string
+    // Relative path to the rs2f file
+    rs2fPath?: string
     // default to true
     enabled?: boolean
     inputs: Input[]

@@ -8,6 +8,14 @@ import {
 } from '../types/ModularFilterSpec'
 import { assertString, validateModule } from '../types/validate'
 
+export const trimUrl = (input: string): string => {
+    const lastSlashIndex = input.lastIndexOf('/')
+    if (lastSlashIndex === -1) {
+        return input // No slash found, return the whole string
+    }
+    return input.substring(0, lastSlashIndex)
+}
+
 export const loadFilter = async (
     source: FilterSource | UiModularFilter
 ): Promise<UiModularFilter> => {
@@ -70,9 +78,47 @@ export const loadFilter = async (
 
                     validateModule(module)
                     return module
+                } else if (
+                    'modulePath' in moduleSource &&
+                    moduleSource.modulePath &&
+                    'filterUrl' in source &&
+                    source.filterUrl
+                ) {
+                    const baseUrl = trimUrl(source.filterUrl)
+                    let moduleJsonUrl = moduleSource.modulePath
+                    if (!moduleSource.modulePath.startsWith('https://')) {
+                        moduleJsonUrl = `${baseUrl}/${moduleSource.modulePath}`
+                    }
+
+                    const moduleJsonResponse = await fetch(moduleJsonUrl)
+                    const moduleJson =
+                        (await moduleJsonResponse.json()) as FilterModule
+
+                    if (!moduleJson.rs2fPath) {
+                        throw new Error(
+                            `Module ${moduleJson.name} has no rs2fPath`
+                        )
+                    }
+                    let moduleRs2fUrl = moduleJson.rs2fPath
+                    if (!moduleJson.rs2fPath.startsWith('https://')) {
+                        const moduleBaseUrl = trimUrl(moduleJsonUrl)
+                        moduleRs2fUrl = `${moduleBaseUrl}/${moduleJson.rs2fPath}`
+                    }
+                    const moduleRs2fResponse = await fetch(moduleRs2fUrl)
+                    const moduleRs2fText = await moduleRs2fResponse.text()
+
+                    const module = {
+                        ...moduleJson,
+                        rs2fText: moduleRs2fText,
+                        source: moduleSource,
+                        id: crypto.randomUUID(),
+                    } as UiFilterModule
+
+                    validateModule(module)
+                    return module
                 } else {
                     throw new Error(
-                        `Invalid module source '${JSON.stringify(moduleSource)}', no moduleJson or moduleJsonUrl`
+                        `Invalid module source '${JSON.stringify(moduleSource)}', no moduleJson or moduleJsonUrl, no modulePath`
                     )
                 }
             }

@@ -10,11 +10,7 @@ import {
 } from '@mui/material'
 import React, { useCallback, useState } from 'react'
 import { useUiStore } from '../store/store'
-import {
-    FilterModule,
-    ModuleSource,
-    UiModularFilter,
-} from '../types/ModularFilterSpec'
+import { FilterModule, ModuleSource } from '../types/ModularFilterSpec'
 import { loadFilter } from '../utils/modularFilterLoader'
 import { Option, UISelect } from './inputs/UISelect'
 
@@ -30,6 +26,7 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
     filtersForImport,
 }) => {
     const [filterUrl, setFilterUrl] = useState('')
+    const [filterNameOverride, setFilterNameOverride] = useState('')
     const [importError, setImportError] = useState('')
 
     const addImportedModularFilter = useUiStore(
@@ -47,12 +44,9 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
         []
     )
 
-    const [loadedFilter, setLoadedFilter] = useState<UiModularFilter | null>(
-        null
-    )
-
     const handleClose = () => {
         setFilterUrl('')
+        setFilterNameOverride('')
         onClose()
     }
 
@@ -100,21 +94,18 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                         helperText={importError}
                     />
                     <TextField
-                        label="Filter Name"
-                        value={loadedFilter?.name ?? ''}
+                        label="Filter Name Override"
+                        value={filterNameOverride}
                         onChange={(e) => {
-                            setLoadedFilter({
-                                ...loadedFilter!!,
-                                name: e.target.value,
-                            })
+                            setFilterNameOverride(e.target.value)
                         }}
                     />
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
                     <Button
+                        disabled={filterUrl.length === 0}
                         variant="outlined"
                         color="primary"
-                        disabled={filterUrl === '' || importError !== ''}
                         onClick={() => {
                             setImportError('')
                             if (filterUrl.startsWith('http')) {
@@ -126,7 +117,12 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                                     })
                                     .then((filter) => {
                                         if (filter) {
-                                            setLoadedFilter(filter)
+                                            if (filterNameOverride !== '') {
+                                                filter.name = filterNameOverride
+                                            }
+                                            addImportedModularFilter(filter)
+                                            setActiveFilterId(filter.id)
+                                            handleClose()
                                         }
                                     })
                             } else {
@@ -145,26 +141,12 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                                         id: crypto.randomUUID(),
                                     })
                                 )
+                                if (filterNameOverride !== '') {
+                                    filter.name = filterNameOverride
+                                }
 
-                                setLoadedFilter(filter)
-
-                                setFilterUrl('')
-                                handleClose()
-                            }
-                        }}
-                    >
-                        Fetch
-                    </Button>
-                    <Button
-                        disabled={loadedFilter === null}
-                        variant="outlined"
-                        color="primary"
-                        onClick={() => {
-                            if (loadedFilter) {
-                                addImportedModularFilter(loadedFilter)
-                                setActiveFilterId(loadedFilter.id)
-                                setFilterUrl('')
-                                setLoadedFilter(null)
+                                addImportedModularFilter(filter)
+                                setActiveFilterId(filter.id)
                                 handleClose()
                             }
                         }}
