@@ -1,4 +1,4 @@
-import { Alert, Container, Snackbar } from '@mui/material'
+import { Alert, Container, Snackbar, Typography } from '@mui/material'
 import { ThemeProvider } from '@mui/material/styles'
 import { useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
@@ -47,7 +47,16 @@ const MainPage = ({ sha }: { sha: string }) => {
                 RuneScapeSmall
             </span>
             <Container className="rs-container" maxWidth="xl">
-                <Header sha={sha} />
+                <div style={{ display: 'flex' }}>
+                    <Header />
+                    <Typography
+                        sx={{ marginLeft: 'auto' }}
+                        variant="body2"
+                        color="text.secondary"
+                    >
+                        version: {sha.slice(0, 7)}
+                    </Typography>
+                </div>
                 <FilterTabs sha={sha} />
             </Container>
         </>
