@@ -47,7 +47,7 @@ const MainPage = ({ sha }: { sha: string }) => {
                 RuneScapeSmall
             </span>
             <Container className="rs-container" maxWidth="xl">
-                <Header />
+                <Header sha={sha} />
                 <FilterTabs sha={sha} />
             </Container>
         </>

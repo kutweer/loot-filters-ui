@@ -10,7 +10,7 @@ import {
 import { useUiStore } from '../store/store'
 import { colors } from '../styles/MuiTheme'
 
-export const Header: React.FC = () => {
+export const Header: React.FC<{ sha: string }> = ({ sha }) => {
     const { siteConfig, setSiteConfig } = useUiStore()
 
     return (
@@ -61,6 +61,9 @@ export const Header: React.FC = () => {
                         </FormGroup>
                     </FormControl>
                 ) : null}
+                <Typography variant="body2" color="text.secondary">
+                    version: {sha.slice(0, 7)}
+                </Typography>
             </Box>
         </Box>
     )
