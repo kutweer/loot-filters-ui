@@ -6,6 +6,7 @@ const filterTypes = {
     enumlist: 'enumlist',
     includeExcludeList: 'includeExcludeList',
     style: 'style',
+    text: 'text',
 } as const
 
 // Types for fields that can change depending on the input type
@@ -16,6 +17,7 @@ export type Input =
     | EnumListInput
     | IncludeExcludeListInput
     | StyleInput
+    | TextInput
 export type FilterType = keyof typeof filterTypes
 export type InputDefault<I extends Input> = I['default']
 export type ModuleName = string
@@ -143,7 +145,7 @@ export const labelFromFontType = (fontType: FontType) => {
 export type ArgbHexColor = `#${string}`
 
 export type StyleInput = Omit<FilterModuleInput<'style'>, 'default'> & {
-    default: {
+    default: Partial<{
         textColor: ArgbHexColor
         backgroundColor: ArgbHexColor
         borderColor: ArgbHexColor
@@ -161,6 +163,11 @@ export type StyleInput = Omit<FilterModuleInput<'style'>, 'default'> & {
         tileStrokeColor: ArgbHexColor
         tileFillColor: ArgbHexColor
         tileHighlightColor: ArgbHexColor
-    }
+        sound: string
+    }>
     exampleItem?: string
+}
+
+export type TextInput = Omit<FilterModuleInput<'text'>, 'default'> & {
+    default: string
 }

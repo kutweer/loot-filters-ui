@@ -28,6 +28,7 @@ import {
     NumberInput,
     StringListInput,
     StyleInput,
+    TextInput,
 } from '../../types/InputsSpec'
 import { FilterId, UiFilterModule } from '../../types/ModularFilterSpec'
 
@@ -38,6 +39,7 @@ import { IncludeExcludeListInputComponent } from '../inputs/IncludeExcludeListIn
 import { NumberInputComponent } from '../inputs/NumberInputComponent'
 import { StringListInputComponent } from '../inputs/StringListInputComponent'
 import { StyleConfig } from '../inputs/StyleInputHelpers'
+import { TextInputComponent } from '../inputs/TextInputComponent'
 import { ItemLabelPreview } from '../Previews'
 
 const InputComponent: React.FC<{
@@ -93,6 +95,15 @@ const InputComponent: React.FC<{
                     activeFilterId={activeFilterId}
                     module={module}
                     input={input as IncludeExcludeListInput}
+                />
+            )
+        case 'text':
+            const textInput = input as TextInput
+            return (
+                <TextInputComponent
+                    activeFilterId={activeFilterId}
+                    module={module}
+                    input={textInput}
                 />
             )
         default:

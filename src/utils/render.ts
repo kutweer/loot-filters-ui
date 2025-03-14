@@ -100,6 +100,15 @@ const renderModule = (
                 }
                 break
             }
+            case 'text': {
+                const text = (config?.[input.macroName] ?? input.default) as
+                    | string
+                    | undefined
+                if (text !== undefined) {
+                    updated = updateMacro(updated, input.macroName, text)
+                }
+                break
+            }
         }
     }
     return updated

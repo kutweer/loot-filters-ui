@@ -43,6 +43,7 @@ export const loadFilter = async (
                     'moduleRs2fText' in moduleSource &&
                     typeof moduleSource.moduleRs2fText === 'string'
                 ) {
+                    console.log(moduleSource.moduleRs2fText)
                     const module = {
                         ...moduleSource.moduleJson,
                         rs2fText: moduleSource.moduleRs2fText,
