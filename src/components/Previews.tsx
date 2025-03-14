@@ -6,12 +6,15 @@ import ChambersOfXericImage from '../images/chambers_of_xeric.png'
 import GodWarsDungeonImage from '../images/god_wars_dungeon.png'
 import GrassImage from '../images/grass.png'
 import SandImage from '../images/sand.png'
+import ScarImage from '../images/scar.png'
 import TzhaarImage from '../images/tzhaar.png'
+import UndercityImage from '../images/undercity.png'
 import WildernessImage from '../images/wilderness.png'
 import ZanarisImage from '../images/zanaris.png'
 import ZulAndraImage from '../images/zul_andra.png'
 
 import { useEffect, useState } from 'react'
+import NightmareImage from '../images/nightmare.png'
 import { useUiStore } from '../store/store'
 import { colors } from '../styles/MuiTheme'
 import { fontFamilyFromFontType, StyleInput } from '../types/InputsSpec'
@@ -113,6 +116,9 @@ const backgroundImages = [
     ZanarisImage,
     ZulAndraImage,
     BareGroundImage,
+    ScarImage,
+    UndercityImage,
+    NightmareImage,
 ]
 export const ItemLabelPreview: React.FC<{
     itemName: string
