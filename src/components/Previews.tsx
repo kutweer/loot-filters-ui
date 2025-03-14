@@ -7,6 +7,7 @@ import GrassImage from '../images/grass.png'
 import SandImage from '../images/sand.png'
 import TzhaarImage from '../images/tzhaar.png'
 import WildernessImage from '../images/wilderness.png'
+import ZanarisImage from '../images/zanaris.png'
 
 import { useEffect, useState } from 'react'
 import { useUiStore } from '../store/store'
@@ -107,6 +108,7 @@ const backgroundImages = [
     CatacombsOfKourendImage,
     AbyssalNexusImage,
     WildernessImage,
+    ZanarisImage,
 ]
 export const ItemLabelPreview: React.FC<{
     itemName: string
