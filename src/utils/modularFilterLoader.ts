@@ -8,6 +8,14 @@ import {
 } from '../types/ModularFilterSpec'
 import { assertString, validateModule } from '../types/validate'
 
+export const trimUrl = (input: string): string => {
+    const lastSlashIndex = input.lastIndexOf('/')
+    if (lastSlashIndex === -1) {
+        return input // No slash found, return the whole string
+    }
+    return input.substring(0, lastSlashIndex)
+}
+
 export const loadFilter = async (
     source: FilterSource | UiModularFilter
 ): Promise<UiModularFilter> => {
@@ -67,6 +75,34 @@ export const loadFilter = async (
                         source: moduleSource,
                         id: crypto.randomUUID(),
                     }
+
+                    validateModule(module)
+                    return module
+                } else if (
+                    'relativeModuleJsonUrl' in moduleSource &&
+                    moduleSource.relativeModuleJsonUrl &&
+                    'relativeModuleRs2fUrl' in moduleSource &&
+                    moduleSource.relativeModuleRs2fUrl &&
+                    'filterUrl' in source &&
+                    source.filterUrl
+                ) {
+                    const baseUrl = trimUrl(source.filterUrl)
+                    const moduleJsonUrl = `${baseUrl}/${moduleSource.relativeModuleJsonUrl}`
+                    const moduleRs2fUrl = `${baseUrl}/${moduleSource.relativeModuleRs2fUrl}`
+
+                    const moduleJsonResponse = await fetch(moduleJsonUrl)
+                    const moduleJson =
+                        (await moduleJsonResponse.json()) as FilterModule
+
+                    const moduleRs2fResponse = await fetch(moduleRs2fUrl)
+                    const moduleRs2fText = await moduleRs2fResponse.text()
+
+                    const module = {
+                        ...moduleJson,
+                        rs2fText: moduleRs2fText,
+                        source: moduleSource,
+                        id: crypto.randomUUID(),
+                    } as UiFilterModule
 
                     validateModule(module)
                     return module

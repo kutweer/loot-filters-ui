@@ -22,6 +22,11 @@ export type FilterSource =
 export type ModuleSource =
     | {
           name: string
+          relativeModuleJsonUrl: string
+          relativeModuleRs2fUrl: string
+      }
+    | {
+          name: string
           moduleJsonUrl: string
           moduleRs2fUrl: string
       }
