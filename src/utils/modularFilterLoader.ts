@@ -85,7 +85,10 @@ export const loadFilter = async (
                     source.filterUrl
                 ) {
                     const baseUrl = trimUrl(source.filterUrl)
-                    const moduleJsonUrl = `${baseUrl}/${moduleSource.modulePath}`
+                    let moduleJsonUrl = moduleSource.modulePath
+                    if (!moduleSource.modulePath.startsWith('https://')) {
+                        moduleJsonUrl = `${baseUrl}/${moduleSource.modulePath}`
+                    }
 
                     const moduleJsonResponse = await fetch(moduleJsonUrl)
                     const moduleJson =
@@ -96,8 +99,11 @@ export const loadFilter = async (
                             `Module ${moduleJson.name} has no rs2fPath`
                         )
                     }
-                    const moduleBaseUrl = trimUrl(moduleJsonUrl)
-                    const moduleRs2fUrl = `${moduleBaseUrl}/${moduleJson.rs2fPath}`
+                    let moduleRs2fUrl = moduleJson.rs2fPath
+                    if (!moduleJson.rs2fPath.startsWith('https://')) {
+                        const moduleBaseUrl = trimUrl(moduleJsonUrl)
+                        moduleRs2fUrl = `${moduleBaseUrl}/${moduleJson.rs2fPath}`
+                    }
                     const moduleRs2fResponse = await fetch(moduleRs2fUrl)
                     const moduleRs2fText = await moduleRs2fResponse.text()
 
