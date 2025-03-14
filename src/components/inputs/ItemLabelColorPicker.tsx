@@ -3,10 +3,12 @@ import { useUiStore } from '../../store/store'
 import { colors } from '../../styles/MuiTheme'
 import {
     FontType,
-    fontType,
+    fontTypes,
+    labelFromFontType,
+    labelFromTextAccent,
     StyleInput,
     TextAccent,
-    textAccent,
+    textAccents,
 } from '../../types/InputsSpec'
 import { UiFilterModule } from '../../types/ModularFilterSpec'
 import { ArgbHexColor } from '../../utils/Color'
@@ -54,19 +56,15 @@ export const ItemLabelColorPicker: React.FC<{
         })
     }
 
-    const fontTypeOptions: Option<FontType>[] = Object.keys(fontType)
-        .map((type) => type as unknown as FontType)
-        .map((type) => ({
-            label: fontType[type],
-            value: type,
-        }))
+    const fontTypeOptions = fontTypes.map<Option<FontType>>((type) => ({
+        label: labelFromFontType(type),
+        value: type,
+    }))
 
-    const textAccentOptions: Option<TextAccent>[] = Object.keys(textAccent)
-        .map((accent) => accent as unknown as TextAccent)
-        .map((accent) => ({
-            label: textAccent[accent],
-            value: accent,
-        }))
+    const textAccentOptions = textAccents.map<Option<TextAccent>>((accent) => ({
+        label: labelFromTextAccent(accent),
+        value: accent,
+    }))
 
     return (
         <div
@@ -128,11 +126,11 @@ export const ItemLabelColorPicker: React.FC<{
                         multiple={false}
                         freeSolo={false}
                         value={{
-                            label: fontType[
+                            label: labelFromFontType(
                                 activeConfig?.fontType ??
                                     input.default?.fontType ??
-                                    1 // Default to small
-                            ],
+                                    FontType.Small // Default to small
+                            ),
                             value:
                                 activeConfig?.fontType ??
                                 input.default?.fontType ??
@@ -198,11 +196,11 @@ export const ItemLabelColorPicker: React.FC<{
                     multiple={false}
                     freeSolo={false}
                     value={{
-                        label: textAccent[
+                        label: labelFromTextAccent(
                             activeConfig?.textAccent ??
                                 input.default?.textAccent ??
-                                1 // Default to shadow
-                        ],
+                                TextAccent.Shadow // Default to shadow
+                        ),
                         value:
                             activeConfig?.textAccent ??
                             input.default?.textAccent ??

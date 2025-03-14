@@ -22,7 +22,7 @@ const COMMON_FILTERS = [
     },
     {
         name: "Joe's Filter for Persnickety Players",
-        url: 'https://raw.githubusercontent.com/typical-whack/loot-filters-modules/refs/heads/main/filter.json',
+        url: 'https://raw.githubusercontent.com/typical-whack/loot-filters-modules/c6fb1b5ebe7da0554b238e78857eb4a1fe680223/filter.json',
     },
 ]
 

@@ -28,7 +28,7 @@ export const Header: React.FC = () => {
                         gutterBottom
                     >
                         <span style={{ color: colors.rsYellow }}>
-                            A Loot Filter builder for{' '}
+                            A LootFilter builder for{' '}
                             <Link
                                 style={{
                                     color: colors.rsYellow,

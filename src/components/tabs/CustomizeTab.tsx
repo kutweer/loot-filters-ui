@@ -445,7 +445,7 @@ export const CustomizeTab: React.FC = () => {
     }
 
     return (
-        <Stack spacing={2}>
+        <Stack>
             {activeFilter?.modules.map((module, index: number) => (
                 <ModuleSection
                     key={index}
