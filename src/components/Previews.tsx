@@ -6,6 +6,7 @@ import GodWarsDungeonImage from '../images/god_wars_dungeon.png'
 import GrassImage from '../images/grass.png'
 import SandImage from '../images/sand.png'
 import TzhaarImage from '../images/tzhaar.png'
+import WildernessImage from '../images/wilderness.png'
 
 import { useEffect, useState } from 'react'
 import { useUiStore } from '../store/store'
@@ -105,6 +106,7 @@ const backgroundImages = [
     ChambersOfXericImage,
     CatacombsOfKourendImage,
     AbyssalNexusImage,
+    WildernessImage,
 ]
 export const ItemLabelPreview: React.FC<{
     itemName: string
