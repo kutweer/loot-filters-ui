@@ -108,7 +108,7 @@ export const loadFilter = async (
                     return module
                 } else {
                     throw new Error(
-                        `Invalid module source '${JSON.stringify(moduleSource)}', no moduleJson or moduleJsonUrl`
+                        `Invalid module source '${JSON.stringify(moduleSource)}', no moduleJson or moduleJsonUrl, no relativeModuleJsonUrl or relativeModuleRs2fUrl`
                     )
                 }
             }
