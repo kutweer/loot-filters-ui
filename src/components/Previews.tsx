@@ -7,7 +7,7 @@ import GrassImage from '../images/grass.png'
 import SandImage from '../images/sand.png'
 import TzhaarImage from '../images/tzhaar.png'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useUiStore } from '../store/store'
 import { colors } from '../styles/MuiTheme'
 import { fontFamilyFromFontType, StyleInput } from '../types/InputsSpec'
