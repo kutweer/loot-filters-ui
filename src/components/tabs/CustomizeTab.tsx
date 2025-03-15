@@ -310,7 +310,15 @@ const ModuleSection: React.FC<{
                         clearConfiguration(
                             activeFilterId,
                             module.inputs
-                                .map((input) => input.macroName as string | { includes: string; excludes: string })
+                                .map(
+                                    (input) =>
+                                        input.macroName as
+                                            | string
+                                            | {
+                                                  includes: string
+                                                  excludes: string
+                                              }
+                                )
                                 .reduce<string[]>((acc, macroName) => {
                                     if (typeof macroName === 'string') {
                                         return [...acc, macroName]
