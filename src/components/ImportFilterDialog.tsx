@@ -139,6 +139,11 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                                             }
                                         ).moduleJson,
                                         id: crypto.randomUUID(),
+                                        rs2fText: (
+                                            module as {
+                                                moduleRs2fText: string
+                                            }
+                                        ).moduleRs2fText,
                                     })
                                 )
                                 if (filterNameOverride !== '') {

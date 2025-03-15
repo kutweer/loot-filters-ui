@@ -8,6 +8,7 @@ import {
     Divider,
     FormControlLabel,
     Grid2 as Grid,
+    TextField,
 } from '@mui/material'
 import React, { useState } from 'react'
 import { useUiStore } from '../../store/store'
@@ -19,6 +20,7 @@ import { ItemLabelPreview, ItemMenuPreview } from '../Previews'
 import { ColorPickerInput } from './ColorPicker'
 import { ItemLabelColorPicker } from './ItemLabelColorPicker'
 import { StyleConfig } from './StyleInputHelpers'
+import { TextInputComponent } from './TextInputComponent'
 
 export const DisplayConfigurationInput: React.FC<{
     module: UiFilterModule
@@ -232,18 +234,16 @@ export const DisplayConfigurationInput: React.FC<{
         </Grid>
     )
 
-    const divider = (
-        <Grid size={1} sx={{ display: 'flex', padding: 1 }}>
-            <Divider
-                sx={{
-                    marginLeft: 'auto',
-                    marginRight: 'auto',
-                    borderColor: colors.rsLightBrown,
-                }}
-                orientation="vertical"
-                flexItem
-            />
-        </Grid>
+    const soundFileInput = (
+        <TextField
+            label="Sound File"
+            value={styleConfig?.sound ?? input.default?.sound ?? ''}
+            onChange={(e) =>
+                setFilterConfiguration(activeFilterId, input.macroName, {
+                    sound: e.target.value,
+                })
+            }
+        />
     )
 
     const inputComponents = [
@@ -258,6 +258,7 @@ export const DisplayConfigurationInput: React.FC<{
         despawnComponent,
         notifyComponent,
         hideOverlayComponent,
+        soundFileInput,
     ]
 
     return (

@@ -91,19 +91,55 @@ const listInputFilter: FilterDefinition = {
     ],
 }
 
+const textInputFilter: FilterDefinition = {
+    name: '[Dev] Text Input Filter',
+    description: 'A filter that allows you to enter text',
+    modules: [
+        {
+            name: 'Text Input',
+            moduleJson: {
+                name: 'Text Input',
+                description: 'A text input with no default values',
+                inputs: [
+                    {
+                        type: 'text',
+                        macroName: 'VAR_TEXT_INPUT',
+                        label: 'Text Input',
+                        default: '',
+                    },
+                ],
+            },
+            moduleRs2fText: '#define VAR_TEXT_INPUT',
+        },
+    ],
+}
+
+const styleInputFilter: FilterDefinition = {
+    name: '[Dev] Style Input Filter',
+    description: 'A filter that allows you to select a style',
+    modules: [
+        {
+            name: 'Style Input',
+            moduleJson: {
+                name: 'Style Input',
+                description: 'A style input with no default values',
+                inputs: [
+                    {
+                        type: 'style',
+                        macroName: 'VAR_STYLE_INPUT',
+                        label: 'Style Input',
+                        default: {},
+                    },
+                ],
+            },
+            moduleRs2fText: '#define VAR_STYLE_INPUT',
+        },
+    ],
+}
+
 export const DEV_FILTERS = [
-    {
-        name: '[Dev] Style Input',
-        url: 'https://raw.githubusercontent.com/Kaqemeex/loot-filters-ui/refs/heads/main/module-system-docs/site-testing-filters/single_style_filter.json',
-    },
-    {
-        name: '[Dev] Number, Bool & Unsupported inputs',
-        url: 'https://raw.githubusercontent.com/Kaqemeex/loot-filters-ui/refs/heads/main/module-system-docs/site-testing-filters/misc_filter.json',
-    },
-    {
-        name: '[Dev] Invalid Filter',
-        url: 'https://raw.githubusercontent.com/Kaqemeex/loot-filters-ui/refs/heads/main/module-system-docs/site-testing-filters/filter_with_invalid_input.json',
-    },
     enableDisableModuleFilter,
     listInputFilter,
+    textInputFilter,
+    styleInputFilter,
 ]
