@@ -237,7 +237,7 @@ export const DisplayConfigurationInput: React.FC<{
     const soundFileInput = (
         <TextField
             label="Sound File"
-            value={styleConfig?.sound ?? input.default?.sound ?? ""}
+            value={styleConfig?.sound ?? input.default?.sound ?? ''}
             onChange={(e) =>
                 setFilterConfiguration(activeFilterId, input.macroName, {
                     sound: e.target.value,
