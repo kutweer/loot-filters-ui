@@ -179,7 +179,7 @@ const ModuleSection: React.FC<{
     const activeConfig = useUiStore(
         (state) => state.filterConfigurations?.[activeFilterId]
     )
-
+    const clearConfiguration = useUiStore((state) => state.clearConfiguration)
     const setEnabledModule = useUiStore((state) => state.setEnabledModule)
 
     let json: string | null = null
@@ -261,6 +261,8 @@ const ModuleSection: React.FC<{
                         justifyContent: 'space-between',
                         gap: '16px',
                     },
+                    flexDirection: 'row-reverse',
+                    gap: '16px',
                 }}
             >
                 <Stack>
@@ -304,17 +306,67 @@ const ModuleSection: React.FC<{
             </AccordionSummary>
             <AccordionDetails>
                 <Stack spacing={2} direction="column">
-                    <Typography
-                        variant="h6"
-                        component="span"
-                        color={colors.rsLightestBrown}
-                        sx={{
-                            ml: 1,
-                            display: 'inline-block',
-                        }}
-                    >
-                        {module.description}
-                    </Typography>
+                    <Stack direction="row" justifyContent="flex-end">
+                        <Typography
+                            variant="h6"
+                            component="span"
+                            color={colors.rsLightestBrown}
+                            sx={{
+                                ml: 1,
+                                display: 'inline-block',
+                            }}
+                        >
+                            {module.description}
+                        </Typography>
+                        <Box display="flex">
+                            <Button
+                                variant="outlined"
+                                size="small"
+                                sx={{
+                                    whiteSpace: 'nowrap',
+                                    minWidth: 'max-content',
+                                    maxHeight: 'max-content',
+                                }}
+                                onClick={() => {
+                                    clearConfiguration(
+                                        activeFilterId,
+                                        module.inputs
+                                            .map(
+                                                (input) =>
+                                                    input.macroName as
+                                                        | string
+                                                        | {
+                                                              includes: string
+                                                              excludes: string
+                                                          }
+                                            )
+                                            .reduce<string[]>(
+                                                (acc, macroName) => {
+                                                    if (
+                                                        typeof macroName ===
+                                                        'string'
+                                                    ) {
+                                                        return [
+                                                            ...acc,
+                                                            macroName,
+                                                        ]
+                                                    } else {
+                                                        return [
+                                                            ...acc,
+                                                            macroName.includes,
+                                                            macroName.excludes,
+                                                        ]
+                                                    }
+                                                },
+                                                []
+                                            )
+                                    )
+                                }}
+                            >
+                                Reset Module
+                            </Button>
+                        </Box>
+                    </Stack>
                     {siteConfig.devMode ? (
                         <Box display="flex" justifyContent="flex-end">
                             <ToggleButtonGroup
