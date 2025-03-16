@@ -18,11 +18,11 @@ import { Option, UISelect } from './inputs/UISelect'
 const COMMON_FILTERS = [
     {
         name: 'FilterScape - An all in one filter for mains',
-        url: 'https://raw.githubusercontent.com/riktenx/filterscape/refs/heads/main/index.json',
+        url: 'https://raw.githubusercontent.com/riktenx/filterscape/b0e3e9dcb9dacda328f62d973ad37ff12b4102e3/index.json',
     },
     {
         name: "Joe's Filter for Persnickety Players",
-        url: 'https://raw.githubusercontent.com/typical-whack/loot-filters-modules/c6fb1b5ebe7da0554b238e78857eb4a1fe680223/filter.json',
+        url: 'https://raw.githubusercontent.com/typical-whack/loot-filters-modules/13209a9b11c48dd52435b45a69e635049c0e1b26/filter.json',
     },
 ]
 
