@@ -137,6 +137,7 @@ const renderStyle = (style: StyleConfig): string => {
         renderStyleBool('notify', style.notify),
         renderStyleBool('hideOverlay', style.hideOverlay),
         renderStyleBool('highlightTile', style.highlightTile),
+        renderStyleString('sound', style.sound),
     ].join('')
 }
 
@@ -148,6 +149,9 @@ const renderStyleInt = (name: string, int: number | undefined): string =>
 
 const renderStyleBool = (name: string, value: boolean | undefined): string =>
     value !== undefined ? `${name} = ${value};` : ''
+
+const renderStyleString = (name: string, value: string | undefined): string =>
+    value !== undefined ? `${name} = "${value}";` : ''
 
 const isTargetMacro = (line: string, target: string): boolean =>
     line.startsWith(`#define ${target} `) || line === `#define ${target}`
