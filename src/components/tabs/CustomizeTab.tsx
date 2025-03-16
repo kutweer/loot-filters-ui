@@ -303,50 +303,68 @@ const ModuleSection: React.FC<{
                 </Button>
             </AccordionSummary>
             <AccordionDetails>
-                <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => {
-                        clearConfiguration(
-                            activeFilterId,
-                            module.inputs
-                                .map(
-                                    (input) =>
-                                        input.macroName as
-                                            | string
-                                            | {
-                                                  includes: string
-                                                  excludes: string
-                                              }
-                                )
-                                .reduce<string[]>((acc, macroName) => {
-                                    if (typeof macroName === 'string') {
-                                        return [...acc, macroName]
-                                    } else {
-                                        return [
-                                            ...acc,
-                                            macroName.includes,
-                                            macroName.excludes,
-                                        ]
-                                    }
-                                }, [])
-                        )
-                    }}
-                >
-                    Reset Module
-                </Button>
                 <Stack spacing={2} direction="column">
-                    <Typography
-                        variant="h6"
-                        component="span"
-                        color={colors.rsLightestBrown}
-                        sx={{
-                            ml: 1,
-                            display: 'inline-block',
-                        }}
-                    >
-                        {module.description}
-                    </Typography>
+                    <Stack direction="row">
+                        <Typography
+                            variant="h6"
+                            component="span"
+                            color={colors.rsLightestBrown}
+                            sx={{
+                                ml: 1,
+                                display: 'inline-block',
+                            }}
+                        >
+                            {module.description}
+                        </Typography>
+                        <Box display="flex" justifyContent="flex-end">
+                            <Button
+                                variant="outlined"
+                                size="small"
+                                sx={{
+                                    whiteSpace: 'nowrap',
+                                    minWidth: 'max-content',
+                                    maxHeight: 'max-content',
+                                }}
+                                onClick={() => {
+                                    clearConfiguration(
+                                        activeFilterId,
+                                        module.inputs
+                                            .map(
+                                                (input) =>
+                                                    input.macroName as
+                                                        | string
+                                                        | {
+                                                              includes: string
+                                                              excludes: string
+                                                          }
+                                            )
+                                            .reduce<string[]>(
+                                                (acc, macroName) => {
+                                                    if (
+                                                        typeof macroName ===
+                                                        'string'
+                                                    ) {
+                                                        return [
+                                                            ...acc,
+                                                            macroName,
+                                                        ]
+                                                    } else {
+                                                        return [
+                                                            ...acc,
+                                                            macroName.includes,
+                                                            macroName.excludes,
+                                                        ]
+                                                    }
+                                                },
+                                                []
+                                            )
+                                    )
+                                }}
+                            >
+                                Reset Module
+                            </Button>
+                        </Box>
+                    </Stack>
                     {siteConfig.devMode ? (
                         <Box display="flex" justifyContent="flex-end">
                             <ToggleButtonGroup
