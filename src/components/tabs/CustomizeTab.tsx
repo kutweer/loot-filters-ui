@@ -333,7 +333,7 @@ const ModuleSection: React.FC<{
                         )
                     }}
                 >
-                    Clear Configuration
+                    Reset Module
                 </Button>
                 <Stack spacing={2} direction="column">
                     <Typography
