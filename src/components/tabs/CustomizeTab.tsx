@@ -261,6 +261,7 @@ const ModuleSection: React.FC<{
                         justifyContent: 'space-between',
                         gap: '16px',
                     },
+                    flexDirection: 'row-reverse',
                 }}
             >
                 <Stack>
