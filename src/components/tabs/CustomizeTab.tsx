@@ -262,6 +262,7 @@ const ModuleSection: React.FC<{
                         gap: '16px',
                     },
                     flexDirection: 'row-reverse',
+                    gap: '16px',
                 }}
             >
                 <Stack>
