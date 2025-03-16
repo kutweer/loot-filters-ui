@@ -304,7 +304,7 @@ const ModuleSection: React.FC<{
             </AccordionSummary>
             <AccordionDetails>
                 <Stack spacing={2} direction="column">
-                    <Stack direction="row">
+                    <Stack direction="row" justifyContent="flex-end">
                         <Typography
                             variant="h6"
                             component="span"
@@ -316,7 +316,7 @@ const ModuleSection: React.FC<{
                         >
                             {module.description}
                         </Typography>
-                        <Box display="flex" justifyContent="flex-end">
+                        <Box display="flex">
                             <Button
                                 variant="outlined"
                                 size="small"
