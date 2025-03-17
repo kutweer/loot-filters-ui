@@ -18,7 +18,7 @@ import { Option, UISelect } from './inputs/UISelect'
 const COMMON_FILTERS = [
     {
         name: 'FilterScape - An all in one filter for mains',
-        url: 'https://raw.githubusercontent.com/riktenx/filterscape/b0e3e9dcb9dacda328f62d973ad37ff12b4102e3/index.json',
+        url: 'https://raw.githubusercontent.com/riktenx/filterscape/c60bafc2caa3ad7f64b26a2377151ad51ac509d7/index.json',
     },
     {
         name: "Joe's Filter for Persnickety Players",
