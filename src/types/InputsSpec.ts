@@ -1,3 +1,5 @@
+import { StyleConfig } from '../components/inputs/StyleInputHelpers'
+
 // Don't export this, just use FilterType
 const filterTypes = {
     boolean: 'boolean',
@@ -19,7 +21,39 @@ export type Input =
     | StyleInput
     | TextInput
 export type FilterType = keyof typeof filterTypes
-export type InputDefault<I extends Input> = I['default']
+export type InputDefault<I extends Input> = I extends NumberInput
+    ? number
+    : I extends BooleanInput
+      ? boolean
+      : I extends StringListInput
+        ? string[] | ListOption[]
+        : I extends EnumListInput
+          ? string[]
+          : I extends IncludeExcludeListInput
+            ? IncludeExcludeListInputDefaults
+            : I extends StyleInput
+              ? Partial<StyleConfig>
+              : I extends TextInput
+                ? string
+                : never
+
+export type ListDiff = {
+    added: string[]
+    removed: string[]
+}
+
+export type InputConfig<I extends Input> =
+    I extends Exclude<
+        Input,
+        StringListInput | EnumListInput | IncludeExcludeListInput | StyleInput
+    >
+        ? InputDefault<I>
+        : I extends StringListInput | EnumListInput | IncludeExcludeListInput
+          ? ListDiff
+          : I extends StyleInput
+            ? Partial<StyleConfig>
+            : never
+
 export type ModuleName = string
 export type MacroName = string
 

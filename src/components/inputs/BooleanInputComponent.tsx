@@ -27,7 +27,11 @@ export const BooleanInputComponent: React.FC<{
             checked={currentSetting}
             onChange={(event) => {
                 const value = event.target.checked
-                setFilterConfiguration(activeFilterId, input.macroName, value)
+                setFilterConfiguration<BooleanInput>(
+                    activeFilterId,
+                    input.macroName,
+                    value
+                )
             }}
         />
     )

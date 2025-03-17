@@ -1,7 +1,12 @@
 import { Box } from '@mui/material'
 import { useUiStore } from '../../store/store'
-import { IncludeExcludeListInput, ListOption } from '../../types/InputsSpec'
+import {
+    IncludeExcludeListInput,
+    ListDiff,
+    ListOption,
+} from '../../types/InputsSpec'
 import { FilterId, UiFilterModule } from '../../types/ModularFilterSpec'
+import { applyDiff, convertToListDiff } from '../../utils/ListDiffUtils'
 import { Option, UISelect } from './UISelect'
 
 export const IncludeExcludeListInputComponent: React.FC<{
@@ -17,14 +22,22 @@ export const IncludeExcludeListInputComponent: React.FC<{
         (state) => state.filterConfigurations[activeFilterId]
     )
 
-    const currentIncludes =
-        (activeConfig?.inputConfigs?.[input.macroName.includes] as
-            | string[]
-            | undefined) ?? input.default.includes
-    const currentExcludes =
-        (activeConfig?.inputConfigs?.[input.macroName.excludes] as
-            | string[]
-            | undefined) ?? input.default.excludes
+    const configuredIncludeDiff = activeConfig?.inputConfigs?.[
+        input.macroName.includes
+    ] as ListDiff | undefined
+
+    const configuredExcludeDiff = activeConfig?.inputConfigs?.[
+        input.macroName.excludes
+    ] as ListDiff | undefined
+
+    const currentIncludes = applyDiff(
+        input.default.includes,
+        configuredIncludeDiff
+    )
+    const currentExcludes = applyDiff(
+        input.default.excludes,
+        configuredExcludeDiff
+    )
 
     const includeOptions: Option[] = input.default.includes.map(
         (option: string | ListOption) => {
@@ -76,10 +89,11 @@ export const IncludeExcludeListInputComponent: React.FC<{
                     const includes = ((newValue as Option[]) || []).map(
                         (option) => option.value
                     )
+
                     setFilterConfiguration(
                         activeFilterId,
                         input.macroName.includes,
-                        includes
+                        convertToListDiff(includes, input.default.includes)
                     )
                 }}
             />
@@ -110,7 +124,7 @@ export const IncludeExcludeListInputComponent: React.FC<{
                     setFilterConfiguration(
                         activeFilterId,
                         input.macroName.excludes,
-                        excludes
+                        convertToListDiff(excludes, input.default.excludes)
                     )
                 }}
             />

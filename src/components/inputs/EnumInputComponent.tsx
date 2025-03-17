@@ -1,6 +1,7 @@
 import { useUiStore } from '../../store/store'
-import { EnumListInput } from '../../types/InputsSpec'
+import { EnumListInput, ListDiff } from '../../types/InputsSpec'
 import { FilterId, UiFilterModule } from '../../types/ModularFilterSpec'
+import { applyDiff, convertToListDiff } from '../../utils/ListDiffUtils'
 import { Option, UISelect } from './UISelect'
 
 export const EnumInputComponent: React.FC<{
@@ -15,9 +16,11 @@ export const EnumInputComponent: React.FC<{
         (state) => state.setFilterConfiguration
     )
 
-    const currentSetting: string[] =
-        (activeConfig?.inputConfigs?.[input.macroName] as string[]) ??
-        input.default
+    const configuredDiff = activeConfig?.inputConfigs?.[input.macroName] as
+        | ListDiff
+        | undefined
+
+    const currentSetting = applyDiff(input.default, configuredDiff)
 
     const options: Option<string>[] = input.enum.map((enumValue) => {
         if (typeof enumValue === 'string') {
@@ -52,7 +55,10 @@ export const EnumInputComponent: React.FC<{
                 setFilterConfiguration(
                     activeFilterId,
                     input.macroName,
-                    newValue ? newValue.map((option) => option.value) : []
+                    convertToListDiff(
+                        newValue ? newValue.map((option) => option.value) : [],
+                        input.default
+                    )
                 )
             }}
             multiple
