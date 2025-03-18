@@ -10,6 +10,7 @@ import SandImage from '../images/sand.png'
 import ScarImage from '../images/scar.png'
 import TzhaarImage from '../images/tzhaar.png'
 import UndercityImage from '../images/undercity.png'
+import VerzikViturImage from '../images/verzik_vitur.png'
 import WildernessImage from '../images/wilderness.png'
 import ZanarisImage from '../images/zanaris.png'
 import ZulAndraImage from '../images/zul_andra.png'
@@ -118,6 +119,7 @@ const backgroundImages = [
     ScarImage,
     TzhaarImage,
     UndercityImage,
+    VerzikViturImage,
     WildernessImage,
     ZanarisImage,
     ZulAndraImage,
