@@ -9,6 +9,8 @@ import GodWarsDungeonImage from '../images/god_wars_dungeon.png'
 import GrassImage from '../images/grass.png'
 import KephriImage from '../images/kephri.png'
 import NightmareImage from '../images/nightmare.png'
+import PrifddinasImage from '../images/prifddinas.png'
+import RevenantCavesImage from '../images/revenant_caves.png'
 import SandImage from '../images/sand.png'
 import ScarImage from '../images/scar.png'
 import TzhaarImage from '../images/tzhaar.png'
@@ -122,6 +124,8 @@ const backgroundImages = [
     GrassImage,
     KephriImage,
     NightmareImage,
+    PrifddinasImage,
+    RevenantCavesImage,
     SandImage,
     ScarImage,
     TzhaarImage,
