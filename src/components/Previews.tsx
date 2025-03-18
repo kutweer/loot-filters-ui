@@ -1,16 +1,20 @@
 import { Box, SxProps } from '@mui/material'
 import AbyssalNexusImage from '../images/abyssal_nexus.png'
+import AkkhaImage from '../images/akkha.png'
+import BabaImage from '../images/baba.png'
 import BareGroundImage from '../images/bare_ground.png'
 import CatacombsOfKourendImage from '../images/catacombs_of_kourend.png'
 import ChambersOfXericImage from '../images/chambers_of_xeric.png'
 import GodWarsDungeonImage from '../images/god_wars_dungeon.png'
 import GrassImage from '../images/grass.png'
+import KephriImage from '../images/kephri.png'
 import NightmareImage from '../images/nightmare.png'
 import SandImage from '../images/sand.png'
 import ScarImage from '../images/scar.png'
 import TzhaarImage from '../images/tzhaar.png'
 import UndercityImage from '../images/undercity.png'
 import VerzikViturImage from '../images/verzik_vitur.png'
+import WardensImage from '../images/wardens.png'
 import WildernessImage from '../images/wilderness.png'
 import ZanarisImage from '../images/zanaris.png'
 import ZulAndraImage from '../images/zul_andra.png'
@@ -109,17 +113,21 @@ export const ItemMenuPreview: React.FC<{
 
 const backgroundImages = [
     AbyssalNexusImage,
+    AkkhaImage,
+    BabaImage,
     BareGroundImage,
     CatacombsOfKourendImage,
     ChambersOfXericImage,
     GodWarsDungeonImage,
     GrassImage,
+    KephriImage,
     NightmareImage,
     SandImage,
     ScarImage,
     TzhaarImage,
     UndercityImage,
     VerzikViturImage,
+    WardensImage,
     WildernessImage,
     ZanarisImage,
     ZulAndraImage,
