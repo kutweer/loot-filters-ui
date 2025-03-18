@@ -21,24 +21,24 @@ import ZulAndraImage from '../images/zul_andra.png'
 export const BackgroundImage = {
     Random: 'Random',
     GodWarsDungeon: 'God Wars Dungeon',
-    Grass: 'Grass',
-    Sand: 'Sand',
-    Tzhaar: 'Tzhaar',
-    ChambersOfXeric: 'Chambers of Xeric',
-    CatacombsOfKourend: 'Catacombs of Kourend',
     AbyssalNexus: 'Abyssal Nexus',
-    Wilderness: 'Wilderness',
-    Zanaris: 'Zanaris',
-    ZulAndra: 'Zul-andra',
     BareGround: 'Bare ground',
-    Scar: 'Scar',
-    Undercity: 'Undercity',
+    CatacombsOfKourend: 'Catacombs of Kourend',
+    ChambersOfXeric: 'Chambers of Xeric',
+    CorruptedGauntlet: 'Corrupted Gauntlet',
+    Gauntlet: 'Gauntlet',
+    Grass: 'Grass',
     Nightmare: 'Nightmare',
     Prifddinas: 'Prifddinas',
     RevenantCaves: 'Revenant Caves',
+    Sand: 'Sand',
+    Scar: 'Scar',
+    Tzhaar: 'Tzhaar',
+    Undercity: 'Undercity',
     Vetion: 'Vetion',
-    Gauntlet: 'Gauntlet',
-    CorruptedGauntlet: 'Corrupted Gauntlet',
+    Wilderness: 'Wilderness',
+    Zanaris: 'Zanaris',
+    ZulAndra: 'Zul-andra',
 } as const
 export type BackgroundImage =
     (typeof BackgroundImage)[keyof typeof BackgroundImage]
@@ -46,43 +46,45 @@ export const backgroundImages = Object.values<BackgroundImage>(BackgroundImage)
 
 export const imageFromBackgroundImage = (backgroundImage: BackgroundImage) => {
     switch (backgroundImage) {
-        case BackgroundImage.Grass:
-            return GrassImage
-        case BackgroundImage.Sand:
-            return SandImage
-        case BackgroundImage.Tzhaar:
-            return TzhaarImage
-        case BackgroundImage.GodWarsDungeon:
-            return GodWarsDungeonImage
-        case BackgroundImage.ChambersOfXeric:
-            return ChambersOfXericImage
-        case BackgroundImage.CatacombsOfKourend:
-            return CatacombsOfKourendImage
         case BackgroundImage.AbyssalNexus:
             return AbyssalNexusImage
-        case BackgroundImage.Wilderness:
-            return WildernessImage
-        case BackgroundImage.Zanaris:
-            return ZanarisImage
-        case BackgroundImage.ZulAndra:
-            return ZulAndraImage
         case BackgroundImage.BareGround:
             return BareGroundImage
-        case BackgroundImage.Scar:
-            return ScarImage
-        case BackgroundImage.Undercity:
-            return UndercityImage
+        case BackgroundImage.CatacombsOfKourend:
+            return CatacombsOfKourendImage
+        case BackgroundImage.ChambersOfXeric:
+            return ChambersOfXericImage
+        case BackgroundImage.CorruptedGauntlet:
+            return CorruptedGauntletImage
+        case BackgroundImage.Gauntlet:
+            return GauntletImage
+        case BackgroundImage.GodWarsDungeon:
+            return GodWarsDungeonImage
+        case BackgroundImage.Grass:
+            return GrassImage
         case BackgroundImage.Nightmare:
             return NightmareImage
         case BackgroundImage.Prifddinas:
             return PrifddinasImage
         case BackgroundImage.RevenantCaves:
             return RevenantCavesImage
+        case BackgroundImage.Sand:
+            return SandImage
+        case BackgroundImage.Scar:
+            return ScarImage
+        case BackgroundImage.Tzhaar:
+            return TzhaarImage
+        case BackgroundImage.Undercity:
+            return UndercityImage
+        case BackgroundImage.VerzikVitur:
+            return VerzikViturImage
         case BackgroundImage.Vetion:
             return VetionImage
-        case BackgroundImage.Gauntlet:
-            return GauntletImage
-        case BackgroundImage.CorruptedGauntlet:
-            return CorruptedGauntletImage
+        case BackgroundImage.Wilderness:
+            return WildernessImage
+        case BackgroundImage.Zanaris:
+            return ZanarisImage
+        case BackgroundImage.ZulAndra:
+            return ZulAndraImage
     }
 }

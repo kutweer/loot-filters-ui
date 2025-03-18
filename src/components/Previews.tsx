@@ -107,20 +107,20 @@ export const ItemMenuPreview: React.FC<{
 }
 
 const backgroundImages = [
-    GrassImage,
-    SandImage,
-    TzhaarImage,
-    GodWarsDungeonImage,
-    ChambersOfXericImage,
-    CatacombsOfKourendImage,
     AbyssalNexusImage,
+    BareGroundImage,
+    CatacombsOfKourendImage,
+    ChambersOfXericImage,
+    GodWarsDungeonImage,
+    GrassImage,
+    NightmareImage,
+    SandImage,
+    ScarImage,
+    TzhaarImage,
+    UndercityImage,
     WildernessImage,
     ZanarisImage,
     ZulAndraImage,
-    BareGroundImage,
-    ScarImage,
-    UndercityImage,
-    NightmareImage,
 ]
 export const ItemLabelPreview: React.FC<{
     itemName: string
