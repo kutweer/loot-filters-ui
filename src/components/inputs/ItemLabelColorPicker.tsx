@@ -1,4 +1,4 @@
-import { Divider } from '@mui/material'
+import { Divider, TextField } from '@mui/material'
 import { useUiStore } from '../../store/store'
 import { colors } from '../../styles/MuiTheme'
 import {
@@ -158,6 +158,15 @@ export const ItemLabelColorPicker: React.FC<{
                         updateStyleField('menuTextColor', color)
                     }
                     labelLocation={labelLocation}
+                />
+                <TextField
+                  style={{ width: 80 }}
+                    label="Menu Sort"
+                    type="number"
+                    value={activeConfig?.menuSort ?? input.default?.menuSort ?? 0}
+                    onChange={(event) =>
+                        updateStyleField('menuSort', parseInt(event.target.value))
+                    }
                 />
             </div>
 

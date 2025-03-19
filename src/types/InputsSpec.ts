@@ -164,6 +164,7 @@ export type StyleInput = Omit<FilterModuleInput<'style'>, 'default'> & {
         tileFillColor: ArgbHexColor
         tileHighlightColor: ArgbHexColor
         sound: string
+        menuSort: number
     }>
     exampleItem?: string
 }
