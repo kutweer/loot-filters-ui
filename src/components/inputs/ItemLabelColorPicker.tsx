@@ -160,12 +160,17 @@ export const ItemLabelColorPicker: React.FC<{
                     labelLocation={labelLocation}
                 />
                 <TextField
-                  style={{ width: 80 }}
+                    style={{ width: 80 }}
                     label="Menu Sort"
                     type="number"
-                    value={activeConfig?.menuSort ?? input.default?.menuSort ?? 0}
+                    value={
+                        activeConfig?.menuSort ?? input.default?.menuSort ?? 0
+                    }
                     onChange={(event) =>
-                        updateStyleField('menuSort', parseInt(event.target.value))
+                        updateStyleField(
+                            'menuSort',
+                            parseInt(event.target.value)
+                        )
                     }
                 />
             </div>
