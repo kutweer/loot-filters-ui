@@ -136,3 +136,43 @@ export const loadFilter = async (
         active: false,
     }
 }
+
+const fingerprintModule = (module: UiFilterModule): string => {
+    const moduleF: any = {
+        ...module,
+    }
+
+    delete moduleF.id
+    delete moduleF.source
+
+    return JSON.stringify(moduleF)
+}
+
+export const fingerprintFilter = async (
+    filter: UiModularFilter | undefined | null
+): Promise<string | null> => {
+    if (!filter) {
+        return null
+    }
+
+    const filterF: any = {
+        ...filter,
+    }
+    delete filterF.id
+    delete filterF.modules
+    delete filterF.importedOn
+    delete filterF.active
+    delete filterF.source
+    delete filterF.name
+
+    const encoder = new TextEncoder()
+    const data = encoder.encode(
+        JSON.stringify(filterF + filter.modules.map(fingerprintModule).join(''))
+    )
+
+    const a = await crypto.subtle.digest('SHA-1', data)
+
+    return Array.from(new Uint8Array(a))
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('')
+}

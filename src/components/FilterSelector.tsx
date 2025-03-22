@@ -1,16 +1,32 @@
-import { Download, IosShare } from '@mui/icons-material'
+import { IosShare, Update } from '@mui/icons-material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import { Box, Button, FormControl, Stack, Typography } from '@mui/material'
-import React, { useCallback, useMemo, useState } from 'react'
+import DeleteIcon from '@mui/icons-material/Delete'
+import DownloadIcon from '@mui/icons-material/Download'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
+import {
+    Box,
+    Button,
+    FormControl,
+    IconButton,
+    ListItemText,
+    Menu,
+    MenuItem,
+    Stack,
+    Typography,
+} from '@mui/material'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAlertStore } from '../store/alerts'
 import { useUiStore } from '../store/store'
 import {
     FilterId,
     ModularFilterConfigurationV2,
+    UiModularFilter,
 } from '../types/ModularFilterSpec'
 import { DEV_FILTERS } from '../utils/devFilters'
 import { downloadFile } from '../utils/file'
 import { createLink } from '../utils/link'
+import { fingerprintFilter, loadFilter } from '../utils/modularFilterLoader'
 import { renderFilter } from '../utils/render'
 import { ImportFilterDialog } from './ImportFilterDialog'
 import { Option, UISelect } from './inputs/UISelect'
@@ -58,6 +74,11 @@ export const FilterSelector: React.FC = () => {
         (state) => state.removeImportedModularFilter
     )
 
+    const addNewFilter = useUiStore((state) => state.addImportedModularFilter)
+    const addFilterConfiguration = useUiStore(
+        (state) => state.addFilterConfiguration
+    )
+
     const handleFilterChange = useCallback(
         (newValue: Option<FilterId> | null) => {
             if (newValue) {
@@ -69,8 +90,9 @@ export const FilterSelector: React.FC = () => {
 
     const handleDeleteFilter = useCallback(() => {
         if (activeFilter) {
-            setActiveFilterId(activeFilter.id)
             removeImportedModularFilter(activeFilter.id)
+            setActiveFilterFingerprint(null)
+            setNewFilterFingerprint(null)
         }
     }, [activeFilter, setActiveFilterId, removeImportedModularFilter])
 
@@ -87,6 +109,49 @@ export const FilterSelector: React.FC = () => {
               value: activeFilter.id,
           }
         : null
+
+    const [activeFilterFingerprint, setActiveFilterFingerprint] = useState<
+        string | null
+    >(null)
+
+    useEffect(() => {
+        if (activeFilter != null) {
+            fingerprintFilter(activeFilter).then((fingerprint) => {
+                setActiveFilterFingerprint(fingerprint)
+            })
+        }
+    }, [activeFilter])
+
+    const [newFilterFingerprint, setNewFilterFingerprint] = useState<
+        string | null
+    >(null)
+
+    const [updatedFilter, setUpdatedFilter] = useState<UiModularFilter | null>(
+        null
+    )
+
+    const updateAvailable =
+        newFilterFingerprint != null &&
+        activeFilterFingerprint != null &&
+        newFilterFingerprint !== activeFilterFingerprint
+
+    useEffect(() => {
+        if (activeFilter != null) {
+            if (Object.hasOwn(activeFilter?.source || {}, 'filterUrl')) {
+                loadFilter(activeFilter.source as { filterUrl: string }).then(
+                    (newFilter) => {
+                        setUpdatedFilter(newFilter)
+                        fingerprintFilter(newFilter).then((fingerprint) => {
+                            setNewFilterFingerprint(fingerprint)
+                        })
+                    }
+                )
+            }
+        }
+    }, [activeFilterFingerprint])
+
+    const [filterMenuAnchor, setFilterMenuAnchor] =
+        useState<HTMLElement | null>(null)
 
     const addAlert = useAlertStore((state) => state.addAlert)
 
@@ -123,108 +188,166 @@ export const FilterSelector: React.FC = () => {
                     </FormControl>
                     <Button
                         variant="outlined"
-                        color="secondary"
+                        color="primary"
+                        startIcon={<ContentCopyIcon />}
+                        disabled={!activeFilter}
+                        onClick={() => {
+                            if (!activeFilter) {
+                                return
+                            }
+                            const renderedFilter = renderFilter(
+                                activeFilter,
+                                activeFilterConfig
+                            )
+                            navigator.clipboard
+                                .writeText(renderedFilter)
+                                .then(() => {
+                                    addAlert({
+                                        children: 'Filter copied to clipboard',
+                                        severity: 'success',
+                                    })
+                                })
+                                .catch(() => {
+                                    addAlert({
+                                        children:
+                                            'Failed to copy filter to clipboard',
+                                        severity: 'error',
+                                    })
+                                })
+                        }}
+                    >
+                        Copy to clipboard
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        color="primary"
                         onClick={() => {
                             setOpen(true)
                         }}
                     >
                         Import Filter
                     </Button>
+
                     <Button
                         variant="outlined"
-                        color="secondary"
-                        disabled={activeFilter === undefined}
-                        onClick={handleDeleteFilter}
+                        startIcon={<Update />}
+                        disabled={
+                            newFilterFingerprint != null &&
+                            activeFilterFingerprint != null &&
+                            newFilterFingerprint === activeFilterFingerprint
+                        }
+                        onClick={() => {
+                            if (!activeFilter) {
+                                return
+                            }
+                            if (updatedFilter != null) {
+                                addNewFilter({
+                                    ...updatedFilter,
+                                    name: `${activeFilter.name} (Updated)`,
+                                })
+                                setActiveFilterId(updatedFilter.id)
+                                addFilterConfiguration(
+                                    updatedFilter.id,
+                                    activeFilterConfig || {
+                                        enabledModules: {},
+                                        inputConfigs: {},
+                                    }
+                                )
+                                addAlert({
+                                    children: 'Filter updated',
+                                    severity: 'success',
+                                })
+                            }
+                        }}
                     >
-                        Delete Filter
+                        Update Filter
                     </Button>
-                    {activeFilter && (
-                        <>
-                            <Button
-                                variant="outlined"
-                                color="primary"
-                                startIcon={<ContentCopyIcon />}
+
+                    <IconButton
+                        onClick={(e) => setFilterMenuAnchor(e.currentTarget)}
+                    >
+                        <MoreVertIcon />
+                    </IconButton>
+
+                    <Menu
+                        open={filterMenuAnchor != null}
+                        onClose={() => setFilterMenuAnchor(null)}
+                        anchorEl={filterMenuAnchor}
+                    >
+                        <MenuItem
+                            disabled={!activeFilter}
+                            onClick={handleDeleteFilter}
+                        >
+                            <ListItemIcon>
+                                <DeleteIcon fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText>Delete</ListItemText>
+                        </MenuItem>
+                        <MenuItem
+                            disabled={!activeFilter}
+                            onClick={() => {
+                                if (!activeFilter) {
+                                    return
+                                }
+                                const renderedFilter = renderFilter(
+                                    activeFilter,
+                                    activeFilterConfig
+                                )
+                                const fileName = `${activeFilter.name}.rs2f`
+                                const file = new File(
+                                    [renderedFilter],
+                                    fileName,
+                                    {
+                                        type: 'text/plain',
+                                    }
+                                )
+                                downloadFile(file)
+                            }}
+                        >
+                            <ListItemIcon>
+                                <DownloadIcon fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText>Download</ListItemText>
+                        </MenuItem>
+
+                        {siteConfig.devMode && (
+                            <MenuItem
+                                disabled={!activeFilter}
                                 onClick={() => {
-                                    const renderedFilter = renderFilter(
+                                    if (!activeFilter) {
+                                        return
+                                    }
+
+                                    createLink(
                                         activeFilter,
                                         activeFilterConfig
+                                    ).then((link) =>
+                                        navigator.clipboard
+                                            .writeText(link)
+                                            .then(() => {
+                                                addAlert({
+                                                    children:
+                                                        'Filter link copied to clipboard',
+                                                    severity: 'success',
+                                                })
+                                            })
+                                            .catch((error) => {
+                                                addAlert({
+                                                    children:
+                                                        'Failed to copy filter link to clipboard',
+                                                    severity: 'error',
+                                                })
+                                            })
                                     )
-                                    navigator.clipboard
-                                        .writeText(renderedFilter)
-                                        .then(() => {
-                                            addAlert({
-                                                children:
-                                                    'Filter copied to clipboard',
-                                                severity: 'success',
-                                            })
-                                        })
-                                        .catch(() => {
-                                            addAlert({
-                                                children:
-                                                    'Failed to copy filter to clipboard',
-                                                severity: 'error',
-                                            })
-                                        })
                                 }}
                             >
-                                Copy to clipboard
-                            </Button>
-                            <Button
-                                variant="outlined"
-                                color="primary"
-                                startIcon={<Download />}
-                                onClick={() => {
-                                    const renderedFilter = renderFilter(
-                                        activeFilter,
-                                        activeFilterConfig
-                                    )
-                                    const fileName = `${activeFilter.name}.rs2f`
-                                    const file = new File(
-                                        [renderedFilter],
-                                        fileName,
-                                        {
-                                            type: 'text/plain',
-                                        }
-                                    )
-                                    downloadFile(file)
-                                }}
-                            >
-                                Download
-                            </Button>
-                            {siteConfig.devMode ? (
-                                <Button
-                                    variant="outlined"
-                                    color="primary"
-                                    startIcon={<IosShare />}
-                                    onClick={() => {
-                                        createLink(
-                                            activeFilter,
-                                            activeFilterConfig
-                                        ).then((link) =>
-                                            navigator.clipboard
-                                                .writeText(link)
-                                                .then(() => {
-                                                    addAlert({
-                                                        children:
-                                                            'Filter link copied to clipboard',
-                                                        severity: 'success',
-                                                    })
-                                                })
-                                                .catch((error) => {
-                                                    addAlert({
-                                                        children:
-                                                            'Failed to copy filter link to clipboard',
-                                                        severity: 'error',
-                                                    })
-                                                })
-                                        )
-                                    }}
-                                >
-                                    Share Link
-                                </Button>
-                            ) : null}
-                        </>
-                    )}
+                                <ListItemIcon>
+                                    <IosShare fontSize="small" />
+                                </ListItemIcon>
+                                <ListItemText>Share Link</ListItemText>
+                            </MenuItem>
+                        )}
+                    </Menu>
                 </Box>
 
                 <Typography variant="h4" color="secondary">

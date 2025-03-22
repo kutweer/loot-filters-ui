@@ -3,14 +3,17 @@ import {
     Accordion,
     AccordionDetails,
     AccordionSummary,
+    Badge,
     Box,
-    Button,
     Divider,
     Grid2,
-    Paper,
+    IconButton,
+    Menu,
+    MenuItem,
     Stack,
     ToggleButton,
     ToggleButtonGroup,
+    Tooltip,
     Typography,
     useMediaQuery,
 } from '@mui/material'
@@ -32,6 +35,8 @@ import {
 } from '../../types/InputsSpec'
 import { FilterId, UiFilterModule } from '../../types/ModularFilterSpec'
 
+import SettingsIcon from '@mui/icons-material/Settings'
+import { isConfigEmpty } from '../../utils/configUtils'
 import { BooleanInputComponent } from '../inputs/BooleanInputComponent'
 import { DisplayConfigurationInput } from '../inputs/DisplayConfigurationInput'
 import { EnumInputComponent } from '../inputs/EnumInputComponent'
@@ -212,250 +217,253 @@ const ModuleSection: React.FC<{
     const showPreviews = useMediaQuery(MuiRsTheme.breakpoints.up('sm'))
     const previews = getPreviews({ module })
 
-    if (!enabled) {
-        return (
-            <Paper sx={{ pl: 2, pr: 2, pt: 1, pb: 1 }}>
-                <Grid2 container spacing={2}>
-                    <Grid2 size={10}>
-                        <Typography variant="h4" color="primary">
-                            {module.name} is disabled
-                        </Typography>
-                    </Grid2>
-                    <Button
-                        sx={{ marginLeft: 'auto' }}
-                        variant="outlined"
-                        size="small"
-                        onClick={() => {
-                            setEnabledModule(
-                                activeFilterId,
-                                module.id,
-                                !enabled
-                            )
-                        }}
-                    >
-                        {module.enabled ? 'Disable' : 'Enable Module'}
-                    </Button>
-                </Grid2>
-            </Paper>
-        )
-    }
+    const filterConfig = useUiStore(
+        (state) =>
+            state.filterConfigurations?.[activeFilterId]?.inputConfigs || {}
+    )
+
+    const moduleMacronames = module.inputs
+        .map((input) => {
+            if (input.type === 'includeExcludeList') {
+                return [
+                    (input as IncludeExcludeListInput).macroName.includes,
+                    (input as IncludeExcludeListInput).macroName.excludes,
+                ]
+            }
+            return [input.macroName]
+        })
+        .reduce((acc, macroName) => [...acc, ...macroName], [])
+
+    const configCount = Object.keys(filterConfig)
+        .filter((macroName) => moduleMacronames.includes(macroName))
+        .filter((key) => !isConfigEmpty(filterConfig[key])).length
+
+    const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
 
     return (
-        <Accordion
-            slotProps={{ transition: { unmountOnExit: true } }}
-            expanded={expanded && enabled}
-            disabled={!enabled}
-            onChange={() => setExpanded(!expanded)}
-            sx={{
-                '&::before': {
-                    backgroundColor: colors.rsDarkBrown,
-                },
-            }}
-        >
-            <AccordionSummary
-                component="div"
-                expandIcon={<ExpandMore />}
-                sx={{
-                    '& .MuiAccordionSummary-content': {
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        gap: '16px',
-                    },
-                    flexDirection: 'row-reverse',
-                    gap: '16px',
-                }}
+        <>
+            <Menu
+                anchorEl={menuAnchor}
+                open={!!menuAnchor}
+                onClose={() => setMenuAnchor(null)}
             >
-                <Stack>
-                    <Typography variant="h4" color="primary">
-                        {module.name}
-                    </Typography>
-                    {module?.subtitle && (
-                        <Typography
-                            variant="h6"
-                            component="span"
-                            color="secondary"
-                        >
-                            {module?.subtitle}
-                        </Typography>
-                    )}
-                </Stack>
-                {showPreviews && (
-                    <Stack
-                        direction="row"
-                        sx={{
-                            flex: '1',
-                            flexWrap: 'wrap',
-                            justifyContent: 'flex-end',
-                            gap: '8px',
-                            alignItems: 'center',
-                        }}
-                    >
-                        {previews}
-                    </Stack>
-                )}
-                <Button
-                    variant="outlined"
-                    size="small"
+                <MenuItem
+                    onClick={() => {
+                        clearConfiguration(
+                            activeFilterId,
+                            module.inputs
+                                .map(
+                                    (input) =>
+                                        input.macroName as
+                                            | string
+                                            | {
+                                                  includes: string
+                                                  excludes: string
+                                              }
+                                )
+                                .reduce<string[]>((acc, macroName) => {
+                                    if (typeof macroName === 'string') {
+                                        return [...acc, macroName]
+                                    } else {
+                                        return [
+                                            ...acc,
+                                            macroName.includes,
+                                            macroName.excludes,
+                                        ]
+                                    }
+                                }, [])
+                        )
+                    }}
+                >
+                    Reset Module
+                </MenuItem>
+                <MenuItem
                     onClick={() => {
                         setEnabledModule(activeFilterId, module.id, !enabled)
                     }}
-                    sx={{ whiteSpace: 'nowrap', minWidth: 'max-content' }}
                 >
                     {enabled ? 'Disable Module' : 'Enable'}
-                </Button>
-            </AccordionSummary>
-            <AccordionDetails>
-                <Stack spacing={2} direction="column">
-                    <Stack direction="row" justifyContent="flex-end">
-                        <Typography
-                            variant="h6"
-                            component="span"
-                            color={colors.rsLightestBrown}
-                            sx={{
-                                ml: 1,
-                                display: 'inline-block',
-                            }}
-                        >
-                            {module.description}
+                </MenuItem>
+            </Menu>
+            <Accordion
+                slotProps={{ transition: { unmountOnExit: true } }}
+                expanded={expanded && enabled}
+                onChange={() => setExpanded(!expanded)}
+                sx={{
+                    '&::before': {
+                        backgroundColor: colors.rsDarkBrown,
+                    },
+                    filter: !enabled ? 'grayscale(0.75)' : 'none',
+                }}
+            >
+                <AccordionSummary
+                    component="div"
+                    expandIcon={<ExpandMore />}
+                    sx={{
+                        '& .MuiAccordionSummary-content': {
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: '16px',
+                        },
+                        flexDirection: 'row-reverse',
+                        gap: '16px',
+                    }}
+                >
+                    <Stack>
+                        <Typography variant="h4" color="primary">
+                            {module.name}
                         </Typography>
-                        <Box display="flex">
-                            <Button
-                                variant="outlined"
-                                size="small"
-                                sx={{
-                                    whiteSpace: 'nowrap',
-                                    minWidth: 'max-content',
-                                    maxHeight: 'max-content',
-                                }}
-                                onClick={() => {
-                                    clearConfiguration(
-                                        activeFilterId,
-                                        module.inputs
-                                            .map(
-                                                (input) =>
-                                                    input.macroName as
-                                                        | string
-                                                        | {
-                                                              includes: string
-                                                              excludes: string
-                                                          }
-                                            )
-                                            .reduce<string[]>(
-                                                (acc, macroName) => {
-                                                    if (
-                                                        typeof macroName ===
-                                                        'string'
-                                                    ) {
-                                                        return [
-                                                            ...acc,
-                                                            macroName,
-                                                        ]
-                                                    } else {
-                                                        return [
-                                                            ...acc,
-                                                            macroName.includes,
-                                                            macroName.excludes,
-                                                        ]
-                                                    }
-                                                },
-                                                []
-                                            )
-                                    )
-                                }}
+                        {module?.subtitle && (
+                            <Typography
+                                variant="h6"
+                                component="span"
+                                color="secondary"
                             >
-                                Reset Module
-                            </Button>
-                        </Box>
+                                {module?.subtitle}
+                            </Typography>
+                        )}
                     </Stack>
-                    {siteConfig.devMode ? (
-                        <Box display="flex" justifyContent="flex-end">
-                            <ToggleButtonGroup
-                                value={showJson}
-                                onChange={(event, value) => setShowJson(value)}
-                                exclusive
-                            >
-                                <ToggleButton value="json">
-                                    Show Module JSON
-                                </ToggleButton>
-                                <ToggleButton value="configJson">
-                                    Show Config JSON
-                                </ToggleButton>
-                            </ToggleButtonGroup>
-                        </Box>
-                    ) : null}
-                    {showJson !== 'none' && !!showJson ? (
-                        <Box
+                    {showPreviews && (
+                        <Stack
+                            direction="row"
                             sx={{
-                                backgroundColor: 'background.paper',
-                                p: 2,
-                                borderRadius: 1,
+                                flex: '1',
+                                flexWrap: 'wrap',
+                                justifyContent: 'flex-end',
+                                gap: '8px',
+                                alignItems: 'center',
                             }}
                         >
-                            <pre
-                                style={{
-                                    margin: 0,
-                                    whiteSpace: 'pre-wrap',
-                                    wordWrap: 'break-word',
+                            {previews}
+                        </Stack>
+                    )}
+
+                    <Tooltip
+                        title={
+                            configCount ? `${configCount} settings changed` : ''
+                        }
+                    >
+                        <IconButton
+                            onClick={(
+                                e: React.MouseEvent<HTMLButtonElement>
+                            ) => {
+                                e.stopPropagation()
+                                setMenuAnchor(e.currentTarget)
+                            }}
+                        >
+                            <Badge badgeContent={configCount} color="secondary">
+                                <SettingsIcon />
+                            </Badge>
+                        </IconButton>
+                    </Tooltip>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <Stack spacing={2} direction="column">
+                        <Stack direction="row" justifyContent="flex-end">
+                            <Typography
+                                variant="h6"
+                                component="span"
+                                color={colors.rsLightestBrown}
+                                sx={{
+                                    ml: 1,
+                                    display: 'inline-block',
                                 }}
                             >
-                                {showJson === 'json'
-                                    ? json
-                                    : showJson === 'configJson'
-                                      ? configJson
-                                      : null}
-                            </pre>
-                        </Box>
-                    ) : null}
-                    {Object.entries(groupedInputs).map(
-                        ([group, inputs], index) => {
-                            return (
-                                <Grid2 key={index} container spacing={2}>
-                                    <Grid2 size={12}>
-                                        <Divider>
-                                            {group !== defaultGroupId ? (
-                                                <Typography
-                                                    variant="h6"
-                                                    color="primary"
-                                                >
-                                                    {group}
-                                                </Typography>
-                                            ) : null}
-                                        </Divider>
-                                    </Grid2>
-                                    {inputs
-                                        .sort(
-                                            (a: Input, b: Input) =>
-                                                sizeOf(a) - sizeOf(b)
-                                        )
-                                        .map((input, index) => {
-                                            return (
-                                                <Grid2
-                                                    key={index}
-                                                    size={sizeOf(input)}
-                                                >
+                                {module.description}
+                            </Typography>
+                        </Stack>
+                        {siteConfig.devMode ? (
+                            <Box display="flex" justifyContent="flex-end">
+                                <ToggleButtonGroup
+                                    value={showJson}
+                                    onChange={(event, value) =>
+                                        setShowJson(value)
+                                    }
+                                    exclusive
+                                >
+                                    <ToggleButton value="json">
+                                        Show Module JSON
+                                    </ToggleButton>
+                                    <ToggleButton value="configJson">
+                                        Show Config JSON
+                                    </ToggleButton>
+                                </ToggleButtonGroup>
+                            </Box>
+                        ) : null}
+                        {showJson !== 'none' && !!showJson ? (
+                            <Box
+                                sx={{
+                                    backgroundColor: 'background.paper',
+                                    p: 2,
+                                    borderRadius: 1,
+                                }}
+                            >
+                                <pre
+                                    style={{
+                                        margin: 0,
+                                        whiteSpace: 'pre-wrap',
+                                        wordWrap: 'break-word',
+                                    }}
+                                >
+                                    {showJson === 'json'
+                                        ? json
+                                        : showJson === 'configJson'
+                                          ? configJson
+                                          : null}
+                                </pre>
+                            </Box>
+                        ) : null}
+                        {Object.entries(groupedInputs).map(
+                            ([group, inputs], index) => {
+                                return (
+                                    <Grid2 key={index} container spacing={2}>
+                                        <Grid2 size={12}>
+                                            <Divider>
+                                                {group !== defaultGroupId ? (
                                                     <Typography
                                                         variant="h6"
                                                         color="primary"
                                                     >
-                                                        {input.label}
+                                                        {group}
                                                     </Typography>
-                                                    <InputComponent
-                                                        activeFilterId={
-                                                            activeFilterId
-                                                        }
-                                                        module={module}
-                                                        input={input}
-                                                    />
-                                                </Grid2>
+                                                ) : null}
+                                            </Divider>
+                                        </Grid2>
+                                        {inputs
+                                            .sort(
+                                                (a: Input, b: Input) =>
+                                                    sizeOf(a) - sizeOf(b)
                                             )
-                                        })}
-                                </Grid2>
-                            )
-                        }
-                    )}
-                </Stack>
-            </AccordionDetails>
-        </Accordion>
+                                            .map((input, index) => {
+                                                return (
+                                                    <Grid2
+                                                        key={index}
+                                                        size={sizeOf(input)}
+                                                    >
+                                                        <Typography
+                                                            variant="h6"
+                                                            color="primary"
+                                                        >
+                                                            {input.label}
+                                                        </Typography>
+                                                        <InputComponent
+                                                            activeFilterId={
+                                                                activeFilterId
+                                                            }
+                                                            module={module}
+                                                            input={input}
+                                                        />
+                                                    </Grid2>
+                                                )
+                                            })}
+                                    </Grid2>
+                                )
+                            }
+                        )}
+                    </Stack>
+                </AccordionDetails>
+            </Accordion>
+        </>
     )
 }
 

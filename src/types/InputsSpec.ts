@@ -178,6 +178,27 @@ export const labelFromFontType = (fontType: FontType) => {
  */
 export type ArgbHexColor = `#${string}`
 
+export const styleConfigFields = [
+    'textColor',
+    'backgroundColor',
+    'borderColor',
+    'textAccent',
+    'textAccentColor',
+    'fontType',
+    'showLootbeam',
+    'lootbeamColor',
+    'showValue',
+    'showDespawn',
+    'notify',
+    'hideOverlay',
+    'highlightTile',
+    'menuTextColor',
+    'tileStrokeColor',
+    'tileFillColor',
+    'tileHighlightColor',
+    'sound',
+]
+
 export type StyleInput = Omit<FilterModuleInput<'style'>, 'default'> & {
     default: Partial<{
         textColor: ArgbHexColor
