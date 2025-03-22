@@ -1,4 +1,4 @@
-import { Input, InputDefault, MacroName } from './InputsSpec'
+import { Input, InputConfig, InputDefault, MacroName } from './InputsSpec'
 
 // ### ### ### ### ###
 //
@@ -78,7 +78,7 @@ export type ModularFilterConfiguration = {
 export type ModularFilterConfigurationV2 = {
     enabledModules: { [key: ModuleId]: boolean }
     inputConfigs: {
-        [key: MacroName]: Partial<InputDefault<Input>>
+        [key: MacroName]: InputConfig<Input>
     }
 }
 

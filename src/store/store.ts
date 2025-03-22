@@ -1,7 +1,14 @@
 import { mapObject } from 'underscore'
 import { create, StateCreator, StoreApi, useStore } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
-import { Input, InputDefault, MacroName } from '../types/InputsSpec'
+import {
+    EnumListInput,
+    IncludeExcludeListInput,
+    Input,
+    InputConfig,
+    MacroName,
+    StringListInput,
+} from '../types/InputsSpec'
 import {
     FilterId,
     ModularFilterConfigurationV2,
@@ -9,6 +16,7 @@ import {
     UiModularFilter,
 } from '../types/ModularFilterSpec'
 import { SiteConfig } from '../types/SiteConfig'
+import { convertToListDiff } from '../utils/ListDiffUtils'
 
 export interface ImportedFilterSlice {
     importedModularFilters: Record<string, UiModularFilter>
@@ -24,10 +32,10 @@ export interface FilterConfigurationSlice {
         moduleId: ModuleId,
         enabled: boolean
     ) => void
-    setFilterConfiguration: (
+    setFilterConfiguration: <I extends Input>(
         filterId: FilterId,
-        macroName: string,
-        data: Partial<InputDefault<Input>>
+        macroName: MacroName,
+        data: InputConfig<I>
     ) => void
     clearConfiguration: (filterId: FilterId, macros: string[]) => void
     addFilterConfiguration: (
@@ -81,10 +89,10 @@ const createFilterConfigurationSlice: StateCreator<
     FilterConfigurationSlice
 > = (set) => ({
     filterConfigurations: {},
-    setFilterConfiguration: (
+    setFilterConfiguration: <I extends Input>(
         filterId: FilterId,
-        macroName: string,
-        data: Partial<InputDefault<Input>>
+        macroName: MacroName,
+        data: InputConfig<I>
     ) => {
         set((state) => {
             let newConfig = data
@@ -134,7 +142,6 @@ const createFilterConfigurationSlice: StateCreator<
         moduleId: ModuleId,
         enabled: boolean
     ) => {
-        console.log('setEnabledModule', moduleId, enabled)
         set(
             (state) =>
                 ({
@@ -242,6 +249,13 @@ type V1PersistedState = Pick<SiteConfigSlice, 'siteConfig'> &
         }
     }
 
+type V2PersistedState = Pick<SiteConfigSlice, 'siteConfig'> &
+    ImportedFilterSlice & {
+        filterConfigurations: {
+            [key: FilterId]: ModularFilterConfigurationV2
+        }
+    }
+
 const v0toV1Migration = (
     persistedState: V0PersistedState
 ): V1PersistedState => {
@@ -261,13 +275,13 @@ const v0toV1Migration = (
                 .map(([moduleId]) => moduleId)
 
             const inputConfigs: {
-                [key: MacroName]: Partial<InputDefault<Input>>
+                [key: MacroName]: InputConfig<Input>
             }[] = Object.values(config).map((macros) => {
                 return Object.entries(macros)
                     .map(
                         ([macroName, data]: [
                             MacroName,
-                            Partial<InputDefault<Input>>,
+                            InputConfig<Input>,
                         ]) => {
                             return {
                                 [macroName]: data,
@@ -291,15 +305,89 @@ const v0toV1Migration = (
     return newState as V1PersistedState
 }
 
+const v1toV2Migration = (
+    persistedState: V1PersistedState
+): V2PersistedState => {
+    console.log('Migrating v1 to v2', persistedState)
+    const persistedInputConfigs = persistedState.importedModularFilters
+
+    const newInputConfigs = Object.entries(
+        persistedState.filterConfigurations
+    ).map(([filterId, config]) => {
+        const newConfig = Object.entries(config.inputConfigs).map(
+            ([macroName, config]) => {
+                if (Array.isArray(config)) {
+                    const input = persistedInputConfigs[filterId].modules
+                        .map((module) => module.inputs)
+                        .flat()
+                        .find((input) => {
+                            return (
+                                input.macroName === macroName ||
+                                Object.values(input.macroName).includes(
+                                    macroName
+                                )
+                            )
+                        }) as
+                        | StringListInput
+                        | EnumListInput
+                        | IncludeExcludeListInput
+
+                    const listDiff =
+                        input.type === 'stringlist' || input.type === 'enumlist'
+                            ? convertToListDiff(
+                                  config as string[],
+                                  input.default
+                              )
+                            : convertToListDiff(
+                                  config as string[],
+                                  input.macroName.includes === macroName
+                                      ? input.default.includes
+                                      : input.default.excludes
+                              )
+
+                    return [macroName, listDiff]
+                }
+                return [macroName, config]
+            }
+        )
+        return [
+            filterId,
+            {
+                ...config,
+                inputConfigs: Object.fromEntries(newConfig),
+            },
+        ]
+    })
+
+    return {
+        ...persistedState,
+        filterConfigurations: {
+            ...Object.fromEntries(newInputConfigs),
+        },
+    } as unknown as V2PersistedState
+}
+
 const migrate = (
     persistedState: unknown,
     version: number
 ): V1PersistedState => {
     let state = persistedState as any
-    if (version <= 0) {
-        state = v0toV1Migration(persistedState as unknown as V0PersistedState)
+    try {
+        if (version <= 0) {
+            state = v0toV1Migration(
+                persistedState as unknown as V0PersistedState
+            )
+        }
+        if (version <= 1) {
+            state = v1toV2Migration(
+                persistedState as unknown as V1PersistedState
+            )
+        }
+    } catch (e) {
+        console.error('Error migrating', e)
+        throw e
     }
-    console.warn('No migration found for persisted state', persistedState)
+
     return state as V1PersistedState
 }
 
@@ -319,7 +407,7 @@ const uiStore = create<
             }),
             {
                 name: 'modular-filter-storage',
-                version: 1,
+                version: 2,
                 migrate,
             }
         )

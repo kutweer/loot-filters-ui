@@ -1,10 +1,11 @@
 import { StyleConfig } from '../components/inputs/StyleInputHelpers'
-import { Input, InputDefault, MacroName } from '../types/InputsSpec'
+import { Input, InputConfig, ListDiff, MacroName } from '../types/InputsSpec'
 import {
     ModularFilterConfigurationV2,
     UiFilterModule,
     UiModularFilter,
 } from '../types/ModularFilterSpec'
+import { applyDiff, convertOptionsToStrings, EMPTY_DIFF } from './ListDiffUtils'
 
 export const renderFilter = (
     filter: UiModularFilter,
@@ -20,7 +21,7 @@ export const renderFilter = (
 
 const renderModule = (
     module: UiFilterModule,
-    config: { [key: MacroName]: Partial<InputDefault<Input>> } | undefined
+    config: { [key: MacroName]: InputConfig<Input> } | undefined
 ): string => {
     let updated = module.rs2fText
 
@@ -50,38 +51,43 @@ const renderModule = (
             }
             case 'stringlist':
             case 'enumlist': {
-                const items = (config?.[input.macroName] ??
-                    input.default) as string[]
-                if (items !== undefined) {
-                    updated = updateMacro(
-                        updated,
-                        input.macroName,
-                        renderStringList(items)
-                    )
-                }
+                const configuredDiff = config?.[input.macroName] as ListDiff
+
+                const list = convertOptionsToStrings(
+                    applyDiff(input.default, configuredDiff ?? EMPTY_DIFF)
+                )
+
+                updated = updateMacro(
+                    updated,
+                    input.macroName,
+                    renderStringList(list)
+                )
                 break
             }
             case 'includeExcludeList': {
-                const includes = (config?.[input.macroName.includes] ??
-                    input.default.includes) as string[]
-                const excludes = (config?.[input.macroName.excludes] ??
-                    input.default.excludes) as string[]
-                if (includes !== undefined) {
-                    updated = updateMacro(
-                        updated,
-                        input.macroName.includes,
-                        renderStringList(includes)
-                    )
-                }
-                if (excludes !== undefined) {
-                    updated = updateMacro(
-                        updated,
-                        input.macroName.excludes,
-                        renderStringList(excludes)
-                    )
-                }
+                const includes = config?.[input.macroName.includes] as ListDiff
+                const excludes = config?.[input.macroName.excludes] as ListDiff
+
+                const includesList = convertOptionsToStrings(
+                    applyDiff(input.default.includes, includes ?? EMPTY_DIFF)
+                )
+                const excludesList = convertOptionsToStrings(
+                    applyDiff(input.default.excludes, excludes ?? EMPTY_DIFF)
+                )
+
+                updated = updateMacro(
+                    updated,
+                    input.macroName.includes,
+                    renderStringList(includesList)
+                )
+                updated = updateMacro(
+                    updated,
+                    input.macroName.excludes,
+                    renderStringList(excludesList)
+                )
                 break
             }
+
             case 'style': {
                 const style = config?.[input.macroName] as
                     | StyleConfig

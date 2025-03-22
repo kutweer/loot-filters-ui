@@ -1,6 +1,7 @@
 import { useUiStore } from '../../store/store'
-import { ListOption, StringListInput } from '../../types/InputsSpec'
+import { ListDiff, ListOption, StringListInput } from '../../types/InputsSpec'
 import { FilterId, UiFilterModule } from '../../types/ModularFilterSpec'
+import { applyDiff, convertToListDiff } from '../../utils/ListDiffUtils'
 import { Option, UISelect } from './UISelect'
 
 export const StringListInputComponent: React.FC<{
@@ -16,10 +17,11 @@ export const StringListInputComponent: React.FC<{
         (state) => state.filterConfigurations[activeFilterId]
     )
 
-    const currentValues =
-        (activeConfig?.inputConfigs?.[input.macroName] as
-            | string[]
-            | undefined) ?? input.default
+    const configuredDiff = activeConfig?.inputConfigs?.[input.macroName] as
+        | ListDiff
+        | undefined
+
+    const currentValues = applyDiff(input.default, configuredDiff)
 
     const options: Option[] = input.default.map(
         (option: string | ListOption) => {
@@ -56,7 +58,11 @@ export const StringListInputComponent: React.FC<{
                 const values = ((newValue as Option[]) || []).map(
                     (option) => option.value
                 )
-                setFilterConfiguration(activeFilterId, input.macroName, values)
+                setFilterConfiguration(
+                    activeFilterId,
+                    input.macroName,
+                    convertToListDiff(values, input.default)
+                )
             }}
         />
     )
