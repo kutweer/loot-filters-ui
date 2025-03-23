@@ -1,3 +1,4 @@
+import { GitHubFilterSource } from './GitHubFilterSource'
 import { Input, InputConfig, InputDefault, MacroName } from './InputsSpec'
 
 // ### ### ### ### ###
@@ -11,28 +12,34 @@ import { Input, InputConfig, InputDefault, MacroName } from './InputsSpec'
  * An importable filter - in the future this may also support a base64'd definition etc.
  */
 export type FilterSource =
-    | {
-          filterUrl: string
-      }
     | FilterDefinition
+    | URLFilterSource
+    | GitHubFilterSource
+
+export type URLFilterSource = {
+    filterUrl: string
+}
 
 /**
  * A module source - this can be a url to a json file or a local file
  */
-export type ModuleSource =
-    | {
-          modulePath: string
-      }
-    | {
-          name: string
-          moduleJsonUrl: string
-          moduleRs2fUrl: string
-      }
-    | {
-          name: string
-          moduleJson: FilterModule
-          moduleRs2fText: string
-      }
+export type ModuleSource = RelativeModuleSource | OldModuleSource | InlineModule
+
+export type InlineModule = {
+    name: string
+    moduleJson: FilterModule
+    moduleRs2fText: string
+}
+
+export type RelativeModuleSource = {
+    modulePath: string
+}
+
+export type OldModuleSource = {
+    name: string
+    moduleJsonUrl: string
+    moduleRs2fUrl: string
+}
 
 /**
  * A filter definition - this is the actual filter definition that you'll see in a repository
@@ -41,7 +48,7 @@ export type ModuleSource =
 export type FilterDefinition = {
     name: string
     description: string
-    modules: (ModuleSource | FilterModule)[]
+    modules: ModuleSource[]
 }
 
 /**

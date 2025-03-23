@@ -3,12 +3,12 @@ import { ThemeProvider } from '@mui/material/styles'
 import { useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Header } from './components/AppHeader'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { FilterTabs } from './components/FilterTabs'
 import { ImportPage } from './pages/ImportPage'
 import { useAlertStore } from './store/alerts'
 import { useUiStore } from './store/store'
 import { MuiRsTheme } from './styles/MuiTheme'
-import { ErrorBoundary } from './components/ErrorBoundary'
 
 const MainPage = ({ sha }: { sha: string }) => {
     const setSiteConfig = useUiStore((state) => state.setSiteConfig)
@@ -75,6 +75,7 @@ export const App = ({ sha = 'main' }: { sha?: string }) => {
                 <Routes>
                     <Route path="/" element={<MainPage sha={sha} />} />
                     <Route path="/import" element={<ImportPage />} />
+                    <Route path="/save-me" element={<div />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
             </BrowserRouter>

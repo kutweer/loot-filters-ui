@@ -69,9 +69,12 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                         <UISelect<string>
                             options={filtersForImport.map((filter) => ({
                                 label: filter.name,
-                                value: filter.hasOwnProperty('url')
-                                    ? (filter as { url: string }).url
-                                    : JSON.stringify(filter),
+                                value:
+                                    'url' in filter
+                                        ? (filter['url'] as string)
+                                        : 'github' in filter
+                                          ? `github:${JSON.stringify(filter['github'])}`
+                                          : JSON.stringify(filter),
                             }))}
                             value={
                                 filterUrl
@@ -106,11 +109,44 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                         disabled={filterUrl.length === 0}
                         variant="outlined"
                         color="primary"
-                        onClick={() => {
+                        onClick={(e) => {
+                            console.log(e)
                             setImportError('')
-                            if (filterUrl.startsWith('http')) {
+
+                            const isUrl = filterUrl.startsWith('http')
+                            const isGithub = filterUrl.startsWith('github:')
+                            console.log(
+                                'filterUrl:',
+                                filterUrl,
+                                'isUrl:',
+                                isUrl,
+                                'isGithub:',
+                                isGithub
+                            )
+                            if (isUrl) {
                                 loadFilter({
                                     filterUrl: filterUrl,
+                                })
+                                    .catch((error) => {
+                                        setImportError(error.message)
+                                    })
+                                    .then((filter) => {
+                                        if (filter) {
+                                            if (filterNameOverride !== '') {
+                                                filter.name = filterNameOverride
+                                            }
+                                            addImportedModularFilter(filter)
+                                            setActiveFilterId(filter.id)
+                                            handleClose()
+                                        }
+                                    })
+                            } else if (isGithub) {
+                                const source = JSON.parse(
+                                    filterUrl.slice('github:'.length)
+                                )
+                                console.log('Loading github filter:', source)
+                                loadFilter({
+                                    ...source,
                                 })
                                     .catch((error) => {
                                         setImportError(error.message)
@@ -131,21 +167,22 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                                     id: crypto.randomUUID(),
                                 }
 
-                                filter.modules = filter.modules.map(
-                                    (module: ModuleSource) => ({
-                                        ...(
-                                            module as {
-                                                moduleJson: FilterModule
-                                            }
-                                        ).moduleJson,
-                                        id: crypto.randomUUID(),
-                                        rs2fText: (
-                                            module as {
-                                                moduleRs2fText: string
-                                            }
-                                        ).moduleRs2fText,
-                                    })
-                                )
+                                if (filter)
+                                    filter.modules = filter.modules.map(
+                                        (module: ModuleSource) => ({
+                                            ...(
+                                                module as {
+                                                    moduleJson: FilterModule
+                                                }
+                                            ).moduleJson,
+                                            id: crypto.randomUUID(),
+                                            rs2fText: (
+                                                module as {
+                                                    moduleRs2fText: string
+                                                }
+                                            ).moduleRs2fText,
+                                        })
+                                    )
                                 if (filterNameOverride !== '') {
                                     filter.name = filterNameOverride
                                 }
