@@ -108,6 +108,13 @@ export const UISelect = <T = string,>({
             isOptionEqualToValue={isOptionEqualToValue}
             disabled={disabled}
             disableCloseOnSelect={multiple}
+            renderOption={(props, option) => {
+                return (
+                    <li {...props} key={`${option.value}`}>
+                        {option.label}
+                    </li>
+                )
+            }}
             renderInput={(params) => (
                 <TextField
                     {...params}

@@ -217,10 +217,11 @@ const ModuleSection: React.FC<{
     const showPreviews = useMediaQuery(MuiRsTheme.breakpoints.up('sm'))
     const previews = getPreviews({ module })
 
-    const filterConfig = useUiStore(
-        (state) =>
-            state.filterConfigurations?.[activeFilterId]?.inputConfigs || {}
-    )
+    const filterConfig =
+        useUiStore(
+            (state) =>
+                state.filterConfigurations?.[activeFilterId]?.inputConfigs
+        ) || {}
 
     const moduleMacronames = module.inputs
         .map((input) => {
@@ -514,6 +515,8 @@ export const CustomizeTab: React.FC = () => {
             </Typography>
         )
     }
+
+    console.log('rendering CustomizeTab', activeFilter.modules.length)
 
     return (
         <Stack>
