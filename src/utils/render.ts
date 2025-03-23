@@ -11,12 +11,19 @@ export const renderFilter = (
     filter: UiModularFilter,
     activeConfig: ModularFilterConfigurationV2 | undefined
 ): string => {
-    return filter.modules
+    const rs2f = filter.modules
         .filter(
             (m) => activeConfig?.enabledModules?.[m.id] ?? m.enabled ?? true
         )
         .map((m) => renderModule(m, activeConfig?.inputConfigs))
         .join('\n')
+
+    // add a simple meta if they don't have one already
+    if (!rs2f.includes('meta {')) {
+        return `meta { name = ${filter.name} }\n${rs2f}`
+    }
+
+    return rs2f
 }
 
 const renderModule = (

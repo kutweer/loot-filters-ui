@@ -1,3 +1,4 @@
+import { GitHubFilterSource } from '../types/GitHubFilterSource'
 import {
     EnumListInput,
     IncludeExcludeListInput,
@@ -8,6 +9,7 @@ import {
 } from '../types/InputsSpec'
 import {
     FilterId,
+    FilterSource,
     ModularFilterConfigurationV2,
 } from '../types/ModularFilterSpec'
 import { convertToListDiff } from '../utils/ListDiffUtils'
@@ -148,6 +150,77 @@ const v1toV2Migration = (
     } as unknown as V2PersistedState
 }
 
+type V3PersistedState = V2PersistedState
+
+const v2toV3Migration = (
+    persistedState: V2PersistedState
+): V3PersistedState => {
+    console.log('Migrating v2 to v3', persistedState)
+
+    const rebuildSource = (
+        source: FilterSource | undefined
+    ): FilterSource | undefined => {
+        if (!source) {
+            return undefined
+        }
+
+        if (!('filterUrl' in source)) {
+            return source
+        }
+
+        const url = source.filterUrl
+        const urlObj = new URL(url)
+        if (urlObj.host !== 'raw.githubusercontent.com') {
+            return source
+        }
+
+        // https://raw.githubusercontent.com/riktenx/filterscape/c60bafc2caa3ad7f64b26a2377151ad51ac509d7/index.json
+
+        const pathParts = urlObj.pathname.split('/')
+        const owner = pathParts[1]
+        const repo = pathParts[2]
+        let branch = 'main'
+        let filterPath = undefined
+        if (pathParts[3].length === 40) {
+            // it's a hash
+            branch = 'main'
+            filterPath = pathParts.slice(4).join('/')
+        } else if (pathParts[3] === 'refs' && pathParts[4] === 'heads') {
+            branch = pathParts[5]
+            filterPath = pathParts.slice(6).join('/')
+        } else {
+            return source
+        }
+
+        const gh: GitHubFilterSource = {
+            owner,
+            repo,
+            branch,
+            filterPath,
+            updateMeta: {
+                updatedAt: new Date(0).toISOString(),
+                sha: 'noSha',
+            },
+        }
+
+        return gh
+    }
+
+    return {
+        ...persistedState,
+        importedModularFilters: Object.fromEntries(
+            Object.entries(persistedState.importedModularFilters).map(
+                ([filterId, filter]) => {
+                    return [
+                        filterId,
+                        { ...filter, source: rebuildSource(filter.source) },
+                    ]
+                }
+            )
+        ),
+    } as V3PersistedState
+}
+
 export const migrate = (
     persistedState: unknown,
     version: number
@@ -162,6 +235,11 @@ export const migrate = (
         if (version <= 1) {
             state = v1toV2Migration(
                 persistedState as unknown as V1PersistedState
+            )
+        }
+        if (version <= 2) {
+            state = v2toV3Migration(
+                persistedState as unknown as V2PersistedState
             )
         }
     } catch (e) {

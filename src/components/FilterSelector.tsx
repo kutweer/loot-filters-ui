@@ -45,7 +45,6 @@ const COMMON_FILTERS = [
             branch: 'main',
             filterPath: 'index.json',
         },
-        url: 'https://raw.githubusercontent.com/riktenx/filterscape/c60bafc2caa3ad7f64b26a2377151ad51ac509d7/index.json',
     },
     {
         name: "Joe's Filter for Persnickety Players",
@@ -232,7 +231,7 @@ export const FilterSelector: React.FC = () => {
                             setOpen(true)
                         }}
                     >
-                        Import Filter
+                        Import New Filter
                     </Button>
 
                     <Button

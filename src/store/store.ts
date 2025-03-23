@@ -258,7 +258,7 @@ const uiStore = create<
             }),
             {
                 name: 'modular-filter-storage',
-                version: 2,
+                version: 3,
                 migrate,
             }
         )
