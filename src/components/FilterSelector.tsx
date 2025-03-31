@@ -1,4 +1,4 @@
-import { IosShare, Update } from '@mui/icons-material'
+import { Edit, IosShare, Update } from '@mui/icons-material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import DeleteIcon from '@mui/icons-material/Delete'
 import DownloadIcon from '@mui/icons-material/Download'
@@ -6,12 +6,16 @@ import MoreVertIcon from '@mui/icons-material/MoreVert'
 import {
     Box,
     Button,
+    Dialog,
+    DialogContent,
+    DialogTitle,
     FormControl,
     IconButton,
     ListItemText,
     Menu,
     MenuItem,
     Stack,
+    TextField,
     Typography,
 } from '@mui/material'
 import ListItemIcon from '@mui/material/ListItemIcon'
@@ -24,7 +28,6 @@ import {
     ModularFilterConfigurationV2,
     UiModularFilter,
 } from '../types/ModularFilterSpec'
-import { DEV_FILTERS } from '../utils/devFilters'
 import { downloadFile } from '../utils/file'
 import { createLink } from '../utils/link'
 import { loadFilter } from '../utils/modularFilterLoader'
@@ -36,40 +39,69 @@ const isGitHubSource = (source: any): source is GitHubFilterSource => {
     return source && 'repo' in source && 'owner' in source
 }
 
-const COMMON_FILTERS = [
-    {
-        name: 'FilterScape - An all in one filter for mains',
-        github: {
-            owner: 'riktenx',
-            repo: 'filterscape',
-            branch: 'main',
-            filterPath: 'index.json',
-        },
-    },
-    {
-        name: "Joe's Filter for Persnickety Players",
-        github: {
-            owner: 'typical-whack',
-            repo: 'loot-filters-modules',
-            branch: 'main',
-            filterPath: 'filter.json',
-        },
-    },
-]
-
+const EditFilterDialog: React.FC<{
+    open: boolean
+    filter: UiModularFilter
+    onSave: (name: string) => void
+    onClose: () => void
+}> = ({ open, filter, onSave, onClose }) => {
+    const [name, setName] = useState(filter.name)
+    return (
+        <Dialog maxWidth="lg" open={open} onClose={onClose}>
+            <DialogTitle>Edit Filter</DialogTitle>
+            <DialogContent>
+                <Box>
+                    <TextField
+                        size="small"
+                        sx={{ width: '350px', mt: 1 }}
+                        label="Filter Name"
+                        value={name}
+                        onChange={(e) => {
+                            setName(e.target.value)
+                        }}
+                    />
+                </Box>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        gap: 10,
+                        mt: 3,
+                        justifyContent: 'center',
+                    }}
+                >
+                    <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={() => {
+                            onSave(name)
+                        }}
+                    >
+                        Save
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={onClose}
+                    >
+                        Close
+                    </Button>
+                </Box>
+            </DialogContent>
+        </Dialog>
+    )
+}
 export const FilterSelector: React.FC = () => {
-    const [open, setOpen] = useState(false)
+    const [editDialogOpen, setEditDialogOpen] = useState(false)
     const { siteConfig } = useUiStore()
-
-    const filtersForImport = [
-        ...(siteConfig.devMode ? DEV_FILTERS : []),
-        ...COMMON_FILTERS,
-    ]
 
     const importedModularFilters = useUiStore(
         (state) => state.importedModularFilters
     )
     const setActiveFilterId = useUiStore((state) => state.setActiveFilterId)
+
+    const [importDialogOpen, setImportDialogOpen] = useState(
+        Object.keys(importedModularFilters).length === 0
+    )
 
     const activeFilter = useMemo(
         () =>
@@ -102,8 +134,12 @@ export const FilterSelector: React.FC = () => {
         },
         [setActiveFilterId]
     )
+    const setFilterName = useUiStore((state) => state.setFilterName)
 
     const handleDeleteFilter = useCallback(() => {
+        if (Object.keys(importedModularFilters).length === 1) {
+            setImportDialogOpen(true)
+        }
         if (activeFilter) {
             removeImportedModularFilter(activeFilter.id)
         }
@@ -228,7 +264,7 @@ export const FilterSelector: React.FC = () => {
                         variant="outlined"
                         color="primary"
                         onClick={() => {
-                            setOpen(true)
+                            setImportDialogOpen(true)
                         }}
                     >
                         Import New Filter
@@ -286,6 +322,17 @@ export const FilterSelector: React.FC = () => {
                         onClose={() => setFilterMenuAnchor(null)}
                         anchorEl={filterMenuAnchor}
                     >
+                        <MenuItem
+                            disabled={!activeFilter}
+                            onClick={() => {
+                                setEditDialogOpen(true)
+                            }}
+                        >
+                            <ListItemIcon>
+                                <Edit />
+                            </ListItemIcon>
+                            <ListItemText>Edit Filter</ListItemText>
+                        </MenuItem>
                         <MenuItem
                             disabled={!activeFilter}
                             onClick={handleDeleteFilter}
@@ -377,10 +424,24 @@ export const FilterSelector: React.FC = () => {
             </Stack>
 
             <ImportFilterDialog
-                open={open}
-                onClose={() => setOpen(false)}
-                filtersForImport={filtersForImport}
+                open={importDialogOpen}
+                onClose={() => setImportDialogOpen(false)}
             />
+            {activeFilter && (
+                <EditFilterDialog
+                    open={editDialogOpen}
+                    filter={activeFilter}
+                    onClose={() => setEditDialogOpen(false)}
+                    onSave={(name) => {
+                        setFilterName(activeFilter.id, name)
+                        addAlert({
+                            children: 'Filter name updated',
+                            severity: 'success',
+                        })
+                        setEditDialogOpen(false)
+                    }}
+                />
+            )}
         </>
     )
 }
