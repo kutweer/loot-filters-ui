@@ -163,27 +163,27 @@ const createFilterConfigurationSlice: StateCreator<
     },
     clearConfiguration: (filterId: FilterId, macros: string[]) => {
         console.log('clearing configuration', filterId, macros)
-        return set(
-            (state) => ({
+        return set((state) => {
+            const filtersNewConfig = {
+                ...state.filterConfigurations[filterId],
+                inputConfigs: {
+                    ...(state.filterConfigurations[filterId]?.inputConfigs ??
+                        {}),
+                },
+            }
+
+            macros.forEach((macro) => {
+                delete filtersNewConfig.inputConfigs[macro]
+            })
+
+            return {
                 ...state,
                 filterConfigurations: {
                     ...state.filterConfigurations,
-                    [filterId]: {
-                        ...state.filterConfigurations[filterId],
-                        inputConfigs: {
-                            ...(state.filterConfigurations[filterId]
-                                ?.inputConfigs ?? {}),
-                            ...Object.fromEntries(
-                                macros.map((macro) => {
-                                    return [macro, {}]
-                                })
-                            ),
-                        },
-                    },
+                    [filterId]: filtersNewConfig,
                 },
-            }),
-            true
-        )
+            }
+        }, true)
     },
 })
 
