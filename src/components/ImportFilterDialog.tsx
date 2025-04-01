@@ -181,7 +181,7 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                             <p>
                                 A filter is a script that controls how items are
                                 displayed in the game. This website provides 2
-                                built-in filters that you can configur and use
+                                built-in filters that you can configure and use
                                 without any scripting.
                             </p>
                             <p>You can also import a filter from a URL.</p>
