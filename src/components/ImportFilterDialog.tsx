@@ -149,10 +149,10 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                             sx={{ color: '#CCCCCC', fontSize: '24px' }}
                         >
                             <p>
-                                The Loot Filters plugin is a replacement for the
-                                builtin Ground Items, and supports a much more
+                                Loot Filters is a replacement for the
+                                built-in Ground Items plugin and supports a much more
                                 powerful set of configuration options through
-                                it's scriptable filters.
+                                its scriptable filters.
                             </p>
 
                             <p>
