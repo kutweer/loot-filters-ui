@@ -156,8 +156,11 @@ export const loadFilter = async (
             updatedAt: date,
         }
         const filterUrl = await buildFilterUrl(filterSource)
+        console.log('filterUrl', filterUrl)
         const response = await fetch(filterUrl)
+        console.log('response', response)
         filter = (await response.json()) as FilterDefinition
+        console.log('Loaded github filter:', filter)
     } else {
         // even if the source is a ModularFilter, some modules may not be loaded
         filter = filterSource as FilterDefinition

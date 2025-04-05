@@ -16,6 +16,7 @@ export interface ImportedFilterSlice {
     addImportedModularFilter: (filter: UiModularFilter) => void
     removeImportedModularFilter: (filterId: FilterId) => void
     setActiveFilterId: (filterId: FilterId) => void
+    setFilterName: (filterId: FilterId, name: string) => void
 }
 
 export interface FilterConfigurationSlice {
@@ -76,6 +77,14 @@ const createImportedFilterSlice: StateCreator<
                     ...filter,
                     active: filter.id === filterId,
                 })),
+            },
+        }))
+    },
+    setFilterName: (filterId: FilterId, name: string) => {
+        set((state) => ({
+            importedModularFilters: {
+                ...state.importedModularFilters,
+                [filterId]: { ...state.importedModularFilters[filterId], name },
             },
         }))
     },
