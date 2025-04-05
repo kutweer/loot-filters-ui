@@ -13,6 +13,7 @@ import { useModuleStore } from '../store/modules'
 import { useUiStore } from '../store/store'
 import { colors } from '../styles/MuiTheme'
 import { UiFilterModule, UiModularFilter } from '../types/ModularFilterSpec'
+import { generateId } from '../utils/idgen'
 
 const ModuleCard: React.FC<{ module: UiFilterModule }> = ({ module }) => {
     const nav = useNavigate()
@@ -143,7 +144,7 @@ export const ModulesNav: React.FC<{
                 onClick={() => {
                     setModule({
                         name: 'New Module',
-                        id: crypto.randomUUID(),
+                        id: generateId(),
                         rs2fText: '',
                         inputs: [],
                     })

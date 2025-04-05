@@ -51,6 +51,7 @@ import { StyleConfig } from '../inputs/StyleInputHelpers'
 import { TextInputComponent } from '../inputs/TextInputComponent'
 import { ItemLabelPreview } from '../Previews'
 import { GitHubFlavoredMarkdown } from '../GitHubFlavoredMarkdown'
+import { generateId } from '../../utils/idgen'
 
 const InputComponent: React.FC<{
     activeFilterId: FilterId
@@ -200,7 +201,7 @@ const ModuleSection: React.FC<{
         configJson = JSON.stringify(activeConfig, null, 2)
     }
 
-    const defaultGroupId = crypto.randomUUID()
+    const defaultGroupId = generateId()
 
     const groupedInputs = groupBy(
         module.inputs.map((input) => ({

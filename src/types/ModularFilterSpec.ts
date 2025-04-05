@@ -105,10 +105,6 @@ export type ModularFilter = {
 //
 // ### ### ### ### ###
 
-// Usually a UUID - allows for non-user-supplied unique keys
-/**
- * @pattern ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
- */
 export type FilterId = string
 
 /**
@@ -122,6 +118,7 @@ export type UiModularFilter = {
     source?: FilterSource // The source we imported from. In the future will use this to check for updates etc.
     modules: UiFilterModule[]
     active: boolean
+    moduleAdditions?: LocalModuleReference[]
 } & ModularFilter
 
 export type UiFilterModule = {
@@ -129,3 +126,10 @@ export type UiFilterModule = {
     rs2fText: string
     source?: ModuleSource
 } & FilterModule
+
+export type LocalModuleReference = {
+    localModuleId: ModuleId
+    position: 'before' | 'after'
+    targetModuleId: ModuleId
+    enabled: boolean
+}
