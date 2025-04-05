@@ -496,6 +496,13 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                         >
                             Import
                         </Button>
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            onClick={() => setShowURLImportOptions(false)}
+                        >
+                            Back
+                        </Button>
                     </Box>
                 </Box>
             </DialogContent>
