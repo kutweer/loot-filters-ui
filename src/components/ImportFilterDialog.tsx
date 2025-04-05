@@ -130,6 +130,14 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                                 It provides previews for your item labels,
                                 groups configurations by item type, and more.
                             </p>
+                            <p>
+                                You can join the community of users of both the
+                                site, and the plugin{' '}
+                                <a href="https://discord.gg/ESbA28wPnt">
+                                    on discord
+                                </a>
+                                .
+                            </p>
                         </Typography>
                     </Grid2>
 
@@ -338,29 +346,42 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                     <Grid2 size={1} />
                     <Grid2 size={3}>
                         <Card variant="outlined">
-                            <CardActionArea
-                                onClick={() => setShowURLImportOptions(true)}
-                            >
-                                <CardContent>
-                                    <Typography
-                                        variant="h6"
-                                        component="div"
-                                        fontSize="36px"
-                                    >
-                                        From a URL
-                                    </Typography>
-                                    <Typography
-                                        variant="body2"
-                                        sx={{
-                                            color: 'text.secondary',
-                                            fontSize: '24px',
-                                        }}
-                                    >
-                                        Import a filter from a pastebin,
-                                        raw.githubusercontent.com url etc.
-                                    </Typography>
-                                </CardContent>
-                            </CardActionArea>
+                            <CardContent>
+                                <Typography
+                                    variant="h6"
+                                    component="div"
+                                    fontSize="36px"
+                                >
+                                    From a URL
+                                </Typography>
+                                <Typography
+                                    variant="body2"
+                                    sx={{
+                                        color: 'text.secondary',
+                                        fontSize: '24px',
+                                    }}
+                                >
+                                    Import a filter from a pastebin or github
+                                    url. Documentation about writing and
+                                    importing filters on the website can be
+                                    found{' '}
+                                    <a href="https://github.com/Kaqemeex/loot-filters-ui/tree/main/module-system-docs/modular-filters-book">
+                                        on GitHub
+                                    </a>
+                                    .
+                                </Typography>
+                            </CardContent>
+                            <CardActions>
+                                <Button
+                                    size="small"
+                                    color="secondary"
+                                    onClick={(e) => {
+                                        setShowURLImportOptions(true)
+                                    }}
+                                >
+                                    Import from Url
+                                </Button>
+                            </CardActions>
                         </Card>
                     </Grid2>
                 </Grid2>

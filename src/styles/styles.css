@@ -28,6 +28,10 @@ body {
     background-color: var(--color-rs-dark-brown);
 }
 
+a {
+    color: var(--color-rs-yellow);
+}
+
 .unset-color-picker {
     background-color: #000;
     background-image:
