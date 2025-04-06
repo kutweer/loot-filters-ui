@@ -9,6 +9,7 @@ import { ImportPage } from './pages/ImportPage'
 import { useAlertStore } from './store/alerts'
 import { useUiStore } from './store/store'
 import { MuiRsTheme } from './styles/MuiTheme'
+import { DebugPage } from './pages/DebugPage'
 
 const MainPage = ({ sha }: { sha: string }) => {
     const setSiteConfig = useUiStore((state) => state.setSiteConfig)
@@ -75,7 +76,7 @@ export const App = ({ sha = 'main' }: { sha?: string }) => {
                 <Routes>
                     <Route path="/" element={<MainPage sha={sha} />} />
                     <Route path="/import" element={<ImportPage />} />
-                    <Route path="/save-me" element={<div />} />
+                    <Route path="/debug" element={<DebugPage />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
             </BrowserRouter>
