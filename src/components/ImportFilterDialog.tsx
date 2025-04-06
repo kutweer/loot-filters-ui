@@ -112,7 +112,7 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                         }}
                         sx={{ float: 'right' }}
                     >
-                        {onboardingComplete ? 'UN HIDE INTRO' : 'HIDE INTRO'}
+                        {onboardingComplete ? 'UNHIDE INTRO' : 'HIDE INTRO'}
                     </Button>
                     <Grid2
                         container
