@@ -62,7 +62,11 @@ const MainPage = ({ sha }: { sha: string }) => {
                         version: {sha.slice(0, 7)}
                     </Typography>
                 </div>
-                        <ErrorBoundary beforeErrorComponent={<FilterSelector reloadOnChange={true} />}>
+                <ErrorBoundary
+                    beforeErrorComponent={
+                        <FilterSelector reloadOnChange={true} />
+                    }
+                >
                     <FilterTabs sha={sha} />
                 </ErrorBoundary>
             </Container>
