@@ -111,7 +111,9 @@ Here's the RS2F snippet we'll pair with the above module, put it in `my_module.r
 
 ```cpp
 #define VAR_SHOW_ITEMS
-hidden=VAR_SHOW_ITEMS;
+apply (true) {
+    hidden=VAR_SHOW_ITEMS;
+}
 ```
 
 Breaking things down, lets start with the first line, `#define VAR_SHOW_ITEMS`.
@@ -120,7 +122,11 @@ Breaking things down, lets start with the first line, `#define VAR_SHOW_ITEMS`.
 
 We define one macro per input, and then the UI populates them when you download the filter. This allows the UI to avoid doing anything complicated with your filter code, it just updates the macro definitions. If you look at the linked macro documentation you'll see that macros take 2 arguments an `identifier` our `VAR_SHOW_ITEMS` and a definition which we've left blank. Why did we leave it blank? Beacuse the UI will be creating the definition part for us, it's why we told it about the macro name in the input configuration.
 
-The second line is `hidden=VAR_SHOW_ITEMS;` this line uses our macro to take the configuration provided by the UI, either `true` or `false` and pass it to the `hidden` property. Because we have no other conditions in this filter this will either hide all items, or show all items, depending on the configured value for our macro.
+The second line, `apply (true) {` applies the configuration inside the `{}` to all items, if we wanted to apply it to fewer things like only stacks of items greater than 1, we would change the condition from `true` to `quantity:>1`.
+
+The third line is `hidden=VAR_SHOW_ITEMS;` this line uses our macro to take the configuration provided by the UI, either `true` or `false` and pass it to the `hidden` property. Because we have no other conditions in this filter this will either hide all items, or show all items, depending on the configured value for our macro.
+
+The fourth line `}` just closes the block for the apply.
 
 ## 3.3 Adding our module to our filter
 
