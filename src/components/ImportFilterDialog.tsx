@@ -2,7 +2,6 @@ import {
     Box,
     Button,
     Card,
-    CardActionArea,
     CardActions,
     CardContent,
     Dialog,
@@ -14,6 +13,7 @@ import {
     Typography,
 } from '@mui/material'
 import React, { useCallback, useState } from 'react'
+import { useOboardingStore } from '../store/onboarding'
 import { useUiStore } from '../store/store'
 import { FilterModule, ModuleSource } from '../types/ModularFilterSpec'
 import { DEV_FILTERS } from '../utils/devFilters'
@@ -100,109 +100,123 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
     const [loading, setLoading] = useState(false)
 
     const [showURLImportOptions, setShowURLImportOptions] = useState(false)
+    const { onboardingComplete, setOnboardingComplete } = useOboardingStore()
 
     return (
-        <Dialog fullWidth maxWidth="xl" open={open} onClose={handleClose}>
+        <Dialog fullWidth maxWidth="xl" open={true} onClose={handleClose}>
             <DialogContent>
-                <Grid2
-                    container
-                    spacing={2}
-                    sx={{ mt: 2, justifyContent: 'center' }}
-                >
-                    <Grid2 size={3}>
-                        <Typography
-                            variant="h6"
-                            fontSize="36px"
-                            component="div"
-                            sx={{ color: 'text.primary', fontSize: '24px' }}
-                        >
-                            What is this Website?
-                        </Typography>
-                        <Typography
-                            variant="body2"
-                            sx={{ color: '#CCCCCC', fontSize: '24px' }}
-                        >
-                            <p>
-                                FilterScape.xyz makes it easy to customize a
-                                filter for the loot-filters plugin.
-                            </p>
-                            <p>
-                                It provides previews for your item labels,
-                                groups configurations by item type, and more.
-                            </p>
-                            <p>
-                                You can join the community of users of both the
-                                site, and the plugin{' '}
-                                <a href="https://discord.gg/ESbA28wPnt">
-                                    on discord
-                                </a>
-                                .
-                            </p>
-                        </Typography>
+                <Box>
+                    <Button
+                        onClick={() => {
+                            setOnboardingComplete(!onboardingComplete)
+                        }}
+                        sx={{ float: 'right' }}
+                    >
+                        {onboardingComplete ? 'UN HIDE INTRO' : 'HIDE INTRO'}
+                    </Button>
+                    <Grid2
+                        container
+                        spacing={2}
+                        sx={{ mt: 2, justifyContent: 'center' }}
+                        display={onboardingComplete ? 'none' : 'flex'}
+                    >
+                        <Grid2 size={3}>
+                            <Typography
+                                variant="h6"
+                                fontSize="36px"
+                                component="div"
+                                sx={{ color: 'text.primary', fontSize: '24px' }}
+                            >
+                                What is this Website?
+                            </Typography>
+                            <Typography
+                                variant="body2"
+                                sx={{ color: '#CCCCCC', fontSize: '24px' }}
+                            >
+                                <p>
+                                    FilterScape.xyz makes it easy to customize a
+                                    filter for the loot-filters plugin.
+                                </p>
+                                <p>
+                                    It provides previews for your item labels,
+                                    groups configurations by item type, and
+                                    more.
+                                </p>
+                                <p>
+                                    You can join the community of users of both
+                                    the site, and the plugin{' '}
+                                    <a href="https://discord.gg/ESbA28wPnt">
+                                        on discord
+                                    </a>
+                                    .
+                                </p>
+                            </Typography>
+                        </Grid2>
+
+                        <Grid2 size={1} />
+
+                        <Grid2 size={3}>
+                            <Typography
+                                variant="h6"
+                                fontSize="36px"
+                                component="div"
+                                sx={{ color: 'text.primary', fontSize: '24px' }}
+                            >
+                                What is the Loot Filters Plugin?
+                            </Typography>
+                            <Typography
+                                variant="body2"
+                                sx={{ color: '#CCCCCC', fontSize: '24px' }}
+                            >
+                                <p>
+                                    <a href="https://runelite.net/plugin-hub/show/loot-filters">
+                                        Loot Filters
+                                    </a>{' '}
+                                    is a replacement for the built-in Ground
+                                    Items plugin and supports a much more
+                                    powerful set of configuration options
+                                    through its scriptable filters.
+                                </p>
+
+                                <p>
+                                    The plugin lets you configure how and when
+                                    items are displayed based on many conditions
+                                    like: if they are noted, how many are in the
+                                    stack, and even where you are in the game
+                                    world.
+                                </p>
+                            </Typography>
+                        </Grid2>
+                        <Grid2 size={1} />
+
+                        <Grid2 size={3}>
+                            <Typography
+                                variant="h6"
+                                fontSize="36px"
+                                component="div"
+                                sx={{ color: 'text.primary', fontSize: '24px' }}
+                            >
+                                What is a Filter?
+                            </Typography>
+                            <Typography
+                                variant="body2"
+                                sx={{ color: '#CCCCCC', fontSize: '24px' }}
+                            >
+                                <p>
+                                    A filter is a script that controls how items
+                                    are displayed in the game. This website
+                                    provides 2 built-in filters that you can
+                                    configure and use without any scripting.
+                                </p>
+                                <p>
+                                    You can also import a filter from a URL.
+                                    This allows you to customize and use other
+                                    filters outside of the 2 presets.
+                                </p>
+                            </Typography>
+                        </Grid2>
                     </Grid2>
-
-                    <Grid2 size={1} />
-
-                    <Grid2 size={3}>
-                        <Typography
-                            variant="h6"
-                            fontSize="36px"
-                            component="div"
-                            sx={{ color: 'text.primary', fontSize: '24px' }}
-                        >
-                            What is the Loot Filters Plugin?
-                        </Typography>
-                        <Typography
-                            variant="body2"
-                            sx={{ color: '#CCCCCC', fontSize: '24px' }}
-                        >
-                            <p>
-                                <a href="https://runelite.net/plugin-hub/show/loot-filters">
-                                    Loot Filters
-                                </a>{' '}
-                                is a replacement for the built-in Ground Items
-                                plugin and supports a much more powerful set of
-                                configuration options through its scriptable
-                                filters.
-                            </p>
-
-                            <p>
-                                The plugin lets you configure how and when items
-                                are displayed based on many conditions like: if
-                                they are noted, how many are in the stack, and
-                                even where you are in the game world.
-                            </p>
-                        </Typography>
-                    </Grid2>
-                    <Grid2 size={1} />
-
-                    <Grid2 size={3}>
-                        <Typography
-                            variant="h6"
-                            fontSize="36px"
-                            component="div"
-                            sx={{ color: 'text.primary', fontSize: '24px' }}
-                        >
-                            What is a Filter?
-                        </Typography>
-                        <Typography
-                            variant="body2"
-                            sx={{ color: '#CCCCCC', fontSize: '24px' }}
-                        >
-                            <p>
-                                A filter is a script that controls how items are
-                                displayed in the game. This website provides 2
-                                built-in filters that you can configure and use
-                                without any scripting.
-                            </p>
-                            <p>
-                                You can also import a filter from a URL. This
-                                allows you to customize and use other filters
-                                outside of the 2 presets.
-                            </p>
-                        </Typography>
-                    </Grid2>
-                </Grid2>
+                </Box>
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <Typography
                         fontSize="40px"
@@ -220,32 +234,26 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                 >
                     <Grid2 size={3}>
                         <Card variant="outlined">
-                            <CardActionArea
-                                disabled={loading}
-                                onClick={(e) => {
-                                    setLoading(true)
-                                    importGithubFilter(FILTERSCAPE_FILTER)
-                                }}
-                            >
-                                <CardContent>
-                                    <Typography
-                                        variant="h6"
-                                        fontSize="36px"
-                                        component="div"
-                                    >
-                                        FilterScape
-                                    </Typography>
-                                    <Typography
-                                        variant="body2"
-                                        fontSize="24px"
-                                        sx={{ color: 'text.secondary' }}
-                                    >
-                                        An all in one filter for mains.
-                                        Configurable styling for most monsters
-                                        and bosses.
-                                    </Typography>
-                                </CardContent>
-                            </CardActionArea>
+                            <CardContent>
+                                <Typography
+                                    variant="h6"
+                                    fontSize="36px"
+                                    component="div"
+                                >
+                                    FilterScape
+                                </Typography>
+                                <Typography
+                                    variant="body2"
+                                    fontSize="24px"
+                                    sx={{
+                                        color: 'text.secondary',
+                                        minHeight: '4lh',
+                                    }}
+                                >
+                                    An all in one filter for mains. Configurable
+                                    styling for most monsters and bosses.
+                                </Typography>
+                            </CardContent>
                             <CardActions>
                                 <Button
                                     size="small"
@@ -259,6 +267,15 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                                     }}
                                 >
                                     GitHub
+                                </Button>
+                                <Button
+                                    disabled={loading}
+                                    onClick={(e) => {
+                                        setLoading(true)
+                                        importGithubFilter(FILTERSCAPE_FILTER)
+                                    }}
+                                >
+                                    Import
                                 </Button>
                                 <div
                                     style={{
@@ -282,36 +299,26 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                     <Grid2 size={1} />
                     <Grid2 size={3}>
                         <Card variant="outlined">
-                            <CardActionArea
-                                onClick={(e) => {
-                                    setLoading(true)
-                                    importGithubFilter(JOES_FILTER)
-                                }}
-                                disabled={loading}
-                            >
-                                <CardContent>
-                                    <Typography
-                                        variant="h6"
-                                        fontSize="36px"
-                                        component="div"
-                                    >
-                                        Joe's Filter
-                                    </Typography>
-                                    <Typography
-                                        variant="body2"
-                                        sx={{
-                                            color: 'text.secondary',
-                                            fontSize: '24px',
-                                        }}
-                                    >
-                                        A filter for the more persnickety
-                                        players.
-                                        <br />
-                                        Goal is customizable styling for every
-                                        item in every context.
-                                    </Typography>
-                                </CardContent>
-                            </CardActionArea>
+                            <CardContent>
+                                <Typography
+                                    variant="h6"
+                                    fontSize="36px"
+                                    component="div"
+                                >
+                                    Joe's Filter
+                                </Typography>
+                                <Typography
+                                    variant="body2"
+                                    sx={{
+                                        color: 'text.secondary',
+                                        fontSize: '24px',
+                                        minHeight: '4lh',
+                                    }}
+                                >
+                                    Goal is customizable styling for every item
+                                    in every context.
+                                </Typography>
+                            </CardContent>
                             <CardActions>
                                 <Button
                                     size="small"
@@ -326,6 +333,16 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                                 >
                                     GitHub
                                 </Button>
+                                <Button
+                                    onClick={(e) => {
+                                        setLoading(true)
+                                        importGithubFilter(JOES_FILTER)
+                                    }}
+                                    disabled={loading}
+                                >
+                                    Import
+                                </Button>
+
                                 <div
                                     style={{
                                         width: '100%',
@@ -359,6 +376,7 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                                     sx={{
                                         color: 'text.secondary',
                                         fontSize: '24px',
+                                        minHeight: '4lh',
                                     }}
                                 >
                                     Import a filter from a pastebin or github
@@ -374,12 +392,11 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                             <CardActions>
                                 <Button
                                     size="small"
-                                    color="secondary"
                                     onClick={(e) => {
                                         setShowURLImportOptions(true)
                                     }}
                                 >
-                                    Import from Url
+                                    Import
                                 </Button>
                             </CardActions>
                         </Card>
