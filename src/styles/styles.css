@@ -26,6 +26,7 @@
 
 body {
     background-color: var(--color-rs-dark-brown);
+    font-family: 'RuneScape'
 }
 
 a {
