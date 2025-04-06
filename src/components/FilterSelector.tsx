@@ -20,6 +20,7 @@ import {
 } from '@mui/material'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAlertStore } from '../store/alerts'
 import { useUiStore } from '../store/store'
 import { GitHubFilterSource } from '../types/GitHubFilterSource'
@@ -90,7 +91,9 @@ const EditFilterDialog: React.FC<{
         </Dialog>
     )
 }
-export const FilterSelector: React.FC = () => {
+export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
+    reloadOnChange,
+}) => {
     const [editDialogOpen, setEditDialogOpen] = useState(false)
     const { siteConfig } = useUiStore()
 
@@ -102,6 +105,8 @@ export const FilterSelector: React.FC = () => {
     const [importDialogOpen, setImportDialogOpen] = useState(
         Object.keys(importedModularFilters).length === 0
     )
+
+    const navigate = useNavigate()
 
     const activeFilter = useMemo(
         () =>
@@ -130,6 +135,9 @@ export const FilterSelector: React.FC = () => {
         (newValue: Option<FilterId> | null) => {
             if (newValue) {
                 setActiveFilterId(newValue.value)
+                if (reloadOnChange) {
+                    window.location.reload()
+                }
             }
         },
         [setActiveFilterId]

@@ -4,12 +4,13 @@ import { useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Header } from './components/AppHeader'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { FilterSelector } from './components/FilterSelector'
 import { FilterTabs } from './components/FilterTabs'
+import { DebugPage } from './pages/DebugPage'
 import { ImportPage } from './pages/ImportPage'
 import { useAlertStore } from './store/alerts'
 import { useUiStore } from './store/store'
 import { MuiRsTheme } from './styles/MuiTheme'
-import { DebugPage } from './pages/DebugPage'
 
 const MainPage = ({ sha }: { sha: string }) => {
     const setSiteConfig = useUiStore((state) => state.setSiteConfig)
@@ -61,7 +62,7 @@ const MainPage = ({ sha }: { sha: string }) => {
                         version: {sha.slice(0, 7)}
                     </Typography>
                 </div>
-                <ErrorBoundary errorComponent={<Typography>Error</Typography>}>
+                        <ErrorBoundary beforeErrorComponent={<FilterSelector reloadOnChange={true} />}>
                     <FilterTabs sha={sha} />
                 </ErrorBoundary>
             </Container>
