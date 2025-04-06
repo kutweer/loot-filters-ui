@@ -103,7 +103,7 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
     const { onboardingComplete, setOnboardingComplete } = useOboardingStore()
 
     return (
-        <Dialog fullWidth maxWidth="xl" open={true} onClose={handleClose}>
+        <Dialog fullWidth maxWidth="xl" open={open} onClose={handleClose}>
             <DialogContent>
                 <Box>
                     <Button
