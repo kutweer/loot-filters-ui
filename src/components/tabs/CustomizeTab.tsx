@@ -5,6 +5,7 @@ import {
     AccordionSummary,
     Badge,
     Box,
+    Dialog,
     Divider,
     Grid2,
     IconButton,
@@ -41,6 +42,7 @@ import {
 
 import SettingsIcon from '@mui/icons-material/Settings'
 import { isConfigEmpty } from '../../utils/configUtils'
+import { generateId } from '../../utils/idgen'
 import { BooleanInputComponent } from '../inputs/BooleanInputComponent'
 import { DisplayConfigurationInput } from '../inputs/DisplayConfigurationInput'
 import { EnumInputComponent } from '../inputs/EnumInputComponent'
@@ -49,9 +51,9 @@ import { NumberInputComponent } from '../inputs/NumberInputComponent'
 import { StringListInputComponent } from '../inputs/StringListInputComponent'
 import { StyleConfig } from '../inputs/StyleInputHelpers'
 import { TextInputComponent } from '../inputs/TextInputComponent'
+import { Option, UISelect } from '../inputs/UISelect'
 import { ItemLabelPreview } from '../Previews'
 import { GitHubFlavoredMarkdown } from '../GitHubFlavoredMarkdown'
-import { generateId } from '../../utils/idgen'
 
 const InputComponent: React.FC<{
     activeFilterId: FilterId
@@ -246,7 +248,6 @@ const ModuleSection: React.FC<{
         .filter((key) => !isConfigEmpty(filterConfig[key])).length
 
     const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
-
     return (
         <>
             <Menu

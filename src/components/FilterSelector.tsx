@@ -48,7 +48,7 @@ const EditFilterDialog: React.FC<{
 }> = ({ open, filter, onSave, onClose }) => {
     const [name, setName] = useState(filter.name)
     return (
-        <Dialog maxWidth="lg" open={open} onClose={onClose}>
+        <Dialog maxWidth="xl" open={open} onClose={onClose}>
             <DialogTitle>Edit Filter</DialogTitle>
             <DialogContent>
                 <Box>
