@@ -20,7 +20,7 @@ export const renderFilter = (
 
     // add a simple meta if they don't have one already
     if (!rs2f.includes('meta {')) {
-        return `meta { name = "${filter.name}" }\n${rs2f}`
+        return `meta { name = "${filter.name}"; }\n${rs2f}`
     }
 
     return rs2f
