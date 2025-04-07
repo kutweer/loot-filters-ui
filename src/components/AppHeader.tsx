@@ -14,8 +14,9 @@ import { useNavigate } from 'react-router-dom'
 import { useUiStore } from '../store/store'
 import { colors } from '../styles/MuiTheme'
 
+export type PrimaryNavTab = 'filters' | 'modules' | 'editModule' | null
 export const Header: React.FC<{
-    primaryNavTab: 'filters' | 'modules' | 'editModule'
+    primaryNavTab: PrimaryNavTab
 }> = ({ primaryNavTab }) => {
     const { siteConfig, setSiteConfig } = useUiStore()
 

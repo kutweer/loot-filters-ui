@@ -13,11 +13,12 @@ import { ModuleEditPage } from './pages/ModuleEditPage'
 import { useAlertStore } from './store/alerts'
 import { useUiStore } from './store/store'
 import { MuiRsTheme } from './styles/MuiTheme'
+import { PrimaryNavTab } from './components/AppHeader'
 
 const Page: React.FC<{
-    primaryNavTab: 'filters' | 'modules' | 'editModule'
-    children: ReactNode
-}> = ({ primaryNavTab: page, children }) => {
+    primaryNavTab: PrimaryNavTab
+    component?: ReactNode
+}> = ({ primaryNavTab: page, component }) => {
     const setSiteConfig = useUiStore((state) => state.setSiteConfig)
     const params = new URLSearchParams(window.location.search)
     const devMode = params.get('dev') === 'true'
@@ -64,9 +65,7 @@ const Page: React.FC<{
                 </div>
             </ErrorBoundary>
 
-            <ErrorBoundary errorComponent={<Typography>Error</Typography>}>
-                {children}
-            </ErrorBoundary>
+            {component}
         </Container>
     )
 }
@@ -86,35 +85,50 @@ export const App = () => {
             <BrowserRouter>
                 <Routes>
                     <Route path="/import" element={<ImportPage />} />
-                    <Route path="/debug" element={<DebugPage />} />
+                    <Route
+                        path="/debug"
+                        element={
+                            <Page
+                                component={<DebugPage />}
+                                primaryNavTab={null}
+                            />
+                        }
+                    />
                     <Route
                         path="/"
                         element={
-                            <Page primaryNavTab="filters">
-                                <ErrorBoundary
-                                    beforeErrorComponent={
-                                        <FilterSelector reloadOnChange={true} />
-                                    }
-                                >
-                                    <FilterTabs sha={sha} />
-                                </ErrorBoundary>
-                            </Page>
+                            <Page
+                                component={
+                                    <ErrorBoundary
+                                        beforeErrorComponent={
+                                            <FilterSelector
+                                                reloadOnChange={true}
+                                            />
+                                        }
+                                    >
+                                        <FilterTabs />
+                                    </ErrorBoundary>
+                                }
+                                primaryNavTab="filters"
+                            />
                         }
                     />
                     <Route
                         path="/modules/:id"
                         element={
-                            <Page primaryNavTab="editModule">
-                                <ModuleEditPage />
-                            </Page>
+                            <Page
+                                component={<ModuleEditPage />}
+                                primaryNavTab="editModule"
+                            />
                         }
                     />
                     <Route
                         path="/modules"
                         element={
-                            <Page primaryNavTab="modules">
-                                <ModuleBuilderPage />
-                            </Page>
+                            <Page
+                                component={<ModuleBuilderPage />}
+                                primaryNavTab="modules"
+                            />
                         }
                     />
                     <Route path="/save-me" element={<div />} />

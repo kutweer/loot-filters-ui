@@ -1,13 +1,11 @@
 import { Box, Button, Container } from '@mui/material'
-import { Header } from '../components/AppHeader'
-import { downloadFile } from '../utils/file'
 import { useNavigate } from 'react-router-dom'
+import { downloadFile } from '../utils/file'
 
 export const DebugPage = () => {
     const nav = useNavigate()
     return (
         <Container maxWidth="lg">
-            <Header />
             <Box
                 sx={{
                     display: 'flex',
@@ -18,7 +16,7 @@ export const DebugPage = () => {
                 }}
             >
                 <Button
-                    sx={{ width: '250px', mt: 50 }}
+                    sx={{ width: '250px', mt: 10 }}
                     variant="outlined"
                     onClick={() => {
                         const state = localStorage.getItem(
