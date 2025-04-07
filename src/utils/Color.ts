@@ -67,7 +67,8 @@ export const normalizeHex = (hex?: ArgbHexColor): ArgbHexColor | undefined => {
     } else if (hex.length === 9) {
         argbHex = hex
     } else {
-        throw new Error(`Invalid color hex: ${hex}`)
+        console.warn(`Invalid color hex: ${hex}`)
+        return '#FF000000'
     }
 
     return argbHex
