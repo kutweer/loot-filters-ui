@@ -46,6 +46,7 @@ import { StringListInputComponent } from '../inputs/StringListInputComponent'
 import { StyleConfig } from '../inputs/StyleInputHelpers'
 import { TextInputComponent } from '../inputs/TextInputComponent'
 import { ItemLabelPreview } from '../Previews'
+import { GitHubFlavoredMarkdown } from '../GitHubFlavoredMarkdown'
 
 const InputComponent: React.FC<{
     activeFilterId: FilterId
@@ -370,7 +371,9 @@ const ModuleSection: React.FC<{
                                     display: 'inline-block',
                                 }}
                             >
-                                {module.description}
+                                <GitHubFlavoredMarkdown
+                                    gfmd={module.description ?? ''}
+                                />
                             </Typography>
                         </Stack>
                         {siteConfig.devMode ? (
