@@ -4,12 +4,14 @@ import { colors } from '../styles/MuiTheme'
 
 export const GitHubFlavoredMarkdown = ({ gfmd }: { gfmd: string }) => {
     return (
-        <div
+        <span
             style={{
                 color: colors.rsLightestBrown,
+                marginLeft: '1em',
+                display: 'inline-block',
             }}
         >
             <Markdown remarkPlugins={[remarkGfm]}>{gfmd}</Markdown>
-        </div>
+        </span>
     )
 }
