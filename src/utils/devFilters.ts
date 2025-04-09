@@ -36,7 +36,7 @@ const markdownTest: FilterDefinition = {
             moduleJson: {
                 name: 'Markdown Test',
                 description:
-                    '# markdown\n\nA filter that allows you to test markdown',
+                    '# markdown\n\nA filter that allows you to test markdown. asdf.\n\n[Link](https://www.google.com)\n\n**Bold**\n\n## test\n\n1. foo\n\n2. bar',
                 inputs: [],
             },
             moduleRs2fText: '',
