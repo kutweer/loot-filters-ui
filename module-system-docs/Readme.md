@@ -26,7 +26,7 @@ A filter hosted somewhere can be imported in the UI by just putting in the URL a
 
 ### What is a module
 
-A module is a pairing of a JSON schema defining what inputs can be configured, and a `rs2f` file which is the filter code itself. The UI renders the inptus configured in the JSON and will replace the definition (right hand side) of the related macro when you download the filter. If there are multiple modules the site will concatenate them all into a single file.
+A module is a pairing of a JSON schema defining what inputs can be configured, and a `rs2f` file which is the filter code itself. The UI renders the inptus configured in the JSON will replace the definition (right hand side) of the related macro when you download the filter. If there are multiple modules the site will concatenate them all into a single file.
 
 The JSON provides a clean way to inform the UI as to what kind of input to expose to the user, ie. a simple `boolean` or a full `style` configuration with color-pickers etc.
 
