@@ -46,6 +46,7 @@ import { StringListInputComponent } from '../inputs/StringListInputComponent'
 import { StyleConfig } from '../inputs/StyleInputHelpers'
 import { TextInputComponent } from '../inputs/TextInputComponent'
 import { ItemLabelPreview } from '../Previews'
+import { GitHubFlavoredMarkdown } from '../GitHubFlavoredMarkdown'
 
 const InputComponent: React.FC<{
     activeFilterId: FilterId
@@ -360,18 +361,14 @@ const ModuleSection: React.FC<{
                 </AccordionSummary>
                 <AccordionDetails>
                     <Stack spacing={2} direction="column">
-                        <Stack direction="row" justifyContent="flex-end">
-                            <Typography
-                                variant="h6"
-                                component="span"
-                                color={colors.rsLightestBrown}
-                                sx={{
-                                    ml: 1,
-                                    display: 'inline-block',
-                                }}
-                            >
-                                {module.description}
-                            </Typography>
+                        <Stack
+                            sx={{ display: 'block' }}
+                            direction="row"
+                            justifyContent="flex-end"
+                        >
+                            <GitHubFlavoredMarkdown
+                                gfmd={module.description ?? ''}
+                            />
                         </Stack>
                         {siteConfig.devMode ? (
                             <Box display="flex" justifyContent="flex-end">

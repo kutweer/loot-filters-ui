@@ -27,6 +27,23 @@ const enableDisableModuleFilter: FilterDefinition = {
     ],
 }
 
+const markdownTest: FilterDefinition = {
+    name: '[Dev] Markdown Test',
+    description: 'A filter that allows you to test markdown',
+    modules: [
+        {
+            name: 'Markdown Test',
+            moduleJson: {
+                name: 'Markdown Test',
+                description:
+                    '# markdown\n\nA filter that allows you to test markdown. asdf.\n\n[Link](https://www.google.com)\n\n**Bold**\n\n## test\n\n1. foo\n\n2. bar',
+                inputs: [],
+            },
+            moduleRs2fText: '',
+        },
+    ],
+}
+
 const listInputFilter: FilterDefinition = {
     name: '[Dev] List Input Filter',
     description: 'A filter that allows you to select a list of items',
@@ -142,4 +159,5 @@ export const DEV_FILTERS = [
     listInputFilter,
     textInputFilter,
     styleInputFilter,
+    markdownTest,
 ]
