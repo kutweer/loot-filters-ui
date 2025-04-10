@@ -1,10 +1,10 @@
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { colors } from '../styles/MuiTheme'
-import { useTheme } from '@mui/material';
+import { useTheme } from '@mui/material'
 
 export const GitHubFlavoredMarkdown = ({ gfmd }: { gfmd: string }) => {
-    const theme = useTheme();
+    const theme = useTheme()
 
     return (
         <span
