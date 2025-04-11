@@ -10,9 +10,14 @@ import {
 import { useUiStore } from '../store/store'
 import { colors } from '../styles/MuiTheme'
 
-export const Header: React.FC = () => {
+export const AppHeader: React.FC = () => {
     const { siteConfig, setSiteConfig } = useUiStore()
-
+    let buildInfo = { gitSha: 'main' }
+    try {
+        buildInfo = require('../build-info.json')
+    } catch {
+        console.warn('Could not load build info, using default')
+    }
     return (
         <Box>
             <Box
@@ -61,6 +66,13 @@ export const Header: React.FC = () => {
                         </FormGroup>
                     </FormControl>
                 ) : null}
+                <Typography
+                    sx={{ marginLeft: 'auto' }}
+                    variant="body2"
+                    color="text.secondary"
+                >
+                    version: {buildInfo.gitSha.slice(0, 7)}
+                </Typography>
             </Box>
         </Box>
     )

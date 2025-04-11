@@ -48,7 +48,7 @@ const EditFilterDialog: React.FC<{
 }> = ({ open, filter, onSave, onClose }) => {
     const [name, setName] = useState(filter.name)
     return (
-        <Dialog maxWidth="lg" open={open} onClose={onClose}>
+        <Dialog maxWidth="xl" open={open} onClose={onClose}>
             <DialogTitle>Edit Filter</DialogTitle>
             <DialogContent>
                 <Box>
@@ -97,10 +97,14 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
     const [editDialogOpen, setEditDialogOpen] = useState(false)
     const { siteConfig } = useUiStore()
 
-    const importedModularFilters = useUiStore(
-        (state) => state.importedModularFilters
-    )
-    const setActiveFilterId = useUiStore((state) => state.setActiveFilterId)
+    const {
+        setActiveFilterId,
+        addFilterConfiguration,
+        importedModularFilters,
+        removeImportedModularFilter,
+        addImportedModularFilter,
+        setFilterName,
+    } = useUiStore()
 
     const [importDialogOpen, setImportDialogOpen] = useState(
         Object.keys(importedModularFilters).length === 0
@@ -122,15 +126,6 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                 activeFilter && state.filterConfigurations?.[activeFilter.id]
         )
 
-    const removeImportedModularFilter = useUiStore(
-        (state) => state.removeImportedModularFilter
-    )
-
-    const addNewFilter = useUiStore((state) => state.addImportedModularFilter)
-    const addFilterConfiguration = useUiStore(
-        (state) => state.addFilterConfiguration
-    )
-
     const handleFilterChange = useCallback(
         (newValue: Option<FilterId> | null) => {
             if (newValue) {
@@ -142,8 +137,6 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
         },
         [setActiveFilterId]
     )
-    const setFilterName = useUiStore((state) => state.setFilterName)
-
     const handleDeleteFilter = useCallback(() => {
         if (Object.keys(importedModularFilters).length === 1) {
             setImportDialogOpen(true)
@@ -171,23 +164,30 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
         null
     )
 
+    const addAlert = useAlertStore((state) => state.addAlert)
+
     useEffect(() => {
         if (activeFilter != null) {
             console.log('checking for updates')
             if (isGitHubSource(activeFilter?.source)) {
                 console.log('loading filter')
-                loadFilter(activeFilter.source).then((newFilter) => {
-                    console.log('loaded filter', newFilter)
-                    setUpdatedFilter(newFilter)
-                })
+                loadFilter(activeFilter.source)
+                    .then((newFilter) => {
+                        console.log('loaded filter', newFilter)
+                        setUpdatedFilter(newFilter)
+                    })
+                    .catch((e) => {
+                        addAlert({
+                            children: `Failed to check for updates to filter: ${e.message}`,
+                            severity: 'error',
+                        })
+                    })
             }
         }
     }, [activeFilter])
 
     const [filterMenuAnchor, setFilterMenuAnchor] =
         useState<HTMLElement | null>(null)
-
-    const addAlert = useAlertStore((state) => state.addAlert)
 
     const activeFilterSha = isGitHubSource(activeFilter?.source)
         ? activeFilter?.source.updateMeta?.sha
@@ -295,7 +295,7 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                                     ).updateMeta!!.updatedAt
                                 ).toLocaleDateString()
 
-                                addNewFilter({
+                                addImportedModularFilter({
                                     ...updatedFilter,
                                     name:
                                         name.replace(/ \(updated: .*\)$/, '') +

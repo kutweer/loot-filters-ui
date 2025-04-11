@@ -5,6 +5,7 @@ import {
     AccordionSummary,
     Badge,
     Box,
+    Dialog,
     Divider,
     Grid2,
     IconButton,
@@ -33,10 +34,15 @@ import {
     StyleInput,
     TextInput,
 } from '../../types/InputsSpec'
-import { FilterId, UiFilterModule } from '../../types/ModularFilterSpec'
+import {
+    FilterId,
+    UiFilterModule,
+    UiModularFilter,
+} from '../../types/ModularFilterSpec'
 
 import SettingsIcon from '@mui/icons-material/Settings'
 import { isConfigEmpty } from '../../utils/configUtils'
+import { generateId } from '../../utils/idgen'
 import { BooleanInputComponent } from '../inputs/BooleanInputComponent'
 import { DisplayConfigurationInput } from '../inputs/DisplayConfigurationInput'
 import { EnumInputComponent } from '../inputs/EnumInputComponent'
@@ -45,6 +51,7 @@ import { NumberInputComponent } from '../inputs/NumberInputComponent'
 import { StringListInputComponent } from '../inputs/StringListInputComponent'
 import { StyleConfig } from '../inputs/StyleInputHelpers'
 import { TextInputComponent } from '../inputs/TextInputComponent'
+import { Option, UISelect } from '../inputs/UISelect'
 import { ItemLabelPreview } from '../Previews'
 import { GitHubFlavoredMarkdown } from '../GitHubFlavoredMarkdown'
 
@@ -196,7 +203,7 @@ const ModuleSection: React.FC<{
         configJson = JSON.stringify(activeConfig, null, 2)
     }
 
-    const defaultGroupId = crypto.randomUUID()
+    const defaultGroupId = generateId()
 
     const groupedInputs = groupBy(
         module.inputs.map((input) => ({
@@ -241,7 +248,6 @@ const ModuleSection: React.FC<{
         .filter((key) => !isConfigEmpty(filterConfig[key])).length
 
     const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
-
     return (
         <>
             <Menu
@@ -474,7 +480,7 @@ export const CustomizeTab: React.FC = () => {
         Record<string, boolean>
     >({})
 
-    const activeFilter = useMemo(
+    const activeFilter: UiModularFilter | undefined = useMemo(
         () =>
             Object.values(importedModularFilters).find(
                 (filter) => filter.active

@@ -1,18 +1,20 @@
 import { Alert, Container, Snackbar, Typography } from '@mui/material'
 import { ThemeProvider } from '@mui/material/styles'
-import { useEffect } from 'react'
+import { ReactNode, useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { Header } from './components/AppHeader'
+import { AppHeader } from './components/AppHeader'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { FilterSelector } from './components/FilterSelector'
-import { FilterTabs } from './components/FilterTabs'
+import { FilterTabs } from './pages/CustomizeFilterPage'
 import { DebugPage } from './pages/DebugPage'
 import { ImportPage } from './pages/ImportPage'
 import { useAlertStore } from './store/alerts'
 import { useUiStore } from './store/store'
 import { MuiRsTheme } from './styles/MuiTheme'
 
-const MainPage = ({ sha }: { sha: string }) => {
+const Page: React.FC<{
+    component?: ReactNode
+}> = ({ component }) => {
     const setSiteConfig = useUiStore((state) => state.setSiteConfig)
     const params = new URLSearchParams(window.location.search)
     const devMode = params.get('dev') === 'true'
@@ -26,9 +28,8 @@ const MainPage = ({ sha }: { sha: string }) => {
             setSiteConfig({ devMode })
         }
     }, [devMode, setSiteConfig])
-
     return (
-        <>
+        <Container className="rs-container" maxWidth="xl">
             {alerts.map((alert) => (
                 <Snackbar
                     key={alert.key}
@@ -40,6 +41,17 @@ const MainPage = ({ sha }: { sha: string }) => {
                     <Alert {...alert} />
                 </Snackbar>
             ))}
+            <ErrorBoundary>
+                <AppHeader />
+            </ErrorBoundary>
+            {component}
+        </Container>
+    )
+}
+
+export const App = () => {
+    return (
+        <ThemeProvider theme={MuiRsTheme}>
             <span style={{ display: 'none', fontFamily: 'RuneScape' }}>
                 runescape
             </span>
@@ -49,39 +61,32 @@ const MainPage = ({ sha }: { sha: string }) => {
             <span style={{ display: 'none', fontFamily: 'RuneScapeSmall' }}>
                 RuneScapeSmall
             </span>
-            <Container className="rs-container" maxWidth="xl">
-                <div style={{ display: 'flex' }}>
-                    <ErrorBoundary>
-                        <Header />
-                    </ErrorBoundary>
-                    <Typography
-                        sx={{ marginLeft: 'auto' }}
-                        variant="body2"
-                        color="text.secondary"
-                    >
-                        version: {sha.slice(0, 7)}
-                    </Typography>
-                </div>
-                <ErrorBoundary
-                    beforeErrorComponent={
-                        <FilterSelector reloadOnChange={true} />
-                    }
-                >
-                    <FilterTabs sha={sha} />
-                </ErrorBoundary>
-            </Container>
-        </>
-    )
-}
-
-export const App = ({ sha = 'main' }: { sha?: string }) => {
-    return (
-        <ThemeProvider theme={MuiRsTheme}>
             <BrowserRouter>
                 <Routes>
-                    <Route path="/" element={<MainPage sha={sha} />} />
                     <Route path="/import" element={<ImportPage />} />
-                    <Route path="/debug" element={<DebugPage />} />
+                    <Route
+                        path="/debug"
+                        element={<Page component={<DebugPage />} />}
+                    />
+                    <Route
+                        path="/"
+                        element={
+                            <Page
+                                component={
+                                    <ErrorBoundary
+                                        beforeErrorComponent={
+                                            <FilterSelector
+                                                reloadOnChange={true}
+                                            />
+                                        }
+                                    >
+                                        <FilterTabs />
+                                    </ErrorBoundary>
+                                }
+                            />
+                        }
+                    />
+                    <Route path="/save-me" element={<div />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
             </BrowserRouter>

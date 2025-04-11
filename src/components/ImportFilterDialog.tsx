@@ -19,6 +19,7 @@ import { FilterModule, ModuleSource } from '../types/ModularFilterSpec'
 import { DEV_FILTERS } from '../utils/devFilters'
 import { loadFilter } from '../utils/modularFilterLoader'
 import { Option, UISelect } from './inputs/UISelect'
+import { generateId } from '../utils/idgen'
 
 interface ImportFilterDialogProps {
     open: boolean
@@ -503,7 +504,7 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                                 } else {
                                     const filter = {
                                         ...JSON.parse(filterUrl),
-                                        id: crypto.randomUUID(),
+                                        id: generateId(),
                                     }
 
                                     if (filter)
@@ -514,7 +515,7 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                                                         moduleJson: FilterModule
                                                     }
                                                 ).moduleJson,
-                                                id: crypto.randomUUID(),
+                                                id: generateId(),
                                                 rs2fText: (
                                                     module as {
                                                         moduleRs2fText: string

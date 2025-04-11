@@ -11,6 +11,7 @@ import {
     UiModularFilter,
 } from '../types/ModularFilterSpec'
 import { assertString, validateModule } from '../types/validate'
+import { generateId } from './idgen'
 
 export const trimUrl = (input: string): string => {
     const lastSlashIndex = input.lastIndexOf('/')
@@ -61,7 +62,7 @@ const loadOldModule = async (
         ...moduleJson,
         rs2fText: moduleRs2fText,
         source: oldSource,
-        id: crypto.randomUUID(),
+        id: generateId(),
     }
 
     validateModule(oldMoudle)
@@ -76,7 +77,7 @@ const loadInlineModule = async (
         ...inlineSource.moduleJson,
         rs2fText: inlineSource.moduleRs2fText,
         source: inlineSource,
-        id: crypto.randomUUID(),
+        id: generateId(),
     }
 
     validateModule(inlineModule)
@@ -126,7 +127,7 @@ const loadRelativeModule = async (
         ...moduleJson,
         rs2fText: moduleRs2fText,
         source: moduleSource,
-        id: crypto.randomUUID(),
+        id: generateId(),
     } as UiFilterModule
 
     validateModule(module)
@@ -195,7 +196,7 @@ export const loadFilter = async (
         name: filter.name,
         // id implies it was an actual filter instance not a source
         source: 'id' in filterSource ? undefined : filterSource,
-        id: crypto.randomUUID(),
+        id: generateId(),
         description: filter.description,
         modules: resolvedModules,
         importedOn: new Date().toISOString(),
