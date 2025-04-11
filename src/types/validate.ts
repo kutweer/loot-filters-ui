@@ -2,7 +2,6 @@ import { isArray, isObject } from 'underscore'
 import {
     BooleanInput,
     EnumListInput,
-    IncludeExcludeListInput,
     NumberInput,
     StringListInput,
 } from './InputsSpec'
@@ -45,16 +44,6 @@ export const validateModule = (module: FilterModule) => {
                 break
             case 'enumlist':
                 checkArrayProperty((input as EnumListInput).default, 'string')
-                break
-            case 'includeExcludeList':
-                checkArrayProperty(
-                    (input as IncludeExcludeListInput).default.includes,
-                    'string'
-                )
-                checkArrayProperty(
-                    (input as IncludeExcludeListInput).default.excludes,
-                    'string'
-                )
                 break
             case 'style':
                 if (!isObject(input.default)) {
