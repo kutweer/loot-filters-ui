@@ -2,18 +2,15 @@ import { Alert, Container, Snackbar, Typography } from '@mui/material'
 import { ThemeProvider } from '@mui/material/styles'
 import { ReactNode, useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { Header } from './components/AppHeader'
+import { Header, PrimaryNavTab } from './components/AppHeader'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { FilterSelector } from './components/FilterSelector'
+import { FilterTabs } from './pages/CustomizeFilterPage'
 import { DebugPage } from './pages/DebugPage'
 import { ImportPage } from './pages/ImportPage'
-import { FilterTabs } from './pages/CustomizeFilterPage'
-import { ModuleBuilderPage } from './pages/ModuleBuilderPage'
-import { ModuleEditPage } from './pages/ModuleEditPage'
 import { useAlertStore } from './store/alerts'
 import { useUiStore } from './store/store'
 import { MuiRsTheme } from './styles/MuiTheme'
-import { PrimaryNavTab } from './components/AppHeader'
 
 const Page: React.FC<{
     primaryNavTab: PrimaryNavTab
@@ -110,24 +107,6 @@ export const App = () => {
                                     </ErrorBoundary>
                                 }
                                 primaryNavTab="filters"
-                            />
-                        }
-                    />
-                    <Route
-                        path="/modules/:id"
-                        element={
-                            <Page
-                                component={<ModuleEditPage />}
-                                primaryNavTab="editModule"
-                            />
-                        }
-                    />
-                    <Route
-                        path="/modules"
-                        element={
-                            <Page
-                                component={<ModuleBuilderPage />}
-                                primaryNavTab="modules"
                             />
                         }
                     />
