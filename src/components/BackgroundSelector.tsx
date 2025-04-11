@@ -49,7 +49,7 @@ export const BackgroundSelector: React.FC = () => {
                     options={backgroundOptions}
                     value={selectedBackground}
                     onChange={handleBackgroundChange}
-                    label="Select a background"
+                    label="Select a preview background"
                     multiple={false}
                 />
             </FormControl>
