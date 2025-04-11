@@ -78,38 +78,8 @@ enum:
     label: Super antifire mix
   - value: Extended super antifire mix*
     label: Extended super antifire mix
-default:
-  - Attack mix*
-  - Antipoison mix*
-  - Relicym's mix*
-  - Strength mix*
-  - Restore mix*
-  - Energy mix*
-  - Defence mix*
-  - Agility mix*
-  - Combat mix*
-  - Prayer mix*
-  - Superattack mix*
-  - Anti-poison supermix*
-  - Fishing mix*
-  - Super energy mix*
-  - Hunting mix*
-  - Super str. mix*
-  - Magic essence mix*
-  - Super restore mix*
-  - Super def. mix*
-  - Antidote+ mix*
-  - Antifire mix*
-  - Ranging mix*
-  - Magic mix*
-  - Zamorak mix*
-  - Stamina mix*
-  - Extended antifire mix*
-  - Ancient mix*
-  - Super antifire mix*
-  - Extended super antifire mix*
 */
-#define VAR_BARB_POTIONS_HIDE []
+#define VAR_BARB_POTIONS_HIDE ["Attack mix*", "Antipoison mix*", "Relicym's mix*", "Strength mix*", "Restore mix*", "Energy mix*", "Defence mix*", "Agility mix*", "Combat mix*", "Prayer mix*", "Superattack mix*", "Anti-poison supermix*", "Fishing mix*", "Super energy mix*", "Hunting mix*", "Super str. mix*", "Magic essence mix*", "Super restore mix*", "Super def. mix*", "Antidote+ mix*", "Antifire mix*", "Ranging mix*", "Magic mix*", "Zamorak mix*", "Stamina mix*", "Extended antifire mix*", "Ancient mix*", "Super antifire mix*", "Extended super antifire mix*"]
 
 /*@ define:input:barb_potions
 ---
@@ -117,14 +87,8 @@ macroName: VAR_BARB_POTIONS_ATTACK_MIX_CUSTOMSTYLE
 label: Attack mix custom style
 type: style
 exampleItem: Attack mix
-default:
-  textColor: '#FFFFFFFF'
-  textAccentColor: '#FF000000'
-  backgroundColor: '#5074E2E6'
-  borderColor: '#FF74E2E6'
-  menuTextColor: '#FF74E2E6'
 */
-#define VAR_BARB_POTIONS_ATTACK_MIX_CUSTOMSTYLE 
+#define VAR_BARB_POTIONS_ATTACK_MIX_CUSTOMSTYLE textColor="#FFFFFFFF";\\n textAccentColor="#FF000000";\\n backgroundColor="#5074E2E6";\\n borderColor="#FF74E2E6";\\n menuTextColor="#FF74E2E6";
 `
 
 export const ParsePage = () => {
