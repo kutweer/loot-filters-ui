@@ -18,11 +18,6 @@ export const validateModule = (module: FilterModule) => {
                 if (input.macroName.length === 0) {
                     throw new Error(`Module ${module.name} has empty macroName`)
                 }
-            } else if (typeof input.macroName === 'object') {
-                checkObjectProperty(input.macroName, 'includes', 'string') &&
-                    input.macroName.includes.length > 0
-                checkObjectProperty(input.macroName, 'excludes', 'string') &&
-                    input.macroName.excludes.length > 0
             } else {
                 throw new Error(
                     `Module ${module.name} has invalid macroName ${input.macroName} or the macroName is empty`
