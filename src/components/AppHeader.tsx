@@ -1,4 +1,3 @@
-import { ChevronRight } from '@mui/icons-material'
 import {
     Box,
     FormControl,
@@ -6,22 +5,19 @@ import {
     FormGroup,
     Link,
     Switch,
-    Tab,
-    Tabs,
     Typography,
 } from '@mui/material'
-import { useNavigate } from 'react-router-dom'
 import { useUiStore } from '../store/store'
 import { colors } from '../styles/MuiTheme'
 
-export type PrimaryNavTab = 'filters' | 'modules' | 'editModule' | null
-export const Header: React.FC<{
-    primaryNavTab: PrimaryNavTab
-}> = ({ primaryNavTab }) => {
+export const AppHeader: React.FC = () => {
     const { siteConfig, setSiteConfig } = useUiStore()
-
-    const navigate = useNavigate()
-
+    let buildInfo = { gitSha: 'main' }
+    try {
+        buildInfo = require('../build-info.json')
+    } catch {
+        console.warn('Could not load build info, using default')
+    }
     return (
         <Box>
             <Box
@@ -70,47 +66,13 @@ export const Header: React.FC<{
                         </FormGroup>
                     </FormControl>
                 ) : null}
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Tabs
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                    }}
-                    value={primaryNavTab}
-                    onChange={(_, value) => {
-                        if (value === 'filters') {
-                            navigate('/')
-                        } else {
-                            navigate('/modules')
-                        }
-                    }}
+                <Typography
+                    sx={{ marginLeft: 'auto' }}
+                    variant="body2"
+                    color="text.secondary"
                 >
-                    <Tab value="filters" label="Filters" />
-                    <Tab value="module" label="Modules" />
-                    <Tab
-                        value="editModule"
-                        style={{
-                            display:
-                                primaryNavTab === 'editModule'
-                                    ? 'block'
-                                    : 'none',
-                        }}
-                        label={
-                            <div style={{ display: 'flex' }}>
-                                <ChevronRight
-                                    sx={{
-                                        color: colors.rsDarkOrange,
-                                    }}
-                                />
-                                <div style={{ alignSelf: 'center' }}>
-                                    {' '}
-                                    Edit Module
-                                </div>
-                            </div>
-                        }
-                    />
-                </Tabs>
+                    version: {buildInfo.gitSha.slice(0, 7)}
+                </Typography>
             </Box>
         </Box>
     )

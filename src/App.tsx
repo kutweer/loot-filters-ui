@@ -2,7 +2,7 @@ import { Alert, Container, Snackbar, Typography } from '@mui/material'
 import { ThemeProvider } from '@mui/material/styles'
 import { ReactNode, useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { Header, PrimaryNavTab } from './components/AppHeader'
+import { AppHeader } from './components/AppHeader'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { FilterSelector } from './components/FilterSelector'
 import { FilterTabs } from './pages/CustomizeFilterPage'
@@ -13,9 +13,8 @@ import { useUiStore } from './store/store'
 import { MuiRsTheme } from './styles/MuiTheme'
 
 const Page: React.FC<{
-    primaryNavTab: PrimaryNavTab
     component?: ReactNode
-}> = ({ primaryNavTab: page, component }) => {
+}> = ({ component }) => {
     const setSiteConfig = useUiStore((state) => state.setSiteConfig)
     const params = new URLSearchParams(window.location.search)
     const devMode = params.get('dev') === 'true'
@@ -23,13 +22,6 @@ const Page: React.FC<{
     const alerts = useAlertStore((state) => state.alerts)
     const isAlerts = Boolean(alerts.length)
     const closeAlert = useAlertStore((state) => state.removeAlert)
-
-    let buildInfo = { gitSha: 'main' }
-    try {
-        buildInfo = require('./build-info.json')
-    } catch {
-        console.warn('Could not load build info, using default')
-    }
 
     useEffect(() => {
         if (devMode) {
@@ -50,18 +42,8 @@ const Page: React.FC<{
                 </Snackbar>
             ))}
             <ErrorBoundary>
-                <Header primaryNavTab={page} />
-                <div style={{ display: 'flex' }}>
-                    <Typography
-                        sx={{ marginLeft: 'auto' }}
-                        variant="body2"
-                        color="text.secondary"
-                    >
-                        version: {buildInfo.gitSha.slice(0, 7)}
-                    </Typography>
-                </div>
+                <AppHeader />
             </ErrorBoundary>
-
             {component}
         </Container>
     )
@@ -84,12 +66,7 @@ export const App = () => {
                     <Route path="/import" element={<ImportPage />} />
                     <Route
                         path="/debug"
-                        element={
-                            <Page
-                                component={<DebugPage />}
-                                primaryNavTab={null}
-                            />
-                        }
+                        element={<Page component={<DebugPage />} />}
                     />
                     <Route
                         path="/"
@@ -106,7 +83,6 @@ export const App = () => {
                                         <FilterTabs />
                                     </ErrorBoundary>
                                 }
-                                primaryNavTab="filters"
                             />
                         }
                     />
