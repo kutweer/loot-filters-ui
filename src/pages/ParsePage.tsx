@@ -1,6 +1,7 @@
 import { Editor } from '@monaco-editor/react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { parse } from '../parsing/parse'
+import { ErrorBoundary } from '../components/ErrorBoundary'
 
 const content = `
 // module:barb_potions
@@ -93,11 +94,21 @@ exampleItem: Attack mix
 
 export const ParsePage = () => {
     const [editorContent, setEditorContent] = useState(content)
+    const [error, setError] = useState<Error | null>(null)
+
+    const parsed = useMemo(() => {
+        try {
+            return parse(editorContent)
+        } catch (e) {
+            setError(e as Error)
+            return (e as Error).message
+        }
+    }, [editorContent])
 
     return (
-        <div>
+        <ErrorBoundary>
             <Editor
-                height="70vh"
+                height="50vh"
                 language="cpp"
                 theme="vs-dark"
                 options={{
@@ -114,10 +125,10 @@ export const ParsePage = () => {
                 }}
             />
             <Editor
-                height="70vh"
+                height="50vh"
                 language="json"
                 theme="vs-dark"
-                value={JSON.stringify(parse(editorContent), null, 2)}
+                value={JSON.stringify(parsed, null, 2)}
                 options={{
                     minimap: {
                         enabled: false,
@@ -125,6 +136,6 @@ export const ParsePage = () => {
                     readOnly: true,
                 }}
             />
-        </div>
+        </ErrorBoundary>
     )
 }

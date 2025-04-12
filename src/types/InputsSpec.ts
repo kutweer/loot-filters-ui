@@ -1,7 +1,6 @@
 import { StyleConfig } from '../components/inputs/StyleInputHelpers'
 
-// Don't export this, just use FilterType
-const inputTypes = {
+export const inputTypes = {
     boolean: 'boolean',
     number: 'number',
     stringlist: 'stringlist',
