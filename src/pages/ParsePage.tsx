@@ -102,7 +102,11 @@ export const ParsePage = () => {
 
     const parsed = useMemo(() => {
         try {
-            return JSON.stringify(parse(cleanEscapedNewlines(editorContent)), null, 2)
+            return JSON.stringify(
+                parse(cleanEscapedNewlines(editorContent)),
+                null,
+                2
+            )
         } catch (e) {
             setError(e as Error)
             return (e as Error).stack
