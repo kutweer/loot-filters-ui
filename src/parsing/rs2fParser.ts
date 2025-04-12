@@ -50,6 +50,7 @@ const parseStyle = (valueStr: string): { [key: string]: string } => {
         .map((part) => part.trim())
         .filter(Boolean)
 
+
     for (const part of parts) {
         const [key, value] = part.split('=').map((s) => s.trim())
         const cleanValue = value.replace(/^"|"$/g, '')
@@ -80,7 +81,9 @@ const parseString = (valueStr: string): string => {
     return valueStr.replace(/^"|"$/g, '')
 }
 
+
 export const parseDefine = (line: string): Rs2fDefine => {
+    console.log('line', line)
     const match = line.match(/^#define\s+([A-Z0-9_]+)(?:\s+(.+))?$/)
     if (!match) {
         throw new Error(`Invalid define expression: ${line}`)
@@ -93,6 +96,7 @@ export const parseDefine = (line: string): Rs2fDefine => {
     }
 
     try {
+
         if (isList(valueStr)) {
             const { value, type } = parseList(valueStr)
             return { name, value, type }
@@ -103,7 +107,11 @@ export const parseDefine = (line: string): Rs2fDefine => {
         }
 
         if (isBoolean(valueStr)) {
-            return { name, value: parseBoolean(valueStr), type: 'boolean' }
+            return {
+                name,
+                value: parseBoolean(valueStr),
+                type: 'boolean',
+            }
         }
 
         if (isNumber(valueStr)) {
@@ -112,6 +120,6 @@ export const parseDefine = (line: string): Rs2fDefine => {
 
         return { name, value: parseString(valueStr), type: 'string' }
     } catch (error) {
-        throw new Error(`Failed to parse define value: ${valueStr}`)
+        throw error
     }
 }

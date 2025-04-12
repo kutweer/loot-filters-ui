@@ -1,7 +1,7 @@
 import { Editor } from '@monaco-editor/react'
 import { useMemo, useState } from 'react'
-import { parse } from '../parsing/parse'
 import { ErrorBoundary } from '../components/ErrorBoundary'
+import { parse } from '../parsing/parse'
 
 const content = `
 // module:barb_potions
@@ -92,16 +92,20 @@ exampleItem: Attack mix
 #define VAR_BARB_POTIONS_ATTACK_MIX_CUSTOMSTYLE textColor="#FFFFFFFF";\\n textAccentColor="#FF000000";\\n backgroundColor="#5074E2E6";\\n borderColor="#FF74E2E6";\\n menuTextColor="#FF74E2E6";
 `
 
+const cleanEscapedNewlines = (str: string): string => {
+    return str.replace(/\\\n\s*/g, '')
+}
+
 export const ParsePage = () => {
     const [editorContent, setEditorContent] = useState(content)
     const [error, setError] = useState<Error | null>(null)
 
     const parsed = useMemo(() => {
         try {
-            return parse(editorContent)
+            return JSON.stringify(parse(cleanEscapedNewlines(editorContent)), null, 2)
         } catch (e) {
             setError(e as Error)
-            return (e as Error).message
+            return (e as Error).stack
         }
     }, [editorContent])
 
@@ -128,7 +132,7 @@ export const ParsePage = () => {
                 height="50vh"
                 language="json"
                 theme="vs-dark"
-                value={JSON.stringify(parsed, null, 2)}
+                value={parsed}
                 options={{
                     minimap: {
                         enabled: false,
