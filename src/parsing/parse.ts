@@ -50,41 +50,45 @@ export const parse = (filter: string) => {
     const inputs: { moduleId: string; input: InputType }[] = []
     const structuredComments = extractStructuredComments(lines)
 
+    const errors = []
+
     for (const comment of structuredComments) {
         try {
-        const line = lines[comment.start]
-        const declaration = parseDeclaration(line.slice(3).trim())
-        console.log('declaration', declaration)
-        switch (declaration.type) {
-            case 'module':
-                modulesById[declaration.id] = parseModule(
-                    declaration.id,
-                    lines,
-                    comment.start,
-                    comment.end
-                )
-                break
-            case 'input':
-                inputs.push(
-                    parseInput(
+            const line = lines[comment.start]
+            const declaration = parseDeclaration(line.slice(3).trim())
+            console.log('declaration', declaration)
+            switch (declaration.type) {
+                case 'module':
+                    modulesById[declaration.id] = parseModule(
                         declaration.id,
                         lines,
                         comment.start,
                         comment.end
                     )
-                )
-                break
+                    break
+                case 'input':
+                    const input = parseInput(
+                        declaration.id,
+                        lines,
+                        comment.start,
+                        comment.end
+                    )
+                    const module = modulesById[input.moduleId]
+                    if (!module) {
+                        throw new Error(
+                            `Module ${input.moduleId} not found for input on line ${comment.start}`
+                        )
+                    }
+                    module.inputs.push(input.input)
+                    break
+            }
+        } catch (e) {
+            errors.push({
+                comment: comment,
+                message: e,
+            })
         }
     }
-    }
-
-    inputs.forEach((input) => {
-        const module = modulesById[input.moduleId]
-        if (!module) {
-            throw new Error(`Module ${input.moduleId} not found`)
-        }
-        module.inputs.push(input.input)
-    })
 
     return modulesById
 }
