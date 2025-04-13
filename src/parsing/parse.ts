@@ -1,12 +1,6 @@
-import { parse as parseYaml } from 'yaml'
-import { Input, InputType, inputTypes } from '../types/InputsSpec'
-import { parseDefine, Rs2fDefine } from './rs2fParser'
-
-type Declaration = {
-    type: 'input' | 'module'
-    declarationContent: string
-    id: string
-}
+import { InputType, ModuleType } from './UiTypesSpec'
+import { parseInput } from './parseInput'
+import { parseModule } from './parseModule'
 
 const parseDeclaration = (line: string) => {
     const match = line.match(/define:([a-z]+):([a-z0-9_]+)/)
@@ -18,140 +12,72 @@ const parseDeclaration = (line: string) => {
         id: match[2],
     }
 }
-export const parse = (filter: string) => {
-    const declarationBlocks: (
-        | (Declaration & { module: any })
-        | (Declaration & { input: any; defaultRs2f: string })
-    )[] = []
 
-    const lines = filter.split('\n')
+const extractStructuredComments = (
+    lines: string[]
+): { start: number; end: number }[] => {
+    const structuredComments: { start: number; end: number }[] = []
 
-    // the define:[module|input]:id bit; as an object
-    let declaration: { type: string; id: string } | null = null
-    let declarationContent: string | null = null
+    let currentComment: { start: number; end: number } | null = null
 
-    for (let lineNumber = 0; lineNumber < lines.length; lineNumber++) {
-        const line = lines[lineNumber]
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i]
+
         if (line.startsWith('/*@')) {
-            if (declaration === null && declarationContent === null) {
-                declaration = parseDeclaration(line.slice(3).trim())
-                continue
-            } else {
+            if (currentComment !== null) {
                 throw new Error(
-                    `Unexpected new declaration at ${lineNumber}: ${line} still parsing ${declaration}`
+                    `Unexpected new declaration at ${i}: ${line} still parsing comment starting at ${currentComment.start}`
                 )
             }
+
+            currentComment = { start: i, end: i }
         }
 
-        if (line.endsWith('*/') && declaration !== null) {
-            if (declaration.type === 'input' && declarationContent !== null) {
-                const input = parseYaml(declarationContent)
-                const inputDefault: Rs2fDefine = parseDefine(
-                    lines[lineNumber + 1]
-                )
-
-                validateInput(input, inputDefault)
-
-                input['default'] = inputDefault
-
-                declarationBlocks.push({
-                    type: declaration.type,
-                    id: declaration.id,
-                    input: input,
-                    // TODO can probably remove this once the parsing fully works
-                    declarationContent: declarationContent,
-                    defaultRs2f: lines[lineNumber + 1],
-                })
-            } else if (
-                declaration.type === 'module' &&
-                declarationContent !== null
-            ) {
-                const module = parseYaml(declarationContent!!)
-                declarationBlocks.push({
-                    type: declaration.type,
-                    id: declaration.id,
-                    declarationContent: declarationContent,
-                    module: module,
-                })
-            } else {
-                throw new Error(
-                    `Unparseable declaration of type ${declaration.type}`
-                )
-            }
-
-            declaration = null
-            declarationContent = null
-        }
-
-        if (declaration !== null) {
-            if (declarationContent === null) {
-                declarationContent = line + '\n'
-            } else {
-                declarationContent += line + '\n'
-            }
+        if (line.endsWith('*/') && currentComment !== null) {
+            currentComment.end = i +1
+            structuredComments.push(currentComment)
+            currentComment = null
         }
     }
-    return declarationBlocks
+    return structuredComments
 }
 
-const checkType = (
-    input: Input,
-    type: Rs2fDefine['type'],
-    expected: Rs2fDefine['type']
-) => {
-    if (type === 'null') {
-        return
-    }
-    if (type !== expected) {
-        throw new Error(
-            `Input ${input.type} requires a default of type ${expected} got ${type}`
-        )
-    }
-}
+export const parse = (filter: string) => {
+    // Remove escaped newlines before any other processing
+    const lines = filter.replace(/\\\n\s*/g, '').split('\n')
 
-function validateInput(input: any, inputDefault: Rs2fDefine) {
-    if (!('type' in input)) {
-        throw new Error('Input must have a type')
-    }
+    const modulesById: Record<string, ModuleType> = {}
+    const inputs: {moduleId: string, input: InputType}[] = []
+    const structuredComments = extractStructuredComments(lines)
 
-    if (!(input.type in inputTypes)) {
-        throw new Error(`Invalid input type: ${input.type}`)
-    }
-
-    console.log('input', input)
-    console.log('inputDefault', inputDefault)
-
-    switch (input.type as InputType) {
-        case 'style':
-            checkType(input, inputDefault.type, 'style')
-            break
-        case 'stringlist':
-            checkType(input, inputDefault.type, 'stringlist')
-            break
-        case 'boolean':
-            checkType(input, inputDefault.type, 'boolean')
-            break
-        case 'number':
-            checkType(input, inputDefault.type, 'number')
-            break
-        case 'enumlist':
-            checkType(input, inputDefault.type, 'stringlist')
-            if (
-                !input.enum ||
-                !Array.isArray(input.enum) ||
-                input.enum.length === 0
-            ) {
-                throw new Error(
-                    'Enumlist input must have an enum with 1 or more values'
+    for (const comment of structuredComments) {
+        const line = lines[comment.start]
+        const declaration = parseDeclaration(line.slice(3).trim())
+        console.log('declaration', declaration)
+        switch (declaration.type) {
+            case 'module':
+                modulesById[declaration.id] = parseModule(declaration.id, lines, comment.start, comment.end)
+                break
+            case 'input':
+                inputs.push(
+                    parseInput(
+                        declaration.id,
+                        lines,
+                        comment.start,
+                        comment.end
+                    )
                 )
-            }
-            break
-        case 'text':
-            checkType(input, inputDefault.type, 'string')
-            break
-        case 'includeExcludeList':
-            throw new Error('IncludeExcludeList is not supported')
-        default:
-            throw new Error(`Invalid input type: ${input.type}`)
+                break
+        }
     }
+
+    inputs.forEach((input) => {
+        const module = modulesById[input.moduleId]
+        if (!module) {
+            throw new Error(`Module ${input.moduleId} not found`)
+        }
+        module.inputs.push(input.input)
+    })
+
+    return modulesById
 }

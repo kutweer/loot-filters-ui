@@ -1,5 +1,7 @@
 import { StyleConfig } from '../components/inputs/StyleInputHelpers'
 
+
+
 export const inputTypes = {
     boolean: 'boolean',
     number: 'number',

@@ -92,24 +92,16 @@ exampleItem: Attack mix
 #define VAR_BARB_POTIONS_ATTACK_MIX_CUSTOMSTYLE textColor="#FFFFFFFF";\\n textAccentColor="#FF000000";\\n backgroundColor="#5074E2E6";\\n borderColor="#FF74E2E6";\\n menuTextColor="#FF74E2E6";
 `
 
-const cleanEscapedNewlines = (str: string): string => {
-    return str.replace(/\\\n\s*/g, '')
-}
-
 export const ParsePage = () => {
     const [editorContent, setEditorContent] = useState(content)
     const [error, setError] = useState<Error | null>(null)
 
     const parsed = useMemo(() => {
         try {
-            return JSON.stringify(
-                parse(cleanEscapedNewlines(editorContent)),
-                null,
-                2
-            )
+            return JSON.stringify(parse(editorContent), null, 2)
         } catch (e) {
             setError(e as Error)
-            return (e as Error).stack
+            return (e as Error).message + '\n' + (e as Error).stack
         }
     }, [editorContent])
 
