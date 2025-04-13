@@ -9,6 +9,7 @@ export const ParsePage = () => {
     const [error, setError] = useState<Error | null>(null)
     const [url, setUrl] = useState(
         'https://raw.githubusercontent.com/typical-whack/loot-filters-modules/refs/heads/migrate/filter.rs2f'
+        // 'https://gist.githubusercontent.com/Kaqemeex/8b57b85303bf713167cbabe235638416/raw/58976caad9124bc99fba5ddec29932e266034e6f/foo.rs2f'
     )
 
     const parsed = useMemo(() => {

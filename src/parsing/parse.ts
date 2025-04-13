@@ -47,7 +47,6 @@ export const parse = (filter: string) => {
     const lines = filter.replace(/\\\n\s*/g, '').split('\n')
 
     const modulesById: Record<string, ModuleType> = {}
-    const inputs: { moduleId: string; input: InputType }[] = []
     const structuredComments = extractStructuredComments(lines)
 
     const errors = []
@@ -76,7 +75,7 @@ export const parse = (filter: string) => {
                     const module = modulesById[input.moduleId]
                     if (!module) {
                         throw new Error(
-                            `Module ${input.moduleId} not found for input on line ${comment.start}`
+                            `Module ${input.moduleId} not found for input of macro ${input.input.macroName}`
                         )
                     }
                     module.inputs.push(input.input)
@@ -84,7 +83,7 @@ export const parse = (filter: string) => {
             }
         } catch (e) {
             errors.push({
-                comment: comment,
+                line: lines.slice(comment.start, comment.end).join('\n'),
                 message: e,
             })
         }

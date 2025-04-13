@@ -27,8 +27,12 @@ const parseList = (
     valueStr: string
 ): { value: string[] | number[]; type: 'stringlist' | 'numberlist' } => {
     const listStr = valueStr.slice(1, -1)
-    const items = listStr.split(',').map((item) => item.trim())
 
+    if (listStr.trim() === '') {
+        return { value: [], type: 'stringlist' }
+    }
+
+    const items = listStr.split(',').map((item) => item.trim())
     if (items.every((item) => /^-?\d+$/.test(item))) {
         return { value: items.map(Number), type: 'numberlist' }
     }
@@ -54,7 +58,16 @@ const parseStyle = (valueStr: string): { [key: string]: string } => {
         const [key, value] = part.split('=').map((s) => s.trim())
         const cleanValue = value.replace(/^"|"$/g, '')
         const cleanKey = key.replace(/\\n\s*/g, '')
-        styleObj[cleanKey] = cleanValue
+
+        // Convert string values to numbers or booleans if applicable
+        let parsedValue: any = cleanValue
+        if (cleanValue === 'true' || cleanValue === 'false') {
+            parsedValue = cleanValue === 'true'
+        } else if (/^-?\d+$/.test(cleanValue)) {
+            parsedValue = Number(cleanValue)
+        }
+
+        styleObj[cleanKey] = parsedValue
     }
 
     return styleObj
@@ -82,7 +95,7 @@ const parseString = (valueStr: string): string => {
 
 export const parseDefine = (line: string, lineNumber: number): Rs2fDefine => {
     console.log('line', line)
-    const match = line.match(/^#define\s+([A-Z0-9_]+)(\s+(.+))?$/)
+    const match = line.match(/^#define\s+([A-Z0-9_]+)(\s+(.*))?$/)
     console.log('match', match)
 
     if (!match) {
@@ -91,7 +104,8 @@ export const parseDefine = (line: string, lineNumber: number): Rs2fDefine => {
         )
     }
 
-    const [, name, valueStr] = match
+    const [, name, valueStrFull] = match
+    const valueStr = valueStrFull?.trim()
 
     if (!valueStr) {
         return { name, value: null, type: 'null' }
