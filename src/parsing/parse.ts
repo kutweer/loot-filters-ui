@@ -90,5 +90,8 @@ export const parse = (filter: string) => {
         }
     }
 
-    return modulesById
+    return {
+        errors,
+        modulesById,
+    }
 }
