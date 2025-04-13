@@ -11,8 +11,6 @@ export const ParsePage = () => {
         'https://raw.githubusercontent.com/typical-whack/loot-filters-modules/refs/heads/migrate/filter.rs2f'
     )
 
-
-
     const parsed = useMemo(() => {
         try {
             return JSON.stringify(parse(editorContent), null, 2)

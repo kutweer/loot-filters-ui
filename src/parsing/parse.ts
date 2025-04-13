@@ -51,6 +51,7 @@ export const parse = (filter: string) => {
     const structuredComments = extractStructuredComments(lines)
 
     for (const comment of structuredComments) {
+        try {
         const line = lines[comment.start]
         const declaration = parseDeclaration(line.slice(3).trim())
         console.log('declaration', declaration)
@@ -74,6 +75,7 @@ export const parse = (filter: string) => {
                 )
                 break
         }
+    }
     }
 
     inputs.forEach((input) => {

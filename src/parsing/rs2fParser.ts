@@ -83,7 +83,7 @@ const parseString = (valueStr: string): string => {
 export const parseDefine = (line: string, lineNumber: number): Rs2fDefine => {
     console.log('line', line)
     const match = line.match(/^#define\s+([A-Z0-9_]+)(\s+(.+))?$/)
-    
+
     if (!match) {
         throw new Error(
             `Invalid define expression: '${line}' at line #${lineNumber}`
