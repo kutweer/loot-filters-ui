@@ -7,7 +7,7 @@ export const parseModule = (
     lines: string[],
     start: number,
     end: number
-) : ModuleType => {
+): ModuleType => {
     // start 1 further to remove the /*@ define stuff
     const wholeComment = lines.slice(start + 1, end).join('\n')
     console.log('wholeComment\n', wholeComment)
@@ -17,5 +17,5 @@ export const parseModule = (
     )
     const module = parseYaml(declarationContent!!)
 
-    return  Module.parse({...FilterSpecModule.parse(module), id: moduleId})
+    return Module.parse({ ...FilterSpecModule.parse(module), id: moduleId })
 }

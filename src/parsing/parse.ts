@@ -34,7 +34,7 @@ const extractStructuredComments = (
         }
 
         if (line.endsWith('*/') && currentComment !== null) {
-            currentComment.end = i +1
+            currentComment.end = i + 1
             structuredComments.push(currentComment)
             currentComment = null
         }
@@ -47,7 +47,7 @@ export const parse = (filter: string) => {
     const lines = filter.replace(/\\\n\s*/g, '').split('\n')
 
     const modulesById: Record<string, ModuleType> = {}
-    const inputs: {moduleId: string, input: InputType}[] = []
+    const inputs: { moduleId: string; input: InputType }[] = []
     const structuredComments = extractStructuredComments(lines)
 
     for (const comment of structuredComments) {
@@ -56,7 +56,12 @@ export const parse = (filter: string) => {
         console.log('declaration', declaration)
         switch (declaration.type) {
             case 'module':
-                modulesById[declaration.id] = parseModule(declaration.id, lines, comment.start, comment.end)
+                modulesById[declaration.id] = parseModule(
+                    declaration.id,
+                    lines,
+                    comment.start,
+                    comment.end
+                )
                 break
             case 'input':
                 inputs.push(

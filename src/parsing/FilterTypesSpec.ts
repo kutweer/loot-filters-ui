@@ -76,7 +76,6 @@ export const TextInput = Input.extend({
     default: z.string(),
 })
 
-
 export type BooleanInputType = z.infer<typeof BooleanInput>
 export type NumberInputType = z.infer<typeof NumberInput>
 export type StringListInputType = z.infer<typeof StringListInput>
