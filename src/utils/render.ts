@@ -12,7 +12,7 @@ export const renderFilter = (
     filter: Filter,
     activeConfig: FilterConfiguration | undefined
 ): string => {
-    let filterText = ''
+    let filterText = filter.rs2f
 
     filter.modules.forEach((m) => {
         filterText = applyModule(filterText, m, activeConfig?.inputConfigs)
