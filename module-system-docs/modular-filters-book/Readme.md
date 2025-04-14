@@ -185,7 +185,7 @@ label: A label
 
 Number inputs create a text box that only accepts whole integers. Here's how to configure a number input:
 
-```json
+```cpp
 /*@ define:input:module_id
 type: number
 label: A label
@@ -202,7 +202,7 @@ There are different kinds of list inputs for different situations. Currently 2 a
 Provides a dropdown in the UI with a restricted set of options. The `enum` property defines the possible values,
 the `value` property is what will be rendered into the filter, the `label` property is a more nicely formated one for the UI to display in the dropdown.
 
-```json
+```cpp
 /*@ define:input:module_id
 type: enumlist
 label: A label
