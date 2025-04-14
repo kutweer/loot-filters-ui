@@ -9,7 +9,7 @@ export const loadFilterFromUrl = async (url: string): Promise<Filter> => {
 
     if (errors && errors.length > 0) {
         throw Error('Failed to parse filter: ' + JSON.stringify(errors))
-    } 
+    }
 
     if (filter == null) {
         throw Error('This should be impossible')

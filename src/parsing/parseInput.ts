@@ -46,7 +46,10 @@ export const parseInput = (
         case 'number':
             return { moduleId: moduleId, input: NumberInputSpec.parse(input) }
         case 'stringlist':
-            return { moduleId: moduleId, input: StringListInputSpec.parse(input) }
+            return {
+                moduleId: moduleId,
+                input: StringListInputSpec.parse(input),
+            }
         case 'enumlist':
             return { moduleId: moduleId, input: EnumListInputSpec.parse(input) }
         case 'style':

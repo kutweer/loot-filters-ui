@@ -217,16 +217,10 @@ export const ItemLabelColorPicker: React.FC<{
             {showExamples && (
                 <>
                     <div style={{ minWidth: '200px', flex: '0 0 auto' }}>
-                        <ItemLabelPreview
-                            input={input}
-                            itemName={itemName}
-                        />
+                        <ItemLabelPreview input={input} itemName={itemName} />
                     </div>
                     <div style={{ minWidth: '200px', flex: '0 0 auto' }}>
-                        <ItemMenuPreview
-                            input={input}
-                            itemName={itemName}
-                        />
+                        <ItemMenuPreview input={input} itemName={itemName} />
                     </div>
                 </>
             )}
