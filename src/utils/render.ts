@@ -146,17 +146,36 @@ const renderStyleString = (name: string, value: string | undefined): string =>
 const isTargetMacro = (line: string, target: string): boolean =>
     line.startsWith(`#define ${target} `) || line === `#define ${target}`
 
+// This WILL handle multiline macros but it's not perfect, if you have
+// whitespace after the trailing slash that will break it even though it's
+// valid rs2f. Long-term we'll just have the full tokenizer on the site and
+// this will be handled better.
 const updateMacro = (
     filter: string,
     macro: string,
     replace: string
 ): string => {
-    return filter
-        .split('\n')
-        .map((line) =>
-            isTargetMacro(line, macro)
-                ? '#define ' + macro + ' ' + replace
-                : line
-        )
-        .join('\n')
+    const replaced = []
+
+    let inMultiline = false
+    for (const line of filter.split('\n')) {
+        if (isTargetMacro(line, macro)) {
+            if (line.endsWith('\\')) {
+                inMultiline = true
+            } else {
+                // it's a one-line define, replace it and we're done
+                replaced.push(`#define ${macro} ${replace}`)
+            }
+        } else if (inMultiline) {
+            if (!line.endsWith('\\')) {
+                // we finished the multiline define, push our replace and carry on
+                replaced.push(`#define ${macro} ${replace}`)
+                inMultiline = false
+            }
+        } else {
+            replaced.push(line)
+        }
+    }
+
+    return replaced.join('\n')
 }
