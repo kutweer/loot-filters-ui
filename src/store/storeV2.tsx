@@ -43,7 +43,7 @@ export const MigrateLegacyData: React.FC = () => {
     Object.values(legacyData.importedModularFilters).forEach(
         ({ id, name, active, source: { owner, repo } }: any, index: number) => {
             const url = filterUrls[`${owner}:${repo}`]
-            if (!url) {
+            if (!url || migrationsStarted.includes(url)) {
                 return
             }
             setMigrationsStarted((prev) => [...prev, url])
@@ -61,6 +61,17 @@ export const MigrateLegacyData: React.FC = () => {
                 })
         }
     )
+
+    const checkMigrations = () => {
+        if (migrationsStarted.length === 0) {
+            localStorage.setItem('modular-filter-storage-migrated', 'true')
+            window.location.reload()
+        } else {
+            setTimeout(checkMigrations, 1000)
+        }
+    }
+
+    setTimeout(checkMigrations, 1000)
 
     useEffect(() => {
         if (migrationsStarted.length === 0) {
