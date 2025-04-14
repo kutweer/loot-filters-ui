@@ -77,23 +77,18 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                                 variant="body2"
                                 sx={{ color: '#CCCCCC', fontSize: '24px' }}
                             >
-                                <p>
-                                    FilterScape.xyz makes it easy to customize a
-                                    filter for the loot-filters plugin.
-                                </p>
-                                <p>
-                                    It provides previews for your item labels,
-                                    groups configurations by item type, and
-                                    more.
-                                </p>
-                                <p>
-                                    You can join the community of users of both
-                                    the site, and the plugin{' '}
-                                    <a href="https://discord.gg/ESbA28wPnt">
-                                        on discord
-                                    </a>
-                                    .
-                                </p>
+                                FilterScape.xyz makes it easy to customize a
+                                filter for the loot-filters plugin.
+                                <br />
+                                It provides previews for your item labels,
+                                groups configurations by item type, and more.
+                                <br />
+                                You can join the community of users of both the
+                                site, and the plugin{' '}
+                                <a href="https://discord.gg/ESbA28wPnt">
+                                    on discord
+                                </a>
+                                .
                             </Typography>
                         </Grid2>
 
@@ -112,23 +107,19 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                                 variant="body2"
                                 sx={{ color: '#CCCCCC', fontSize: '24px' }}
                             >
-                                <p>
-                                    <a href="https://runelite.net/plugin-hub/show/loot-filters">
-                                        Loot Filters
-                                    </a>{' '}
-                                    is a replacement for the built-in Ground
-                                    Items plugin and supports a much more
-                                    powerful set of configuration options
-                                    through its scriptable filters.
-                                </p>
-
-                                <p>
-                                    The plugin lets you configure how and when
-                                    items are displayed based on many conditions
-                                    like: if they are noted, how many are in the
-                                    stack, and even where you are in the game
-                                    world.
-                                </p>
+                                <a href="https://runelite.net/plugin-hub/show/loot-filters">
+                                    Loot Filters
+                                </a>{' '}
+                                is a replacement for the built-in Ground Items
+                                plugin and supports a much more powerful set of
+                                configuration options through its scriptable
+                                filters.
+                                <br />
+                                The plugin lets you configure how and when items
+                                are displayed based on many conditions like: if
+                                they are noted, how many are in the stack, and
+                                even where you are in the game world.
+                                <br />
                             </Typography>
                         </Grid2>
                         <Grid2 size={1} />
@@ -146,17 +137,15 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                                 variant="body2"
                                 sx={{ color: '#CCCCCC', fontSize: '24px' }}
                             >
-                                <p>
-                                    A filter is a script that controls how items
-                                    are displayed in the game. This website
-                                    provides 2 built-in filters that you can
-                                    configure and use without any scripting.
-                                </p>
-                                <p>
-                                    You can also import a filter from a URL.
-                                    This allows you to customize and use other
-                                    filters outside of the 2 presets.
-                                </p>
+                                A filter is a script that controls how items are
+                                displayed in the game. This website provides 2
+                                built-in filters that you can configure and use
+                                without any scripting.
+                                <br />
+                                You can also import a filter from a URL. This
+                                allows you to customize and use other filters
+                                outside of the 2 presets.
+                                <br />
                             </Typography>
                         </Grid2>
                     </Grid2>
