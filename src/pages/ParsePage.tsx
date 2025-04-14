@@ -8,19 +8,16 @@ export const ParsePage = () => {
     const [editorContent, setEditorContent] = useState('')
     const [error, setError] = useState<Error | null>(null)
     const [url, setUrl] = useState(
-        'https://raw.githubusercontent.com/riktenx/filterscape/refs/heads/migrate/filterscape.rs2f'
+        // 'https://raw.githubusercontent.com/riktenx/filterscape/refs/heads/migrate/filterscape.rs2f'
         // 'https://raw.githubusercontent.com/typical-whack/loot-filters-modules/21b862c9502a20a82e0ac02038f92fb8c8f6bd4b/filter.rs2f'
-        // 'https://raw.githubusercontent.com/typical-whack/loot-filters-modules/refs/heads/migrate/filter.rs2f'
+        'https://raw.githubusercontent.com/typical-whack/loot-filters-modules/refs/heads/migrate/filter.rs2f'
         // 'https://gist.githubusercontent.com/Kaqemeex/8b57b85303bf713167cbabe235638416/raw/58976caad9124bc99fba5ddec29932e266034e6f/foo.rs2f'
     )
 
-    const parsed = useMemo(() => {
-        try {
-            return JSON.stringify(parse(editorContent), null, 2)
-        } catch (e) {
-            setError(e as Error)
-            return (e as Error).message + '\n' + (e as Error).stack
-        }
+    const [parsed, setParsed] = useState<string | null>(null)
+
+    useMemo(async () => {
+        return setParsed(JSON.stringify(await parse(editorContent), null, 2))
     }, [editorContent])
 
     useMemo(() => {
@@ -100,7 +97,7 @@ export const ParsePage = () => {
                         width="100%"
                         language="json"
                         theme="vs-dark"
-                        value={parsed}
+                        value={parsed ?? ''}
                         options={{
                             minimap: {
                                 enabled: false,

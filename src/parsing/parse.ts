@@ -1,4 +1,5 @@
-import { InputType, ModuleType } from './UiTypesSpec'
+import { generateId } from '../utils/idgen'
+import { Filter, ModuleType } from './UiTypesSpec'
 import { parseInput } from './parseInput'
 import { parseModule } from './parseModule'
 
@@ -42,7 +43,7 @@ const extractStructuredComments = (
     return structuredComments
 }
 
-export const parse = (filter: string) => {
+export const parse = async (filter: string) => {
     // Remove escaped newlines before any other processing
     const lines = filter.replace(/\\\n\s*/g, '').split('\n')
 
@@ -89,8 +90,34 @@ export const parse = (filter: string) => {
         }
     }
 
+    if (errors.length > 0) {
+        return {
+            errors,
+            filter: undefined,
+        }
+    }
+
+    const filterBytes = new TextEncoder().encode(filter)
+    const hashBuffer = await window.crypto.subtle.digest('SHA-1', filterBytes)
+    const hashArray = Array.from(new Uint8Array(hashBuffer))
+    const rs2fHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+
+    const parsedFilter = Filter.parse({
+        id: generateId(),
+        // TODO parse name from filter
+        name: 'Loaded Filter',
+        // TODO parse description from filter
+        description: 'Description Placeholder',
+        modules: Object.values(modulesById),
+        importedOn: new Date().toISOString(),
+        source: undefined,
+        active: false,
+        rs2f: filter,
+        rs2fHash,
+    })
+
     return {
-        errors,
-        modulesById,
+        errors: undefined,
+        filter: parsedFilter,
     }
 }

@@ -83,3 +83,17 @@ export type StringListInputType = z.infer<typeof StringListInput>
 export type EnumListInputType = z.infer<typeof EnumListInput>
 export type StyleInputType = z.infer<typeof StyleInput>
 export type TextInputType = z.infer<typeof TextInput>
+
+export const Filter = z.object({
+    id: z.string().nonempty(),
+    name: z.string().nonempty(),
+    description: z.string().optional(),
+    rs2fHash: z.string(),
+    active: z.boolean().default(false),
+    importedOn: z.string().datetime().default(new Date().toISOString()),
+    source: z.string().url().optional(),
+    modules: z.array(Module).default([]),
+    rs2f: z.string(),
+})
+
+export type FilterType = z.infer<typeof Filter>
