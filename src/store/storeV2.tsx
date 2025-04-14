@@ -1,4 +1,5 @@
 import { CircularProgress, Typography } from '@mui/material'
+import { useEffect, useState } from 'react'
 import { isObject } from 'underscore'
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
@@ -37,38 +38,39 @@ export const MigrateLegacyData: React.FC = () => {
     const data = localStorage.getItem('modular-filter-storage')!!
     const legacyData = JSON.parse(data).state
 
+    const [migrationsStarted, setMigrationsStarted] = useState<string[]>([])
+
     Object.values(legacyData.importedModularFilters).forEach(
         ({ id, name, active, source: { owner, repo } }: any, index: number) => {
             const url = filterUrls[`${owner}:${repo}`]
             if (!url) {
                 return
             }
-
+            setMigrationsStarted((prev) => [...prev, url])
             const configs = legacyData.filterConfigurations[id] ?? {}
             loadFilterFromUrl(url)
                 .then((filter) => {
+                    setMigrationsStarted((prev) =>
+                        prev.filter((url) => url !== url)
+                    )
                     updateFilter({ ...filter, id: id, name, active })
                     setFilterConfiguration(id, configs)
-                    if (
-                        index ===
-                        Object.values(legacyData.importedModularFilters)
-                            .length -
-                            1
-                    ) {
-                        localStorage.setItem(
-                            'modular-filter-storage-migrated',
-                            'true'
-                        )
-                        setTimeout(() => {
-                            window.location.reload()
-                        }, 2000)
-                    }
                 })
                 .catch((error) => {
                     console.error(error)
                 })
         }
     )
+
+    useEffect(() => {
+        if (migrationsStarted.length === 0) {
+            localStorage.setItem('modular-filter-storage-migrated', 'true')
+            setTimeout(() => {
+                window.location.reload()
+            }, 2000)
+        }
+    }, [migrationsStarted])
+
     return (
         <div
             style={{
