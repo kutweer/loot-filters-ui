@@ -100,7 +100,9 @@ export const parse = async (filter: string) => {
     const filterBytes = new TextEncoder().encode(filter)
     const hashBuffer = await window.crypto.subtle.digest('SHA-1', filterBytes)
     const hashArray = Array.from(new Uint8Array(hashBuffer))
-    const rs2fHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+    const rs2fHash = hashArray
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('')
 
     const parsedFilter = Filter.parse({
         id: generateId(),
