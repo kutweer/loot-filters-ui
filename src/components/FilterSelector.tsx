@@ -42,10 +42,11 @@ import { Option, UISelect } from './inputs/UISelect'
 const EditFilterDialog: React.FC<{
     open: boolean
     filter: Filter
-    onSave: (name: string) => void
+    onSave: (name: string, description?: string) => void
     onClose: () => void
 }> = ({ open, filter, onSave, onClose }) => {
     const [name, setName] = useState(filter.name)
+    const [description, setDescription] = useState(filter.description)
     return (
         <Dialog maxWidth="xl" open={open} onClose={onClose}>
             <DialogTitle>Edit Filter</DialogTitle>
@@ -58,6 +59,15 @@ const EditFilterDialog: React.FC<{
                         value={name}
                         onChange={(e) => {
                             setName(e.target.value)
+                        }}
+                    />
+                    <TextField
+                        size="small"
+                        sx={{ width: '350px', mt: 1 }}
+                        label="Filter Description"
+                        value={description}
+                        onChange={(e) => {
+                            setDescription(e.target.value)
                         }}
                     />
                 </Box>
@@ -73,7 +83,7 @@ const EditFilterDialog: React.FC<{
                         variant="outlined"
                         color="primary"
                         onClick={() => {
-                            onSave(name)
+                            onSave(name, description)
                         }}
                     >
                         Save
@@ -418,10 +428,11 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                     open={editDialogOpen}
                     filter={activeFilter}
                     onClose={() => setEditDialogOpen(false)}
-                    onSave={(name) => {
+                    onSave={(name, description) => {
                         updateFilter({
                             ...activeFilter,
                             name,
+                            description,
                         })
                         addAlert({
                             children: 'Filter name updated',

@@ -2,6 +2,7 @@ import { generateId } from '../utils/idgen'
 import { FilterSpec, Module } from './UiTypesSpec'
 import { parseInput } from './parseInput'
 import { parseModule } from './parseModule'
+import { parseMetaDescription, parseMetaName } from './rs2fParser'
 
 const parseDeclaration = (line: string) => {
     const match = line.match(/define:([a-z]+):([a-z0-9_]+)/)
@@ -103,12 +104,13 @@ export const parse = async (filter: string) => {
         .map((b) => b.toString(16).padStart(2, '0'))
         .join('')
 
+    const name = parseMetaName(filter)
+    const description = parseMetaDescription(filter)
+
     const parsedFilter = FilterSpec.parse({
         id: generateId(),
-        // TODO parse name from filter
-        name: 'Loaded Filter',
-        // TODO parse description from filter
-        description: 'Description Placeholder',
+        name,
+        description,
         modules: Object.values(modulesById),
         importedOn: new Date().toISOString(),
         source: undefined,
