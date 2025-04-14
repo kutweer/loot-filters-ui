@@ -8,9 +8,9 @@ import { loadFilterFromUrl } from '../utils/loaderv2'
 
 const filterUrls: Record<string, string> = {
     'riktenx:filterscape':
-        'https://raw.githubusercontent.com/riktenx/filterscape/refs/heads/migrate/filterscape.rs2f',
+        'https://raw.githubusercontent.com/riktenx/filterscape/refs/heads/main/filterscape.rs2f',
     'typical-whack:loot-filters-modules':
-        'https://raw.githubusercontent.com/typical-whack/loot-filters-modules/refs/heads/migrate/filter.rs2f',
+        'https://raw.githubusercontent.com/typical-whack/loot-filters-modules/refs/heads/main/filter.rs2f',
     'Blooprnt:ClearLoot':
         'https://raw.githubusercontent.com/Blooprnt/ClearLoot/refs/heads/main/clearloot.rs2f',
 }
