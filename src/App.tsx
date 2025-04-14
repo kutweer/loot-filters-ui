@@ -57,7 +57,7 @@ const Page: React.FC<{
 export const App = () => {
     const doMigration = requiresMigration()
     console.log('doMigration', doMigration)
-    if (doMigration) {
+    if (doMigration && window.location.pathname !== '/debug') {
         return (
             <ThemeProvider theme={MuiRsTheme}>
                 <MigrateLegacyData />
