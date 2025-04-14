@@ -31,8 +31,10 @@ const parseList = (
     if (listStr.trim() === '') {
         return { value: [], type: 'stringlist' }
     }
-
-    const items = listStr.split(',').map((item) => item.trim())
+    const items = listStr
+        .split(',')
+        .map((item) => item.trim())
+        .filter((item) => item !== '')
     if (items.every((item) => /^-?\d+$/.test(item))) {
         return { value: items.map(Number), type: 'numberlist' }
     }
