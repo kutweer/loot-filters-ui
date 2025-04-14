@@ -1,4 +1,4 @@
-# Chatper 1: Getting started with modular filters
+# Chapter 1: Getting started with modular filters
 
 Modular filters are an extension of the filter framework provided by the loot-filters plugin that allow you to build, share and configure filters via the loot-filters UI.
 
