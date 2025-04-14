@@ -17,62 +17,57 @@ import {
     Typography,
     useMediaQuery,
 } from '@mui/material'
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import { groupBy } from 'underscore'
-import { useUiStore } from '../../store/store'
 import { colors, MuiRsTheme } from '../../styles/MuiTheme'
 
+import SettingsIcon from '@mui/icons-material/Settings'
 import {
     BooleanInput,
     EnumListInput,
-    IncludeExcludeListInput,
+    FilterId,
     Input,
-    InputType,
+    Module,
     NumberInput,
     StringListInput,
+    StyleConfigSpec,
     StyleInput,
     TextInput,
-} from '../../types/InputsSpec'
+} from '../../parsing/UiTypesSpec'
 import {
-    FilterId,
-    UiFilterModule,
-    UiModularFilter,
-} from '../../types/ModularFilterSpec'
-
-import SettingsIcon from '@mui/icons-material/Settings'
+    useFilterConfigStore,
+    useFilterStore,
+    useSiteConfigStore,
+} from '../../store/storeV2'
 import { isConfigEmpty } from '../../utils/configUtils'
 import { generateId } from '../../utils/idgen'
 import { GitHubFlavoredMarkdown } from '../GitHubFlavoredMarkdown'
 import { BooleanInputComponent } from '../inputs/BooleanInputComponent'
 import { DisplayConfigurationInput } from '../inputs/DisplayConfigurationInput'
 import { EnumInputComponent } from '../inputs/EnumInputComponent'
-import { IncludeExcludeListInputComponent } from '../inputs/IncludeExcludeListInputComponent'
 import { NumberInputComponent } from '../inputs/NumberInputComponent'
 import { StringListInputComponent } from '../inputs/StringListInputComponent'
-import { StyleConfig } from '../inputs/StyleInputHelpers'
 import { TextInputComponent } from '../inputs/TextInputComponent'
 import { ItemLabelPreview } from '../Previews'
 
 const InputComponent: React.FC<{
     activeFilterId: FilterId
-    module: UiFilterModule
+    module: Module
     input: Input
 }> = ({ activeFilterId, module, input }) => {
-    switch (input.type as InputType) {
+    switch (input.type) {
         case 'number':
             const numberInput = input as NumberInput
             return (
                 <NumberInputComponent
                     activeFilterId={activeFilterId}
                     input={numberInput}
-                    module={module}
                 />
             )
         case 'boolean':
             return (
                 <BooleanInputComponent
                     activeFilterId={activeFilterId}
-                    module={module}
                     input={input as BooleanInput}
                 />
             )
@@ -81,7 +76,6 @@ const InputComponent: React.FC<{
             return (
                 <EnumInputComponent
                     activeFilterId={activeFilterId}
-                    module={module}
                     input={enumListInput}
                 />
             )
@@ -89,7 +83,6 @@ const InputComponent: React.FC<{
             return (
                 <StringListInputComponent
                     activeFilterId={activeFilterId}
-                    module={module}
                     input={input as StringListInput}
                 />
             )
@@ -100,20 +93,11 @@ const InputComponent: React.FC<{
                     input={input as StyleInput}
                 />
             )
-        case 'includeExcludeList':
-            return (
-                <IncludeExcludeListInputComponent
-                    activeFilterId={activeFilterId}
-                    module={module}
-                    input={input as IncludeExcludeListInput}
-                />
-            )
         case 'text':
             const textInput = input as TextInput
             return (
                 <TextInputComponent
                     activeFilterId={activeFilterId}
-                    module={module}
                     input={textInput}
                 />
             )
@@ -135,32 +119,28 @@ const sizeOf = (input: Input) => {
             return 2
         case 'style':
             return 16
-        case 'includeExcludeList':
-            return 12
         default:
             return 4
     }
 }
 
-const getPreviews = ({ module }: { module: UiFilterModule }) => {
+const getPreviews = ({ module }: { module: Module }) => {
     const styleInputs: StyleInput[] = module.inputs.filter(
         (input) => input.type === 'style'
     ) as StyleInput[]
 
-    const activeFilterId = useUiStore(
+    const activeFilterId = useFilterStore(
         (state) =>
-            Object.keys(state.importedModularFilters).find(
-                (id) => state.importedModularFilters[id].active
-            )!!
+            Object.keys(state.filters).find((id) => state.filters[id].active)!!
     )
-    const configForModule = useUiStore(
+    const configForModule = useFilterConfigStore(
         (state) => state.filterConfigurations?.[activeFilterId]?.inputConfigs
     )
 
     const visibleStyleInputs = styleInputs.filter((input) => {
-        const config = configForModule?.[
-            input.macroName
-        ] as Partial<StyleConfig>
+        const config = StyleConfigSpec.optional()
+            .default({})
+            .parse(configForModule?.[input.macroName])
         return !(config?.hideOverlay ?? input.default?.hideOverlay ?? false)
     })
 
@@ -171,7 +151,6 @@ const getPreviews = ({ module }: { module: UiFilterModule }) => {
                 key={macroName}
                 itemName={input.label}
                 input={input}
-                module={module}
             />
         )
     })
@@ -181,17 +160,21 @@ const ModuleSection: React.FC<{
     activeFilterId: FilterId
     expanded: boolean
     setExpanded: (expanded: boolean) => void
-    module: UiFilterModule
+    module: Module
 }> = ({ activeFilterId, expanded, setExpanded, module }) => {
-    const { siteConfig } = useUiStore()
+    const { siteConfig } = useSiteConfigStore()
     const [showJson, setShowJson] = useState<'json' | 'configJson' | 'none'>(
         'none'
     )
-    const activeConfig = useUiStore(
+    const activeConfig = useFilterConfigStore(
         (state) => state.filterConfigurations?.[activeFilterId]
     )
-    const clearConfiguration = useUiStore((state) => state.clearConfiguration)
-    const setEnabledModule = useUiStore((state) => state.setEnabledModule)
+    const clearConfiguration = useFilterConfigStore(
+        (state) => state.clearConfiguration
+    )
+    const setEnabledModule = useFilterConfigStore(
+        (state) => state.setEnabledModule
+    )
 
     let json: string | null = null
     let configJson: string | null = null
@@ -211,35 +194,27 @@ const ModuleSection: React.FC<{
         'group'
     )
 
-    const moduleEnabledDefaultValue = module?.enabled ?? true
-    const configuredEnableValue = useUiStore(
+    const moduleEnabledDefaultValue = module.enabled
+
+    const configuredEnableValue = useFilterConfigStore(
         (state) =>
             state.filterConfigurations?.[activeFilterId]?.enabledModules?.[
                 module.id
             ]
     )
+
     const enabled = configuredEnableValue ?? moduleEnabledDefaultValue
 
     const showPreviews = useMediaQuery(MuiRsTheme.breakpoints.up('sm'))
     const previews = getPreviews({ module })
 
     const filterConfig =
-        useUiStore(
+        useFilterConfigStore(
             (state) =>
                 state.filterConfigurations?.[activeFilterId]?.inputConfigs
         ) || {}
 
-    const moduleMacronames = module.inputs
-        .map((input) => {
-            if (input.type === 'includeExcludeList') {
-                return [
-                    (input as IncludeExcludeListInput).macroName.includes,
-                    (input as IncludeExcludeListInput).macroName.excludes,
-                ]
-            }
-            return [input.macroName]
-        })
-        .reduce((acc, macroName) => [...acc, ...macroName], [])
+    const moduleMacronames = module.inputs.map((input) => input.macroName)
 
     const configCount = Object.keys(filterConfig)
         .filter((macroName) => moduleMacronames.includes(macroName))
@@ -470,20 +445,14 @@ const ModuleSection: React.FC<{
 }
 
 export const CustomizeTab: React.FC = () => {
-    const { siteConfig } = useUiStore()
-    const importedModularFilters = useUiStore(
-        (state) => state.importedModularFilters
-    )
+    const { siteConfig } = useSiteConfigStore()
+    const importedModularFilters = useFilterStore((state) => state.filters)
     const [expandedModules, setExpandedModules] = useState<
         Record<string, boolean>
     >({})
 
-    const activeFilter: UiModularFilter | undefined = useMemo(
-        () =>
-            Object.values(importedModularFilters).find(
-                (filter) => filter.active
-            ),
-        [importedModularFilters]
+    const activeFilter = useFilterStore((state) =>
+        Object.values(state.filters).find((filter) => filter.active)
     )
 
     const setAllExpanded = (expanded: boolean) => {
@@ -516,8 +485,6 @@ export const CustomizeTab: React.FC = () => {
             </Typography>
         )
     }
-
-    console.log('rendering CustomizeTab', activeFilter.modules.length)
 
     return (
         <Stack>

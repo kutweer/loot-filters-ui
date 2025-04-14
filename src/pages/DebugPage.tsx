@@ -1,6 +1,6 @@
 import { Box, Button, Container } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
-import { downloadFile } from '../utils/file'
+import { downloadFile, localState } from '../utils/file'
 
 export const DebugPage = () => {
     const nav = useNavigate()
@@ -19,15 +19,17 @@ export const DebugPage = () => {
                     sx={{ width: '250px', mt: 10 }}
                     variant="outlined"
                     onClick={() => {
-                        const state = localStorage.getItem(
-                            'modular-filter-storage'
-                        )
+                        const state = localState()
                         const fileName = `filterscape_state_${Date.now()
                             .toString()
                             .replaceAll('/', '-')}.json`
-                        const file = new File([state ?? '{}'], fileName, {
-                            type: 'text/plain',
-                        })
+                        const file = new File(
+                            [JSON.stringify(state)],
+                            fileName,
+                            {
+                                type: 'text/plain',
+                            }
+                        )
                         downloadFile(file)
                     }}
                 >
@@ -51,9 +53,14 @@ export const DebugPage = () => {
                             const reader = new FileReader()
                             reader.onload = (e) => {
                                 const content = e.target?.result as string
-                                localStorage.setItem(
-                                    'modular-filter-storage',
-                                    content
+                                const state = JSON.parse(content)
+                                Object.entries(state).forEach(
+                                    ([key, value]) => {
+                                        localStorage.setItem(
+                                            key,
+                                            (value as string) ?? null
+                                        )
+                                    }
                                 )
                                 nav('/')
                             }

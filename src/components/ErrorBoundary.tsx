@@ -1,7 +1,7 @@
 import { Box, Button, Typography } from '@mui/material'
 import { Component, ErrorInfo, ReactNode } from 'react'
 import { colors } from '../styles/MuiTheme'
-import { downloadFile } from '../utils/file'
+import { downloadFile, localState } from '../utils/file'
 
 interface Props {
     children: ReactNode
@@ -80,14 +80,12 @@ export class ErrorBoundary extends Component<Props, State> {
                                 sx={{ width: '250px', mt: 5 }}
                                 variant="outlined"
                                 onClick={() => {
-                                    const state = localStorage.getItem(
-                                        'modular-filter-storage'
-                                    )
+                                    const state = localState()
                                     const fileName = `filterscape_state_${Date.now()
                                         .toString()
                                         .replaceAll('/', '-')}.json`
                                     const file = new File(
-                                        [state ?? '{}'],
+                                        [JSON.stringify(state)],
                                         fileName,
                                         {
                                             type: 'text/plain',

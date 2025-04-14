@@ -22,28 +22,24 @@ import ZanarisImage from '../images/zanaris.png'
 import ZulAndraImage from '../images/zul_andra.png'
 
 import { useEffect, useState } from 'react'
+import { Module, StyleConfig, StyleInput } from '../parsing/UiTypesSpec'
 import { useBackgroundStore } from '../store/background'
-import { useUiStore } from '../store/store'
+import { useFilterConfigStore, useFilterStore } from '../store/storeV2'
 import { colors } from '../styles/MuiTheme'
 import { BackgroundImage, imageFromBackgroundImage } from '../types/Images'
-import { fontFamilyFromFontType, StyleInput } from '../types/InputsSpec'
-import { UiFilterModule } from '../types/ModularFilterSpec'
+import { fontFamilyFromFontType, FontType } from '../types/Rs2fEnum'
 import { colorHexToRgbaCss } from '../utils/Color'
-import { StyleConfig } from './inputs/StyleInputHelpers'
 
 export const ItemMenuPreview: React.FC<{
     itemName: string
     input: StyleInput
-    module: UiFilterModule
-}> = ({ itemName, input, module }) => {
-    const activeFilterId = useUiStore(
+}> = ({ itemName, input }) => {
+    const activeFilterId = useFilterStore(
         (state) =>
-            Object.keys(state.importedModularFilters).find(
-                (id) => state.importedModularFilters[id].active
-            )!!
+            Object.keys(state.filters).find((id) => state.filters[id].active)!!
     )
 
-    const activeConfig = useUiStore(
+    const activeConfig = useFilterConfigStore(
         (state) =>
             state.filterConfigurations?.[activeFilterId!!]?.inputConfigs?.[
                 input.macroName
@@ -139,17 +135,14 @@ const backgroundImages = [
 export const ItemLabelPreview: React.FC<{
     itemName: string
     input: StyleInput
-    module: UiFilterModule
     sx?: SxProps
-}> = ({ itemName, input, module, sx }) => {
-    const activeFilterId = useUiStore(
+}> = ({ itemName, input, sx }) => {
+    const activeFilterId = useFilterStore(
         (state) =>
-            Object.keys(state.importedModularFilters).find(
-                (id) => state.importedModularFilters[id].active
-            )!!
+            Object.keys(state.filters).find((id) => state.filters[id].active)!!
     )
 
-    const activeConfig = useUiStore(
+    const activeConfig = useFilterConfigStore(
         (state) =>
             state.filterConfigurations?.[activeFilterId!!]?.inputConfigs?.[
                 input.macroName
@@ -169,7 +162,9 @@ export const ItemLabelPreview: React.FC<{
     const hidden =
         activeConfig?.hideOverlay ?? input.default?.hideOverlay ?? false
 
-    const fontType = activeConfig?.fontType ?? input.default?.fontType
+    const fontType = (activeConfig?.fontType ?? input.default?.fontType) as
+        | FontType
+        | undefined
     const fontFamily = fontFamilyFromFontType(fontType)
 
     const textAccent = activeConfig?.textAccent ?? input.default?.textAccent

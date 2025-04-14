@@ -1,7 +1,8 @@
 import { generateId } from '../utils/idgen'
-import { Filter, ModuleType } from './UiTypesSpec'
+import { FilterSpec, Module } from './UiTypesSpec'
 import { parseInput } from './parseInput'
 import { parseModule } from './parseModule'
+import { parseMetaDescription, parseMetaName } from './rs2fParser'
 
 const parseDeclaration = (line: string) => {
     const match = line.match(/define:([a-z]+):([a-z0-9_]+)/)
@@ -47,7 +48,7 @@ export const parse = async (filter: string) => {
     // Remove escaped newlines before any other processing
     const lines = filter.replace(/\\\n\s*/g, '').split('\n')
 
-    const modulesById: Record<string, ModuleType> = {}
+    const modulesById: Record<string, Module> = {}
     const structuredComments = extractStructuredComments(lines)
 
     const errors = []
@@ -56,7 +57,6 @@ export const parse = async (filter: string) => {
         try {
             const line = lines[comment.start]
             const declaration = parseDeclaration(line.slice(3).trim())
-            console.log('declaration', declaration)
             switch (declaration.type) {
                 case 'module':
                     modulesById[declaration.id] = parseModule(
@@ -104,22 +104,34 @@ export const parse = async (filter: string) => {
         .map((b) => b.toString(16).padStart(2, '0'))
         .join('')
 
-    const parsedFilter = Filter.parse({
-        id: generateId(),
-        // TODO parse name from filter
-        name: 'Loaded Filter',
-        // TODO parse description from filter
-        description: 'Description Placeholder',
-        modules: Object.values(modulesById),
-        importedOn: new Date().toISOString(),
-        source: undefined,
-        active: false,
-        rs2f: filter,
-        rs2fHash,
-    })
+    const name = parseMetaName(filter)
+    const description = parseMetaDescription(filter) || undefined
 
-    return {
-        errors: undefined,
-        filter: parsedFilter,
+    try {
+        const parsedFilter = FilterSpec.parse({
+            id: generateId(),
+            name,
+            description,
+            modules: Object.values(modulesById),
+            importedOn: new Date().toISOString(),
+            source: undefined,
+            active: false,
+            rs2f: filter,
+            rs2fHash,
+        })
+        return {
+            errors: undefined,
+            filter: parsedFilter,
+        }
+    } catch (e) {
+        return {
+            errors: [
+                {
+                    line: filter,
+                    message: e,
+                },
+            ],
+            filter: undefined,
+        }
     }
 }

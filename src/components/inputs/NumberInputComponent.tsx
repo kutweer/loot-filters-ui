@@ -1,22 +1,31 @@
 import { TextField } from '@mui/material'
-import { useUiStore } from '../../store/store'
-import { NumberInput } from '../../types/InputsSpec'
-import { FilterId, UiFilterModule } from '../../types/ModularFilterSpec'
+import {
+    FilterId,
+    NumberInput,
+    NumberInputDefaultSpec,
+} from '../../parsing/UiTypesSpec'
+import { useFilterConfigStore } from '../../store/storeV2'
 
 export const NumberInputComponent: React.FC<{
     activeFilterId: FilterId
-    module: UiFilterModule
     input: NumberInput
-}> = ({ activeFilterId, module, input }) => {
-    const activeConfig = useUiStore(
-        (state) => state.filterConfigurations[activeFilterId]
+}> = ({ activeFilterId, input }) => {
+    const activeConfigValue = useFilterConfigStore(
+        (state) =>
+            state.filterConfigurations[activeFilterId]?.inputConfigs?.[
+                input.macroName
+            ]
     )
-    const setFilterConfiguration = useUiStore(
-        (state) => state.setFilterConfiguration
+
+    const updateInputConfiguration = useFilterConfigStore(
+        (state) => state.updateInputConfiguration
     )
 
     const userConfigValue =
-        activeConfig?.inputConfigs?.[input.macroName] ?? input.default
+        activeConfigValue || activeConfigValue === 0
+            ? NumberInputDefaultSpec.optional().parse(activeConfigValue)
+            : undefined
+
     const currentSetting = userConfigValue ?? input.default
 
     return (
@@ -25,7 +34,7 @@ export const NumberInputComponent: React.FC<{
             value={currentSetting}
             onChange={(event) => {
                 const value = event.target.value
-                setFilterConfiguration(
+                updateInputConfiguration(
                     activeFilterId,
                     input.macroName,
                     parseInt(value)

@@ -7,11 +7,12 @@ import {
     Switch,
     Typography,
 } from '@mui/material'
-import { useUiStore } from '../store/store'
+import { useSiteConfigStore } from '../store/storeV2'
 import { colors } from '../styles/MuiTheme'
 
 export const AppHeader: React.FC = () => {
-    const { siteConfig, setSiteConfig } = useUiStore()
+    const { siteConfig, setSiteConfig } = useSiteConfigStore()
+
     let buildInfo = { gitSha: 'main' }
     try {
         buildInfo = require('../build-info.json')
@@ -57,7 +58,6 @@ export const AppHeader: React.FC = () => {
                                 }
                                 onChange={(_, checked: boolean) =>
                                     setSiteConfig({
-                                        ...siteConfig,
                                         devMode: checked,
                                     })
                                 }

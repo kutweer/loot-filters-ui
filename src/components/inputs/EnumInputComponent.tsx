@@ -1,24 +1,30 @@
-import { useUiStore } from '../../store/store'
-import { EnumListInput, ListDiff } from '../../types/InputsSpec'
-import { FilterId, UiFilterModule } from '../../types/ModularFilterSpec'
-import { applyDiff, convertToListDiff } from '../../utils/ListDiffUtils'
+import {
+    EnumListInput,
+    FilterId,
+    ListDiffSpec,
+} from '../../parsing/UiTypesSpec'
+import { useFilterConfigStore } from '../../store/storeV2'
+import {
+    applyDiff,
+    convertToListDiff,
+    EMPTY_DIFF,
+} from '../../utils/ListDiffUtils'
 import { Option, UISelect } from './UISelect'
 
 export const EnumInputComponent: React.FC<{
     activeFilterId: FilterId
-    module: UiFilterModule
     input: EnumListInput
-}> = ({ activeFilterId, module, input }) => {
-    const activeConfig = useUiStore(
+}> = ({ activeFilterId, input }) => {
+    const activeConfig = useFilterConfigStore(
         (state) => state.filterConfigurations[activeFilterId]
     )
-    const setFilterConfiguration = useUiStore(
-        (state) => state.setFilterConfiguration
+    const updateInputConfiguration = useFilterConfigStore(
+        (state) => state.updateInputConfiguration
     )
 
-    const configuredDiff = activeConfig?.inputConfigs?.[input.macroName] as
-        | ListDiff
-        | undefined
+    const configuredDiff = ListDiffSpec.optional()
+        .default(EMPTY_DIFF)
+        .parse(activeConfig?.inputConfigs?.[input.macroName])
 
     const currentSetting = applyDiff(input.default, configuredDiff)
 
@@ -52,7 +58,7 @@ export const EnumInputComponent: React.FC<{
             options={options}
             value={selectedOptions}
             onChange={(newValue: Option<string>[] | null) => {
-                setFilterConfiguration(
+                updateInputConfiguration(
                     activeFilterId,
                     input.macroName,
                     convertToListDiff(

@@ -2,21 +2,17 @@ import {
     compressToEncodedURIComponent,
     decompressFromEncodedURIComponent,
 } from 'lz-string'
-import {
-    ModularFilterConfigurationV2,
-    UiModularFilter,
-} from '../types/ModularFilterSpec'
+import { Filter, FilterConfiguration } from '../parsing/UiTypesSpec'
 
 export const createLink = (
-    filter: UiModularFilter,
-    config: ModularFilterConfigurationV2 | undefined
+    filter: Filter,
+    config: FilterConfiguration | undefined
 ) => {
     const data = {
-        filter: filter,
+        filterUrl: filter.source,
         config: config,
     }
 
-    console.log('data', JSON.stringify(data))
     const component = compressToEncodedURIComponent(JSON.stringify(data))
 
     if (component.length >= 100 * 1024) {
@@ -31,11 +27,10 @@ export const createLink = (
 export const parseComponent = (
     component: string
 ): {
-    filter: UiModularFilter
-    config: ModularFilterConfigurationV2
+    filterUrl: string
+    config: FilterConfiguration
 } => {
     const data = decompressFromEncodedURIComponent(component)
-    console.log('data', data)
     const parsedData = JSON.parse(data)
     return parsedData
 }

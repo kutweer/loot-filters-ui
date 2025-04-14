@@ -1,58 +1,54 @@
-import { ExpandMore, MacroOff } from '@mui/icons-material'
+import { ExpandMore } from '@mui/icons-material'
 import {
     Accordion,
     AccordionDetails,
     AccordionSummary,
     Box,
     Checkbox,
-    Divider,
     FormControlLabel,
     Grid2 as Grid,
     TextField,
 } from '@mui/material'
 import React, { useState } from 'react'
-import { useUiStore } from '../../store/store'
+import { Module, StyleConfigSpec, StyleInput } from '../../parsing/UiTypesSpec'
+import {
+    useFilterConfigStore,
+    useFilterStore,
+    useSiteConfigStore,
+} from '../../store/storeV2'
 import { colors } from '../../styles/MuiTheme'
-import { StyleInput } from '../../types/InputsSpec'
-import { UiFilterModule } from '../../types/ModularFilterSpec'
 import { ArgbHexColor } from '../../utils/Color'
 import { ItemLabelPreview, ItemMenuPreview } from '../Previews'
 import { ColorPickerInput } from './ColorPicker'
 import { ItemLabelColorPicker } from './ItemLabelColorPicker'
-import { StyleConfig } from './StyleInputHelpers'
-import { TextInputComponent } from './TextInputComponent'
 
 export const DisplayConfigurationInput: React.FC<{
-    module: UiFilterModule
+    module: Module
     input: StyleInput
 }> = ({ module, input }) => {
-    const { siteConfig } = useUiStore()
+    const { siteConfig } = useSiteConfigStore()
     const [expanded, setExpanded] = useState(siteConfig.devMode)
 
-    const activeFilterId = useUiStore(
+    const activeFilterId = useFilterStore(
         (state) =>
-            Object.keys(state.importedModularFilters).find(
-                (id) => state.importedModularFilters[id].active
-            )!!
+            Object.keys(state.filters).find((id) => state.filters[id].active)!!
     )
 
-    const styleConfig: Partial<StyleConfig> = useUiStore(
-        (state) =>
-            state.filterConfigurations?.[activeFilterId]?.inputConfigs?.[
-                input.macroName
-            ] as Partial<StyleConfig>
-    ) ?? { [input.macroName]: {} }
-
-    const setFilterConfiguration = useUiStore(
-        (state) => state.setFilterConfiguration
+    const activeConfig = useFilterConfigStore(
+        (state) => state.filterConfigurations[activeFilterId]
     )
+
+    const styleConfig = StyleConfigSpec.optional()
+        .default({})
+        .parse(activeConfig?.inputConfigs?.[input.macroName])
+
+    const { updateInputConfiguration } = useFilterConfigStore()
 
     const itemLabelColorPicker = (
         <Grid size={{ xs: 12, md: 12 }} sx={{ display: 'flex', padding: 1 }}>
             <ItemLabelColorPicker
                 showExamples={false}
                 labelLocation="right"
-                module={module}
                 input={input}
             />
         </Grid>
@@ -69,7 +65,7 @@ export const DisplayConfigurationInput: React.FC<{
                             input.default?.showLootbeam
                         }
                         onChange={(e) =>
-                            setFilterConfiguration(
+                            updateInputConfiguration(
                                 activeFilterId,
                                 input.macroName,
                                 { showLootbeam: e.target.checked }
@@ -86,7 +82,7 @@ export const DisplayConfigurationInput: React.FC<{
                     styleConfig.lootbeamColor ?? input.default?.lootbeamColor
                 }
                 onChange={(color?: ArgbHexColor) =>
-                    setFilterConfiguration(activeFilterId, input.macroName, {
+                    updateInputConfiguration(activeFilterId, input.macroName, {
                         lootbeamColor: color,
                     })
                 }
@@ -103,7 +99,7 @@ export const DisplayConfigurationInput: React.FC<{
                 <Checkbox
                     checked={styleConfig.showValue ?? input.default?.showValue}
                     onChange={(e) =>
-                        setFilterConfiguration(
+                        updateInputConfiguration(
                             activeFilterId,
                             input.macroName,
                             {
@@ -125,7 +121,7 @@ export const DisplayConfigurationInput: React.FC<{
                         styleConfig.showDespawn ?? input.default?.showDespawn
                     }
                     onChange={(e) =>
-                        setFilterConfiguration(
+                        updateInputConfiguration(
                             activeFilterId,
                             input.macroName,
                             {
@@ -145,7 +141,7 @@ export const DisplayConfigurationInput: React.FC<{
                 <Checkbox
                     checked={styleConfig.notify ?? input.default?.notify}
                     onChange={(e) =>
-                        setFilterConfiguration(
+                        updateInputConfiguration(
                             activeFilterId,
                             input.macroName,
                             {
@@ -167,7 +163,7 @@ export const DisplayConfigurationInput: React.FC<{
                         styleConfig.hideOverlay ?? input.default?.hideOverlay
                     }
                     onChange={(e) =>
-                        setFilterConfiguration(
+                        updateInputConfiguration(
                             activeFilterId,
                             input.macroName,
                             {
@@ -191,7 +187,7 @@ export const DisplayConfigurationInput: React.FC<{
                             input.default?.highlightTile
                         }
                         onChange={(e) =>
-                            setFilterConfiguration(
+                            updateInputConfiguration(
                                 activeFilterId,
                                 input.macroName,
                                 { highlightTile: e.target.checked }
@@ -206,7 +202,7 @@ export const DisplayConfigurationInput: React.FC<{
                     input.default?.tileStrokeColor
                 }
                 onChange={(color?: ArgbHexColor) =>
-                    setFilterConfiguration(activeFilterId, input.macroName, {
+                    updateInputConfiguration(activeFilterId, input.macroName, {
                         tileStrokeColor: color,
                     })
                 }
@@ -221,7 +217,7 @@ export const DisplayConfigurationInput: React.FC<{
                     styleConfig.tileFillColor ?? input.default?.tileFillColor
                 }
                 onChange={(color?: ArgbHexColor) =>
-                    setFilterConfiguration(activeFilterId, input.macroName, {
+                    updateInputConfiguration(activeFilterId, input.macroName, {
                         tileFillColor: color,
                     })
                 }
@@ -239,7 +235,7 @@ export const DisplayConfigurationInput: React.FC<{
             label="Sound File"
             value={styleConfig?.sound ?? input.default?.sound ?? ''}
             onChange={(e) =>
-                setFilterConfiguration(activeFilterId, input.macroName, {
+                updateInputConfiguration(activeFilterId, input.macroName, {
                     sound: e.target.value,
                 })
             }
@@ -277,16 +273,8 @@ export const DisplayConfigurationInput: React.FC<{
                 expandIcon={<ExpandMore />}
             >
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                    <ItemLabelPreview
-                        module={module}
-                        input={input}
-                        itemName={input.label}
-                    />
-                    <ItemMenuPreview
-                        module={module}
-                        input={input}
-                        itemName={input.label}
-                    />
+                    <ItemLabelPreview input={input} itemName={input.label} />
+                    <ItemMenuPreview input={input} itemName={input.label} />
                 </Box>
             </AccordionSummary>
             <AccordionDetails

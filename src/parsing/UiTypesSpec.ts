@@ -1,90 +1,117 @@
 import { z } from 'zod'
 import {
-    Input as FilterSpecInput,
-    Module as FilterSpecModule,
+    InputSpec as FilterSpecInput,
+    ModuleSpec as FilterSpecModule,
 } from './FilterTypesSpec'
 
-export const Input = FilterSpecInput.extend({
+export const InputSpec = FilterSpecInput.extend({
     macroName: z.string().nonempty(),
     default: z.any().optional(),
 }).catchall(z.any())
 
-export type InputType = z.infer<typeof Input>
+export type Input = z.infer<typeof InputSpec>
 
-export const Module = FilterSpecModule.extend({
+export const ModuleSpec = FilterSpecModule.extend({
     id: z.string().nonempty(),
-    inputs: z.array(Input).default([]),
+    inputs: z.array(InputSpec).default([]),
 })
 
-export type ModuleType = z.infer<typeof Module>
+export type Module = z.infer<typeof ModuleSpec>
+
+export const BooleanInputDefaultSpec = z.boolean().optional().default(false)
 
 // Concrete implementations for each input type
-export const BooleanInput = Input.extend({
+export const BooleanInputSpec = InputSpec.extend({
     type: z.literal('boolean'),
-    default: z.boolean().optional(),
+    default: BooleanInputDefaultSpec,
 })
 
-export const NumberInput = Input.extend({
+export const NumberInputDefaultSpec = z.number().optional()
+
+export const NumberInputSpec = InputSpec.extend({
     type: z.literal('number'),
-    default: z.number().optional(),
+    default: NumberInputDefaultSpec,
 })
 
-export const StringListInput = Input.extend({
+export const StringListInputDefaultSpec = z
+    .array(z.string())
+    .optional()
+    .default([])
+
+export const StringListInputSpec = InputSpec.extend({
     type: z.literal('stringlist'),
-    default: z.array(z.string()).optional(),
+    default: StringListInputDefaultSpec,
 })
 
-export const ListOption = z.object({
+export const ListOptionSpec = z.object({
     label: z.string(),
     value: z.string(),
 })
 
-export type ListOptionType = z.infer<typeof ListOption>
-export const EnumListInput = Input.extend({
+export type ListOption = z.infer<typeof ListOptionSpec>
+
+export const EnumListInputDefaultSpec = z
+    .array(z.string())
+    .optional()
+    .default([])
+
+export const EnumListInputSpec = InputSpec.extend({
     type: z.literal('enumlist'),
-    default: z.array(z.string()).optional(),
-    enum: z.array(ListOption.or(z.string())).min(1),
+    default: EnumListInputDefaultSpec,
+    enum: z.array(ListOptionSpec.or(z.string())).min(1),
 })
 
-export const StyleInput = Input.extend({
+export const ArgbHexColorSpec = z
+    .string()
+    .startsWith('#')
+    .min(7)
+    .max(9)
+    .optional()
+    .catch('#FF000000')
+
+export const StyleConfigSpec = z.object({
+    textColor: ArgbHexColorSpec.optional(),
+    backgroundColor: ArgbHexColorSpec.optional(),
+    borderColor: ArgbHexColorSpec.optional(),
+    textAccent: z.number().min(1).max(4).optional(),
+    textAccentColor: ArgbHexColorSpec.optional(),
+    fontType: z.number().min(1).max(3).optional(),
+    showLootbeam: z.boolean().optional(),
+    lootbeamColor: ArgbHexColorSpec.optional(),
+    showValue: z.boolean().optional(),
+    showDespawn: z.boolean().optional(),
+    notify: z.boolean().optional(),
+    hideOverlay: z.boolean().optional(),
+    highlightTile: z.boolean().optional(),
+    menuTextColor: ArgbHexColorSpec.optional(),
+    tileStrokeColor: ArgbHexColorSpec.optional(),
+    tileFillColor: ArgbHexColorSpec.optional(),
+    tileHighlightColor: ArgbHexColorSpec.optional(),
+    sound: z.string().optional(),
+})
+
+export type StyleConfig = z.infer<typeof StyleConfigSpec>
+
+export const StyleInputSpec = InputSpec.extend({
     type: z.literal('style'),
-    default: z
-        .object({
-            textColor: z.string().optional(),
-            backgroundColor: z.string().optional(),
-            borderColor: z.string().optional(),
-            textAccent: z.number().optional(),
-            textAccentColor: z.string().optional(),
-            fontType: z.number().optional(),
-            showLootbeam: z.boolean().optional(),
-            lootbeamColor: z.string().optional(),
-            showValue: z.boolean().optional(),
-            showDespawn: z.boolean().optional(),
-            notify: z.boolean().optional(),
-            hideOverlay: z.boolean().optional(),
-            highlightTile: z.boolean().optional(),
-            menuTextColor: z.string().optional(),
-            tileStrokeColor: z.string().optional(),
-            tileFillColor: z.string().optional(),
-            tileHighlightColor: z.string().optional(),
-            sound: z.string().optional(),
-        })
-        .optional(),
+    default: StyleConfigSpec.optional(),
 })
 
-export const TextInput = Input.extend({
+export const TextInputDefaultSpec = z.string().optional().default('')
+export const TextInputSpec = InputSpec.extend({
     type: z.literal('text'),
-    default: z.string(),
+    default: TextInputDefaultSpec,
 })
 
-export type BooleanInputType = z.infer<typeof BooleanInput>
-export type NumberInputType = z.infer<typeof NumberInput>
-export type StringListInputType = z.infer<typeof StringListInput>
-export type EnumListInputType = z.infer<typeof EnumListInput>
-export type StyleInputType = z.infer<typeof StyleInput>
-export type TextInputType = z.infer<typeof TextInput>
+export type BooleanInput = z.infer<typeof BooleanInputSpec>
+export type NumberInput = z.infer<typeof NumberInputSpec>
+export type StringListInput = z.infer<typeof StringListInputSpec>
+export type EnumListInput = z.infer<typeof EnumListInputSpec>
+export type StyleInput = z.infer<typeof StyleInputSpec>
+export type TextInput = z.infer<typeof TextInputSpec>
 
-export const Filter = z.object({
+export type FilterId = string
+export const FilterSpec = z.object({
     id: z.string().nonempty(),
     name: z.string().nonempty(),
     description: z.string().optional(),
@@ -92,8 +119,24 @@ export const Filter = z.object({
     active: z.boolean().default(false),
     importedOn: z.string().datetime().default(new Date().toISOString()),
     source: z.string().url().optional(),
-    modules: z.array(Module).default([]),
+    modules: z.array(ModuleSpec).default([]),
     rs2f: z.string(),
 })
 
-export type FilterType = z.infer<typeof Filter>
+export type Filter = z.infer<typeof FilterSpec>
+
+export const ListDiffSpec = z.object({
+    added: z.array(z.string()),
+    removed: z.array(z.string()),
+})
+
+export type ListDiff = z.infer<typeof ListDiffSpec>
+
+export const FilterConfigurationSpec = z.object({
+    enabledModules: z.record(z.string(), z.boolean()).optional().default({}),
+    inputConfigs: z.record(z.string(), z.any()).optional().default({}),
+})
+
+export type FilterConfiguration = z.infer<typeof FilterConfigurationSpec>
+
+export type MacroName = string
