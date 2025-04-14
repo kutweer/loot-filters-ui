@@ -105,22 +105,31 @@ export const parse = async (filter: string) => {
         .join('')
 
     const name = parseMetaName(filter)
-    const description = parseMetaDescription(filter)
+    const description = parseMetaDescription(filter) || undefined
 
-    const parsedFilter = FilterSpec.parse({
-        id: generateId(),
-        name,
-        description,
-        modules: Object.values(modulesById),
-        importedOn: new Date().toISOString(),
-        source: undefined,
-        active: false,
-        rs2f: filter,
-        rs2fHash,
-    })
-
-    return {
-        errors: undefined,
-        filter: parsedFilter,
+    try {
+        const parsedFilter = FilterSpec.parse({
+            id: generateId(),
+            name,
+            description,
+            modules: Object.values(modulesById),
+            importedOn: new Date().toISOString(),
+            source: undefined,
+            active: false,
+            rs2f: filter,
+            rs2fHash,
+        })
+        return {
+            errors: undefined,
+            filter: parsedFilter,
+        }
+    } catch (e) {
+        return {
+            errors: [{
+                line: filter,
+                message: e,
+            }],
+            filter: undefined,
+        }
     }
 }
