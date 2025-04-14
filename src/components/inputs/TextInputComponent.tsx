@@ -1,18 +1,16 @@
 import { TextField } from '@mui/material'
-import { useUiStore } from '../../store/store'
-import { TextInput } from '../../types/InputsSpec'
-import { FilterId, UiFilterModule } from '../../types/ModularFilterSpec'
+import { FilterId, TextInput } from '../../parsing/UiTypesSpec'
+import { useFilterConfigStore } from '../../store/storeV2'
 
 export const TextInputComponent: React.FC<{
     activeFilterId: FilterId
-    module: UiFilterModule
     input: TextInput
-}> = ({ activeFilterId, module, input }) => {
-    const activeConfig = useUiStore(
+}> = ({ activeFilterId, input }) => {
+    const activeConfig = useFilterConfigStore(
         (state) => state.filterConfigurations[activeFilterId]
     )
-    const setFilterConfiguration = useUiStore(
-        (state) => state.setFilterConfiguration
+    const updateInputConfiguration = useFilterConfigStore(
+        (state) => state.updateInputConfiguration
     )
 
     const userConfigValue = activeConfig?.inputConfigs?.[input.macroName]
@@ -23,7 +21,7 @@ export const TextInputComponent: React.FC<{
             value={currentSetting}
             onChange={(event) => {
                 const value = event.target.value
-                setFilterConfiguration(activeFilterId, input.macroName, value)
+                updateInputConfiguration(activeFilterId, input.macroName, value)
             }}
             fullWidth
         />

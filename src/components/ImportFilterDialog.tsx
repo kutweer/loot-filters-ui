@@ -6,20 +6,14 @@ import {
     CardContent,
     Dialog,
     DialogContent,
-    FormControl,
-    FormHelperText,
     Grid2,
     TextField,
     Typography,
 } from '@mui/material'
-import React, { useCallback, useState } from 'react'
+import React, { useState } from 'react'
 import { useOboardingStore } from '../store/onboarding'
-import { useUiStore } from '../store/store'
-import { FilterModule, ModuleSource } from '../types/ModularFilterSpec'
-import { DEV_FILTERS } from '../utils/devFilters'
-import { loadFilter } from '../utils/modularFilterLoader'
-import { Option, UISelect } from './inputs/UISelect'
-import { generateId } from '../utils/idgen'
+import { useFilterStore } from '../store/storeV2'
+import { loadFilterFromUrl } from '../utils/loaderv2'
 
 interface ImportFilterDialogProps {
     open: boolean
@@ -27,21 +21,9 @@ interface ImportFilterDialogProps {
 }
 
 const FILTERSCAPE_FILTER =
-    'github:' +
-    JSON.stringify({
-        owner: 'riktenx',
-        repo: 'filterscape',
-        branch: 'main',
-        filterPath: 'index.json',
-    })
+    'https://raw.githubusercontent.com/riktenx/filterscape/refs/heads/migrate/filterscape.rs2f'
 const JOES_FILTER =
-    'github:' +
-    JSON.stringify({
-        owner: 'typical-whack',
-        repo: 'loot-filters-modules',
-        branch: 'main',
-        filterPath: 'filter.json',
-    })
+    'https://github.com/typical-whack/loot-filters-modules/blob/migrate/filter.rs2f'
 
 export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
     open,
@@ -50,23 +32,7 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
     const [filterUrl, setFilterUrl] = useState('')
     const [filterNameOverride, setFilterNameOverride] = useState('')
     const [importError, setImportError] = useState('')
-
-    const devMode = useUiStore((state) => state.siteConfig.devMode)
-
-    const addImportedModularFilter = useUiStore(
-        (state) => state.addImportedModularFilter
-    )
-    const setActiveFilterId = useUiStore((state) => state.setActiveFilterId)
-
-    const handleImportFilterChange = useCallback(
-        (newValue: Option<string> | null) => {
-            if (newValue) {
-                setFilterUrl(newValue.value)
-                setImportError('')
-            }
-        },
-        []
-    )
+    const { updateFilter, setActiveFilter } = useFilterStore()
 
     const handleClose = () => {
         setFilterUrl('')
@@ -76,30 +42,7 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
         onClose()
     }
 
-    const importGithubFilter = (str: string) => {
-        const source = JSON.parse(str.slice('github:'.length))
-        console.log('Loading github filter:', source)
-        return loadFilter({
-            ...source,
-        })
-            .catch((error) => {
-                setImportError(error.message)
-            })
-            .then((filter) => {
-                if (filter) {
-                    if (filterNameOverride !== '') {
-                        filter.name = filterNameOverride
-                    }
-                    addImportedModularFilter(filter)
-                    setActiveFilterId(filter.id)
-                    handleClose()
-                }
-                return filter
-            })
-    }
-
     const [loading, setLoading] = useState(false)
-
     const [showURLImportOptions, setShowURLImportOptions] = useState(false)
     const { onboardingComplete, setOnboardingComplete } = useOboardingStore()
 
@@ -273,7 +216,17 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                                     disabled={loading}
                                     onClick={(e) => {
                                         setLoading(true)
-                                        importGithubFilter(FILTERSCAPE_FILTER)
+                                        loadFilterFromUrl(FILTERSCAPE_FILTER)
+                                            .then((filter) => {
+                                                if (filter) {
+                                                    updateFilter(filter)
+                                                    setActiveFilter(filter.id)
+                                                    handleClose()
+                                                }
+                                            })
+                                            .catch((error) => {
+                                                setImportError(error.message)
+                                            })
                                     }}
                                 >
                                     Import
@@ -337,7 +290,17 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                                 <Button
                                     onClick={(e) => {
                                         setLoading(true)
-                                        importGithubFilter(JOES_FILTER)
+                                        loadFilterFromUrl(JOES_FILTER)
+                                            .then((filter) => {
+                                                if (filter) {
+                                                    updateFilter(filter)
+                                                    setActiveFilter(filter.id)
+                                                    handleClose()
+                                                }
+                                            })
+                                            .catch((error) => {
+                                                setImportError(error.message)
+                                            })
                                     }}
                                     disabled={loading}
                                 >
@@ -411,34 +374,6 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                         marginBottom: 2,
                     }}
                 >
-                    <FormControl>
-                        <FormHelperText sx={{ fontSize: '24px' }}>
-                            Paste in your URL, and optionally, give the filter a
-                            customized name.
-                        </FormHelperText>
-                        <UISelect<string>
-                            sx={{
-                                display: devMode ? 'block' : 'none',
-                            }}
-                            options={DEV_FILTERS.map((filter) => ({
-                                label: filter.name,
-                                value:
-                                    'url' in filter
-                                        ? (filter['url'] as string)
-                                        : 'github' in filter
-                                          ? `github:${JSON.stringify(filter['github'])}`
-                                          : JSON.stringify(filter),
-                            }))}
-                            value={
-                                filterUrl
-                                    ? { label: filterUrl, value: filterUrl }
-                                    : null
-                            }
-                            onChange={handleImportFilterChange}
-                            label="Select a filter"
-                            multiple={false}
-                        />
-                    </FormControl>
                     <TextField
                         label="Filter URL"
                         value={filterUrl}
@@ -468,69 +403,18 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                             variant="outlined"
                             color="primary"
                             onClick={(e) => {
-                                console.log(e)
-                                setImportError('')
-
-                                const isUrl = filterUrl.startsWith('http')
-                                const isGithub = filterUrl.startsWith('github:')
-                                console.log(
-                                    'filterUrl:',
-                                    filterUrl,
-                                    'isUrl:',
-                                    isUrl,
-                                    'isGithub:',
-                                    isGithub
-                                )
-                                if (isUrl) {
-                                    loadFilter({
-                                        filterUrl: filterUrl,
+                                setLoading(true)
+                                loadFilterFromUrl(filterUrl)
+                                    .then((filter) => {
+                                        if (filter) {
+                                            updateFilter(filter)
+                                            setActiveFilter(filter.id)
+                                            handleClose()
+                                        }
                                     })
-                                        .catch((error) => {
-                                            setImportError(error.message)
-                                        })
-                                        .then((filter) => {
-                                            if (filter) {
-                                                if (filterNameOverride !== '') {
-                                                    filter.name =
-                                                        filterNameOverride
-                                                }
-                                                addImportedModularFilter(filter)
-                                                setActiveFilterId(filter.id)
-                                                handleClose()
-                                            }
-                                        })
-                                } else if (isGithub) {
-                                    importGithubFilter(filterUrl)
-                                } else {
-                                    const filter = {
-                                        ...JSON.parse(filterUrl),
-                                        id: generateId(),
-                                    }
-
-                                    if (filter)
-                                        filter.modules = filter.modules.map(
-                                            (module: ModuleSource) => ({
-                                                ...(
-                                                    module as {
-                                                        moduleJson: FilterModule
-                                                    }
-                                                ).moduleJson,
-                                                id: generateId(),
-                                                rs2fText: (
-                                                    module as {
-                                                        moduleRs2fText: string
-                                                    }
-                                                ).moduleRs2fText,
-                                            })
-                                        )
-                                    if (filterNameOverride !== '') {
-                                        filter.name = filterNameOverride
-                                    }
-
-                                    addImportedModularFilter(filter)
-                                    setActiveFilterId(filter.id)
-                                    handleClose()
-                                }
+                                    .catch((error) => {
+                                        setImportError(error.message)
+                                    })
                             }}
                         >
                             Import

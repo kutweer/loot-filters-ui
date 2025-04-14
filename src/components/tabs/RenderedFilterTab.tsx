@@ -1,12 +1,11 @@
 import { Editor } from '@monaco-editor/react'
-import { useUiStore } from '../../store/store'
+import { useFilterConfigStore, useFilterStore } from '../../store/storeV2'
 import { renderFilter } from '../../utils/render'
-
 const RenderFilterComponent: React.FC = () => {
-    const activeFilter = useUiStore((state) =>
-        Object.values(state.importedModularFilters).find((f) => f.active)
+    const activeFilter = useFilterStore((state) =>
+        Object.values(state.filters).find((f) => f.active)
     )
-    const activeConfig = useUiStore((state) =>
+    const activeConfig = useFilterConfigStore((state) =>
         activeFilter ? state.filterConfigurations[activeFilter.id] : undefined
     )
 

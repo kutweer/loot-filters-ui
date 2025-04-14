@@ -1,36 +1,32 @@
-import { StyleConfig } from '../components/inputs/StyleInputHelpers'
-import { Input, InputConfig, ListDiff, MacroName } from '../types/InputsSpec'
 import {
-    ModularFilterConfigurationV2,
-    UiFilterModule,
-    UiModularFilter,
-} from '../types/ModularFilterSpec'
+    Filter,
+    FilterConfiguration,
+    ListDiff,
+    MacroName,
+    Module,
+    StyleConfig,
+} from '../parsing/UiTypesSpec'
 import { applyDiff, convertOptionsToStrings, EMPTY_DIFF } from './ListDiffUtils'
 
 export const renderFilter = (
-    filter: UiModularFilter,
-    activeConfig: ModularFilterConfigurationV2 | undefined
+    filter: Filter,
+    activeConfig: FilterConfiguration | undefined
 ): string => {
-    const rs2f = filter.modules
-        .filter(
-            (m) => activeConfig?.enabledModules?.[m.id] ?? m.enabled ?? true
-        )
-        .map((m) => renderModule(m, activeConfig?.inputConfigs))
-        .join('\n')
+    let filterText = ''
 
-    // add a simple meta if they don't have one already
-    if (!rs2f.includes('meta {')) {
-        return `meta { name = "${filter.name}"; }\n${rs2f}`
-    }
+    filter.modules.forEach((m) => {
+        filterText = applyModule(filterText, m, activeConfig?.inputConfigs)
+    })
 
-    return rs2f
+    return filterText
 }
 
-const renderModule = (
-    module: UiFilterModule,
-    config: { [key: MacroName]: InputConfig<Input> } | undefined
+const applyModule = (
+    filterText: string,
+    module: Module,
+    config: { [key: MacroName]: any } | undefined
 ): string => {
-    let updated = module.rs2fText
+    let updated = filterText
 
     for (const input of module.inputs) {
         switch (input.type) {
@@ -71,30 +67,6 @@ const renderModule = (
                 )
                 break
             }
-            case 'includeExcludeList': {
-                const includes = config?.[input.macroName.includes] as ListDiff
-                const excludes = config?.[input.macroName.excludes] as ListDiff
-
-                const includesList = convertOptionsToStrings(
-                    applyDiff(input.default.includes, includes ?? EMPTY_DIFF)
-                )
-                const excludesList = convertOptionsToStrings(
-                    applyDiff(input.default.excludes, excludes ?? EMPTY_DIFF)
-                )
-
-                updated = updateMacro(
-                    updated,
-                    input.macroName.includes,
-                    renderStringList(includesList)
-                )
-                updated = updateMacro(
-                    updated,
-                    input.macroName.excludes,
-                    renderStringList(excludesList)
-                )
-                break
-            }
-
             case 'style': {
                 const style = config?.[input.macroName] as
                     | StyleConfig

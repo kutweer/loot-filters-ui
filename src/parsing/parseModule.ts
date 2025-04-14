@@ -1,13 +1,13 @@
 import { parse as parseYaml } from 'yaml'
-import { Module as FilterSpecModule } from './FilterTypesSpec'
-import { Module, ModuleType } from './UiTypesSpec'
+import { ModuleSpec as FilterSpecModule } from './FilterTypesSpec'
+import { Module, ModuleSpec } from './UiTypesSpec'
 
 export const parseModule = (
     moduleId: string,
     lines: string[],
     start: number,
     end: number
-): ModuleType => {
+): Module => {
     // start 1 further to remove the /*@ define stuff
     const wholeComment = lines.slice(start + 1, end).join('\n')
     console.log('wholeComment\n', wholeComment)
@@ -17,5 +17,5 @@ export const parseModule = (
     )
     const module = parseYaml(declarationContent!!)
 
-    return Module.parse({ ...FilterSpecModule.parse(module), id: moduleId })
+    return ModuleSpec.parse({ ...FilterSpecModule.parse(module), id: moduleId })
 }

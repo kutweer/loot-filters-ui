@@ -1,14 +1,15 @@
 import { z } from 'zod'
 
-export const Module = z.object({
+export const ModuleSpec = z.object({
     name: z.string().nonempty(),
     subtitle: z.string().optional(),
     description: z.string().optional(),
+    enabled: z.boolean().optional().default(true),
 })
 
-export type ModuleType = z.infer<typeof Module>
+export type Module = z.infer<typeof ModuleSpec>
 
-export const Input = z
+export const InputSpec = z
     .object({
         type: z.enum([
             'boolean',
@@ -24,4 +25,4 @@ export const Input = z
     })
     .catchall(z.any())
 
-export type InputType = z.infer<typeof Input>
+export type Input = z.infer<typeof InputSpec>

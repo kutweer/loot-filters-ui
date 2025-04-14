@@ -1,5 +1,5 @@
 import { generateId } from '../utils/idgen'
-import { Filter, ModuleType } from './UiTypesSpec'
+import { FilterSpec, Module } from './UiTypesSpec'
 import { parseInput } from './parseInput'
 import { parseModule } from './parseModule'
 
@@ -47,7 +47,7 @@ export const parse = async (filter: string) => {
     // Remove escaped newlines before any other processing
     const lines = filter.replace(/\\\n\s*/g, '').split('\n')
 
-    const modulesById: Record<string, ModuleType> = {}
+    const modulesById: Record<string, Module> = {}
     const structuredComments = extractStructuredComments(lines)
 
     const errors = []
@@ -104,7 +104,7 @@ export const parse = async (filter: string) => {
         .map((b) => b.toString(16).padStart(2, '0'))
         .join('')
 
-    const parsedFilter = Filter.parse({
+    const parsedFilter = FilterSpec.parse({
         id: generateId(),
         // TODO parse name from filter
         name: 'Loaded Filter',

@@ -1,57 +1,52 @@
 import { Divider } from '@mui/material'
-import { useUiStore } from '../../store/store'
+import { Module, StyleConfig, StyleInput } from '../../parsing/UiTypesSpec'
+import { useFilterConfigStore, useFilterStore } from '../../store/storeV2'
 import { colors } from '../../styles/MuiTheme'
 import {
     FontType,
     fontTypes,
     labelFromFontType,
     labelFromTextAccent,
-    StyleInput,
     TextAccent,
     textAccents,
-} from '../../types/InputsSpec'
-import { UiFilterModule } from '../../types/ModularFilterSpec'
+} from '../../types/Rs2fEnum'
 import { ArgbHexColor } from '../../utils/Color'
 import { ItemLabelPreview, ItemMenuPreview } from '../Previews'
 import { ColorPickerInput } from './ColorPicker'
-import { StyleConfig, StyleConfigKey } from './StyleInputHelpers'
 import { Option, UISelect } from './UISelect'
 
 export const ItemLabelColorPicker: React.FC<{
-    module: UiFilterModule
     input: StyleInput
     itemName?: string
     showExamples?: boolean
     labelLocation?: 'right' | 'bottom'
 }> = ({
-    module,
     input,
     itemName = 'Example',
     showExamples = true,
     labelLocation = 'bottom',
 }) => {
-    const activeFilterId = useUiStore((state) =>
-        Object.keys(state.importedModularFilters).find(
-            (id) => state.importedModularFilters[id].active
-        )
-    )!!
+    const activeFilterId = useFilterStore(
+        (state) =>
+            Object.keys(state.filters).find((id) => state.filters[id].active)!!
+    )
 
-    const activeConfig = useUiStore(
+    const activeConfig = useFilterConfigStore(
         (state) =>
             state.filterConfigurations[activeFilterId]?.inputConfigs?.[
                 input.macroName
-            ] as Partial<StyleConfig>
+            ]
     )
 
-    const setFilterConfiguration = useUiStore(
-        (state) => state.setFilterConfiguration
+    const updateInputConfiguration = useFilterConfigStore(
+        (state) => state.updateInputConfiguration
     )
 
     const updateStyleField = (
-        field: StyleConfigKey,
-        value: StyleConfig[StyleConfigKey]
+        field: keyof StyleConfig,
+        value: StyleConfig[keyof StyleConfig]
     ) => {
-        setFilterConfiguration(activeFilterId, input.macroName, {
+        updateInputConfiguration(activeFilterId, input.macroName, {
             [field]: value,
         })
     }
@@ -223,14 +218,12 @@ export const ItemLabelColorPicker: React.FC<{
                 <>
                     <div style={{ minWidth: '200px', flex: '0 0 auto' }}>
                         <ItemLabelPreview
-                            module={module}
                             input={input}
                             itemName={itemName}
                         />
                     </div>
                     <div style={{ minWidth: '200px', flex: '0 0 auto' }}>
                         <ItemMenuPreview
-                            module={module}
                             input={input}
                             itemName={itemName}
                         />

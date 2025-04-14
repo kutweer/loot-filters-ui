@@ -7,16 +7,15 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { FilterSelector } from './components/FilterSelector'
 import { FilterTabs } from './pages/CustomizeFilterPage'
 import { DebugPage } from './pages/DebugPage'
-import { ImportPage } from './pages/ImportPage'
 import { ParsePage } from './pages/ParsePage'
 import { useAlertStore } from './store/alerts'
-import { useUiStore } from './store/store'
+import { useSiteConfigStore } from './store/storeV2'
 import { MuiRsTheme } from './styles/MuiTheme'
 
 const Page: React.FC<{
     component?: ReactNode
 }> = ({ component }) => {
-    const setSiteConfig = useUiStore((state) => state.setSiteConfig)
+    const { setSiteConfig } = useSiteConfigStore()
     const params = new URLSearchParams(window.location.search)
     const devMode = params.get('dev') === 'true'
 
@@ -29,6 +28,7 @@ const Page: React.FC<{
             setSiteConfig({ devMode })
         }
     }, [devMode, setSiteConfig])
+
     return (
         <Container className="rs-container" maxWidth="xl">
             {alerts.map((alert) => (
@@ -64,7 +64,6 @@ export const App = () => {
             </span>
             <BrowserRouter>
                 <Routes>
-                    <Route path="/import" element={<ImportPage />} />
                     <Route
                         path="/debug"
                         element={<Page component={<DebugPage />} />}

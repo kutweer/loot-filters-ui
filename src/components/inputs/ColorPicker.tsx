@@ -2,21 +2,12 @@ import { FormControl, Popover, Tooltip, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import { RgbaColorPicker } from 'react-colorful'
 import { isNumber } from 'underscore'
+import { ArgbHexColorSpec } from '../../parsing/UiTypesSpec'
 import {
     ArgbHexColor,
     argbHexColorToRGBColor,
     colorHexToRgbaCss,
-    normalizeHex,
 } from '../../utils/Color'
-
-const colorValid = (color?: ArgbHexColor) => {
-    try {
-        normalizeHex(color)
-        return true
-    } catch (error) {
-        return false
-    }
-}
 
 type RGBColor = {
     a: number
@@ -44,6 +35,8 @@ const ColorPicker: React.FC<{
     const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null)
     const open = Boolean(anchorEl)
 
+    const colorOrError = ArgbHexColorSpec.safeParse(color)
+
     const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
         if (!disabled) {
             setAnchorEl(event.currentTarget)
@@ -56,22 +49,20 @@ const ColorPicker: React.FC<{
 
     const handleChange = (newColor: RGBColor) => {
         const argbColor = rGBColorToArgbHex(newColor)
+        setInputTextState(argbColor)
         onChange(argbColor)
     }
 
     const [inputTextState, setInputTextState] = useState<string>(
-        color ?? '#FF000000'
+        colorOrError.success ? colorOrError.data!! : '#FF000000'
     )
 
     const handleHexChange = (newColor: string) => {
-        let error = false
-        const valid = colorValid(newColor as ArgbHexColor)
+        const newColorOrError = ArgbHexColorSpec.safeParse(newColor)
 
-        setInputTextState(
-            valid ? normalizeHex(newColor as ArgbHexColor)!! : newColor
-        )
-        if (valid) {
-            onChange(newColor as ArgbHexColor)
+        if (newColorOrError.success) {
+            setInputTextState(newColorOrError.data!!)
+            onChange(newColorOrError.data)
         }
     }
 
@@ -81,8 +72,8 @@ const ColorPicker: React.FC<{
         width: '36px',
         height: labelLocation == 'right' ? '100%' : '14px',
         borderRadius: '2px',
-        ...(color && colorValid(color)
-            ? { background: colorHexToRgbaCss(color) }
+        ...(colorOrError.success
+            ? { background: colorHexToRgbaCss(colorOrError.data) }
             : {}),
     }
 
@@ -164,7 +155,7 @@ const ColorPicker: React.FC<{
                 >
                     <RgbaColorPicker
                         color={
-                            color && colorValid(color)
+                            colorOrError.success
                                 ? argbHexColorToRGBColor(color)
                                 : {
                                       r: 0,
@@ -185,6 +176,11 @@ const ColorPicker: React.FC<{
                         <span style={{ fontFamily: 'monospace' }}>
                             #AARRGGBB
                         </span>
+                    </div>
+                    <div>
+                        <Typography fontSize="12px" color="red">
+                            {colorOrError.error?.message}
+                        </Typography>
                     </div>
                 </div>
             </Popover>

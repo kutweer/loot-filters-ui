@@ -1,14 +1,14 @@
 import { parse as parseYaml } from 'yaml'
-import { Input as FilterSpecInput } from './FilterTypesSpec'
+import { InputSpec as FilterSpecInput } from './FilterTypesSpec'
 import {
-    BooleanInput,
-    EnumListInput,
+    BooleanInputSpec,
+    EnumListInputSpec,
     Input,
-    InputType,
-    NumberInput,
-    StringListInput,
-    StyleInput,
-    TextInput,
+    InputSpec,
+    NumberInputSpec,
+    StringListInputSpec,
+    StyleInputSpec,
+    TextInputSpec,
 } from './UiTypesSpec'
 import { parseDefine, Rs2fDefine } from './rs2fParser'
 
@@ -17,7 +17,7 @@ export const parseInput = (
     lines: string[],
     start: number,
     end: number
-): { moduleId: string; input: InputType } => {
+): { moduleId: string; input: Input } => {
     // start 1 further to remove the /*@ define stuff
     const wholeComment = lines.slice(start + 1, end).join('\n')
     const declarationContent = wholeComment.substring(
@@ -36,23 +36,23 @@ export const parseInput = (
         default: inputDefault.type === 'null' ? undefined : inputDefault.value,
     }
     console.log('baseInput input', baseInput)
-    const input = Input.parse(baseInput)
+    const input = InputSpec.parse(baseInput)
     console.log('input', input)
 
     // validate the input with a default field; to check that the default field is correct
     switch (input.type as unknown as string) {
         case 'boolean':
-            return { moduleId: moduleId, input: BooleanInput.parse(input) }
+            return { moduleId: moduleId, input: BooleanInputSpec.parse(input) }
         case 'number':
-            return { moduleId: moduleId, input: NumberInput.parse(input) }
+            return { moduleId: moduleId, input: NumberInputSpec.parse(input) }
         case 'stringlist':
-            return { moduleId: moduleId, input: StringListInput.parse(input) }
+            return { moduleId: moduleId, input: StringListInputSpec.parse(input) }
         case 'enumlist':
-            return { moduleId: moduleId, input: EnumListInput.parse(input) }
+            return { moduleId: moduleId, input: EnumListInputSpec.parse(input) }
         case 'style':
-            return { moduleId: moduleId, input: StyleInput.parse(input) }
+            return { moduleId: moduleId, input: StyleInputSpec.parse(input) }
         case 'text':
-            return { moduleId: moduleId, input: TextInput.parse(input) }
+            return { moduleId: moduleId, input: TextInputSpec.parse(input) }
         default:
             throw new Error(`Invalid input type: ${input.type}`)
     }

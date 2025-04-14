@@ -14,21 +14,14 @@ import { BackgroundSelector } from '../components/BackgroundSelector'
 import { FilterSelector } from '../components/FilterSelector'
 import { CustomizeTab } from '../components/tabs/CustomizeTab'
 import { RenderedFilterTab } from '../components/tabs/RenderedFilterTab'
-import { useUiStore } from '../store/store'
+import { useFilterStore, useSiteConfigStore } from '../store/storeV2'
 
 export const FilterTabs: React.FC = () => {
-    const { siteConfig } = useUiStore()
+    const { siteConfig } = useSiteConfigStore()
     const [activeTab, setActiveTab] = useState(0)
 
-    const importedModularFilters = useUiStore(
-        (state) => state.importedModularFilters
-    )
-    const activeFilter = useMemo(
-        () =>
-            Object.values(importedModularFilters).find(
-                (filter) => filter.active
-            ),
-        [importedModularFilters]
+    const activeFilter = useFilterStore((state) =>
+        Object.values(state.filters).find((filter) => filter.active)
     )
 
     const tabs = useMemo(() => {

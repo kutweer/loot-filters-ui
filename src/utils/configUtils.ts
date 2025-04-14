@@ -1,4 +1,4 @@
-import { ListDiff, styleConfigFields } from '../types/InputsSpec'
+import { ListDiff, StyleConfigSpec } from '../parsing/UiTypesSpec'
 
 export const isConfigEmpty = (config: any): boolean => {
     if (config === undefined || config === null) {
@@ -18,7 +18,9 @@ export const isConfigEmpty = (config: any): boolean => {
             )
         }
 
-        return styleConfigFields.every((key) => isConfigEmpty(config[key]))
+        return Object.keys(StyleConfigSpec.shape).every((key) =>
+            isConfigEmpty(config[key])
+        )
     }
 
     return false

@@ -21,28 +21,27 @@ import {
 import ListItemIcon from '@mui/material/ListItemIcon'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAlertStore } from '../store/alerts'
-import { useUiStore } from '../store/store'
-import { GitHubFilterSource } from '../types/GitHubFilterSource'
 import {
+    Filter,
+    FilterConfigurationSpec,
     FilterId,
-    ModularFilterConfigurationV2,
-    UiModularFilter,
-} from '../types/ModularFilterSpec'
+} from '../parsing/UiTypesSpec'
+import { useAlertStore } from '../store/alerts'
+import {
+    useFilterConfigStore,
+    useFilterStore,
+    useSiteConfigStore,
+} from '../store/storeV2'
 import { downloadFile } from '../utils/file'
 import { createLink } from '../utils/link'
-import { loadFilter } from '../utils/modularFilterLoader'
+import { loadFilterFromUrl } from '../utils/loaderv2'
 import { renderFilter } from '../utils/render'
 import { ImportFilterDialog } from './ImportFilterDialog'
 import { Option, UISelect } from './inputs/UISelect'
 
-const isGitHubSource = (source: any): source is GitHubFilterSource => {
-    return source && 'repo' in source && 'owner' in source
-}
-
 const EditFilterDialog: React.FC<{
     open: boolean
-    filter: UiModularFilter
+    filter: Filter
     onSave: (name: string) => void
     onClose: () => void
 }> = ({ open, filter, onSave, onClose }) => {
@@ -91,67 +90,68 @@ const EditFilterDialog: React.FC<{
         </Dialog>
     )
 }
+
 export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
     reloadOnChange,
 }) => {
     const [editDialogOpen, setEditDialogOpen] = useState(false)
-    const { siteConfig } = useUiStore()
+    const { siteConfig } = useSiteConfigStore()
+
+    const { filters, removeFilter, setActiveFilter, updateFilter } =
+        useFilterStore()
 
     const {
-        setActiveFilterId,
-        addFilterConfiguration,
-        importedModularFilters,
-        removeImportedModularFilter,
-        addImportedModularFilter,
-        setFilterName,
-    } = useUiStore()
+        filterConfigurations,
+        updateInputConfiguration,
+        setFilterConfiguration,
+        removeFilterConfiguration,
+    } = useFilterConfigStore()
 
     const [importDialogOpen, setImportDialogOpen] = useState(
-        Object.keys(importedModularFilters).length === 0
+        Object.keys(filters).length === 0
     )
 
     const navigate = useNavigate()
 
     const activeFilter = useMemo(
-        () =>
-            Object.values(importedModularFilters).find(
-                (filter) => filter.active
-            ),
-        [importedModularFilters]
+        () => Object.values(filters).find((filter) => filter.active),
+        [filters]
     )
 
-    const activeFilterConfig: ModularFilterConfigurationV2 | undefined =
-        useUiStore(
+    const activeFilterConfig = FilterConfigurationSpec.optional().parse(
+        useFilterConfigStore(
             (state) =>
-                activeFilter && state.filterConfigurations?.[activeFilter.id]
+                activeFilter && state.filterConfigurations?.[activeFilter?.id]
         )
+    )
 
     const handleFilterChange = useCallback(
         (newValue: Option<FilterId> | null) => {
             if (newValue) {
-                setActiveFilterId(newValue.value)
+                setActiveFilter(newValue.value)
                 if (reloadOnChange) {
                     window.location.reload()
                 }
             }
         },
-        [setActiveFilterId]
+        [setActiveFilter]
     )
     const handleDeleteFilter = useCallback(() => {
-        if (Object.keys(importedModularFilters).length === 1) {
+        if (Object.keys(filters).length === 1) {
             setImportDialogOpen(true)
         }
         if (activeFilter) {
-            removeImportedModularFilter(activeFilter.id)
+            removeFilter(activeFilter.id)
+            removeFilterConfiguration(activeFilter.id)
         }
-    }, [activeFilter, setActiveFilterId, removeImportedModularFilter])
+    }, [activeFilter, setActiveFilter, removeFilter, removeFilterConfiguration])
 
-    const filterOptions: Option<FilterId>[] = Object.values(
-        importedModularFilters
-    ).map((filter) => ({
-        label: filter.name,
-        value: filter.id,
-    }))
+    const filterOptions: Option<FilterId>[] = Object.values(filters).map(
+        (filter) => ({
+            label: filter.name,
+            value: filter.id,
+        })
+    )
 
     const selectedFilter = activeFilter
         ? {
@@ -160,50 +160,34 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
           }
         : null
 
-    const [updatedFilter, setUpdatedFilter] = useState<UiModularFilter | null>(
-        null
-    )
+    const [updatedFilter, setUpdatedFilter] = useState<Filter | null>(null)
 
     const addAlert = useAlertStore((state) => state.addAlert)
 
     useEffect(() => {
-        if (activeFilter != null) {
+        if (activeFilter != null && activeFilter.source != null) {
             console.log('checking for updates')
-            if (isGitHubSource(activeFilter?.source)) {
-                console.log('loading filter')
-                loadFilter(activeFilter.source)
-                    .then((newFilter) => {
-                        console.log('loaded filter', newFilter)
-                        setUpdatedFilter(newFilter)
+            loadFilterFromUrl(activeFilter.source)
+                .then((newFilter) => {
+                    setUpdatedFilter(newFilter)
+                })
+                .catch((e) => {
+                    addAlert({
+                        children: `Failed to check for updates to filter: ${e.message}`,
+                        severity: 'error',
                     })
-                    .catch((e) => {
-                        addAlert({
-                            children: `Failed to check for updates to filter: ${e.message}`,
-                            severity: 'error',
-                        })
-                    })
-            }
+                })
         }
     }, [activeFilter])
 
     const [filterMenuAnchor, setFilterMenuAnchor] =
         useState<HTMLElement | null>(null)
 
-    const activeFilterSha = isGitHubSource(activeFilter?.source)
-        ? activeFilter?.source.updateMeta?.sha
-        : undefined
-    const updatedFilterSha = isGitHubSource(updatedFilter?.source)
-        ? updatedFilter?.source.updateMeta?.sha
-        : undefined
+    const activeFilterSha = activeFilter?.rs2fHash
+    const updatedFilterSha = updatedFilter?.rs2fHash
 
     const updateAvailable =
-        activeFilterSha !== undefined &&
-        updatedFilterSha !== undefined &&
-        activeFilterSha !== updatedFilterSha
-
-    console.log('activeFilter', activeFilter?.source)
-    console.log('updatedFilter', updatedFilter?.source, updatedFilter)
-    console.log(activeFilterSha, updatedFilterSha, updateAvailable)
+        updatedFilterSha !== undefined && activeFilterSha !== updatedFilterSha
 
     return (
         <>
@@ -230,9 +214,7 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                             value={selectedFilter}
                             onChange={handleFilterChange}
                             label="Select a filter"
-                            disabled={
-                                Object.keys(importedModularFilters).length === 0
-                            }
+                            disabled={Object.keys(filters).length === 0}
                             multiple={false}
                         />
                     </FormControl>
@@ -289,20 +271,17 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                             if (updatedFilter != null) {
                                 let name = activeFilter.name
 
-                                const updatedAt = new Date(
-                                    (
-                                        updatedFilter.source!! as GitHubFilterSource
-                                    ).updateMeta!!.updatedAt
-                                ).toLocaleDateString()
+                                const updatedAt =
+                                    new Date().toLocaleDateString()
 
-                                addImportedModularFilter({
+                                updateFilter({
                                     ...updatedFilter,
                                     name:
                                         name.replace(/ \(updated: .*\)$/, '') +
                                         ` (updated: ${updatedAt})`,
                                 })
-                                setActiveFilterId(updatedFilter.id)
-                                addFilterConfiguration(
+                                setActiveFilter(updatedFilter.id)
+                                setFilterConfiguration(
                                     updatedFilter.id,
                                     activeFilterConfig || {
                                         enabledModules: {},
@@ -441,7 +420,10 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                     filter={activeFilter}
                     onClose={() => setEditDialogOpen(false)}
                     onSave={(name) => {
-                        setFilterName(activeFilter.id, name)
+                        updateFilter({
+                            ...activeFilter,
+                            name,
+                        })
                         addAlert({
                             children: 'Filter name updated',
                             severity: 'success',

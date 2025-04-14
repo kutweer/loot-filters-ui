@@ -1,4 +1,4 @@
-import { ListDiff, ListOption } from '../types/InputsSpec'
+import { ListDiff, ListOption } from '../parsing/UiTypesSpec'
 
 export const EMPTY_DIFF: ListDiff = {
     added: [],
