@@ -486,8 +486,6 @@ export const CustomizeTab: React.FC = () => {
         )
     }
 
-    console.log('rendering CustomizeTab', activeFilter.modules.length)
-
     return (
         <Stack>
             {activeFilter?.modules.map((module, index: number) => (

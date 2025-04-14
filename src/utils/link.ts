@@ -13,7 +13,6 @@ export const createLink = (
         config: config,
     }
 
-    console.log('data', JSON.stringify(data))
     const component = compressToEncodedURIComponent(JSON.stringify(data))
 
     if (component.length >= 100 * 1024) {
@@ -32,7 +31,6 @@ export const parseComponent = (
     config: FilterConfiguration
 } => {
     const data = decompressFromEncodedURIComponent(component)
-    console.log('data', data)
     const parsedData = JSON.parse(data)
     return parsedData
 }

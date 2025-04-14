@@ -9,7 +9,11 @@ import { FilterTabs } from './pages/CustomizeFilterPage'
 import { DebugPage } from './pages/DebugPage'
 import { ParsePage } from './pages/ParsePage'
 import { useAlertStore } from './store/alerts'
-import { useSiteConfigStore } from './store/storeV2'
+import {
+    MigrateLegacyData,
+    requiresMigration,
+    useSiteConfigStore,
+} from './store/storeV2'
 import { MuiRsTheme } from './styles/MuiTheme'
 
 const Page: React.FC<{
@@ -51,6 +55,16 @@ const Page: React.FC<{
 }
 
 export const App = () => {
+    const doMigration = requiresMigration()
+    console.log('doMigration', doMigration)
+    if (doMigration) {
+        return (
+            <ThemeProvider theme={MuiRsTheme}>
+                <MigrateLegacyData />
+            </ThemeProvider>
+        )
+    }
+
     return (
         <ThemeProvider theme={MuiRsTheme}>
             <span style={{ display: 'none', fontFamily: 'RuneScape' }}>

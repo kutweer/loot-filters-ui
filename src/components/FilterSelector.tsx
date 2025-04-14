@@ -166,7 +166,6 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
 
     useEffect(() => {
         if (activeFilter != null && activeFilter.source != null) {
-            console.log('checking for updates')
             loadFilterFromUrl(activeFilter.source)
                 .then((newFilter) => {
                     setUpdatedFilter(newFilter)

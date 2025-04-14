@@ -27,7 +27,6 @@ export const parseInput = (
 
     // Macro for input MUST be the next line after the input declaration
     const inputDefault: Rs2fDefine = parseDefine(lines[end], end)
-    console.log('inputDefault', inputDefault)
     const baseInput = {
         // ensure base input is correct - it should not have a default field - we define that in the macro only
         // This throws if the core input fields are incorrect
@@ -35,9 +34,7 @@ export const parseInput = (
         macroName: inputDefault.name,
         default: inputDefault.type === 'null' ? undefined : inputDefault.value,
     }
-    console.log('baseInput input', baseInput)
     const input = InputSpec.parse(baseInput)
-    console.log('input', input)
 
     // validate the input with a default field; to check that the default field is correct
     switch (input.type as unknown as string) {

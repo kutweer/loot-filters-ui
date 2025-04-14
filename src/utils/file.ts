@@ -13,3 +13,18 @@ export const downloadFile = (file: File) => {
         document.body.removeChild(link)
     }
 }
+
+const keys = [
+    'background-image-selected',
+    'filter-store',
+    'modular-filter-storage',
+    'filter-configuration-store',
+    'modular-filter-storage-migrated',
+]
+export const localState = () => {
+    return Object.fromEntries(
+        keys.map((key) => {
+            return [key, localStorage.getItem(key) ?? null]
+        })
+    )
+}

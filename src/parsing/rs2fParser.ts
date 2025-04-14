@@ -94,9 +94,7 @@ const parseString = (valueStr: string): string => {
 }
 
 export const parseDefine = (line: string, lineNumber: number): Rs2fDefine => {
-    console.log('line', line)
     const match = line.match(/^#define\s+([A-Z0-9_]+)(\s+(.*))?$/)
-    console.log('match', match)
 
     if (!match) {
         throw new Error(

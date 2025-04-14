@@ -10,7 +10,6 @@ export const parseModule = (
 ): Module => {
     // start 1 further to remove the /*@ define stuff
     const wholeComment = lines.slice(start + 1, end).join('\n')
-    console.log('wholeComment\n', wholeComment)
     const declarationContent = wholeComment.substring(
         0,
         wholeComment.indexOf('*/')

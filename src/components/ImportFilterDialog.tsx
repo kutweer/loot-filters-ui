@@ -23,7 +23,7 @@ interface ImportFilterDialogProps {
 const FILTERSCAPE_FILTER =
     'https://raw.githubusercontent.com/riktenx/filterscape/refs/heads/migrate/filterscape.rs2f'
 const JOES_FILTER =
-    'https://github.com/typical-whack/loot-filters-modules/blob/migrate/filter.rs2f'
+    'https://raw.githubusercontent.com/typical-whack/loot-filters-modules/refs/heads/migrate/filter.rs2f'
 
 export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
     open,

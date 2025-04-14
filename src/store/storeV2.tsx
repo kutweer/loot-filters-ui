@@ -1,8 +1,93 @@
+import { CircularProgress, Typography } from '@mui/material'
 import { isObject } from 'underscore'
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 import { Filter, FilterConfiguration } from '../parsing/UiTypesSpec'
 import { SiteConfig } from '../types/SiteConfig'
+import { loadFilterFromUrl } from '../utils/loaderv2'
+
+const filterUrls: Record<string, string> = {
+    'riktenx:filterscape':
+        'https://raw.githubusercontent.com/riktenx/filterscape/refs/heads/migrate/filterscape.rs2f',
+    'typical-whack:loot-filters-modules':
+        'https://raw.githubusercontent.com/typical-whack/loot-filters-modules/refs/heads/migrate/filter.rs2f',
+}
+
+export const requiresMigration = () => {
+    const migrated = localStorage.getItem('modular-filter-storage-migrated')
+    if (migrated === 'true') {
+        return false
+    }
+
+    const data = localStorage.getItem('modular-filter-storage')
+    if (!data) {
+        localStorage.setItem('modular-filter-storage-migrated', 'true')
+        return false
+    }
+
+    return true
+}
+
+export const MigrateLegacyData: React.FC = () => {
+    const { setFilterConfiguration } = useFilterConfigStore()
+    const { updateFilter } = useFilterStore()
+
+    const data = localStorage.getItem('modular-filter-storage')!!
+    const legacyData = JSON.parse(data).state
+
+    Object.values(legacyData.importedModularFilters).forEach(
+        ({ id, name, active, source: { owner, repo } }: any, index: number) => {
+            const url = filterUrls[`${owner}:${repo}`]
+            if (!url) {
+                return
+            }
+
+            const configs = legacyData.filterConfigurations[id] ?? {}
+            loadFilterFromUrl(url)
+                .then((filter) => {
+                    updateFilter({ ...filter, id: id, name, active })
+                    setFilterConfiguration(id, configs)
+                    if (
+                        index ===
+                        Object.values(legacyData.importedModularFilters)
+                            .length -
+                            1
+                    ) {
+                        localStorage.setItem(
+                            'modular-filter-storage-migrated',
+                            'true'
+                        )
+                        setTimeout(() => {
+                            window.location.reload()
+                        }, 2000)
+                    }
+                })
+                .catch((error) => {
+                    console.error(error)
+                })
+        }
+    )
+    return (
+        <div
+            style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh',
+            }}
+        >
+            <div>
+                <Typography variant="h6" color="primary">
+                    Legacy data detected, migrating...
+                    <CircularProgress />
+                </Typography>
+                <Typography variant="h6" color="primary">
+                    Page will reload when done.
+                </Typography>
+            </div>
+        </div>
+    )
+}
 
 interface SiteConfigStoreState {
     siteConfig: SiteConfig

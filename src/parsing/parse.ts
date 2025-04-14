@@ -56,7 +56,6 @@ export const parse = async (filter: string) => {
         try {
             const line = lines[comment.start]
             const declaration = parseDeclaration(line.slice(3).trim())
-            console.log('declaration', declaration)
             switch (declaration.type) {
                 case 'module':
                     modulesById[declaration.id] = parseModule(
