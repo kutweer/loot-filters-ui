@@ -51,6 +51,7 @@ const ColorPicker: React.FC<{
         const argbColor = rGBColorToArgbHex(newColor)
         setInputTextState(argbColor)
         onChange(argbColor)
+        setInputTextState(argbColor)
     }
 
     const [inputTextState, setInputTextState] = useState<string>(
