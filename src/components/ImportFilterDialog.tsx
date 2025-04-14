@@ -21,7 +21,7 @@ interface ImportFilterDialogProps {
 }
 
 const FILTERSCAPE_FILTER =
-    'https://raw.githubusercontent.com/riktenx/filterscape/refs/heads/main/filterscape.rs2f'
+    'https://raw.githubusercontent.com/riktenx/filterscape/refs/heads/main/filter.rs2f'
 const JOES_FILTER =
     'https://raw.githubusercontent.com/typical-whack/loot-filters-modules/refs/heads/main/filter.rs2f'
 
