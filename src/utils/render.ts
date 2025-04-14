@@ -19,7 +19,9 @@ export const renderFilter = (
     })
 
     filterText = filterText.replace(/^meta\s*{([^}]*)}/, '')
-    filterText = `meta { name = \"${filter.name}\"; description = \"${filter.description}\"; }` + filterText
+    filterText =
+        `meta { name = \"${filter.name}\"; description = \"${filter.description}\"; }` +
+        filterText
 
     return filterText
 }
