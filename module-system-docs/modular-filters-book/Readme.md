@@ -31,20 +31,18 @@ Now you're ready for Chapter 2.
 
 In this chapter we're going to go from 0 filter - to something you can actually import into the loot-filters UI.
 
-## 2.1 Filter Json
+## 2.1 First steps
 
-[JSON](https://en.wikipedia.org/wiki/JSON) or `JavaScript Object Notation` is a way to structure data. It's the format we'll be using to configure the modular parts of our filter. The first `json` file we're going to need will be a file for our filter definition. Lets
-call it `filter.json`. The file should contain a json object with 3 fields `name` for the name of our filter, `description` a short description of your filter, and `modules` which will be a list of our modules. For now we'll just leave it as an empty list `[]`
+Create a file called `filter.rs2f`. For now, the file should contain just a rs2f [meta](https://github.com/riktenx/loot-filters/blob/userguide/filter-lang.md#the-meta-block) which sets the name and description of our filter.
 
-```json
-{
-    "name": "My Filter",
-    "description": "My first filter",
-    "modules": []
+```cpp
+meta {
+    name = "My Filter"
+    description = "My first filter"
 }
 ```
 
-That's it - you now, in the most technical sense, do have a 'modular filter'. It has no modules so it won't do anything. But it does exist. Lets save it, and push it up to GitHub.
+That's it - you now, in the most technical sense, do have a 'filter'. It has no modules inputs or filtering so it won't do anything. But it does exist. Lets save it, and push it up to GitHub.
 
 ## 2.2 GitHub, branches
 
@@ -58,107 +56,129 @@ If prompted to commit or push your changes to another branch; skip that we don't
 
 ## 2.3 Loading your filter for the first time
 
-Now that we have our file in the cloud we can load our filter in the UI. Browse to GitHub and open your file:
+Now that we have our file in the cloud we can load our filter in the UI. Browse to GitHub and open your file
 ![open file](./images/ch_2-open_file.png)
 
 Then with your file open; navigate to the 'raw' view of your file:
 ![open raw](./images/ch_2-open_raw.png)
 
-Copy the URL for this page and go to the [Loot Filters UI](https://loot-filters.kaqemeex.net/). Click the button to import a filter,
-and instead of choosing from the dropdown, paste your URL into the URL input:
+Copy the URL for this page and go to the [Loot Filters UI](https://loot-filters.kaqemeex.net/). Click the button to import a filter.
+Choose the import from URL option and, paste your URL into the URL input:
 ![import](./images/ch_2-import_filter.png)
 
 Now hit Import and your filter should load. As we said before, there are no modules so you can't do much in the UI at this point.
 But if all the steps have been followed correctly the filter should load, and be available in the `select a filter` dropdown.
 
-# Chapter 3: Adding a module
+# Chapter 3: Adding functionality
 
-In this chapter we're going to create and add our first module. It won't be super useful, but it will serve as a starting point for future modules we want to add. Like with the filter we'll end by importing it into the UI and being able to see our progress.
+In this chapter we're going to do add filter functionality, and connect it to the UI to make it configurable.
 
-## 3.1 Module JSON
+## 3.1 A list of items to hide
 
-In the modular filter system modules have 2 parts. First, an json file which defines which UI inputs we'll be able to configure, and a second `rs2f` file with the actual filter configuration in it. Lets start with the JSON. Add a new file called `my_module.json`.
-In that file put the following json structure.
-
-```json
-{
-    "name": "Hide Items",
-    "subtitle": "Hides all items",
-    "description": "My first module, its not much but it's mine",
-    "rs2fPath": "./my_module.rs2f",
-    "inputs": [
-        {
-            "type": "boolean",
-            "macroName": "VAR_SHOW_ITEMS",
-            "label": "Show Items",
-            "default": true
-        }
-    ]
-}
-```
-
-Every module has a few common parts, a `name` (required), a `subtitle` (optional), and a `descripton` (optional). These are used in the UI to give some context for a user as to what the moudule does. Then we have `inputs` this is where the magic happens. Each input we define in this list will create an interactable UI component that allows us to control the resulting filter code. In this case we have a `boolean` input which is a simple true / false configuration. In the UI this renders as a checkbox. It will render with the `label` we provide, and the default value will be whatever we put in `default`. We'll cover the `rs2f` in the next section.
-
-The `macroName` field is how the UI transfers this over to the rs2f filter, so lets dive into that next, we'll cover the choice of `VAR_SHOW_ITEMS` in the next section.
-
-## 3.2 RS2F
-
-Looping back to the `rs2f` field in the module json. `"rs2f": { "path": "./my_module.rs2f" }` this is how we tell the UI to find the `rs2f` file. In this case we're telling the UI that the `rs2f` file exists at a path relative (the `./` bit) to the `my_module.json` that was loaded, at a file named `my_module.rs2f`.
-
-Before we dive into the RS2F file content, if at any point you're confused about some syntax consult the [complete reference](https://github.com/riktenx/loot-filters/blob/userguide/filter-lang.md) which covers all the various features of the language.
-
-Here's the RS2F snippet we'll pair with the above module, put it in `my_module.rs2f`:
+Below the meta block lets add another section of rs2f.
 
 ```cpp
-#define VAR_SHOW_ITEMS
-apply (true) {
-    hidden=VAR_SHOW_ITEMS;
+#define VAR_ITEMS_TO_HIDE []
+
+if (name:VAR_ITEMS_TO_HIDE) {
+    hidden = true;
 }
 ```
 
-Breaking things down, lets start with the first line, `#define VAR_SHOW_ITEMS`.
+This rs2f will cause any item in the `VAR_ITEMS_TO_HIDE` list to be hidden, however the list is currently empty and not configurable by the UI. Lets change that. First we need to define a module. A module is a collection of inputs, the top level collapseable section you see in the UI.
 
-`#define` is a rs2f feature that creates a [macro](https://github.com/riktenx/loot-filters/blob/userguide/filter-lang.md#macros). A macro is a way for us to store something in one place, but re-use it in one or more other places. The module system takes advantage of this and uses macros as the connection point between the UI and the filter.
+Modules and inputs are defined using a structured comment syntax. Structured comments work like this:
 
-We define one macro per input, and then the UI populates them when you download the filter. This allows the UI to avoid doing anything complicated with your filter code, it just updates the macro definitions. If you look at the linked macro documentation you'll see that macros take 2 arguments an `identifier` our `VAR_SHOW_ITEMS` and a definition which we've left blank. Why did we leave it blank? Beacuse the UI will be creating the definition part for us, it's why we told it about the macro name in the input configuration.
+1. The first line must be `/*@ define:[module|input]:[identifier]` this defines what kind of content to expect in the rest of the comment.
+2. The body of the comment must be a valid YAML object with the appropriate fields for either an input or a module.
+3. Then the comment is closed with a `*/`
 
-The second line, `apply (true) {` applies the configuration inside the `{}` to all items, if we wanted to apply it to fewer things like only stacks of items greater than 1, we would change the condition from `true` to `quantity:>1`.
+For our first module the comment will look something like, you can put this anywhere between the `meta{}` block and the `#define`.
 
-The third line is `hidden=VAR_SHOW_ITEMS;` this line uses our macro to take the configuration provided by the UI, either `true` or `false` and pass it to the `hidden` property. Because we have no other conditions in this filter this will either hide all items, or show all items, depending on the configured value for our macro.
+```cpp
+/*@ define:module:my_first_module
+name: My First Module
+subtitle: A short phrase
+description: |
+    A long description; shown when the module is expanded.
 
-The fourth line `}` just closes the block for the apply.
+    Can use line breaks and markdown for formatting, including [links](http://google.com),
+    - lists
 
-## 3.3 Adding our module to our filter
+    # and various heading sizes
+*/
+```
 
-Now we need to update our filter to tell it about our module, we'll use the same relative path feature. The new `filter.json` should be:
+In this example we've created a module with the ID `my_first_module`, it's name is `My First Module` and it has a long description.
 
-```json
-{
-    "name": "My Filter",
-    "description": "My first filter",
-    "modules": [{ "modulePath": "my_module.json" }]
+Next we need to define an input for our list like so:
+
+```cpp
+/*@ define:input:my_first_module
+type: stringlist
+label: Items to Hide
+*/
+```
+
+This creates a `stringlist` input in the module `my_first_module`. This comment **must** be placed directly above the `#define` for our list. This is because the default value for our input will be pulled from that `#define VAR_ITEMS_TO_HIDE` declaration.
+
+Finally - lets update the value of that define to hide `ashes` default `#define VAR_ITEMS_TO_HIDE ["ashes"]`
+
+<details>
+<summary>
+You can check your work by comparing what you have to this example.
+</summary>
+
+```cpp
+meta {
+    name = "My Filter"
+    description = "My first filter"
+}
+/*@ define:module:my_first_module
+name: My First Module
+subtitle: A short phrase
+description: |
+    A long description; shown when the module is expanded.
+
+    Can use line breaks and markdown for formatting, including [links](http://google.com),
+    - lists
+
+    # and various heading sizes
+*/
+
+/*@ define:input:my_first_module
+type: stringlist
+label: Items To Hide
+*/
+#define VAR_ITEMS_TO_HIDE ["ashes"]
+
+if (name:VAR_ITEMS_TO_HIDE) {
+    hidden = true;
 }
 ```
 
-With all of that done you can commit & push like we did in step 2.3. Grab the new raw URL for the updated `filter.json` paste that into the import section in the UI and you should see something like this be loaded up:
+</details>
 
-![imported first filter](./images/ch_3-hide-items-module.png)
+## 3.2 Updating in the site
 
-Congratulations! You've built your first modular filter. From here it is all about applying the principals and patterns outlined in the first 3 chapters, to different kinds of inputs and RS2F configuration. Chapter 4 will go over each of the inputs, their configuration and how to use them. Chapter 5 will cover useful RS2F patterns or 'recipies' for getting certain kinds of results.
+You can commit and push this up to GitHub. Once the cache expires (can be a few minutes) when you refresh the filterscape site the `update` button will be enabled and you can press it to update your filter.
 
-# Chapter 4: Input Types
+You should now have a module, with a list input for hiding your items!
+
+# Chapter 4: Other inputs
+
+This section isn't linear, it covers the structured comments for all the supported input types
 
 ## 4.1: Boolean
 
 Boolean inputs are the simplest input type. They create a checkbox in the UI that toggles between true and false. They are configured like this:
 
-```json
-{
-    "type": "boolean",
-    "label": "Show Items",
-    "default": true,
-    "macroName": "VAR_SHOW_ITEMS"
-}
+```cpp
+/*@ define:input:module_id
+type: boolean
+label: A label
+*/
+#define VAR_MY_BOOL true
 ```
 
 ## 4.2: Number
@@ -166,17 +186,16 @@ Boolean inputs are the simplest input type. They create a checkbox in the UI tha
 Number inputs create a text box that only accepts whole integers. Here's how to configure a number input:
 
 ```json
-{
-    "type": "number",
-    "label": "Value Threshold",
-    "default": 5000,
-    "macroName": "VAR_VALUE_THRESHOLD"
-}
+/*@ define:input:module_id
+type: number
+label: A label
+*/
+#define VAR_MY_NUMBER 100
 ```
 
 ## 4.3: Lists
 
-There are different kinds of list inputs for different situations. Currently 3 are supported.
+There are different kinds of list inputs for different situations. Currently 2 are supported
 
 ### 4.3.1: EnumList
 
@@ -184,101 +203,38 @@ Provides a dropdown in the UI with a restricted set of options. The `enum` prope
 the `value` property is what will be rendered into the filter, the `label` property is a more nicely formated one for the UI to display in the dropdown.
 
 ```json
-{
-    "type": "enumlist",
-    "macroName": "VAR_HERB_SHOW",
-    "label": "Herbs to always show regardless of value",
-    "enum": [
-        { "value": "guam leaf", "label": "Guam Leaf" },
-        { "value": "marrentill", "label": "Marrentill" },
-        { "value": "tarromin", "label": "Tarromin" },
-        { "value": "harralander", "label": "Harralander" },
-        { "value": "ranarr weed", "label": "Ranarr Weed" },
-        { "value": "toadflax", "label": "Toadflax" },
-        { "value": "irit leaf", "label": "Irit Leaf" },
-        { "value": "avantoe", "label": "Avantoe" },
-        { "value": "kwuarm", "label": "Kwuarm" },
-        { "value": "huasca", "label": "Huasca" },
-        { "value": "snapdragon", "label": "Snapdragon" },
-        { "value": "cadantine", "label": "Cadantine" },
-        { "value": "lantadyme", "label": "Lantadyme" },
-        { "value": "dwarf weed", "label": "Dwarf Weed" },
-        { "value": "torstol", "label": "Torstol" }
-    ],
-    "default": []
-}
+/*@ define:input:module_id
+type: enumlist
+label: A label
+enum:
+    - value: ugly item name
+      label: Nice Item Name
+    - value: second item
+      label: Second Item
+*/
+#define VAR_MY_ENUM_LIST ["ugly item name"]
 ```
 
 ### 4.3.2: StringList
 
-Provides a dropdown in the UI where you can put in any number of strings
+Provides a dropdown in the UI where you can put in any number of strings.
 
-```json
-{
-    "type": "stringlist",
-    "macroName": "VAR_MY_STRINGS",
-    "label": "A list of strings",
-    "default": ["example-item"]
-}
-```
-
-### 4.3.3: IncludeExcludeList
-
-A specical input of paired lists, useful for times when you may want to allow both including and excluding values.
-
-```json
-{
-    "type": "includeExcludeList",
-    "macroName": {
-        "includes": "VAR_GENERAL_GRAARDOR_UNIQUES_SHOW",
-        "excludes": "VAR_GENERAL_GRAARDOR_UNIQUES_HIDE"
-    },
-    "label": "General Graardor uniques",
-    "default": {
-        "includes": [
-            "Bandos chestplate",
-            "Bandos tassets",
-            "Bandos boots",
-            "Bandos hilt"
-        ],
-        "excludes": []
-    }
-}
+```cpp
+/*@ define:input:module_id
+type: stringlist
+label: A label
+*/
+#define VAR_MY_STRING_LIST ["an item"]
 ```
 
 ## 4.4: Style
 
 An input that allows configuring all the available style options. All colors are in the `#AARRGGBB` alpha rgb format. For a more complete list of values see the [loot filter plugin docs](https://github.com/riktenx/loot-filters/blob/userguide/filter-lang.md#display-settings).
 
-```json
-{
-    "type": "style",
-    "label": "Style Input Test",
-    "macroName": "STYLE_INPUT_TEST",
-    "description": "A style input with no default values",
-    "default": {
-        "textColor": "#FFFFFFFF",
-        "backgroundColor": "#00000000",
-        "borderColor": "#FFFFFFFF",
-        "textAccent": 1,
-        "textAccentColor": "#FFFFFFFF",
-        "fontType": 1,
-        "showLootbeam": false,
-        "lootbeamColor": "#FFFFFFFF",
-        "showValue": false,
-        "showDespawn": false,
-        "notify": false,
-        "hideOverlay": false,
-        "highlightTile": false,
-        "menuTextColor": "#FFFFFFFF",
-        "tileStrokeColor": "#FFFFFFFF",
-        "tileFillColor": "#00000000",
-        "tileHighlightColor": "#FFFFFFFF"
-    },
-    "exampleItem": "Example item"
-}
+```cpp
+/*@ define:input:module_id
+type: style
+label: A label
+*/
+#define VAR_MY_STYLE textColor="#FFFFFFFF"
 ```
-
-# Chapter 5: Useful Patterns
-
-To Do.
