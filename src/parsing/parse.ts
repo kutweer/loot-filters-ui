@@ -125,10 +125,12 @@ export const parse = async (filter: string) => {
         }
     } catch (e) {
         return {
-            errors: [{
-                line: filter,
-                message: e,
-            }],
+            errors: [
+                {
+                    line: filter,
+                    message: e,
+                },
+            ],
             filter: undefined,
         }
     }
