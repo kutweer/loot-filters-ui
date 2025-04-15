@@ -40,8 +40,6 @@ export const DisplayConfigurationInput: React.FC<{
         .default({})
         .parse(config?.inputConfigs?.[input.macroName])
 
-    const { updateInputConfiguration } = useFilterConfigStore()
-
     const itemLabelColorPicker = (
         <Grid size={{ xs: 12, md: 12 }} sx={{ display: 'flex', padding: 1 }}>
             <ItemLabelColorPicker

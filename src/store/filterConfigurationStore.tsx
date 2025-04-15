@@ -5,11 +5,6 @@ import { FilterConfiguration } from '../parsing/UiTypesSpec'
 
 export interface FilterConfigurationStoreState {
     filterConfigurations: Record<string, FilterConfiguration>
-    updateInputConfiguration: (
-        filterId: string,
-        macroName: string,
-        value: any
-    ) => void
     setFilterConfiguration: (
         filterId: string,
         filterConfiguration: FilterConfiguration
@@ -73,33 +68,6 @@ export const useFilterConfigStore = create<FilterConfigurationStoreState>()(
                                             ([key]) => !macroNames.includes(key)
                                         )
                                     ),
-                                },
-                            },
-                        }
-                    }),
-                updateInputConfiguration: (filterId, macroName, value) =>
-                    set((state) => {
-                        const existingConf =
-                            state.filterConfigurations[filterId]
-                                ?.inputConfigs?.[macroName]
-
-                        const newConf = isObject(value)
-                            ? {
-                                  ...(existingConf ?? {}),
-                                  ...value,
-                              }
-                            : value
-
-                        return {
-                            filterConfigurations: {
-                                ...state.filterConfigurations,
-                                [filterId]: {
-                                    ...state.filterConfigurations[filterId],
-                                    inputConfigs: {
-                                        ...(state.filterConfigurations[filterId]
-                                            ?.inputConfigs ?? {}),
-                                        [macroName]: newConf,
-                                    },
                                 },
                             },
                         }

@@ -18,7 +18,7 @@ import {
     useMediaQuery,
 } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import { groupBy } from 'underscore'
+import { groupBy, isObject } from 'underscore'
 import { colors, MuiRsTheme } from '../../styles/MuiTheme'
 
 import { ExpandLess } from '@mui/icons-material'
@@ -461,13 +461,30 @@ const ModuleSection: React.FC<{
                                                                 value,
                                                                 macroName
                                                             ) => {
+                                                                const existingValue =
+                                                                    config
+                                                                        .inputConfigs[
+                                                                        macroName
+                                                                    ]
+
+                                                                const newConf =
+                                                                    isObject(
+                                                                        value
+                                                                    )
+                                                                        ? {
+                                                                              ...(existingValue ??
+                                                                                  {}),
+                                                                              ...value,
+                                                                          }
+                                                                        : value
+
                                                                 onChange({
                                                                     ...config,
                                                                     inputConfigs:
                                                                         {
                                                                             ...config.inputConfigs,
                                                                             [macroName]:
-                                                                                value,
+                                                                                newConf,
                                                                         },
                                                                 })
                                                             }}

@@ -108,12 +108,8 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
     const { filters, removeFilter, setActiveFilter, updateFilter } =
         useFilterStore()
 
-    const {
-        filterConfigurations,
-        updateInputConfiguration,
-        setFilterConfiguration,
-        removeFilterConfiguration,
-    } = useFilterConfigStore()
+    const { setFilterConfiguration, removeFilterConfiguration } =
+        useFilterConfigStore()
 
     const [importDialogOpen, setImportDialogOpen] = useState(
         Object.keys(filters).length === 0
