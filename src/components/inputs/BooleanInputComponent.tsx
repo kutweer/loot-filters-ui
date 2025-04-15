@@ -6,7 +6,7 @@ import {
 } from '../../parsing/UiTypesSpec'
 
 export const BooleanInputComponent: React.FC<{
-        input: BooleanInput
+    input: BooleanInput
     config: FilterConfiguration
     onChange: (boolean: boolean) => void
     readonly: boolean

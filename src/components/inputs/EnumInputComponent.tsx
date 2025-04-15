@@ -19,7 +19,6 @@ export const EnumInputComponent: React.FC<{
     onChange: (diff: ListDiff) => void
     readonly: boolean
 }> = ({ input, config, onChange, readonly }) => {
-
     const configuredDiff = ListDiffSpec.optional()
         .default(EMPTY_DIFF)
         .parse(config?.inputConfigs?.[input.macroName])

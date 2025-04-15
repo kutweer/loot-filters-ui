@@ -107,7 +107,9 @@ export const DisplayConfigurationInput: React.FC<{
                     checked={
                         styleConfig.showDespawn ?? input.default?.showDespawn
                     }
-                    onChange={(e) => onChange({ showDespawn: e.target.checked })}
+                    onChange={(e) =>
+                        onChange({ showDespawn: e.target.checked })
+                    }
                 />
             }
         />
@@ -133,7 +135,9 @@ export const DisplayConfigurationInput: React.FC<{
                     checked={
                         styleConfig.hideOverlay ?? input.default?.hideOverlay
                     }
-                    onChange={(e) => onChange({ hideOverlay: e.target.checked })}
+                    onChange={(e) =>
+                        onChange({ hideOverlay: e.target.checked })
+                    }
                 />
             }
         />
@@ -149,7 +153,9 @@ export const DisplayConfigurationInput: React.FC<{
                             styleConfig.highlightTile ??
                             input.default?.highlightTile
                         }
-                        onChange={(e) => onChange({ highlightTile: e.target.checked })}
+                        onChange={(e) =>
+                            onChange({ highlightTile: e.target.checked })
+                        }
                     />
                 }
             />
