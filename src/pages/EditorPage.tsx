@@ -150,16 +150,6 @@ export const EditorPage = () => {
         debouncedParse(editorContent)
     }, [editorContent])
 
-    useEffect(() => {
-        if (!editorContent) {
-            fetch(url)
-                .then((res) => res.text())
-                .then((content) => {
-                    setEditorContent(content)
-                })
-        }
-    }, [editorContent, url])
-
     return (
         <ErrorBoundary>
             <div
