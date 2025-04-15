@@ -11,22 +11,22 @@ import {
     TextInputSpec,
 } from './UiTypesSpec'
 import { parseDefine, Rs2fDefine } from './rs2fParser'
+import { TokenStream } from './tokenstream'
 
 export const parseInput = (
     moduleId: string,
-    lines: string[],
-    start: number,
-    end: number
+    comment: string,
+    define: TokenStream
 ): { moduleId: string; input: Input } => {
-    // start 1 further to remove the /*@ define stuff
-    const wholeComment = lines.slice(start + 1, end).join('\n')
-    const declarationContent = wholeComment.substring(
-        0,
-        wholeComment.indexOf('*/')
+    const declarationContent = comment.substring(
+        comment.indexOf('\n'), // chop the structured declaration
+        comment.indexOf('*/')
     )
 
-    // Macro for input MUST be the next line after the input declaration
-    const inputDefault: Rs2fDefine = parseDefine(lines[end], end)
+    // FUTURE: actually consume the token stream in parseDefine
+    const line = define.peek()!!.location!!.line
+    const inputDefault: Rs2fDefine = parseDefine(define.toString(), line)
+
     const baseInput = {
         // ensure base input is correct - it should not have a default field - we define that in the macro only
         // This throws if the core input fields are incorrect

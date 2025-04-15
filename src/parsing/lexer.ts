@@ -40,7 +40,7 @@ export class Lexer {
     private cChar: number = 1
 
     constructor(input: string) {
-        this.input = input
+        this.input = input.replaceAll('\r', '') // fuck windows
     }
 
     tokenize(): Token[] {
