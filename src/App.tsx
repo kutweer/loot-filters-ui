@@ -7,7 +7,7 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { FilterSelector } from './components/FilterSelector'
 import { FilterTabs } from './pages/CustomizeFilterPage'
 import { DebugPage } from './pages/DebugPage'
-import { EditorPage } from './pages/ParsePage'
+import { EditorPage } from './pages/EditorPage'
 import { useAlertStore } from './store/alerts'
 import {
     MigrateLegacyData,
