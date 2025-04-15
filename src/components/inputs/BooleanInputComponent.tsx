@@ -4,7 +4,7 @@ import {
     BooleanInputDefaultSpec,
     FilterId,
 } from '../../parsing/UiTypesSpec'
-import { useFilterConfigStore } from '../../store/storeV2'
+import { useFilterConfigStore } from '../../store/filterConfigurationStore'
 
 export const BooleanInputComponent: React.FC<{
     activeFilterId: FilterId

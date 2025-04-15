@@ -11,8 +11,8 @@ import {
     Typography,
 } from '@mui/material'
 import React, { useState } from 'react'
+import { useFilterStore } from '../store/filterStore'
 import { useOboardingStore } from '../store/onboarding'
-import { useFilterStore } from '../store/storeV2'
 import { loadFilterFromUrl } from '../utils/loaderv2'
 
 interface ImportFilterDialogProps {

@@ -11,11 +11,9 @@ import {
 } from '@mui/material'
 import React, { useState } from 'react'
 import { Module, StyleConfigSpec, StyleInput } from '../../parsing/UiTypesSpec'
-import {
-    useFilterConfigStore,
-    useFilterStore,
-    useSiteConfigStore,
-} from '../../store/storeV2'
+import { useFilterConfigStore } from '../../store/filterConfigurationStore'
+import { useFilterStore } from '../../store/filterStore'
+import { useSiteConfigStore } from '../../store/siteConfigStore'
 import { colors } from '../../styles/MuiTheme'
 import { ArgbHexColor } from '../../utils/Color'
 import { ItemLabelPreview, ItemMenuPreview } from '../Previews'
