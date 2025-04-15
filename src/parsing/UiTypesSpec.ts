@@ -135,15 +135,10 @@ export const DEFAULT_FILTER_CONFIGURATION = {
     enabledModules: {},
     inputConfigs: {},
 }
-export const FilterConfigurationSpec = z
-    .object({
-        enabledModules: z
-            .record(z.string(), z.boolean())
-            .optional()
-            .default({}),
-        inputConfigs: z.record(z.string(), z.any()).optional().default({}),
-    })
-
+export const FilterConfigurationSpec = z.object({
+    enabledModules: z.record(z.string(), z.boolean()).optional().default({}),
+    inputConfigs: z.record(z.string(), z.any()).optional().default({}),
+})
 
 export type FilterConfiguration = z.infer<typeof FilterConfigurationSpec>
 
