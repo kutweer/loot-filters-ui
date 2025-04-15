@@ -1,5 +1,5 @@
 import { generateId } from '../utils/idgen'
-import { FilterSpec, Module } from './UiTypesSpec'
+import { Filter, FilterSpec, Module } from './UiTypesSpec'
 import { parseInput } from './parseInput'
 import { parseModule } from './parseModule'
 import { parseMetaDescription, parseMetaName } from './rs2fParser'
@@ -44,14 +44,19 @@ const extractStructuredComments = (
     return structuredComments
 }
 
-export const parse = async (filter: string) => {
+export type ParseResult = {
+    errors?: Array<{ line: string; error: Error }>
+    filter?: Filter
+}
+
+export const parse = async (filter: string): Promise<ParseResult> => {
     // Remove escaped newlines before any other processing
     const lines = filter.replace(/\\\n\s*/g, '').split('\n')
 
     const modulesById: Record<string, Module> = {}
     const structuredComments = extractStructuredComments(lines)
 
-    const errors = []
+    const errors: { line: string; error: Error }[] = []
 
     for (const comment of structuredComments) {
         try {
@@ -85,7 +90,7 @@ export const parse = async (filter: string) => {
         } catch (e) {
             errors.push({
                 line: lines.slice(comment.start, comment.end).join('\n'),
-                message: e,
+                error: e as Error,
             })
         }
     }
@@ -128,7 +133,7 @@ export const parse = async (filter: string) => {
             errors: [
                 {
                     line: filter,
-                    message: e,
+                    error: e as Error,
                 },
             ],
             filter: undefined,
