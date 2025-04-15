@@ -10,16 +10,13 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { CustomizeTab } from '../components/tabs/CustomizeTab'
 import {
     DEFAULT_FILTER_CONFIGURATION,
-    Filter,
     FilterConfiguration,
 } from '../parsing/UiTypesSpec'
 import { parse, ParseResult } from '../parsing/parse'
 import { useFilterConfigStore } from '../store/filterConfigurationStore'
 import { useFilterStore } from '../store/filterStore'
-import { useSiteConfigStore } from '../store/siteConfig'
 import { colors } from '../styles/MuiTheme'
 import { parseComponent } from '../utils/link'
-import { DEFAULT_CONFIG } from 'ts-json-schema-generator'
 
 export const ImportPage: React.FC = () => {
     const [searchParams] = useSearchParams()
@@ -156,7 +153,7 @@ export const ImportPage: React.FC = () => {
                             variant="body2"
                             fontSize={24}
                         >
-                            Check out the modules below. If you'd like to impor
+                            Check out the modules below. If you'd like to import
                             this filter and customize it, press import on the
                             right.
                         </Typography>
