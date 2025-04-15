@@ -1,6 +1,8 @@
 import {
     EnumListInput,
+    FilterConfiguration,
     FilterId,
+    ListDiff,
     ListDiffSpec,
 } from '../../parsing/UiTypesSpec'
 import { useFilterConfigStore } from '../../store/filterConfigurationStore'
@@ -12,19 +14,15 @@ import {
 import { Option, UISelect } from './UISelect'
 
 export const EnumInputComponent: React.FC<{
-    activeFilterId: FilterId
     input: EnumListInput
-}> = ({ activeFilterId, input }) => {
-    const activeConfig = useFilterConfigStore(
-        (state) => state.filterConfigurations[activeFilterId]
-    )
-    const updateInputConfiguration = useFilterConfigStore(
-        (state) => state.updateInputConfiguration
-    )
+    config: FilterConfiguration
+    onChange: (diff: ListDiff) => void
+    readonly: boolean
+}> = ({ input, config, onChange, readonly }) => {
 
     const configuredDiff = ListDiffSpec.optional()
         .default(EMPTY_DIFF)
-        .parse(activeConfig?.inputConfigs?.[input.macroName])
+        .parse(config?.inputConfigs?.[input.macroName])
 
     const currentSetting = applyDiff(input.default, configuredDiff)
 
@@ -55,12 +53,11 @@ export const EnumInputComponent: React.FC<{
 
     return (
         <UISelect<string>
+            disabled={readonly}
             options={options}
             value={selectedOptions}
             onChange={(newValue: Option<string>[] | null) => {
-                updateInputConfiguration(
-                    activeFilterId,
-                    input.macroName,
+                onChange(
                     convertToListDiff(
                         newValue ? newValue.map((option) => option.value) : [],
                         input.default

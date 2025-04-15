@@ -2,31 +2,26 @@ import { Checkbox } from '@mui/material'
 import {
     BooleanInput,
     BooleanInputDefaultSpec,
-    FilterId,
+    FilterConfiguration,
 } from '../../parsing/UiTypesSpec'
-import { useFilterConfigStore } from '../../store/filterConfigurationStore'
 
 export const BooleanInputComponent: React.FC<{
-    activeFilterId: FilterId
-    input: BooleanInput
-}> = ({ activeFilterId, input }) => {
-    const activeConfig = useFilterConfigStore(
-        (state) => state.filterConfigurations[activeFilterId]
-    )
-    const updateInputConfiguration = useFilterConfigStore(
-        (state) => state.updateInputConfiguration
-    )
-
+        input: BooleanInput
+    config: FilterConfiguration
+    onChange: (boolean: boolean) => void
+    readonly: boolean
+}> = ({ input, config, onChange, readonly }) => {
     const currentSetting = BooleanInputDefaultSpec.parse(
-        activeConfig?.inputConfigs?.[input.macroName]
+        config?.inputConfigs?.[input.macroName]
     )
 
     return (
         <Checkbox
+            disabled={readonly}
             checked={currentSetting}
             onChange={(event) => {
                 const value = event.target.checked
-                updateInputConfiguration(activeFilterId, input.macroName, value)
+                onChange(value)
             }}
         />
     )

@@ -1,25 +1,17 @@
 import { TextField } from '@mui/material'
 import {
-    FilterId,
+    FilterConfiguration,
     NumberInput,
     NumberInputDefaultSpec,
 } from '../../parsing/UiTypesSpec'
-import { useFilterConfigStore } from '../../store/filterConfigurationStore'
 
 export const NumberInputComponent: React.FC<{
-    activeFilterId: FilterId
+    config: FilterConfiguration
     input: NumberInput
-}> = ({ activeFilterId, input }) => {
-    const activeConfigValue = useFilterConfigStore(
-        (state) =>
-            state.filterConfigurations[activeFilterId]?.inputConfigs?.[
-                input.macroName
-            ]
-    )
-
-    const updateInputConfiguration = useFilterConfigStore(
-        (state) => state.updateInputConfiguration
-    )
+    readonly: boolean
+    onChange: (number: number) => void
+}> = ({ config, input, readonly, onChange }) => {
+    const activeConfigValue = config?.inputConfigs?.[input.macroName]
 
     const userConfigValue =
         activeConfigValue || activeConfigValue === 0
@@ -30,15 +22,12 @@ export const NumberInputComponent: React.FC<{
 
     return (
         <TextField
+            disabled={readonly}
             type="number"
             value={currentSetting}
             onChange={(event) => {
                 const value = event.target.value
-                updateInputConfiguration(
-                    activeFilterId,
-                    input.macroName,
-                    parseInt(value)
-                )
+                onChange(parseInt(value))
             }}
         />
     )

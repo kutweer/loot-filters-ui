@@ -17,14 +17,18 @@ import {
     Typography,
     useMediaQuery,
 } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { groupBy } from 'underscore'
 import { colors, MuiRsTheme } from '../../styles/MuiTheme'
 
+import { ExpandLess } from '@mui/icons-material'
 import SettingsIcon from '@mui/icons-material/Settings'
 import {
     BooleanInput,
     EnumListInput,
+    Filter,
+    FilterConfiguration,
+    FilterConfigurationSpec,
     FilterId,
     Input,
     Module,
@@ -39,6 +43,7 @@ import { useFilterStore } from '../../store/filterStore'
 import { useSiteConfigStore } from '../../store/siteConfigStore'
 import { isConfigEmpty } from '../../utils/configUtils'
 import { generateId } from '../../utils/idgen'
+import { BackgroundSelector } from '../BackgroundSelector'
 import { GitHubFlavoredMarkdown } from '../GitHubFlavoredMarkdown'
 import { BooleanInputComponent } from '../inputs/BooleanInputComponent'
 import { DisplayConfigurationInput } from '../inputs/DisplayConfigurationInput'
@@ -49,44 +54,67 @@ import { TextInputComponent } from '../inputs/TextInputComponent'
 import { ItemLabelPreview } from '../Previews'
 
 const InputComponent: React.FC<{
-    activeFilterId: FilterId
+    config: FilterConfiguration
     module: Module
     input: Input
-}> = ({ activeFilterId, module, input }) => {
+    readonly: boolean
+    persist: (value: any, macroName: string) => void
+}> = ({ config, module, input, readonly, persist }) => {
     switch (input.type) {
         case 'number':
             const numberInput = input as NumberInput
             return (
                 <NumberInputComponent
-                    activeFilterId={activeFilterId}
+                    config={config}
                     input={numberInput}
+                    readonly={readonly}
+                    onChange={(value) => {
+                        persist(value, input.macroName)
+                    }}
                 />
             )
         case 'boolean':
             return (
                 <BooleanInputComponent
-                    activeFilterId={activeFilterId}
                     input={input as BooleanInput}
+                    config={config}
+                    readonly={readonly}
+                    onChange={(value) => {
+                        persist(value, input.macroName)
+                    }}
                 />
             )
         case 'enumlist':
             const enumListInput = input as EnumListInput
             return (
                 <EnumInputComponent
-                    activeFilterId={activeFilterId}
+                    config={config}
                     input={enumListInput}
+                    readonly={readonly}
+                    onChange={(diff) => {
+                        persist(diff, input.macroName)
+                    }}
                 />
             )
         case 'stringlist':
             return (
                 <StringListInputComponent
-                    activeFilterId={activeFilterId}
+                    config={config}
                     input={input as StringListInput}
+                    readonly={readonly}
+                    onChange={(diff) => {
+                        persist(diff, input.macroName)
+                    }}
                 />
             )
         case 'style':
             return (
                 <DisplayConfigurationInput
+                    config={config}
+                    onChange={(style) => {
+                        persist(style, input.macroName)
+                    }}
+                    readonly={readonly}
                     module={module}
                     input={input as StyleInput}
                 />
@@ -95,8 +123,12 @@ const InputComponent: React.FC<{
             const textInput = input as TextInput
             return (
                 <TextInputComponent
-                    activeFilterId={activeFilterId}
+                    config={config}
                     input={textInput}
+                    readonly={readonly}
+                    onChange={(str) => {
+                        persist(str, input.macroName)
+                    }}
                 />
             )
         default:
@@ -159,19 +191,28 @@ const ModuleSection: React.FC<{
     expanded: boolean
     setExpanded: (expanded: boolean) => void
     module: Module
-}> = ({ activeFilterId, expanded, setExpanded, module }) => {
+
+    config: FilterConfiguration
+    onChange: (config: FilterConfiguration) => void
+    clearConfiguration: (filterId: FilterId, macroNames: string[]) => void
+    setEnabledModule: (
+        filterId: FilterId,
+        moduleId: string,
+        enabled: boolean
+    ) => void
+}> = ({
+    activeFilterId,
+    expanded,
+    setExpanded,
+    module,
+    config,
+    onChange,
+    clearConfiguration,
+    setEnabledModule,
+}) => {
     const { siteConfig } = useSiteConfigStore()
     const [showJson, setShowJson] = useState<'json' | 'configJson' | 'none'>(
         'none'
-    )
-    const activeConfig = useFilterConfigStore(
-        (state) => state.filterConfigurations?.[activeFilterId]
-    )
-    const clearConfiguration = useFilterConfigStore(
-        (state) => state.clearConfiguration
-    )
-    const setEnabledModule = useFilterConfigStore(
-        (state) => state.setEnabledModule
     )
 
     let json: string | null = null
@@ -179,7 +220,7 @@ const ModuleSection: React.FC<{
 
     if (siteConfig.devMode) {
         json = JSON.stringify(module, null, 2)
-        configJson = JSON.stringify(activeConfig, null, 2)
+        configJson = JSON.stringify(config, null, 2)
     }
 
     const defaultGroupId = generateId()
@@ -194,29 +235,18 @@ const ModuleSection: React.FC<{
 
     const moduleEnabledDefaultValue = module.enabled
 
-    const configuredEnableValue = useFilterConfigStore(
-        (state) =>
-            state.filterConfigurations?.[activeFilterId]?.enabledModules?.[
-                module.id
-            ]
-    )
-
+    const configuredEnableValue =
+        config.inputConfigs?.enabledModules?.[module.id]
     const enabled = configuredEnableValue ?? moduleEnabledDefaultValue
 
     const showPreviews = useMediaQuery(MuiRsTheme.breakpoints.up('sm'))
     const previews = getPreviews({ module })
 
-    const filterConfig =
-        useFilterConfigStore(
-            (state) =>
-                state.filterConfigurations?.[activeFilterId]?.inputConfigs
-        ) || {}
-
     const moduleMacronames = module.inputs.map((input) => input.macroName)
 
-    const configCount = Object.keys(filterConfig)
+    const configCount = Object.keys(config)
         .filter((macroName) => moduleMacronames.includes(macroName))
-        .filter((key) => !isConfigEmpty(filterConfig[key])).length
+        .filter((key) => !isConfigEmpty(config?.inputConfigs?.[key])).length
 
     const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
     return (
@@ -422,11 +452,24 @@ const ModuleSection: React.FC<{
                                                             {input.label}
                                                         </Typography>
                                                         <InputComponent
-                                                            activeFilterId={
-                                                                activeFilterId
-                                                            }
+                                                            config={config}
                                                             module={module}
                                                             input={input}
+                                                            readonly={false}
+                                                            persist={(
+                                                                value,
+                                                                macroName
+                                                            ) => {
+                                                                onChange({
+                                                                    ...config,
+                                                                    inputConfigs:
+                                                                        {
+                                                                            ...config.inputConfigs,
+                                                                            [macroName]:
+                                                                                value,
+                                                                        },
+                                                                })
+                                                            }}
                                                         />
                                                     </Grid2>
                                                 )
@@ -442,27 +485,40 @@ const ModuleSection: React.FC<{
     )
 }
 
-export const CustomizeTab: React.FC = () => {
+export const CustomizeTab: React.FC<{
+    filter: Filter | null
+    config: FilterConfiguration | null
+    onChange: (config: FilterConfiguration) => void
+    clearConfiguration: (filterId: FilterId, macroNames: string[]) => void
+    setEnabledModule: (
+        filterId: FilterId,
+        moduleId: string,
+        enabled: boolean
+    ) => void
+    extraComponent?: React.ReactNode
+}> = ({
+    filter,
+    config,
+    onChange,
+    clearConfiguration,
+    setEnabledModule,
+    extraComponent,
+}) => {
+    console.log('CustomizeTab:config', config)
     const { siteConfig } = useSiteConfigStore()
-    const importedModularFilters = useFilterStore((state) => state.filters)
     const [expandedModules, setExpandedModules] = useState<
         Record<string, boolean>
     >({})
 
-    const activeFilter = useFilterStore((state) =>
-        Object.values(state.filters).find((filter) => filter.active)
-    )
-
     const setAllExpanded = (expanded: boolean) => {
-        if (!activeFilter) return
         const newExpandedModules: Record<string, boolean> = {}
-        activeFilter.modules.forEach((module) => {
+        filter?.modules.forEach((module) => {
             newExpandedModules[module.name] = expanded
         })
         setExpandedModules(newExpandedModules)
     }
 
-    React.useEffect(() => {
+    useEffect(() => {
         const handleExpandAll = (event: CustomEvent) => {
             setAllExpanded(event.detail)
         }
@@ -474,9 +530,9 @@ export const CustomizeTab: React.FC = () => {
                 handleExpandAll as EventListener
             )
         }
-    }, [activeFilter])
+    }, [filter])
 
-    if (!activeFilter) {
+    if (!filter) {
         return (
             <Typography variant="h4" color="primary">
                 No filter selected
@@ -485,24 +541,72 @@ export const CustomizeTab: React.FC = () => {
     }
 
     return (
-        <Stack>
-            {activeFilter?.modules.map((module, index: number) => (
-                <ModuleSection
-                    key={index}
-                    activeFilterId={activeFilter.id}
-                    module={module}
-                    expanded={
-                        expandedModules[module.name] ??
-                        (false || siteConfig.devMode)
-                    }
-                    setExpanded={(expanded) =>
-                        setExpandedModules((prev) => ({
-                            ...prev,
-                            [module.name]: expanded,
-                        }))
-                    }
-                />
-            ))}
-        </Stack>
+        <div>
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+                {extraComponent}
+                <div
+                    style={{
+                        marginLeft: 'auto',
+                        display: 'flex',
+                        flexDirection: 'row',
+                        gap: '1rem',
+                        alignItems: 'center',
+                    }}
+                >
+                    <BackgroundSelector />
+                    <ToggleButtonGroup
+                        size="small"
+                        exclusive={false}
+                        sx={{ height: 'fit-content' }}
+                    >
+                        <ToggleButton
+                            value="expand"
+                            onClick={() => {
+                                const event = new CustomEvent('expandAll', {
+                                    detail: true,
+                                })
+                                window.dispatchEvent(event)
+                            }}
+                        >
+                            <ExpandMore />
+                        </ToggleButton>
+                        <ToggleButton
+                            value="collapse"
+                            onClick={() => {
+                                const event = new CustomEvent('expandAll', {
+                                    detail: false,
+                                })
+                                window.dispatchEvent(event)
+                            }}
+                        >
+                            <ExpandLess />
+                        </ToggleButton>
+                    </ToggleButtonGroup>
+                </div>
+            </div>
+            <Stack>
+                {filter?.modules.map((module, index: number) => (
+                    <ModuleSection
+                        key={index}
+                        activeFilterId={filter.id}
+                        module={module}
+                        config={config ?? FilterConfigurationSpec.parse(null)}
+                        onChange={onChange}
+                        clearConfiguration={clearConfiguration}
+                        setEnabledModule={setEnabledModule}
+                        expanded={
+                            expandedModules[module.name] ??
+                            (false || siteConfig.devMode)
+                        }
+                        setExpanded={(expanded) =>
+                            setExpandedModules((prev) => ({
+                                ...prev,
+                                [module.name]: expanded,
+                            }))
+                        }
+                    />
+                ))}
+            </Stack>
+        </div>
     )
 }

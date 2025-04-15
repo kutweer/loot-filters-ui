@@ -1,5 +1,5 @@
 import { Divider } from '@mui/material'
-import { StyleConfig, StyleInput } from '../../parsing/UiTypesSpec'
+import { FilterConfiguration, StyleConfig, StyleInput } from '../../parsing/UiTypesSpec'
 import { useFilterConfigStore } from '../../store/filterConfigurationStore'
 import { useFilterStore } from '../../store/filterStore'
 import { colors } from '../../styles/MuiTheme'
@@ -17,39 +17,30 @@ import { ColorPickerInput } from './ColorPicker'
 import { Option, UISelect } from './UISelect'
 
 export const ItemLabelColorPicker: React.FC<{
+    config: FilterConfiguration
+    onChange: (style: StyleConfig) => void
+    readonly: boolean
     input: StyleInput
+
     itemName?: string
     showExamples?: boolean
     labelLocation?: 'right' | 'bottom'
 }> = ({
     input,
+    config,
+    onChange,
+    readonly,
     itemName = 'Example',
     showExamples = true,
     labelLocation = 'bottom',
 }) => {
-    const activeFilterId = useFilterStore(
-        (state) =>
-            Object.keys(state.filters).find((id) => state.filters[id].active)!!
-    )
-
-    const activeConfig = useFilterConfigStore(
-        (state) =>
-            state.filterConfigurations[activeFilterId]?.inputConfigs?.[
-                input.macroName
-            ]
-    )
-
-    const updateInputConfiguration = useFilterConfigStore(
-        (state) => state.updateInputConfiguration
-    )
+    const activeConfig = config?.inputConfigs?.[input.macroName]
 
     const updateStyleField = (
         field: keyof StyleConfig,
         value: StyleConfig[keyof StyleConfig]
     ) => {
-        updateInputConfiguration(activeFilterId, input.macroName, {
-            [field]: value,
-        })
+        onChange({ [field]: value })
     }
 
     const fontTypeOptions = fontTypes.map<Option<FontType>>((type) => ({
@@ -74,6 +65,7 @@ export const ItemLabelColorPicker: React.FC<{
             }}
         >
             <ColorPickerInput
+                disabled={readonly}
                 color={activeConfig?.textColor ?? input.default?.textColor}
                 labelText="Text Color"
                 onChange={(color?: ArgbHexColor) =>
