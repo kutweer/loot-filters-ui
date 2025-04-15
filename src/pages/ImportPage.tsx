@@ -10,6 +10,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { CustomizeTab } from '../components/tabs/CustomizeTab'
 import {
     DEFAULT_FILTER_CONFIGURATION,
+    Filter,
     FilterConfiguration,
 } from '../parsing/UiTypesSpec'
 import { parse, ParseResult } from '../parsing/parse'
@@ -28,8 +29,6 @@ export const ImportPage: React.FC = () => {
     const { setFilterConfiguration } = useFilterConfigStore()
     const navigate = useNavigate()
 
-    const { siteConfig } = useSiteConfigStore()
-
     const [error, setError] = useState<Error | null>(null)
 
     const [loadingFilter, setLoadingFilter] = useState(false)
@@ -44,6 +43,7 @@ export const ImportPage: React.FC = () => {
             setError(new Error('No import data'))
             return
         }
+        setLoadingFilter(true)
 
         parseComponent(importData)
             .then(({ filterUrl, config }) => {
@@ -60,10 +60,12 @@ export const ImportPage: React.FC = () => {
             .then((parsed: ParseResult) => {
                 setParsedFilter(parsed)
                 setError(null)
+                setLoadingFilter(false)
             })
             .catch((err) => {
                 setParsedFilter(null)
                 setError(err)
+                setLoadingFilter(false)
             })
     }, [])
 
@@ -84,6 +86,8 @@ export const ImportPage: React.FC = () => {
         </Typography>
     ) : null
 
+    console.log('parsedFilter', parsedFilter)
+    console.log('filterConfig', filterConfig)
     const customizationCount = Object.keys(filterConfig ?? {}).length
 
     const filterComponent = parsedFilter ? (
@@ -109,6 +113,7 @@ export const ImportPage: React.FC = () => {
                                 filter: {
                                     ...parsedFilter.filter,
                                     name: e.target.value,
+                                    source: filterUrl!!,
                                 },
                             })
                         }
@@ -169,8 +174,8 @@ export const ImportPage: React.FC = () => {
 
     return (
         <Container maxWidth="xl">
-            {errorComponent}
             {loadingComponent}
+            {errorComponent}
             {filterComponent}
         </Container>
     )
