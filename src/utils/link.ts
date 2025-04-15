@@ -15,7 +15,7 @@ export const createLink = (
 
     const component = compressToEncodedURIComponent(JSON.stringify(data))
 
-    if (component.length >= 100 * 1024) {
+    if (component.length >= 15 * 1024) {
         return Promise.reject(new Error('Link is too long'))
     }
 
@@ -24,12 +24,12 @@ export const createLink = (
     )
 }
 
-export const parseComponent = (
+export const parseComponent = async (
     component: string
-): {
+): Promise<{
     filterUrl: string
     config: FilterConfiguration
-} => {
+}> => {
     const data = decompressFromEncodedURIComponent(component)
     const parsedData = JSON.parse(data)
     return parsedData

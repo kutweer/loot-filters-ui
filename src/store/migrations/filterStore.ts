@@ -6,7 +6,6 @@ export const migrateFilterStore = (
     version: number
 ) => {
     let updated = { ...state }
-    console.log('Running migration from v', version)
     if (version < 2) {
         toV2(state)
     }

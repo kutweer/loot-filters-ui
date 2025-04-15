@@ -8,12 +8,13 @@ import { FilterSelector } from './components/FilterSelector'
 import { FilterTabs } from './pages/CustomizeFilterPage'
 import { DebugPage } from './pages/DebugPage'
 import { EditorPage } from './pages/EditorPage'
+import { ImportPage } from './pages/ImportPage'
 import { useAlertStore } from './store/alerts'
 import {
     MigrateLegacyData,
     requiresMigration,
 } from './store/migrations/MigrateLegacyData'
-import { useSiteConfigStore } from './store/siteConfigStore'
+import { useSiteConfigStore } from './store/siteConfig'
 import { MuiRsTheme } from './styles/MuiTheme'
 
 const Page: React.FC<{
@@ -56,7 +57,6 @@ const Page: React.FC<{
 
 export const App = () => {
     const doMigration = requiresMigration()
-    console.log('doMigration', doMigration)
     if (doMigration && window.location.pathname !== '/debug') {
         return (
             <ThemeProvider theme={MuiRsTheme}>
@@ -103,6 +103,10 @@ export const App = () => {
                     <Route
                         path="/editor"
                         element={<Page component={<EditorPage />} />}
+                    />
+                    <Route
+                        path="/import"
+                        element={<Page component={<ImportPage />} />}
                     />
                     <Route path="/save-me" element={<div />} />
                     <Route path="*" element={<Navigate to="/" replace />} />

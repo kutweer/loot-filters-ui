@@ -78,6 +78,7 @@ export const ItemLabelColorPicker: React.FC<{
                 labelLocation={labelLocation}
             />
             <ColorPickerInput
+                disabled={readonly}
                 color={
                     activeConfig?.backgroundColor ??
                     input.default?.backgroundColor
@@ -89,6 +90,7 @@ export const ItemLabelColorPicker: React.FC<{
                 labelLocation={labelLocation}
             />
             <ColorPickerInput
+                disabled={readonly}
                 color={activeConfig?.borderColor ?? input.default?.borderColor}
                 labelText="Border"
                 onChange={(color?: ArgbHexColor) =>
@@ -113,6 +115,7 @@ export const ItemLabelColorPicker: React.FC<{
             >
                 <div style={{ minWidth: '200px', flex: '0 0 auto' }}>
                     <UISelect<number>
+                        disabled={readonly}
                         options={fontTypeOptions}
                         label="Overlay Font Type"
                         multiple={false}
@@ -141,6 +144,7 @@ export const ItemLabelColorPicker: React.FC<{
                     />
                 </div>
                 <ColorPickerInput
+                    disabled={readonly}
                     color={
                         activeConfig?.menuTextColor ??
                         input.default?.menuTextColor
@@ -161,6 +165,7 @@ export const ItemLabelColorPicker: React.FC<{
 
             <div style={{ marginLeft: 'auto', alignSelf: 'center' }}>
                 <ColorPickerInput
+                    disabled={readonly}
                     color={
                         activeConfig?.textAccentColor ??
                         input.default?.textAccentColor
@@ -183,6 +188,7 @@ export const ItemLabelColorPicker: React.FC<{
 
             <div style={{ minWidth: '200px', flex: '0 0 auto' }}>
                 <UISelect<number>
+                    disabled={readonly}
                     options={textAccentOptions}
                     label="Text Accent"
                     multiple={false}

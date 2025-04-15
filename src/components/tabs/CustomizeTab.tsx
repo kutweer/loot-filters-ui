@@ -18,7 +18,7 @@ import {
     useMediaQuery,
 } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import { groupBy } from 'underscore'
+import { groupBy, isObject } from 'underscore'
 import { colors, MuiRsTheme } from '../../styles/MuiTheme'
 
 import { ExpandLess } from '@mui/icons-material'
@@ -29,7 +29,6 @@ import {
     EnumListInput,
     Filter,
     FilterConfiguration,
-    FilterConfigurationSpec,
     FilterId,
     Input,
     Module,
@@ -41,7 +40,7 @@ import {
 } from '../../parsing/UiTypesSpec'
 import { useFilterConfigStore } from '../../store/filterConfigurationStore'
 import { useFilterStore } from '../../store/filterStore'
-import { useSiteConfigStore } from '../../store/siteConfigStore'
+import { useSiteConfigStore } from '../../store/siteConfig'
 import { isConfigEmpty } from '../../utils/configUtils'
 import { generateId } from '../../utils/idgen'
 import { BackgroundSelector } from '../BackgroundSelector'
@@ -192,7 +191,7 @@ const ModuleSection: React.FC<{
     expanded: boolean
     setExpanded: (expanded: boolean) => void
     module: Module
-
+    readonly: boolean
     config: FilterConfiguration
     onChange: (config: FilterConfiguration) => void
     clearConfiguration: (filterId: FilterId, macroNames: string[]) => void
@@ -206,6 +205,7 @@ const ModuleSection: React.FC<{
     expanded,
     setExpanded,
     module,
+    readonly,
     config,
     onChange,
     clearConfiguration,
@@ -245,7 +245,7 @@ const ModuleSection: React.FC<{
 
     const moduleMacronames = module.inputs.map((input) => input.macroName)
 
-    const configCount = Object.keys(config)
+    const configCount = Object.keys(config.inputConfigs ?? {})
         .filter((macroName) => moduleMacronames.includes(macroName))
         .filter((key) => !isConfigEmpty(config?.inputConfigs?.[key])).length
 
@@ -456,18 +456,35 @@ const ModuleSection: React.FC<{
                                                             config={config}
                                                             module={module}
                                                             input={input}
-                                                            readonly={false}
+                                                            readonly={readonly}
                                                             persist={(
                                                                 value,
                                                                 macroName
                                                             ) => {
+                                                                const existingValue =
+                                                                    config
+                                                                        .inputConfigs[
+                                                                        macroName
+                                                                    ]
+
+                                                                const newConf =
+                                                                    isObject(
+                                                                        value
+                                                                    )
+                                                                        ? {
+                                                                              ...(existingValue ??
+                                                                                  {}),
+                                                                              ...value,
+                                                                          }
+                                                                        : value
+
                                                                 onChange({
                                                                     ...config,
                                                                     inputConfigs:
                                                                         {
                                                                             ...config.inputConfigs,
                                                                             [macroName]:
-                                                                                value,
+                                                                                newConf,
                                                                         },
                                                                 })
                                                             }}
@@ -497,6 +514,7 @@ export const CustomizeTab: React.FC<{
         enabled: boolean
     ) => void
     extraComponent?: React.ReactNode
+    readonly: boolean
 }> = ({
     filter,
     config,
@@ -504,8 +522,8 @@ export const CustomizeTab: React.FC<{
     clearConfiguration,
     setEnabledModule,
     extraComponent,
+    readonly,
 }) => {
-    console.log('CustomizeTab:config', config)
     const { siteConfig } = useSiteConfigStore()
     const [expandedModules, setExpandedModules] = useState<
         Record<string, boolean>
@@ -543,7 +561,13 @@ export const CustomizeTab: React.FC<{
 
     return (
         <div>
-            <div style={{ display: 'flex', flexDirection: 'row' }}>
+            <div
+                style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    marginBottom: extraComponent === null ? undefined : '1rem',
+                }}
+            >
                 {extraComponent}
                 <div
                     style={{
@@ -589,6 +613,7 @@ export const CustomizeTab: React.FC<{
                 {filter?.modules.map((module, index: number) => (
                     <ModuleSection
                         key={index}
+                        readonly={readonly}
                         activeFilterId={filter.id}
                         module={module}
                         config={config ?? DEFAULT_FILTER_CONFIGURATION}

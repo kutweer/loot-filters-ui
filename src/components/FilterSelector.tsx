@@ -29,7 +29,7 @@ import {
 import { useAlertStore } from '../store/alerts'
 import { useFilterConfigStore } from '../store/filterConfigurationStore'
 import { useFilterStore } from '../store/filterStore'
-import { useSiteConfigStore } from '../store/siteConfigStore'
+import { useSiteConfigStore } from '../store/siteConfig'
 import { downloadFile } from '../utils/file'
 import { createLink } from '../utils/link'
 import { loadFilterFromUrl } from '../utils/loaderv2'
@@ -108,12 +108,8 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
     const { filters, removeFilter, setActiveFilter, updateFilter } =
         useFilterStore()
 
-    const {
-        filterConfigurations,
-        updateInputConfiguration,
-        setFilterConfiguration,
-        removeFilterConfiguration,
-    } = useFilterConfigStore()
+    const { setFilterConfiguration, removeFilterConfiguration } =
+        useFilterConfigStore()
 
     const [importDialogOpen, setImportDialogOpen] = useState(
         Object.keys(filters).length === 0
@@ -363,43 +359,50 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                             <ListItemText>Download</ListItemText>
                         </MenuItem>
 
-                        {siteConfig.devMode && (
-                            <MenuItem
-                                disabled={!activeFilter}
-                                onClick={() => {
-                                    if (!activeFilter) {
-                                        return
-                                    }
+                        <MenuItem
+                            disabled={!activeFilter}
+                            onClick={() => {
+                                if (!activeFilter) {
+                                    return
+                                }
 
-                                    createLink(
-                                        activeFilter,
-                                        activeFilterConfig
-                                    ).then((link) =>
-                                        navigator.clipboard
-                                            .writeText(link)
-                                            .then(() => {
-                                                addAlert({
-                                                    children:
-                                                        'Filter link copied to clipboard',
-                                                    severity: 'success',
-                                                })
+                                if (activeFilter.source === null) {
+                                    addAlert({
+                                        children:
+                                            'Filters without a source URL cannot be shared',
+                                        severity: 'error',
+                                    })
+                                    return
+                                }
+
+                                createLink(
+                                    activeFilter,
+                                    activeFilterConfig
+                                ).then((link) =>
+                                    navigator.clipboard
+                                        .writeText(link)
+                                        .then(() => {
+                                            addAlert({
+                                                children:
+                                                    'Filter link copied to clipboard',
+                                                severity: 'success',
                                             })
-                                            .catch((error) => {
-                                                addAlert({
-                                                    children:
-                                                        'Failed to copy filter link to clipboard',
-                                                    severity: 'error',
-                                                })
+                                        })
+                                        .catch((error) => {
+                                            addAlert({
+                                                children:
+                                                    'Failed to copy filter link to clipboard',
+                                                severity: 'error',
                                             })
-                                    )
-                                }}
-                            >
-                                <ListItemIcon>
-                                    <IosShare fontSize="small" />
-                                </ListItemIcon>
-                                <ListItemText>Share Link</ListItemText>
-                            </MenuItem>
-                        )}
+                                        })
+                                )
+                            }}
+                        >
+                            <ListItemIcon>
+                                <IosShare fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText>Share Link</ListItemText>
+                        </MenuItem>
                     </Menu>
                 </Box>
 
