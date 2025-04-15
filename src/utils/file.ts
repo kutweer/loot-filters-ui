@@ -24,7 +24,7 @@ const keys = [
 export const localState = () => {
     return Object.fromEntries(
         keys.map((key) => {
-            return [key, localStorage.getItem(key) ?? null]
-        })
+            return [key, localStorage.getItem(key)]
+        }).filter(([_, value]) => value !== null)
     )
 }
