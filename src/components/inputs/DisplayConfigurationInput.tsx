@@ -19,7 +19,7 @@ import {
 } from '../../parsing/UiTypesSpec'
 import { useFilterConfigStore } from '../../store/filterConfigurationStore'
 import { useFilterStore } from '../../store/filterStore'
-import { useSiteConfigStore } from '../../store/siteConfigStore'
+import { useSiteConfigStore } from '../../store/siteConfig'
 import { colors } from '../../styles/MuiTheme'
 import { ArgbHexColor } from '../../utils/Color'
 import { ItemLabelPreview, ItemMenuPreview } from '../Previews'
@@ -61,6 +61,7 @@ export const DisplayConfigurationInput: React.FC<{
                 label="Lootbeam"
                 control={
                     <Checkbox
+                        disabled={readonly}
                         checked={
                             styleConfig.showLootbeam ??
                             input.default?.showLootbeam
@@ -73,7 +74,9 @@ export const DisplayConfigurationInput: React.FC<{
             />
             <ColorPickerInput
                 disabled={
-                    !(styleConfig.showLootbeam ?? input.default?.showLootbeam)
+                    !(
+                        styleConfig.showLootbeam ?? input.default?.showLootbeam
+                    ) || readonly
                 }
                 color={
                     styleConfig.lootbeamColor ?? input.default?.lootbeamColor
@@ -92,6 +95,7 @@ export const DisplayConfigurationInput: React.FC<{
             label="Show Item Value"
             control={
                 <Checkbox
+                    disabled={readonly}
                     checked={styleConfig.showValue ?? input.default?.showValue}
                     onChange={(e) => onChange({ showValue: e.target.checked })}
                 />
@@ -104,6 +108,7 @@ export const DisplayConfigurationInput: React.FC<{
             label="Show Despawn Timer"
             control={
                 <Checkbox
+                    disabled={readonly}
                     checked={
                         styleConfig.showDespawn ?? input.default?.showDespawn
                     }
@@ -120,6 +125,7 @@ export const DisplayConfigurationInput: React.FC<{
             label="Notify on Drop"
             control={
                 <Checkbox
+                    disabled={readonly}
                     checked={styleConfig.notify ?? input.default?.notify}
                     onChange={(e) => onChange({ notify: e.target.checked })}
                 />
@@ -132,6 +138,7 @@ export const DisplayConfigurationInput: React.FC<{
             label="Hide Overlay"
             control={
                 <Checkbox
+                    disabled={readonly}
                     checked={
                         styleConfig.hideOverlay ?? input.default?.hideOverlay
                     }
@@ -149,6 +156,7 @@ export const DisplayConfigurationInput: React.FC<{
                 label="Highlight Tile"
                 control={
                     <Checkbox
+                        disabled={readonly}
                         checked={
                             styleConfig.highlightTile ??
                             input.default?.highlightTile
@@ -170,7 +178,10 @@ export const DisplayConfigurationInput: React.FC<{
                 labelText={'Tile Stroke Color'}
                 labelLocation="right"
                 disabled={
-                    !(styleConfig.highlightTile ?? input.default?.highlightTile)
+                    !(
+                        styleConfig.highlightTile ??
+                        input.default?.highlightTile
+                    ) || readonly
                 }
             />
             <ColorPickerInput
@@ -183,7 +194,10 @@ export const DisplayConfigurationInput: React.FC<{
                 labelText={'Tile Fill Color'}
                 labelLocation="right"
                 disabled={
-                    !(styleConfig.highlightTile ?? input.default?.highlightTile)
+                    !(
+                        styleConfig.highlightTile ??
+                        input.default?.highlightTile
+                    ) || readonly
                 }
             />
         </Grid>
@@ -194,6 +208,7 @@ export const DisplayConfigurationInput: React.FC<{
             label="Sound File"
             value={styleConfig?.sound ?? input.default?.sound ?? ''}
             onChange={(e) => onChange({ sound: e.target.value })}
+            disabled={readonly}
         />
     )
 

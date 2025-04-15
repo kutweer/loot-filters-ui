@@ -5,7 +5,7 @@ import { CustomizeTab } from '../components/tabs/CustomizeTab'
 import { RenderedFilterTab } from '../components/tabs/RenderedFilterTab'
 import { useFilterConfigStore } from '../store/filterConfigurationStore'
 import { useFilterStore } from '../store/filterStore'
-import { useSiteConfigStore } from '../store/siteConfigStore'
+import { useSiteConfigStore } from '../store/siteConfig'
 
 export const FilterTabs: React.FC = () => {
     const { siteConfig } = useSiteConfigStore()
@@ -62,14 +62,11 @@ export const FilterTabs: React.FC = () => {
             <Box sx={{ mt: 2 }}>
                 {activeFilter && activeTab === 0 && (
                     <CustomizeTab
+                        readonly={false}
                         extraComponent={tabs}
                         filter={activeFilter}
                         config={config}
                         onChange={(config) => {
-                            console.log(
-                                'FilterTabs:setFilterConfiguration',
-                                config
-                            )
                             setFilterConfiguration(activeFilter?.id, config)
                         }}
                         clearConfiguration={(filterId, macroNames) => {
