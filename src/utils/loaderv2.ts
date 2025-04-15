@@ -17,5 +17,6 @@ export const loadFilterFromUrl = async (url: string): Promise<Filter> => {
         throw Error('This should be impossible')
     }
 
+    filter.source = url
     return filter
 }
