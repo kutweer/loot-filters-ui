@@ -1,7 +1,6 @@
 import { Editor } from '@monaco-editor/react'
 import { Button, Tab, Tabs, TextField, Typography } from '@mui/material'
-import { useCallback, useEffect, useState } from 'react'
-import { debounce } from 'underscore'
+import { useCallback, useState } from 'react'
 import { ErrorBoundary } from '../components/ErrorBoundary'
 import { Input } from '../parsing/FilterTypesSpec'
 import { parse, ParseResult } from '../parsing/parse'
@@ -125,36 +124,24 @@ const VisualResults: React.FC<{
 export const EditorPage = () => {
     const { content: editorContent, setContent: setEditorContent } =
         useEditorStore()
+    const [parsed, setParsed] = useState<ParseResult | null>(null)
     const [error, setError] = useState<Error | null>(null)
-
-    const [tab, setTab] = useState<'visual' | 'json' | 'none'>('visual')
-
+    const [tab, setTab] = useState<'visual' | 'json' | 'wide'>('visual')
     const [url, setUrl] = useState('')
 
-    const [parsed, setParsed] = useState<ParseResult | null>(null)
-
-    const debouncedParse = useCallback(
-        debounce(async (content: string) => {
-            if (!content || content.length === 0) {
-                console.error('No content')
-                setError(new Error('No content'))
-                setParsed(null)
-                return
-            }
+    const handleContentChange = useCallback(
+        async (content: string) => {
+            setEditorContent(content)
             try {
+                const parseResult = await parse(content)
+                setParsed(parseResult)
                 setError(null)
-                const parsed = await parse(content)
-                setParsed(parsed)
             } catch (e) {
                 setError(e as Error)
             }
-        }, 100),
-        [setError, setParsed]
+        },
+        [setParsed, setError, setEditorContent]
     )
-
-    useEffect(() => {
-        debouncedParse(editorContent)
-    }, [editorContent])
 
     return (
         <ErrorBoundary>
@@ -187,7 +174,7 @@ export const EditorPage = () => {
                         fetch(url)
                             .then((res) => res.text())
                             .then((content) => {
-                                setEditorContent(content)
+                                handleContentChange(content)
                             })
                     }}
                 >
@@ -205,13 +192,13 @@ export const EditorPage = () => {
                 <Tabs value={tab} onChange={(_, newValue) => setTab(newValue)}>
                     <Tab value="visual" label="Visual Results" />
                     <Tab value="json" label="Result JSON" />
-                    <Tab value="none" label="Wide Editor" />
+                    <Tab value="wide" label="Wide Editor" />
                 </Tabs>
             </div>
             <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
                 <div
                     style={{
-                        width: tab === 'none' ? '100%' : '50%',
+                        width: tab === 'wide' ? '100%' : '50%',
                         minHeight: '75vh',
                     }}
                 >
@@ -222,18 +209,14 @@ export const EditorPage = () => {
                         theme="vs-dark"
                         options={{
                             minimap: {
-                                enabled: false,
+                                enabled: (tab as unknown as string) === 'asdf',
                             },
                             wordWrap: 'on',
                             readOnly: false,
                         }}
                         value={editorContent}
                         onChange={(content) => {
-                            if (!content || content.length === 0) {
-                                setEditorContent('')
-                            } else {
-                                setEditorContent(content)
-                            }
+                            handleContentChange(content ?? '')
                         }}
                     />
                 </div>
