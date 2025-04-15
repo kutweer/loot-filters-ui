@@ -135,6 +135,12 @@ export const EditorPage = () => {
 
     const debouncedParse = useCallback(
         debounce(async (content: string) => {
+            if (!content || content.length === 0) {
+                console.error('No content')
+                setError(new Error('No content'))
+                setParsed(null)
+                return
+            }
             try {
                 setError(null)
                 const parsed = await parse(content)
@@ -180,7 +186,9 @@ export const EditorPage = () => {
                     onClick={() => {
                         fetch(url)
                             .then((res) => res.text())
-                            .then(setEditorContent)
+                            .then((content) => {
+                                setEditorContent(content)
+                            })
                     }}
                 >
                     Fetch
@@ -220,9 +228,11 @@ export const EditorPage = () => {
                             readOnly: false,
                         }}
                         value={editorContent}
-                        onChange={(value) => {
-                            if (value) {
-                                setEditorContent(value)
+                        onChange={(content) => {
+                            if (!content || content.length === 0) {
+                                setEditorContent('')
+                            } else {
+                                setEditorContent(content)
                             }
                         }}
                     />
