@@ -1,6 +1,7 @@
 import { Editor } from '@monaco-editor/react'
 import { Button, Tab, Tabs, TextField, Typography } from '@mui/material'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { debounce } from 'underscore'
 import { ErrorBoundary } from '../components/ErrorBoundary'
 import { Input } from '../parsing/FilterTypesSpec'
 import { parse, ParseResult } from '../parsing/parse'
@@ -124,22 +125,32 @@ const VisualResults: React.FC<{
 export const EditorPage = () => {
     const { content: editorContent, setContent: setEditorContent } =
         useEditorStore()
+    const [initialized, setInitialized] = useState(false)
     const [parsed, setParsed] = useState<ParseResult | null>(null)
     const [error, setError] = useState<Error | null>(null)
     const [tab, setTab] = useState<'visual' | 'json' | 'wide'>('visual')
     const [url, setUrl] = useState('')
 
+    useEffect(() => {
+        if (!initialized) {
+            setInitialized(true)
+            handleContentChange(editorContent)
+        }
+    }, [])
+
     const handleContentChange = useCallback(
-        async (content: string) => {
+        debounce((content: string) => {
             setEditorContent(content)
-            try {
-                const parseResult = await parse(content)
-                setParsed(parseResult)
-                setError(null)
-            } catch (e) {
-                setError(e as Error)
-            }
-        },
+            parse(content)
+                .then((parseResult) => {
+                    setParsed(parseResult)
+                    setError(null)
+                })
+                .catch((error) => {
+                    setParsed(null)
+                    setError(error as Error)
+                })
+        }, 100),
         [setParsed, setError, setEditorContent]
     )
 
