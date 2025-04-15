@@ -7,7 +7,7 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { FilterSelector } from './components/FilterSelector'
 import { FilterTabs } from './pages/CustomizeFilterPage'
 import { DebugPage } from './pages/DebugPage'
-import { ParsePage } from './pages/ParsePage'
+import { EditorPage } from './pages/ParsePage'
 import { useAlertStore } from './store/alerts'
 import {
     MigrateLegacyData,
@@ -100,7 +100,10 @@ export const App = () => {
                             />
                         }
                     />
-                    <Route path="/parser" element={<ParsePage />} />
+                    <Route
+                        path="/editor"
+                        element={<Page component={<EditorPage />} />}
+                    />
                     <Route path="/save-me" element={<div />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
