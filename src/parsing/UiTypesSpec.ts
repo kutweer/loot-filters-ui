@@ -131,7 +131,10 @@ export const ListDiffSpec = z.object({
 })
 
 export type ListDiff = z.infer<typeof ListDiffSpec>
-
+export const DEFAULT_FILTER_CONFIGURATION = {
+    enabledModules: {},
+    inputConfigs: {},
+}
 export const FilterConfigurationSpec = z
     .object({
         enabledModules: z
@@ -140,10 +143,7 @@ export const FilterConfigurationSpec = z
             .default({}),
         inputConfigs: z.record(z.string(), z.any()).optional().default({}),
     })
-    .default({
-        enabledModules: {},
-        inputConfigs: {},
-    })
+
 
 export type FilterConfiguration = z.infer<typeof FilterConfigurationSpec>
 

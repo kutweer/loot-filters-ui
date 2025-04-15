@@ -25,6 +25,7 @@ import { ExpandLess } from '@mui/icons-material'
 import SettingsIcon from '@mui/icons-material/Settings'
 import {
     BooleanInput,
+    DEFAULT_FILTER_CONFIGURATION,
     EnumListInput,
     Filter,
     FilterConfiguration,
@@ -590,7 +591,7 @@ export const CustomizeTab: React.FC<{
                         key={index}
                         activeFilterId={filter.id}
                         module={module}
-                        config={config ?? FilterConfigurationSpec.parse(null)}
+                        config={config ?? DEFAULT_FILTER_CONFIGURATION}
                         onChange={onChange}
                         clearConfiguration={clearConfiguration}
                         setEnabledModule={setEnabledModule}
