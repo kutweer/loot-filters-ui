@@ -56,8 +56,8 @@ const VisualResults: React.FC<{
                 <Typography color="text.primary" variant="h4">
                     {parsed.errors.length} errors found
                 </Typography>
-                {parsed.errors.map((error) => (
-                    <div key={error.error.toString()}>
+                {parsed.errors.map((error, i) => (
+                    <div key={i}>
                         <Typography color="text.secondary" variant="body2">
                             An error was encountered handling the structured
                             comment or #define for:
@@ -78,8 +78,8 @@ const VisualResults: React.FC<{
                     <Typography color="text.secondary" variant="body2">
                         {parsed.filter?.description}
                     </Typography>
-                    {parsed.filter?.modules.map((module) => (
-                        <div key={module.name}>
+                    {parsed.filter?.modules.map((module, i) => (
+                        <div key={i}>
                             <Typography color="text.primary" variant="h6">
                                 {module.name}
                             </Typography>
@@ -90,8 +90,8 @@ const VisualResults: React.FC<{
                             >
                                 {module.description}
                             </Typography>
-                            {module.inputs.map((input: Input) => (
-                                <div key={input.label + input.type}>
+                            {module.inputs.map((input: Input, i) => (
+                                <div key={i}>
                                     <Typography
                                         sx={{ marginLeft: '2rem' }}
                                         component="span"
