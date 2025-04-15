@@ -7,7 +7,7 @@ import {
     Switch,
     Typography,
 } from '@mui/material'
-import { useSiteConfigStore } from '../store/storeV2'
+import { useSiteConfigStore } from '../store/siteConfigStore'
 import { colors } from '../styles/MuiTheme'
 
 export const AppHeader: React.FC = () => {

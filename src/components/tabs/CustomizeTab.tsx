@@ -34,11 +34,9 @@ import {
     StyleInput,
     TextInput,
 } from '../../parsing/UiTypesSpec'
-import {
-    useFilterConfigStore,
-    useFilterStore,
-    useSiteConfigStore,
-} from '../../store/storeV2'
+import { useFilterConfigStore } from '../../store/filterConfigurationStore'
+import { useFilterStore } from '../../store/filterStore'
+import { useSiteConfigStore } from '../../store/siteConfigStore'
 import { isConfigEmpty } from '../../utils/configUtils'
 import { generateId } from '../../utils/idgen'
 import { GitHubFlavoredMarkdown } from '../GitHubFlavoredMarkdown'

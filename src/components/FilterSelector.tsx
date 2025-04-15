@@ -27,11 +27,9 @@ import {
     FilterId,
 } from '../parsing/UiTypesSpec'
 import { useAlertStore } from '../store/alerts'
-import {
-    useFilterConfigStore,
-    useFilterStore,
-    useSiteConfigStore,
-} from '../store/storeV2'
+import { useFilterConfigStore } from '../store/filterConfigurationStore'
+import { useFilterStore } from '../store/filterStore'
+import { useSiteConfigStore } from '../store/siteConfigStore'
 import { downloadFile } from '../utils/file'
 import { createLink } from '../utils/link'
 import { loadFilterFromUrl } from '../utils/loaderv2'

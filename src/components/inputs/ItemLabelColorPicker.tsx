@@ -1,6 +1,7 @@
 import { Divider } from '@mui/material'
-import { Module, StyleConfig, StyleInput } from '../../parsing/UiTypesSpec'
-import { useFilterConfigStore, useFilterStore } from '../../store/storeV2'
+import { StyleConfig, StyleInput } from '../../parsing/UiTypesSpec'
+import { useFilterConfigStore } from '../../store/filterConfigurationStore'
+import { useFilterStore } from '../../store/filterStore'
 import { colors } from '../../styles/MuiTheme'
 import {
     FontType,

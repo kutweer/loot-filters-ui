@@ -14,7 +14,8 @@ import { BackgroundSelector } from '../components/BackgroundSelector'
 import { FilterSelector } from '../components/FilterSelector'
 import { CustomizeTab } from '../components/tabs/CustomizeTab'
 import { RenderedFilterTab } from '../components/tabs/RenderedFilterTab'
-import { useFilterStore, useSiteConfigStore } from '../store/storeV2'
+import { useFilterStore } from '../store/filterStore'
+import { useSiteConfigStore } from '../store/siteConfigStore'
 
 export const FilterTabs: React.FC = () => {
     const { siteConfig } = useSiteConfigStore()

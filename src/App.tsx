@@ -12,8 +12,8 @@ import { useAlertStore } from './store/alerts'
 import {
     MigrateLegacyData,
     requiresMigration,
-    useSiteConfigStore,
-} from './store/storeV2'
+} from './store/migrations/MigrateLegacyData'
+import { useSiteConfigStore } from './store/siteConfigStore'
 import { MuiRsTheme } from './styles/MuiTheme'
 
 const Page: React.FC<{

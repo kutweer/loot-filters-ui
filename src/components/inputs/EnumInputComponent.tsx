@@ -3,7 +3,7 @@ import {
     FilterId,
     ListDiffSpec,
 } from '../../parsing/UiTypesSpec'
-import { useFilterConfigStore } from '../../store/storeV2'
+import { useFilterConfigStore } from '../../store/filterConfigurationStore'
 import {
     applyDiff,
     convertToListDiff,

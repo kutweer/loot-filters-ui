@@ -1,5 +1,6 @@
 import { Editor } from '@monaco-editor/react'
-import { useFilterConfigStore, useFilterStore } from '../../store/storeV2'
+import { useFilterConfigStore } from '../../store/filterConfigurationStore'
+import { useFilterStore } from '../../store/filterStore'
 import { renderFilter } from '../../utils/render'
 const RenderFilterComponent: React.FC = () => {
     const activeFilter = useFilterStore((state) =>

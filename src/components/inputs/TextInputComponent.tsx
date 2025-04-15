@@ -1,6 +1,6 @@
 import { TextField } from '@mui/material'
 import { FilterId, TextInput } from '../../parsing/UiTypesSpec'
-import { useFilterConfigStore } from '../../store/storeV2'
+import { useFilterConfigStore } from '../../store/filterConfigurationStore'
 
 export const TextInputComponent: React.FC<{
     activeFilterId: FilterId
