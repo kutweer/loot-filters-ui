@@ -5,8 +5,8 @@ import { debounce } from 'underscore'
 import { ErrorBoundary } from '../components/ErrorBoundary'
 import { Input } from '../parsing/FilterTypesSpec'
 import { parse, ParseResult } from '../parsing/parse'
-import { colors } from '../styles/MuiTheme'
 import { useEditorStore } from '../store/editor'
+import { colors } from '../styles/MuiTheme'
 
 const Pre: React.FC<{
     line: string
@@ -207,7 +207,7 @@ export const EditorPage = () => {
                 <Tabs value={tab} onChange={(_, newValue) => setTab(newValue)}>
                     <Tab value="visual" label="Visual Results" />
                     <Tab value="json" label="Result JSON" />
-                    <Tab value="none" label="No Results" />
+                    <Tab value="none" label="Wide Editor" />
                 </Tabs>
             </div>
             <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
