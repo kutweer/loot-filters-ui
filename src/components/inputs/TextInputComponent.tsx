@@ -1,27 +1,22 @@
 import { TextField } from '@mui/material'
-import { FilterId, TextInput } from '../../parsing/UiTypesSpec'
-import { useFilterConfigStore } from '../../store/filterConfigurationStore'
+import { FilterConfiguration, TextInput } from '../../parsing/UiTypesSpec'
 
 export const TextInputComponent: React.FC<{
-    activeFilterId: FilterId
     input: TextInput
-}> = ({ activeFilterId, input }) => {
-    const activeConfig = useFilterConfigStore(
-        (state) => state.filterConfigurations[activeFilterId]
-    )
-    const updateInputConfiguration = useFilterConfigStore(
-        (state) => state.updateInputConfiguration
-    )
-
-    const userConfigValue = activeConfig?.inputConfigs?.[input.macroName]
+    config: FilterConfiguration
+    onChange: (str: string) => void
+    readonly: boolean
+}> = ({ input, config, onChange, readonly }) => {
+    const userConfigValue = config?.inputConfigs?.[input.macroName]
     const currentSetting = userConfigValue ?? input?.default
 
     return (
         <TextField
+            disabled={readonly}
             value={currentSetting}
             onChange={(event) => {
                 const value = event.target.value
-                updateInputConfiguration(activeFilterId, input.macroName, value)
+                onChange(value)
             }}
             fullWidth
         />

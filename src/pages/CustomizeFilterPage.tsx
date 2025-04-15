@@ -1,19 +1,9 @@
-import ExpandLess from '@mui/icons-material/ExpandLess'
-import ExpandMore from '@mui/icons-material/ExpandMore'
-import {
-    Box,
-    Tab,
-    Tabs,
-    ToggleButton,
-    ToggleButtonGroup,
-    Typography,
-} from '@mui/material'
+import { Box, Tab, Tabs } from '@mui/material'
 import { useMemo, useState } from 'react'
-import { filter } from 'underscore'
-import { BackgroundSelector } from '../components/BackgroundSelector'
 import { FilterSelector } from '../components/FilterSelector'
 import { CustomizeTab } from '../components/tabs/CustomizeTab'
 import { RenderedFilterTab } from '../components/tabs/RenderedFilterTab'
+import { useFilterConfigStore } from '../store/filterConfigurationStore'
 import { useFilterStore } from '../store/filterStore'
 import { useSiteConfigStore } from '../store/siteConfigStore'
 
@@ -25,39 +15,23 @@ export const FilterTabs: React.FC = () => {
         Object.values(state.filters).find((filter) => filter.active)
     )
 
-    const tabs = useMemo(() => {
-        return [
-            {
-                label: 'Customize',
-                disabled: !activeFilter,
-                dev: false,
-                component: activeFilter ? (
-                    <CustomizeTab />
-                ) : (
-                    <Typography variant="h6" color="secondary">
-                        No filter selected, select or import a filter
-                    </Typography>
-                ),
-            },
-            {
-                label: 'Preview',
-                disabled: !activeFilter,
-                dev: false,
-                component: <RenderedFilterTab />,
-            },
-        ]
-    }, [activeFilter])
+    const config = useFilterConfigStore((state) => {
+        if (!activeFilter) return null
+        return state.filterConfigurations[activeFilter.id] ?? null
+    })
 
-    const filteredTabs = useMemo(
-        () => filter(tabs, (tab) => siteConfig.devMode || tab.dev === false),
-        [tabs, siteConfig.devMode]
+    const setFilterConfiguration = useFilterConfigStore(
+        (state) => state.setFilterConfiguration
+    )
+    const clearConfiguration = useFilterConfigStore(
+        (state) => state.clearConfiguration
+    )
+    const setEnabledModule = useFilterConfigStore(
+        (state) => state.setEnabledModule
     )
 
-    return (
-        <Box sx={{ mt: 3 }}>
-            <Box>
-                <FilterSelector />
-            </Box>
+    const tabs = useMemo(() => {
+        return (
             <Box
                 sx={{
                     display: 'flex',
@@ -73,48 +47,41 @@ export const FilterTabs: React.FC = () => {
                     aria-label="filter tabs"
                     sx={{ flex: 1 }}
                 >
-                    {filteredTabs.map((tab, index) => (
-                        <Tab
-                            key={index}
-                            label={tab.label}
-                            disabled={tab.disabled}
-                            sx={{
-                                fontSize: '1.2rem',
-                            }}
-                        />
-                    ))}
+                    <Tab label="Customize" value={0} />
+                    <Tab label="Preview" value={1} />
                 </Tabs>
-                {activeTab === 0 && activeFilter && (
-                    <>
-                        <BackgroundSelector />
-                        <ToggleButtonGroup size="small" exclusive={false}>
-                            <ToggleButton
-                                value="expand"
-                                onClick={() => {
-                                    const event = new CustomEvent('expandAll', {
-                                        detail: true,
-                                    })
-                                    window.dispatchEvent(event)
-                                }}
-                            >
-                                <ExpandMore />
-                            </ToggleButton>
-                            <ToggleButton
-                                value="collapse"
-                                onClick={() => {
-                                    const event = new CustomEvent('expandAll', {
-                                        detail: false,
-                                    })
-                                    window.dispatchEvent(event)
-                                }}
-                            >
-                                <ExpandLess />
-                            </ToggleButton>
-                        </ToggleButtonGroup>
-                    </>
+            </Box>
+        )
+    }, [activeTab, setActiveTab])
+    return (
+        <Box sx={{ mt: 3 }}>
+            <Box>
+                <FilterSelector />
+            </Box>
+
+            <Box sx={{ mt: 2 }}>
+                {activeFilter && activeTab === 0 && (
+                    <CustomizeTab
+                        extraComponent={tabs}
+                        filter={activeFilter}
+                        config={config}
+                        onChange={(config) => {
+                            console.log(
+                                'FilterTabs:setFilterConfiguration',
+                                config
+                            )
+                            setFilterConfiguration(activeFilter?.id, config)
+                        }}
+                        clearConfiguration={(filterId, macroNames) => {
+                            clearConfiguration(filterId, macroNames)
+                        }}
+                        setEnabledModule={setEnabledModule}
+                    />
+                )}
+                {activeFilter && activeTab === 1 && (
+                    <RenderedFilterTab extraComponent={tabs} />
                 )}
             </Box>
-            <Box sx={{ mt: 2 }}>{filteredTabs[activeTab].component}</Box>
         </Box>
     )
 }

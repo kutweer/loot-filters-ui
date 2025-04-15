@@ -1,10 +1,10 @@
 import {
-    FilterId,
+    FilterConfiguration,
+    ListDiff,
     ListDiffSpec,
     ListOption,
     StringListInput,
 } from '../../parsing/UiTypesSpec'
-import { useFilterConfigStore } from '../../store/filterConfigurationStore'
 import {
     applyDiff,
     convertToListDiff,
@@ -13,20 +13,14 @@ import {
 import { Option, UISelect } from './UISelect'
 
 export const StringListInputComponent: React.FC<{
-    activeFilterId: FilterId
     input: StringListInput
-}> = ({ activeFilterId, input }) => {
-    const updateInputConfiguration = useFilterConfigStore(
-        (state) => state.updateInputConfiguration
-    )
-
-    const activeConfig = useFilterConfigStore(
-        (state) => state.filterConfigurations[activeFilterId]
-    )
-
+    config: FilterConfiguration
+    onChange: (diff: ListDiff) => void
+    readonly: boolean
+}> = ({ input, config, onChange, readonly }) => {
     const configuredDiff = ListDiffSpec.optional()
         .default(EMPTY_DIFF)
-        .parse(activeConfig?.inputConfigs?.[input.macroName])
+        .parse(config?.inputConfigs?.[input.macroName])
 
     const currentValues = applyDiff(input.default, configuredDiff)
 
@@ -44,6 +38,7 @@ export const StringListInputComponent: React.FC<{
 
     return (
         <UISelect
+            disabled={readonly}
             options={options}
             label={input.label}
             multiple={true}
@@ -65,11 +60,7 @@ export const StringListInputComponent: React.FC<{
                 const values = ((newValue as Option[]) || []).map(
                     (option) => option.value
                 )
-                updateInputConfiguration(
-                    activeFilterId,
-                    input.macroName,
-                    convertToListDiff(values, input.default)
-                )
+                onChange(convertToListDiff(values, input.default))
             }}
         />
     )

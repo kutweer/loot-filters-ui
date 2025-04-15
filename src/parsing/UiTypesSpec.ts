@@ -132,10 +132,18 @@ export const ListDiffSpec = z.object({
 
 export type ListDiff = z.infer<typeof ListDiffSpec>
 
-export const FilterConfigurationSpec = z.object({
-    enabledModules: z.record(z.string(), z.boolean()).optional().default({}),
-    inputConfigs: z.record(z.string(), z.any()).optional().default({}),
-})
+export const FilterConfigurationSpec = z
+    .object({
+        enabledModules: z
+            .record(z.string(), z.boolean())
+            .optional()
+            .default({}),
+        inputConfigs: z.record(z.string(), z.any()).optional().default({}),
+    })
+    .default({
+        enabledModules: {},
+        inputConfigs: {},
+    })
 
 export type FilterConfiguration = z.infer<typeof FilterConfigurationSpec>
 
