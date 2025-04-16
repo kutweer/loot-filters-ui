@@ -20,7 +20,7 @@ export const renderFilter = (
         .map((m) => applyModule(m, activeConfig?.inputConfigs))
         .join('\n')
 
-    filterText = filterText.replace(/^meta\s*{([^}]*)}/, '')
+    filterText = filterText.replace(/meta\s*{([^}]*)}/, '')
     filterText =
         `meta { name = \"${filter.name}\"; description = \"${filter.description}\"; }\n\n` +
         filterText
