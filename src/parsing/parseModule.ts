@@ -9,5 +9,9 @@ export const parseModule = (moduleId: string, comment: string): Module => {
     )
     const module = parseYaml(declarationContent)
 
-    return ModuleSpec.parse({ ...FilterSpecModule.parse(module), id: moduleId })
+    return ModuleSpec.parse({
+        ...FilterSpecModule.parse(module),
+        id: moduleId,
+        rs2f: '',
+    })
 }

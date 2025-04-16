@@ -1,7 +1,7 @@
 export type Token = {
     readonly type: TokenType
     readonly value: string
-    readonly location?: Location
+    readonly location: Location
 }
 
 export type Location = {

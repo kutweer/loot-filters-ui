@@ -76,7 +76,11 @@ export class TokenStream {
     }
 
     toString(): string {
-        return this.tokens.map((t) => t.value).join('')
+        return this.tokens
+            .map((t) =>
+                t.type === TokenType.LITERAL_STRING ? `"${t.value}"` : t.value
+            )
+            .join('')
     }
 }
 

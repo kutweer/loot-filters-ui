@@ -7,8 +7,16 @@ import { Lexer } from './lexer'
 import { Token, TokenType } from './token'
 import { TokenStream } from './tokenstream'
 
-const parseDeclaration = (line: string) => {
-    const match = line.match(/define:([a-z]+):([a-z0-9_]+)/)
+const isModuleDeclaration = (token: Token) =>
+    token.type === TokenType.COMMENT &&
+    token.value.startsWith('/*@ define:module')
+
+const isInputDeclaration = (token: Token) =>
+    token.type === TokenType.COMMENT &&
+    token.value.startsWith('/*@ define:input')
+
+const parseModuleDeclaration = (line: string) => {
+    const match = line.match(/\/\*@ define:([a-z]+):([a-z0-9_]+)/)
     if (!match) {
         throw new Error(`Unparseable declaration at '${line}'`)
     }
@@ -25,40 +33,59 @@ export type ParseResult = {
 
 export const parse = async (filter: string): Promise<ParseResult> => {
     const tokens = new TokenStream(new Lexer(filter).tokenize())
+    if (!tokens.hasTokens()) {
+        return {
+            errors: [{ line: '', error: new Error('filter is blank') }],
+        }
+    }
+
+    const first = tokens.peek()!!
+    if (!isModuleDeclaration(first)) {
+        return {
+            errors: [
+                {
+                    line: first.value,
+                    error: new Error(
+                        'filter MUST start with a module declaration'
+                    ),
+                },
+            ],
+        }
+    }
 
     const modulesById: Record<string, Module> = {}
     const errors: { line: string; error: Error }[] = []
 
-    while (tokens.hasTokens()) {
-        const next = tokens.take()!!
-        if (!isStructuredComment(next)) {
-            continue
-        }
+    // we vetted the first token above, the loop will properly init this
+    let currentModule: string = ''
 
+    while (tokens.hasTokens()) {
+        const next = tokens.take(true)!! // preserve whitespace in output
         try {
-            const declaration = parseDeclaration(next.value.slice(3).trim())
-            switch (declaration.type) {
-                case 'module':
-                    modulesById[declaration.id] = parseModule(
-                        declaration.id,
-                        next.value
-                    )
-                    break
-                case 'input':
-                    const define = new TokenStream([
-                        // define MUST come after the input declaration
-                        tokens.takeExpect(TokenType.PREPROC_DEFINE),
-                        ...tokens.takeLine().getTokens(),
-                    ])
-                    const input = parseInput(declaration.id, next.value, define)
-                    const module = modulesById[input.moduleId]
-                    if (!module) {
-                        throw new Error(
-                            `Module ${input.moduleId} not found for input of macro ${input.input.macroName}`
-                        )
-                    }
-                    module.inputs.push(input.input)
-                    break
+            if (isModuleDeclaration(next)) {
+                const decl = parseModuleDeclaration(next.value)
+                currentModule = decl.id
+                modulesById[decl.id] = parseModule(decl.id, next.value)
+
+                modulesById[currentModule].rs2f += next.value
+            } else if (isInputDeclaration(next)) {
+                const define = new TokenStream([
+                    // define MUST come after the input declaration
+                    tokens.takeExpect(TokenType.PREPROC_DEFINE),
+                    ...tokens.takeLine().getTokens(),
+                ])
+
+                // capture source before parseInput consumes token stream
+                const defineSource = define.toString()
+
+                const input = parseInput(next.value, define)
+                const module = modulesById[currentModule]
+                module.inputs.push(input)
+
+                modulesById[currentModule].rs2f += next.value + '\n'
+                modulesById[currentModule].rs2f += defineSource + '\n'
+            } else {
+                modulesById[currentModule].rs2f += next.value
             }
         } catch (e) {
             errors.push({
@@ -97,6 +124,7 @@ export const parse = async (filter: string): Promise<ParseResult> => {
             rs2f: filter,
             rs2fHash,
         })
+        console.log(parsedFilter)
         return {
             errors: undefined,
             filter: parsedFilter,
@@ -113,6 +141,3 @@ export const parse = async (filter: string): Promise<ParseResult> => {
         }
     }
 }
-
-const isStructuredComment = (token: Token) =>
-    token.type === TokenType.COMMENT && token.value.startsWith('/*@')

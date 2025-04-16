@@ -13,18 +13,14 @@ import {
 import { parseDefine, Rs2fDefine } from './rs2fParser'
 import { TokenStream } from './tokenstream'
 
-export const parseInput = (
-    moduleId: string,
-    comment: string,
-    define: TokenStream
-): { moduleId: string; input: Input } => {
+export const parseInput = (comment: string, define: TokenStream): Input => {
     const declarationContent = comment.substring(
         comment.indexOf('\n'), // chop the structured declaration
         comment.indexOf('*/')
     )
 
     // FUTURE: actually consume the token stream in parseDefine
-    const line = define.peek()!!.location!!.line
+    const line = define.peek()!!.location.line
     const inputDefault: Rs2fDefine = parseDefine(define.toString(), line)
 
     const baseInput = {
@@ -39,20 +35,17 @@ export const parseInput = (
     // validate the input with a default field; to check that the default field is correct
     switch (input.type as unknown as string) {
         case 'boolean':
-            return { moduleId: moduleId, input: BooleanInputSpec.parse(input) }
+            return BooleanInputSpec.parse(input)
         case 'number':
-            return { moduleId: moduleId, input: NumberInputSpec.parse(input) }
+            return NumberInputSpec.parse(input)
         case 'stringlist':
-            return {
-                moduleId: moduleId,
-                input: StringListInputSpec.parse(input),
-            }
+            return StringListInputSpec.parse(input)
         case 'enumlist':
-            return { moduleId: moduleId, input: EnumListInputSpec.parse(input) }
+            return EnumListInputSpec.parse(input)
         case 'style':
-            return { moduleId: moduleId, input: StyleInputSpec.parse(input) }
+            return StyleInputSpec.parse(input)
         case 'text':
-            return { moduleId: moduleId, input: TextInputSpec.parse(input) }
+            return TextInputSpec.parse(input)
         default:
             throw new Error(`Invalid input type: ${input.type}`)
     }
