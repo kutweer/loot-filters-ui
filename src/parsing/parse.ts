@@ -3,9 +3,20 @@ import { Filter, FilterSpec, Module } from './UiTypesSpec'
 import { parseInput } from './parseInput'
 import { parseModule } from './parseModule'
 import { parseMetaDescription, parseMetaName } from './rs2fParser'
+import { Lexer } from './lexer'
+import { Token, TokenType } from './token'
+import { TokenStream } from './tokenstream'
 
-const parseDeclaration = (line: string) => {
-    const match = line.match(/define:([a-z]+):([a-z0-9_]+)/)
+const isModuleDeclaration = (token: Token) =>
+    token.type === TokenType.COMMENT &&
+    token.value.startsWith('/*@ define:module')
+
+const isInputDeclaration = (token: Token) =>
+    token.type === TokenType.COMMENT &&
+    token.value.startsWith('/*@ define:input')
+
+const parseModuleDeclaration = (line: string) => {
+    const match = line.match(/\/\*@ define:([a-z]+):([a-z0-9_]+)/)
     if (!match) {
         throw new Error(`Unparseable declaration at '${line}'`)
     }
@@ -15,81 +26,73 @@ const parseDeclaration = (line: string) => {
     }
 }
 
-const extractStructuredComments = (
-    lines: string[]
-): { start: number; end: number }[] => {
-    const structuredComments: { start: number; end: number }[] = []
-
-    let currentComment: { start: number; end: number } | null = null
-
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i]
-
-        if (line.startsWith('/*@')) {
-            if (currentComment !== null) {
-                throw new Error(
-                    `Unexpected new declaration at ${i}: ${line} still parsing comment starting at ${currentComment.start}`
-                )
-            }
-
-            currentComment = { start: i, end: i }
-        }
-
-        if (line.endsWith('*/') && currentComment !== null) {
-            currentComment.end = i + 1
-            structuredComments.push(currentComment)
-            currentComment = null
-        }
-    }
-    return structuredComments
-}
-
 export type ParseResult = {
     errors?: Array<{ line: string; error: Error }>
     filter?: Filter
 }
 
 export const parse = async (filter: string): Promise<ParseResult> => {
-    // Remove escaped newlines before any other processing
-    const lines = filter.replace(/\\\n\s*/g, '').split('\n')
+    const tokens = new TokenStream(new Lexer(filter).tokenize())
+    if (!tokens.hasTokens()) {
+        return {
+            errors: [{ line: '', error: new Error('filter is blank') }],
+        }
+    }
+
+    const first = tokens.peek()!!
+    if (!isModuleDeclaration(first)) {
+        return {
+            errors: [
+                {
+                    line: first.value,
+                    error: new Error(
+                        'filter MUST start with a module declaration'
+                    ),
+                },
+            ],
+        }
+    }
 
     const modulesById: Record<string, Module> = {}
-    const structuredComments = extractStructuredComments(lines)
-
     const errors: { line: string; error: Error }[] = []
 
-    for (const comment of structuredComments) {
+    // we vetted the first token above, the loop will properly init this
+    let currentModule: string = ''
+
+    while (tokens.hasTokens()) {
+        const next = tokens.take(true)!! // preserve whitespace in output
         try {
-            const line = lines[comment.start]
-            const declaration = parseDeclaration(line.slice(3).trim())
-            switch (declaration.type) {
-                case 'module':
-                    modulesById[declaration.id] = parseModule(
-                        declaration.id,
-                        lines,
-                        comment.start,
-                        comment.end
-                    )
-                    break
-                case 'input':
-                    const input = parseInput(
-                        declaration.id,
-                        lines,
-                        comment.start,
-                        comment.end
-                    )
-                    const module = modulesById[input.moduleId]
-                    if (!module) {
-                        throw new Error(
-                            `Module ${input.moduleId} not found for input of macro ${input.input.macroName}`
-                        )
-                    }
-                    module.inputs.push(input.input)
-                    break
+            if (isModuleDeclaration(next)) {
+                const decl = parseModuleDeclaration(next.value)
+                currentModule = decl.id
+                modulesById[decl.id] = parseModule(decl.id, next.value)
+
+                modulesById[currentModule].rs2f += next.value
+            } else if (isInputDeclaration(next)) {
+                const define = new TokenStream([
+                    // define MUST come after the input declaration
+                    tokens.takeExpect(TokenType.PREPROC_DEFINE),
+                    ...tokens.takeLine().getTokens(),
+                ])
+
+                // capture source before parseInput consumes token stream
+                const defineSource = define.toString()
+
+                const input = parseInput(next.value, define)
+                const module = modulesById[currentModule]
+                module.inputs.push(input)
+
+                modulesById[currentModule].rs2f += next.value + '\n'
+                modulesById[currentModule].rs2f += defineSource + '\n'
+            } else {
+                modulesById[currentModule].rs2f +=
+                    next.type === TokenType.LITERAL_STRING
+                        ? `"${next.value}"`
+                        : next.value
             }
         } catch (e) {
             errors.push({
-                line: lines.slice(comment.start, comment.end).join('\n'),
+                line: next.value,
                 error: e as Error,
             })
         }
@@ -124,6 +127,7 @@ export const parse = async (filter: string): Promise<ParseResult> => {
             rs2f: filter,
             rs2fHash,
         })
+        console.log(parsedFilter)
         return {
             errors: undefined,
             filter: parsedFilter,

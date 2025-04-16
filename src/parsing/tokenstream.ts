@@ -15,15 +15,16 @@ export class TokenStream {
         this.tokens = [...tokens]
     }
 
-    /**
-     * Returns a shallow copy of the token stream.
-     */
     getTokens(): Token[] {
         return [...this.tokens]
     }
 
+    hasTokens(): boolean {
+        return this.peek() !== undefined
+    }
+
     /**
-     * Peek at the first non-whitespace token in the stream, without consuming
+     * Peek at the first non-whitespace token in the stream without consuming
      * it.
      */
     peek(): Token | undefined {
@@ -31,12 +32,12 @@ export class TokenStream {
     }
 
     /**
-     * Consume the first non-whitespace token in the stream.
+     * Consume the first token in the stream, optionally including whitespace.
      */
-    take(): Token | undefined {
+    take(includeWhitespace?: boolean): Token | undefined {
         while (this.tokens.length !== 0) {
             const next = this.tokens.shift()
-            if (!isWhitespace(next)) {
+            if (includeWhitespace || !isWhitespace(next)) {
                 return next
             }
         }
@@ -62,26 +63,30 @@ export class TokenStream {
      * Take a complete line from the stream, including whitespace, and
      * excluding the newline at the end.
      */
-    takeLine(): Token[] {
+    takeLine(): TokenStream {
         const line: Token[] = []
         while (this.tokens.length !== 0) {
-            const next = this.tokens.shift() as Token
+            const next = this.tokens.shift()!!
             if (next.type === TokenType.NEWLINE) {
-                return line
+                return new TokenStream(line)
             }
             line.push(next)
         }
-        return line
+        return new TokenStream(line)
     }
 
     toString(): string {
-        return this.tokens.map((t) => t.value).join('')
+        return this.tokens
+            .map((t) =>
+                t.type === TokenType.LITERAL_STRING ? `"${t.value}"` : t.value
+            )
+            .join('')
     }
 }
 
 export function isWhitespace(token?: Token): boolean {
     return (
-        token?.type !== TokenType.WHITESPACE &&
-        token?.type !== TokenType.NEWLINE
+        token?.type === TokenType.WHITESPACE ||
+        token?.type === TokenType.NEWLINE
     )
 }

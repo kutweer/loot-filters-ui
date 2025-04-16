@@ -1,4 +1,4 @@
-import { Token, TokenType, Location } from './token'
+import { Token, TokenType } from './token'
 
 export class Lexer {
     private static readonly STATICS = {
@@ -40,7 +40,7 @@ export class Lexer {
     private cChar: number = 1
 
     constructor(input: string) {
-        this.input = input
+        this.input = input.trim().replaceAll('\r', '') // fuck windows
     }
 
     tokenize(): Token[] {
@@ -72,11 +72,10 @@ export class Lexer {
         }
 
         return this.tokens // un-map escaped newlines
-            .map((it) =>
-                it.value === '\\\n'
-                    ? { type: TokenType.WHITESPACE, value: '' }
-                    : it
-            )
+            .map((token) => {
+                const { type, value, location } = token
+                return value === '\\\n' ? { type, location, value: '' } : token
+            })
     }
 
     private tokenizeStatic(): boolean {

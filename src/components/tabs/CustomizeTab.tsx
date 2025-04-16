@@ -236,8 +236,8 @@ const ModuleSection: React.FC<{
 
     const moduleEnabledDefaultValue = module.enabled
 
-    const configuredEnableValue =
-        config.inputConfigs?.enabledModules?.[module.id]
+    const configuredEnableValue = config.enabledModules?.[module.id]
+
     const enabled = configuredEnableValue ?? moduleEnabledDefaultValue
 
     const showPreviews = useMediaQuery(MuiRsTheme.breakpoints.up('sm'))
@@ -610,28 +610,30 @@ export const CustomizeTab: React.FC<{
                 </div>
             </div>
             <Stack>
-                {filter?.modules.map((module, index: number) => (
-                    <ModuleSection
-                        key={index}
-                        readonly={readonly}
-                        activeFilterId={filter.id}
-                        module={module}
-                        config={config ?? DEFAULT_FILTER_CONFIGURATION}
-                        onChange={onChange}
-                        clearConfiguration={clearConfiguration}
-                        setEnabledModule={setEnabledModule}
-                        expanded={
-                            expandedModules[module.name] ??
-                            (false || siteConfig.devMode)
-                        }
-                        setExpanded={(expanded) =>
-                            setExpandedModules((prev) => ({
-                                ...prev,
-                                [module.name]: expanded,
-                            }))
-                        }
-                    />
-                ))}
+                {filter?.modules
+                    .filter((m) => !m.hidden)
+                    .map((module, index: number) => (
+                        <ModuleSection
+                            key={index}
+                            readonly={readonly}
+                            activeFilterId={filter.id}
+                            module={module}
+                            config={config ?? DEFAULT_FILTER_CONFIGURATION}
+                            onChange={onChange}
+                            clearConfiguration={clearConfiguration}
+                            setEnabledModule={setEnabledModule}
+                            expanded={
+                                expandedModules[module.name] ??
+                                (false || siteConfig.devMode)
+                            }
+                            setExpanded={(expanded) =>
+                                setExpandedModules((prev) => ({
+                                    ...prev,
+                                    [module.name]: expanded,
+                                }))
+                            }
+                        />
+                    ))}
             </Stack>
         </div>
     )

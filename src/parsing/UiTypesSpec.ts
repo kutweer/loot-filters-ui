@@ -14,6 +14,7 @@ export type Input = z.infer<typeof InputSpec>
 export const ModuleSpec = FilterSpecModule.extend({
     id: z.string().nonempty(),
     inputs: z.array(InputSpec).default([]),
+    rs2f: z.string(),
 })
 
 export type Module = z.infer<typeof ModuleSpec>

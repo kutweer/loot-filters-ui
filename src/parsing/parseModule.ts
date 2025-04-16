@@ -2,19 +2,16 @@ import { parse as parseYaml } from 'yaml'
 import { ModuleSpec as FilterSpecModule } from './FilterTypesSpec'
 import { Module, ModuleSpec } from './UiTypesSpec'
 
-export const parseModule = (
-    moduleId: string,
-    lines: string[],
-    start: number,
-    end: number
-): Module => {
-    // start 1 further to remove the /*@ define stuff
-    const wholeComment = lines.slice(start + 1, end).join('\n')
-    const declarationContent = wholeComment.substring(
-        0,
-        wholeComment.indexOf('*/')
+export const parseModule = (moduleId: string, comment: string): Module => {
+    const declarationContent = comment.substring(
+        comment.indexOf('\n'), // chop the structured declaration
+        comment.indexOf('*/')
     )
-    const module = parseYaml(declarationContent!!)
+    const module = parseYaml(declarationContent)
 
-    return ModuleSpec.parse({ ...FilterSpecModule.parse(module), id: moduleId })
+    return ModuleSpec.parse({
+        ...FilterSpecModule.parse(module),
+        id: moduleId,
+        rs2f: '',
+    })
 }
