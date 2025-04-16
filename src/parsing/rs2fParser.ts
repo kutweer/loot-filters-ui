@@ -135,7 +135,7 @@ export const parseDefine = (line: string, lineNumber: number): Rs2fDefine => {
 
         return { name, value: parseString(valueStr), type: 'string' }
     } catch (error) {
-        throw error
+        throw new Error((error as Error).toString())
     }
 }
 

@@ -1,4 +1,4 @@
-import { parse } from '../../parsing/parse'
+import { parseAsync as parse } from '../../parsing/parse'
 import { Filter } from '../../parsing/UiTypesSpec'
 import { FilterStoreState } from '../filterStore'
 import { legacyFilterUrls } from './MigrateLegacyData'

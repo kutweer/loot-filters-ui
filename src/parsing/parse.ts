@@ -31,11 +31,18 @@ export type ParseResult = {
     filter?: Filter
 }
 
-export const parse = async (
+export const parse = (
     filter: string,
     addHeaderModule: boolean = false
-): Promise<ParseResult> => {
-    const tokens = new TokenStream(new Lexer(filter).tokenize())
+): ParseResult => {
+    let tokens: TokenStream
+    try {
+        tokens = new TokenStream(new Lexer(filter).tokenize())
+    } catch (e) {
+        return {
+            errors: [{ line: '', error: e as Error }],
+        }
+    }
     if (!tokens.hasTokens()) {
         return {
             errors: [{ line: '', error: new Error('filter is blank') }],
@@ -118,13 +125,6 @@ export const parse = async (
         }
     }
 
-    const filterBytes = new TextEncoder().encode(filter)
-    const hashBuffer = await window.crypto.subtle.digest('SHA-1', filterBytes)
-    const hashArray = Array.from(new Uint8Array(hashBuffer))
-    const rs2fHash = hashArray
-        .map((b) => b.toString(16).padStart(2, '0'))
-        .join('')
-
     const name = parseMetaName(filter)
     const description = parseMetaDescription(filter) || undefined
 
@@ -138,7 +138,7 @@ export const parse = async (
             source: undefined,
             active: false,
             rs2f: filter,
-            rs2fHash,
+            rs2fHash: '00000000',
         })
         return {
             errors: undefined,
@@ -149,10 +149,38 @@ export const parse = async (
             errors: [
                 {
                     line: filter,
-                    error: e as Error,
+                    error: new Error(
+                        'Failed to parse filter - do you have a meta block?',
+                        {
+                            cause: e,
+                        }
+                    ),
                 },
             ],
             filter: undefined,
         }
     }
+}
+
+export const parseAsync = async (
+    filterText: string,
+    addHeaderModule: boolean = false
+): Promise<ParseResult> => {
+    const result = parse(filterText, addHeaderModule)
+    if (result.errors) {
+        return Promise.resolve(result)
+    }
+
+    return { filter: await addRs2fHash(result.filter!!) }
+}
+
+export const addRs2fHash = async (filter: Filter) => {
+    const filterBytes = new TextEncoder().encode(filter.rs2f)
+    const hashBuffer = await window.crypto.subtle.digest('SHA-1', filterBytes)
+    const hashArray = Array.from(new Uint8Array(hashBuffer))
+    const rs2fHash = hashArray
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('')
+
+    return { ...filter, rs2fHash }
 }

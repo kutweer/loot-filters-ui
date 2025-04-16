@@ -12,7 +12,7 @@ import {
     DEFAULT_FILTER_CONFIGURATION,
     FilterConfiguration,
 } from '../parsing/UiTypesSpec'
-import { parse, ParseResult } from '../parsing/parse'
+import { parseAsync as parse, ParseResult } from '../parsing/parse'
 import { useFilterConfigStore } from '../store/filterConfigurationStore'
 import { useFilterStore } from '../store/filterStore'
 import { colors } from '../styles/MuiTheme'

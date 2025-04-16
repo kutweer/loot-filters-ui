@@ -114,6 +114,7 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
     const [importDialogOpen, setImportDialogOpen] = useState(
         Object.keys(filters).length === 0
     )
+    const [prefixDialogOpen, setPrefixDialogOpen] = useState(false)
 
     const navigate = useNavigate()
 
@@ -324,6 +325,13 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                             <ListItemText>Edit Filter</ListItemText>
                         </MenuItem>
                         <MenuItem
+                            onClick={() => {
+                                setPrefixDialogOpen(true)
+                            }}
+                        >
+                            Add / Edit Prefix Module
+                        </MenuItem>
+                        <MenuItem
                             disabled={!activeFilter}
                             onClick={handleDeleteFilter}
                         >
@@ -443,6 +451,7 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                     }}
                 />
             )}
+            {activeFilter && <div />}
         </>
     )
 }

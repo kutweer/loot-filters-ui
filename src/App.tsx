@@ -7,7 +7,6 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { FilterSelector } from './components/FilterSelector'
 import { FilterTabs } from './pages/CustomizeFilterPage'
 import { DebugPage } from './pages/DebugPage'
-import { EditorPage } from './pages/EditorPage'
 import { ImportPage } from './pages/ImportPage'
 import { useAlertStore } from './store/alerts'
 import {
@@ -16,6 +15,7 @@ import {
 } from './store/migrations/MigrateLegacyData'
 import { useSiteConfigStore } from './store/siteConfig'
 import { MuiRsTheme } from './styles/MuiTheme'
+import { EditorPage } from './pages/EditorPage'
 
 const Page: React.FC<{
     component?: ReactNode
