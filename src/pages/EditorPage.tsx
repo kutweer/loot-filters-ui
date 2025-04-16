@@ -7,6 +7,8 @@ import { Input } from '../parsing/FilterTypesSpec'
 import { parse, ParseResult } from '../parsing/parse'
 import { useEditorStore } from '../store/editor'
 import { colors } from '../styles/MuiTheme'
+import { CustomizeTab } from '../components/tabs/CustomizeTab'
+import { FilterConfiguration, FilterId } from '../parsing/UiTypesSpec'
 
 const Pre: React.FC<{
     line: string
@@ -70,55 +72,17 @@ const VisualResults: React.FC<{
         )
     } else {
         return (
-            <div>
-                <div>
-                    <Typography color="text.primary" variant="h4">
-                        {parsed.filter?.name}
-                    </Typography>
-                    <Typography color="text.secondary" variant="body2">
-                        {parsed.filter?.description}
-                    </Typography>
-                    {parsed.filter?.modules.map((module, i) => (
-                        <div key={i}>
-                            <Typography color="text.primary" variant="h6">
-                                {module.name}{' '}
-                                {module.hidden ? '(hidden)' : null}
-                            </Typography>
-                            <Typography
-                                sx={{ marginLeft: '2rem' }}
-                                color="text.secondary"
-                                variant="body2"
-                            >
-                                {module.description}
-                            </Typography>
-                            {module.inputs.map((input: Input, i) => (
-                                <div key={i}>
-                                    <Typography
-                                        sx={{ marginLeft: '2rem' }}
-                                        component="span"
-                                        color="text.primary"
-                                        variant="body2"
-                                    >
-                                        <span
-                                            style={{ color: colors.rsYellow }}
-                                        >
-                                            {input.type}
-                                        </span>{' '}
-                                        ({input.group ?? 'No Group'}){' '}
-                                        <span
-                                            style={{
-                                                color: colors.rsLightestBrown,
-                                            }}
-                                        >
-                                            {input.label}
-                                        </span>
-                                    </Typography>
-                                </div>
-                            ))}
-                        </div>
-                    ))}
-                </div>
-            </div>
+            <CustomizeTab
+                filter={parsed.filter!!}
+                config={{
+                    enabledModules: {},
+                    inputConfigs: {},
+                }}
+                readonly={true}
+                onChange={() => {}}
+                clearConfiguration={() => {}}
+                setEnabledModule={() => {}}
+            />
         )
     }
 }
@@ -221,7 +185,8 @@ export const EditorPage = () => {
                         theme="vs-dark"
                         options={{
                             minimap: {
-                                enabled: (tab as unknown as string) === 'asdf',
+                                // VERY laggy on large filters
+                                enabled: false,
                             },
                             wordWrap: 'on',
                             readOnly: false,

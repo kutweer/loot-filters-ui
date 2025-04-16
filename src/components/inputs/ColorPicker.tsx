@@ -25,6 +25,50 @@ const rGBColorToArgbHex = (color: RGBColor): ArgbHexColor => {
     return `#${alpha?.toString(16).padStart(2, '0') || '00'}${color.r.toString(16).padStart(2, '0')}${color.g.toString(16).padStart(2, '0')}${color.b.toString(16).padStart(2, '0')}`
 }
 
+const Swatch: React.FC<{
+    color: ArgbHexColor | undefined
+}> = ({ color }) => {
+    const canvasRef = React.useRef<HTMLCanvasElement>(null)
+
+    React.useEffect(() => {
+        const canvas = canvasRef.current
+        if (!canvas) return
+
+        const ctx = canvas.getContext('2d')
+        if (!ctx) return
+
+        // Create checkerboard pattern
+        const size = 5
+        for (let x = 0; x < canvas.width; x += size) {
+            for (let y = 0; y < canvas.height; y += size) {
+                ctx.fillStyle = ((x + y) / size) % 2 ? '#000000' : '#FF00FF'
+                ctx.fillRect(x, y, size, size)
+            }
+        }
+
+        // Draw the actual color on top if set
+        if (color !== '#00000000') {
+            const rgba = colorHexToRgbaCss(color)
+            if (rgba) {
+                ctx.fillStyle = rgba
+                ctx.fillRect(0, 0, canvas.width, canvas.height)
+            }
+        }
+    }, [color])
+
+    return (
+        <canvas
+            ref={canvasRef}
+            width={36}
+            height={18}
+            style={{
+                borderRadius: '4px',
+                border: '1px solid #564e43',
+            }}
+        />
+    )
+}
+
 const ColorPicker: React.FC<{
     color?: ArgbHexColor
     onChange: (color: ArgbHexColor | undefined) => void
@@ -67,16 +111,7 @@ const ColorPicker: React.FC<{
         }
     }
 
-    const unset = color === undefined
-
-    const style = {
-        width: '36px',
-        height: labelLocation == 'right' ? '100%' : '14px',
-        borderRadius: '2px',
-        ...(colorOrError.success
-            ? { background: colorHexToRgbaCss(colorOrError.data) }
-            : {}),
-    }
+    const unset = color === undefined || color === '00000000'
 
     return (
         <div>
@@ -100,9 +135,6 @@ const ColorPicker: React.FC<{
                         <div
                             style={{
                                 padding: '5px',
-                                background: '#fff',
-                                borderRadius: '1px',
-                                boxShadow: '0 0 0 1px rgba(0,0,0,.1)',
                                 display: 'inline-block',
                                 cursor: disabled ? 'not-allowed' : 'pointer',
                             }}
@@ -115,10 +147,7 @@ const ColorPicker: React.FC<{
                                 }
                             }}
                         >
-                            <div
-                                className={unset ? 'unset-color-picker' : ''}
-                                style={style}
-                            />
+                            <Swatch color={color} />
                         </div>
                     </Tooltip>
                     <Typography

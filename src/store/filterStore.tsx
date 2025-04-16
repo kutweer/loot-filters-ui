@@ -21,7 +21,7 @@ export const useFilterStore = create<FilterStoreState>()(
                             filters: {
                                 ...state.filters,
                                 [filter.id]: filter,
-                            },
+                            }
                         })),
                     removeFilter: (filterId: string) =>
                         set((state) => ({
