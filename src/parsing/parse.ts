@@ -85,7 +85,10 @@ export const parse = async (filter: string): Promise<ParseResult> => {
                 modulesById[currentModule].rs2f += next.value + '\n'
                 modulesById[currentModule].rs2f += defineSource + '\n'
             } else {
-                modulesById[currentModule].rs2f += next.value
+                modulesById[currentModule].rs2f +=
+                    next.type === TokenType.LITERAL_STRING
+                        ? `"${next.value}"`
+                        : next.value
             }
         } catch (e) {
             errors.push({
