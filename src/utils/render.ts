@@ -12,26 +12,27 @@ export const renderFilter = (
     filter: Filter,
     activeConfig: FilterConfiguration | undefined
 ): string => {
-    let filterText = filter.rs2f
-
-    filter.modules.forEach((m) => {
-        filterText = applyModule(filterText, m, activeConfig?.inputConfigs)
+    const modules = filter.modules.filter((module) => {
+        const enabledConfig = activeConfig?.enabledModules?.[module.id]
+        return enabledConfig ?? module.enabled
     })
+    let filterText = modules
+        .map((m) => applyModule(m, activeConfig?.inputConfigs))
+        .join('\n')
 
     filterText = filterText.replace(/^meta\s*{([^}]*)}/, '')
     filterText =
-        `meta { name = \"${filter.name}\"; description = \"${filter.description}\"; }` +
+        `meta { name = \"${filter.name}\"; description = \"${filter.description}\"; }\n\n` +
         filterText
 
     return filterText
 }
 
 const applyModule = (
-    filterText: string,
     module: Module,
     config: { [key: MacroName]: any } | undefined
 ): string => {
-    let updated = filterText
+    let updated = module.rs2f
 
     for (const input of module.inputs) {
         switch (input.type) {
