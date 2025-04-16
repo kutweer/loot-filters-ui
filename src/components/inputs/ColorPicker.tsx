@@ -59,8 +59,8 @@ const Swatch: React.FC<{
     return (
         <canvas
             ref={canvasRef}
-            width={36}
-            height={18}
+            width={40}
+            height={20}
             style={{
                 borderRadius: '4px',
                 border: '1px solid #564e43',
