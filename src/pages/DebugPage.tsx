@@ -62,7 +62,7 @@ export const DebugPage = () => {
                                         )
                                     }
                                 )
-                                nav('/')
+                                window.location.href = `${window.location.protocol}://${window.location.host}`
                             }
                             reader.readAsText(file)
                         }}

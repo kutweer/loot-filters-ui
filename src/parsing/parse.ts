@@ -48,7 +48,7 @@ export const parse = async (
         // but ONLY if we're doing the migration from v2 to v3...
         if (addHeaderModule) {
             return parse(
-                `/*@ define:module:__migration_header__\nname: __migration_header__\n*/\n` +
+                `/*@ define:module:__migration_header__\nname: __migration_header__\nhidden: true\n*/\n` +
                     filter,
                 false
             )

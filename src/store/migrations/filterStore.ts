@@ -57,9 +57,14 @@ const toV3 = async (state: FilterStoreState) => {
             const updatedFilter = { ...parsed.filter!! }
 
             // Preserve certain fields off the original
+            // Ensures configurations still map correctly
             updatedFilter.id = filter.id
+            // User can edit these
             updatedFilter.active = filter.active
             updatedFilter.name = filter.name
+            updatedFilter.description = filter.description
+
+            // We parsed from raw text- no url; so copy over source & date
             updatedFilter.source = filter.source
             updatedFilter.importedOn = filter.importedOn
             // preserve original hash so that we don't immediately re-check for an
