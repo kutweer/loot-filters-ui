@@ -83,8 +83,6 @@ export const ImportPage: React.FC = () => {
         </Typography>
     ) : null
 
-    console.log('parsedFilter', parsedFilter)
-    console.log('filterConfig', filterConfig)
     const customizationCount = Object.keys(filterConfig ?? {}).length
 
     const filterComponent = parsedFilter ? (
@@ -103,7 +101,6 @@ export const ImportPage: React.FC = () => {
                     }
                     error={parsedFilter.filter?.name.trim() === ''}
                     onChange={(e) => {
-                        console.log('onChange', e.target.value)
                         if (parsedFilter?.filter) {
                             setParsedFilter({
                                 ...parsedFilter,

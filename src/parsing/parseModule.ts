@@ -8,7 +8,6 @@ export const parseModule = (moduleId: string, comment: string): Module => {
         comment.indexOf('*/')
     )
     const module = parseYaml(declarationContent)
-
     return ModuleSpec.parse({
         ...FilterSpecModule.parse(module),
         id: moduleId,

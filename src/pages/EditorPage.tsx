@@ -81,7 +81,8 @@ const VisualResults: React.FC<{
                     {parsed.filter?.modules.map((module, i) => (
                         <div key={i}>
                             <Typography color="text.primary" variant="h6">
-                                {module.name}
+                                {module.name}{' '}
+                                {module.hidden ? '(hidden)' : null}
                             </Typography>
                             <Typography
                                 sx={{ marginLeft: '2rem' }}

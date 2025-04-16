@@ -1,9 +1,9 @@
 import { generateId } from '../utils/idgen'
 import { Filter, FilterSpec, Module } from './UiTypesSpec'
+import { Lexer } from './lexer'
 import { parseInput } from './parseInput'
 import { parseModule } from './parseModule'
 import { parseMetaDescription, parseMetaName } from './rs2fParser'
-import { Lexer } from './lexer'
 import { Token, TokenType } from './token'
 import { TokenStream } from './tokenstream'
 
@@ -31,7 +31,10 @@ export type ParseResult = {
     filter?: Filter
 }
 
-export const parse = async (filter: string): Promise<ParseResult> => {
+export const parse = async (
+    filter: string,
+    addHeaderModule: boolean = false
+): Promise<ParseResult> => {
     const tokens = new TokenStream(new Lexer(filter).tokenize())
     if (!tokens.hasTokens()) {
         return {
@@ -41,6 +44,16 @@ export const parse = async (filter: string): Promise<ParseResult> => {
 
     const first = tokens.peek()!!
     if (!isModuleDeclaration(first)) {
+        // If the filter doesn't start with a module declaration, we need to add a header module
+        // but ONLY if we're doing the migration from v2 to v3...
+        if (addHeaderModule) {
+            return parse(
+                `/*@ define:module:__migration_header__\nname: __migration_header__\n*/\n` +
+                    filter,
+                false
+            )
+        }
+
         return {
             errors: [
                 {
@@ -127,7 +140,6 @@ export const parse = async (filter: string): Promise<ParseResult> => {
             rs2f: filter,
             rs2fHash,
         })
-        console.log(parsedFilter)
         return {
             errors: undefined,
             filter: parsedFilter,

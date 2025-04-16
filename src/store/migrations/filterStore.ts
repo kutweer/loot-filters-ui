@@ -1,15 +1,20 @@
+import { parse } from '../../parsing/parse'
+import { Filter } from '../../parsing/UiTypesSpec'
 import { FilterStoreState } from '../filterStore'
 import { legacyFilterUrls } from './MigrateLegacyData'
 
-export const migrateFilterStore = (
+export const migrateFilterStore = async (
     state: FilterStoreState,
     version: number
 ) => {
     let updated = { ...state }
     if (version < 2) {
-        toV2(state)
+        toV2(updated)
     }
 
+    if (version < 3) {
+        await toV3(updated)
+    }
     return updated
 }
 
@@ -34,4 +39,38 @@ const toV2 = (state: FilterStoreState) => {
             source: url,
         }
     })
+}
+
+/**
+ * We moved back to having the rs2f stored on each module (though the whole thing also remains on the filter)
+ */
+const toV3 = async (state: FilterStoreState) => {
+    const updatedFilters = await Promise.all(
+        Object.values(state.filters).map(async (filter: Filter) => {
+            const parsed = await parse(filter.rs2f, true)
+
+            if (parsed.errors) {
+                console.error(parsed.errors)
+                throw Error('Error parsing filter during migration')
+            }
+
+            const updatedFilter = { ...parsed.filter!! }
+
+            // Preserve certain fields off the original
+            updatedFilter.id = filter.id
+            updatedFilter.active = filter.active
+            updatedFilter.name = filter.name
+            updatedFilter.source = filter.source
+            updatedFilter.importedOn = filter.importedOn
+            // preserve original hash so that we don't immediately re-check for an
+            //  update for a filter that doesn't start with a module declaration.
+            updatedFilter.rs2fHash = filter.rs2fHash
+
+            return updatedFilter
+        })
+    )
+
+    state.filters = Object.fromEntries(
+        updatedFilters.map((filter) => [filter.id, filter])
+    )
 }

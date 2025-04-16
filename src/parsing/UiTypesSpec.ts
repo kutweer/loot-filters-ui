@@ -120,7 +120,7 @@ export const FilterSpec = z.object({
     active: z.boolean().default(false),
     importedOn: z.string().datetime().default(new Date().toISOString()),
     source: z.string().url().optional(),
-    modules: z.array(ModuleSpec).default([]),
+    modules: z.array(ModuleSpec),
     rs2f: z.string(),
 })
 
