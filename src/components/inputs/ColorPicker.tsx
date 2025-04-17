@@ -128,7 +128,7 @@ const ColorPicker: React.FC<{
                             disabled
                                 ? 'Color picker is disabled'
                                 : !unset
-                                  ? 'Shift + Click to unset color'
+                                  ? 'Shift + Click to revert to default color'
                                   : 'Click to pick a color'
                         }
                     >
