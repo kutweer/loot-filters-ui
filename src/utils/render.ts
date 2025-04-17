@@ -1,3 +1,4 @@
+import { parseModules } from '../parsing/parse'
 import {
     Filter,
     FilterConfiguration,
@@ -12,10 +13,17 @@ export const renderFilter = (
     filter: Filter,
     activeConfig: FilterConfiguration | undefined
 ): string => {
-    const modules = filter.modules.filter((module) => {
+    const filterModules = filter.modules.filter((module) => {
         const enabledConfig = activeConfig?.enabledModules?.[module.id]
         return enabledConfig ?? module.enabled
     })
+
+    const modules = [
+        ...(parseModules(activeConfig?.prefixRs2f || '')?.modules || []),
+        ...filterModules,
+        ...(parseModules(activeConfig?.suffixRs2f || '')?.modules || []),
+    ]
+
     let filterText = modules
         .map((m) => applyModule(m, activeConfig?.inputConfigs))
         .join('\n')
@@ -32,11 +40,12 @@ export const renderFilter = (
     return filterText
 }
 
-const applyModule = (
+export const applyModule = (
     module: Module,
     config: { [key: MacroName]: any } | undefined
 ): string => {
     let updated = module.rs2f
+    console.log('apply', module, config)
 
     for (const input of module.inputs) {
         switch (input.type) {
@@ -53,6 +62,7 @@ const applyModule = (
             }
             case 'number': {
                 const value = config?.[input.macroName] ?? input.default
+                console.log('number value', value)
                 if (value !== undefined) {
                     updated = updateMacro(
                         updated,
@@ -165,6 +175,7 @@ const updateMacro = (
     let inMultiline = false
     for (const line of filter.split('\n')) {
         if (isTargetMacro(line, macro)) {
+            console.log('hi')
             if (line.endsWith('\\')) {
                 inMultiline = true
             } else {

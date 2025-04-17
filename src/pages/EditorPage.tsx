@@ -7,6 +7,10 @@ export const EditorPage: React.FC = () => {
         <Rs2fEditor
             selected="editor"
             setEditorContent={setContent}
+            allowEditDefaults={false}
+            configClearConfiguration={() => {}}
+            configSetEnabledModule={() => {}}
+            configOnChange={() => {}}
             setSelected={() => {}}
             filesContent={Object.fromEntries(
                 Object.entries(contentById).filter(([k, v]) => {

@@ -1,10 +1,11 @@
 import { Editor } from '@monaco-editor/react'
 import { Tab, Tabs, Typography } from '@mui/material'
-import { useState } from 'react'
+import { ReactNode, useState } from 'react'
 import { parse, ParseResult } from '../parsing/parse'
+import { FilterConfiguration, FilterId } from '../parsing/UiTypesSpec'
 import { colors } from '../styles/MuiTheme'
 import { ErrorBoundary } from './ErrorBoundary'
-import { UISelect } from './inputs/UISelect'
+import { Option, UISelect } from './inputs/UISelect'
 import { CustomizeTab } from './tabs/CustomizeTab'
 
 const Pre: React.FC<{
@@ -54,7 +55,21 @@ const causeList = (error: Error): Error[] => {
 
 const VisualResults: React.FC<{
     parsed: ParseResult | null
-}> = ({ parsed }) => {
+    enableEdits: boolean
+    configOnChange: (config: FilterConfiguration) => void
+    configClearConfiguration: () => void
+    configSetEnabledModule: (
+        filterId: FilterId,
+        moduleId: string,
+        enabled: boolean
+    ) => void
+}> = ({
+    parsed,
+    enableEdits,
+    configOnChange,
+    configClearConfiguration,
+    configSetEnabledModule,
+}) => {
     if (!parsed) {
         return <div>No parsed result</div>
     }
@@ -90,15 +105,16 @@ const VisualResults: React.FC<{
     } else {
         return (
             <CustomizeTab
+                sx={{ marginTop: '-4rem' }}
                 filter={parsed.filter!!}
                 config={{
                     enabledModules: {},
                     inputConfigs: {},
                 }}
-                readonly={true}
-                onChange={() => {}}
-                clearConfiguration={() => {}}
-                setEnabledModule={() => {}}
+                readonly={!enableEdits}
+                onChange={configOnChange}
+                clearConfiguration={configClearConfiguration}
+                setEnabledModule={configSetEnabledModule}
             />
         )
     }
@@ -110,11 +126,45 @@ export const Rs2fEditor: React.FC<{
 
     filesContent: Record<string, string>
     setEditorContent: (id: string, content: string) => void
-}> = ({ selected, setSelected, filesContent, setEditorContent }) => {
+
+    requireMeta?: boolean
+    options?: Option[]
+
+    extraTabComponent?: ReactNode
+
+    // For editing config options
+    allowEditDefaults: boolean
+    // only need these implemented if the above is true
+    configOnChange: (config: FilterConfiguration) => void
+    configClearConfiguration: () => void
+    configSetEnabledModule: (
+        filterId: FilterId,
+        moduleId: string,
+        enabled: boolean
+    ) => void
+}> = ({
+    selected,
+    setSelected,
+    filesContent,
+    setEditorContent,
+    options,
+    requireMeta,
+    extraTabComponent,
+    allowEditDefaults,
+    configOnChange,
+    configClearConfiguration,
+    configSetEnabledModule,
+}) => {
     const selectedContent = selected ? filesContent[selected] || '' : ''
 
+    const metaContentOverride = requireMeta
+        ? undefined
+        : { name: '__filter_name__' }
+
     const parsed =
-        typeof selectedContent === 'string' ? parse(selectedContent) : null
+        typeof selectedContent === 'string'
+            ? parse(selectedContent, false, metaContentOverride)
+            : null
 
     const [tab, setTab] = useState<'visual' | 'json' | 'wide'>('visual')
 
@@ -129,12 +179,22 @@ export const Rs2fEditor: React.FC<{
                 }}
             >
                 <UISelect<string>
-                    options={Object.keys(filesContent).map((file) => ({
-                        label: file,
-                        value: file,
-                    }))}
+                    disableClearable={true}
+                    sx={{ width: '15rem' }}
+                    options={
+                        options ||
+                        Object.keys(filesContent).map((file) => ({
+                            label: file,
+                            value: file,
+                        }))
+                    }
                     value={
-                        selected ? { label: selected, value: selected } : null
+                        (options
+                            ? options.filter(
+                                  ({ value }) => value === selected
+                              )[0]
+                            : undefined) ??
+                        (selected ? { label: selected, value: selected } : null)
                     }
                     onChange={(value) => {
                         if (!value) {
@@ -143,7 +203,7 @@ export const Rs2fEditor: React.FC<{
                             setSelected(value.value)
                         }
                     }}
-                    label="choose a file"
+                    label="Choose a File"
                     multiple={false}
                     freeSolo={false}
                     disabled={false}
@@ -163,6 +223,7 @@ export const Rs2fEditor: React.FC<{
                     <Tab value="json" label="Result JSON" />
                     <Tab value="wide" label="Wide Editor" />
                 </Tabs>
+                {extraTabComponent}
             </div>
             <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
                 <div
@@ -198,7 +259,13 @@ export const Rs2fEditor: React.FC<{
                         display: tab === 'visual' ? 'block' : 'none',
                     }}
                 >
-                    <VisualResults parsed={parsed} />
+                    <VisualResults
+                        enableEdits={allowEditDefaults}
+                        parsed={parsed}
+                        configOnChange={configOnChange}
+                        configClearConfiguration={configClearConfiguration}
+                        configSetEnabledModule={configSetEnabledModule}
+                    />
                 </div>
                 <div
                     style={{

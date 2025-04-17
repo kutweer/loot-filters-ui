@@ -16,6 +16,7 @@ import {
 import { useSiteConfigStore } from './store/siteConfig'
 import { MuiRsTheme } from './styles/MuiTheme'
 import { EditorPage } from './pages/EditorPage'
+import { EditorLoadedFilterPage } from './pages/EditLoadedFilterPage'
 
 const Page: React.FC<{
     component?: ReactNode
@@ -103,6 +104,10 @@ export const App = () => {
                     <Route
                         path="/editor"
                         element={<Page component={<EditorPage />} />}
+                    />
+                    <Route
+                        path="/editor/:filterId"
+                        element={<Page component={<EditorLoadedFilterPage />} />}
                     />
                     <Route
                         path="/import"

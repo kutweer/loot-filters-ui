@@ -11,18 +11,21 @@ import {
     Menu,
     MenuItem,
     Stack,
+    SxProps,
+    Theme,
     ToggleButton,
     ToggleButtonGroup,
     Tooltip,
     Typography,
     useMediaQuery,
 } from '@mui/material'
-import React, { useEffect, useState } from 'react'
+import React, { CSSProperties, useEffect, useState } from 'react'
 import { groupBy, isObject } from 'underscore'
 import { colors, MuiRsTheme } from '../../styles/MuiTheme'
 
 import { ExpandLess } from '@mui/icons-material'
 import SettingsIcon from '@mui/icons-material/Settings'
+import { parseModules } from '../../parsing/parse'
 import {
     BooleanInput,
     DEFAULT_FILTER_CONFIGURATION,
@@ -515,6 +518,7 @@ export const CustomizeTab: React.FC<{
     ) => void
     extraComponent?: React.ReactNode
     readonly: boolean
+    sx?: CSSProperties
 }> = ({
     filter,
     config,
@@ -523,6 +527,7 @@ export const CustomizeTab: React.FC<{
     setEnabledModule,
     extraComponent,
     readonly,
+    sx
 }) => {
     const { siteConfig } = useSiteConfigStore()
     const [expandedModules, setExpandedModules] = useState<
@@ -559,8 +564,14 @@ export const CustomizeTab: React.FC<{
         )
     }
 
+    const modules = [
+        ...(parseModules(config?.prefixRs2f || '')?.modules || []),
+        ...filter.modules,
+        ...(parseModules(config?.suffixRs2f || '')?.modules || []),
+    ]
+
     return (
-        <div>
+        <div style={{ ...sx }}>
             <div
                 style={{
                     display: 'flex',
@@ -610,7 +621,7 @@ export const CustomizeTab: React.FC<{
                 </div>
             </div>
             <Stack>
-                {filter?.modules
+                {modules
                     .filter((m) => !m.hidden)
                     .map((module, index: number) => (
                         <ModuleSection

@@ -31,9 +31,20 @@ export type ParseResult = {
     filter?: Filter
 }
 
+export const parseModules = (
+    filter: string
+): { errors?: Array<{ line: string; error: Error }>; modules?: Module[] } => {
+    const result = parse(filter, false, { name: 'onlyModules' })
+    return {
+        errors: result.errors,
+        modules: result.filter?.modules,
+    }
+}
+
 export const parse = (
     filter: string,
-    addHeaderModule: boolean = false
+    addHeaderModule: boolean = false,
+    metaContentOverride?: { name: string; description?: string }
 ): ParseResult => {
     let tokens: TokenStream
     try {
@@ -139,6 +150,7 @@ export const parse = (
             active: false,
             rs2f: filter,
             rs2fHash: '00000000',
+            ...(metaContentOverride || {}),
         })
         return {
             errors: undefined,

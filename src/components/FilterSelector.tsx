@@ -6,16 +6,12 @@ import MoreVertIcon from '@mui/icons-material/MoreVert'
 import {
     Box,
     Button,
-    Dialog,
-    DialogContent,
-    DialogTitle,
     FormControl,
     IconButton,
     ListItemText,
     Menu,
     MenuItem,
     Stack,
-    TextField,
     Typography,
 } from '@mui/material'
 import ListItemIcon from '@mui/material/ListItemIcon'
@@ -36,68 +32,6 @@ import { loadFilterFromUrl } from '../utils/loaderv2'
 import { renderFilter } from '../utils/render'
 import { ImportFilterDialog } from './ImportFilterDialog'
 import { Option, UISelect } from './inputs/UISelect'
-
-const EditFilterDialog: React.FC<{
-    open: boolean
-    filter: Filter
-    onSave: (name: string, description?: string) => void
-    onClose: () => void
-}> = ({ open, filter, onSave, onClose }) => {
-    const [name, setName] = useState(filter.name)
-    const [description, setDescription] = useState(filter.description)
-    return (
-        <Dialog maxWidth="xl" open={open} onClose={onClose}>
-            <DialogTitle>Edit Filter</DialogTitle>
-            <DialogContent>
-                <Box>
-                    <TextField
-                        size="small"
-                        sx={{ width: '350px', mt: 1 }}
-                        label="Filter Name"
-                        value={name}
-                        onChange={(e) => {
-                            setName(e.target.value)
-                        }}
-                    />
-                    <TextField
-                        size="small"
-                        sx={{ width: '350px', mt: 1 }}
-                        label="Filter Description"
-                        value={description}
-                        onChange={(e) => {
-                            setDescription(e.target.value)
-                        }}
-                    />
-                </Box>
-                <Box
-                    sx={{
-                        display: 'flex',
-                        gap: 10,
-                        mt: 3,
-                        justifyContent: 'center',
-                    }}
-                >
-                    <Button
-                        variant="outlined"
-                        color="primary"
-                        onClick={() => {
-                            onSave(name, description)
-                        }}
-                    >
-                        Save
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        color="primary"
-                        onClick={onClose}
-                    >
-                        Close
-                    </Button>
-                </Box>
-            </DialogContent>
-        </Dialog>
-    )
-}
 
 export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
     reloadOnChange,
@@ -316,20 +250,13 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                         <MenuItem
                             disabled={!activeFilter}
                             onClick={() => {
-                                setEditDialogOpen(true)
+                                navigate(`/editor/${activeFilter!!.id}`)
                             }}
                         >
                             <ListItemIcon>
                                 <Edit />
                             </ListItemIcon>
                             <ListItemText>Edit Filter</ListItemText>
-                        </MenuItem>
-                        <MenuItem
-                            onClick={() => {
-                                setPrefixDialogOpen(true)
-                            }}
-                        >
-                            Add / Edit Prefix Module
                         </MenuItem>
                         <MenuItem
                             disabled={!activeFilter}
@@ -432,26 +359,6 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                 open={importDialogOpen}
                 onClose={() => setImportDialogOpen(false)}
             />
-            {activeFilter && (
-                <EditFilterDialog
-                    open={editDialogOpen}
-                    filter={activeFilter}
-                    onClose={() => setEditDialogOpen(false)}
-                    onSave={(name, description) => {
-                        updateFilter({
-                            ...activeFilter,
-                            name,
-                            description,
-                        })
-                        addAlert({
-                            children: 'Filter name updated',
-                            severity: 'success',
-                        })
-                        setEditDialogOpen(false)
-                    }}
-                />
-            )}
-            {activeFilter && <div />}
         </>
     )
 }

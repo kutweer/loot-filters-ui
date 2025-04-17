@@ -139,6 +139,8 @@ export const DEFAULT_FILTER_CONFIGURATION = {
 export const FilterConfigurationSpec = z.object({
     enabledModules: z.record(z.string(), z.boolean()).optional().default({}),
     inputConfigs: z.record(z.string(), z.any()).optional().default({}),
+    prefixRs2f: z.string().optional(),
+    suffixRs2f: z.string().optional(),
 })
 
 export type FilterConfiguration = z.infer<typeof FilterConfigurationSpec>
