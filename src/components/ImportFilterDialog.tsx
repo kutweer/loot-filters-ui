@@ -11,8 +11,11 @@ import {
     Typography,
 } from '@mui/material'
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { FilterSpec } from '../parsing/UiTypesSpec'
 import { useFilterStore } from '../store/filterStore'
 import { useOboardingStore } from '../store/onboarding'
+import { generateId } from '../utils/idgen'
 import { loadFilterFromUrl } from '../utils/loaderv2'
 
 interface ImportFilterDialogProps {
@@ -33,6 +36,7 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
     const [filterNameOverride, setFilterNameOverride] = useState('')
     const [importError, setImportError] = useState('')
     const { updateFilter, setActiveFilter } = useFilterStore()
+    const navigate = useNavigate()
 
     const handleClose = () => {
         setFilterUrl('')
@@ -239,7 +243,6 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                             </CardActions>
                         </Card>
                     </Grid2>
-                    <Grid2 size={1} />
                     <Grid2 size={3}>
                         <Card variant="outlined">
                             <CardContent>
@@ -313,7 +316,6 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                             </CardActions>
                         </Card>
                     </Grid2>
-                    <Grid2 size={1} />
                     <Grid2 size={3}>
                         <Card variant="outlined">
                             <CardContent>
@@ -347,6 +349,51 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                                     size="small"
                                     onClick={(e) => {
                                         setShowURLImportOptions(true)
+                                    }}
+                                >
+                                    Import
+                                </Button>
+                            </CardActions>
+                        </Card>
+                    </Grid2>
+                    <Grid2 size={3}>
+                        <Card variant="outlined">
+                            <CardContent>
+                                <Typography
+                                    variant="h6"
+                                    component="div"
+                                    fontSize="36px"
+                                >
+                                    Create In UI
+                                </Typography>
+                                <Typography
+                                    variant="body2"
+                                    sx={{
+                                        color: 'text.secondary',
+                                        fontSize: '24px',
+                                        minHeight: '4lh',
+                                    }}
+                                >
+                                    Write a filter right here in the UI.
+                                </Typography>
+                            </CardContent>
+                            <CardActions>
+                                <Button
+                                    size="small"
+                                    onClick={(e) => {
+                                        const id = generateId()
+                                        updateFilter(
+                                            FilterSpec.parse({
+                                                id: id,
+                                                name: 'My new filter',
+                                                rs2fHash: '',
+                                                modules: [], // TODO add a module
+                                                rs2f: '',
+                                            })
+                                        )
+                                        navigate(
+                                            `/editor/${id}?initialFile=filterRs2f`
+                                        )
                                     }}
                                 >
                                     Import

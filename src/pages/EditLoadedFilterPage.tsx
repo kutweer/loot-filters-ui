@@ -1,6 +1,6 @@
 import { FormControlLabel, Switch, Typography } from '@mui/material'
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { ErrorBoundary } from '../components/ErrorBoundary'
 import { Rs2fEditor } from '../components/Rs2fEditor'
 import { parseModules } from '../parsing/parse'
@@ -23,6 +23,8 @@ export const EditorLoadedFilterPage: React.FC = () => {
         useFilterConfigStore()
     const { filters, updateFilter } = useFilterStore()
     const [editDefaults, setEditDefaults] = useState<boolean>(false)
+    const [searchParams] = useSearchParams()
+    const initialFile = searchParams.get('initialFile')
 
     if (!filterId || !filters[filterId]) {
         return (
@@ -52,13 +54,24 @@ export const EditorLoadedFilterPage: React.FC = () => {
         ...(filters[filterId] ? { filterRs2f: filters[filterId].rs2f } : {}),
     }
 
+    const initialFileValid = [
+        'filterRs2f',
+        'prefixRs2f',
+        'suffixRs2f',
+    ].includes(initialFile || '')
     const [selected, setSelected] = useState<
         'filterRs2f' | 'prefixRs2f' | 'suffixRs2f'
-    >('prefixRs2f')
+    >(
+        initialFileValid
+            ? (initialFile as 'filterRs2f' | 'prefixRs2f' | 'suffixRs2f')
+            : 'prefixRs2f'
+    )
     const setContent = (id: string, content: string) => {
         if (id === 'filterRs2f') {
+            const modules = parseModules(content)
             updateFilter({
                 ...filters[filterId],
+                ...(modules.modules ? { modules: modules.modules } : {}),
                 rs2f: content,
             })
         } else if (id === 'prefixRs2f' || id === 'suffixRs2f') {

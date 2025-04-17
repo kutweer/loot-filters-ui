@@ -7,6 +7,7 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { FilterSelector } from './components/FilterSelector'
 import { FilterTabs } from './pages/CustomizeFilterPage'
 import { DebugPage } from './pages/DebugPage'
+import { EditorLoadedFilterPage } from './pages/EditLoadedFilterPage'
 import { ImportPage } from './pages/ImportPage'
 import { useAlertStore } from './store/alerts'
 import {
@@ -15,8 +16,6 @@ import {
 } from './store/migrations/MigrateLegacyData'
 import { useSiteConfigStore } from './store/siteConfig'
 import { MuiRsTheme } from './styles/MuiTheme'
-import { EditorPage } from './pages/EditorPage'
-import { EditorLoadedFilterPage } from './pages/EditLoadedFilterPage'
 
 const Page: React.FC<{
     component?: ReactNode
@@ -102,12 +101,10 @@ export const App = () => {
                         }
                     />
                     <Route
-                        path="/editor"
-                        element={<Page component={<EditorPage />} />}
-                    />
-                    <Route
                         path="/editor/:filterId"
-                        element={<Page component={<EditorLoadedFilterPage />} />}
+                        element={
+                            <Page component={<EditorLoadedFilterPage />} />
+                        }
                     />
                     <Route
                         path="/import"
