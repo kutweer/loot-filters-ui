@@ -1,6 +1,8 @@
 import { Editor } from '@monaco-editor/react'
-import { Tab, Tabs, Typography } from '@mui/material'
+import { ArrowBack } from '@mui/icons-material'
+import { Button, Tab, Tabs, Typography } from '@mui/material'
 import { ReactNode, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { parse, ParseResult } from '../parsing/parse'
 import { FilterConfiguration, FilterId } from '../parsing/UiTypesSpec'
 import { colors } from '../styles/MuiTheme'
@@ -156,6 +158,7 @@ export const Rs2fEditor: React.FC<{
     configSetEnabledModule,
 }) => {
     const selectedContent = selected ? filesContent[selected] || '' : ''
+    const navigator = useNavigate()
 
     const metaContentOverride = requireMeta
         ? undefined
@@ -178,6 +181,17 @@ export const Rs2fEditor: React.FC<{
                     gap: '1rem',
                 }}
             >
+                <Button
+                    color="primary"
+                    variant="outlined"
+                    sx={{ fontFamily: 'RuneScape' }}
+                    onClick={() => {
+                        navigator('/')
+                    }}
+                >
+                    <ArrowBack />
+                    Back to Customizer
+                </Button>
                 <UISelect<string>
                     disableClearable={true}
                     sx={{ width: '15rem' }}
