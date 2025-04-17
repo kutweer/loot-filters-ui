@@ -4,7 +4,11 @@ import { Button, Tab, Tabs, Typography } from '@mui/material'
 import { ReactNode, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { parse, ParseResult } from '../parsing/parse'
-import { DEFAULT_FILTER_CONFIGURATION, FilterConfiguration, FilterId } from '../parsing/UiTypesSpec'
+import {
+    DEFAULT_FILTER_CONFIGURATION,
+    FilterConfiguration,
+    FilterId,
+} from '../parsing/UiTypesSpec'
 import { colors } from '../styles/MuiTheme'
 import { ErrorBoundary } from './ErrorBoundary'
 import { Option, UISelect } from './inputs/UISelect'
@@ -59,11 +63,7 @@ const VisualResults: React.FC<{
     parsed: ParseResult | null
     enableEdits: boolean
     configOnChange: (config: FilterConfiguration) => void
-}> = ({
-    parsed,
-    enableEdits,
-    configOnChange,
-}) => {
+}> = ({ parsed, enableEdits, configOnChange }) => {
     if (!parsed) {
         return <div>No parsed result</div>
     }
