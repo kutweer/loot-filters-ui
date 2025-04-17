@@ -103,7 +103,14 @@ export const EditorLoadedFilterPage: React.FC = () => {
                 }
             }}
             extraTabComponent={
-                <div>
+                <div
+                    style={{
+                        width: '80%',
+                        display: 'flex',
+                        flexDirection: 'row',
+                        gap: 2,
+                    }}
+                >
                     <FormControlLabel
                         sx={{ color: colors.rsYellow }}
                         control={<Switch checked={editDefaults} />}
@@ -114,7 +121,7 @@ export const EditorLoadedFilterPage: React.FC = () => {
                     />
                     <Typography variant="h5" color="error">
                         {selected === 'filterRs2f' && filters[filterId].source
-                            ? 'Warning: Changes will not be carried forward when filter updates'
+                            ? 'Changes will not carry forward if filter updates'
                             : null}
                     </Typography>
                 </div>
