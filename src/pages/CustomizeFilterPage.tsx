@@ -40,7 +40,7 @@ export const FilterTabs: React.FC = () => {
         parse(config?.suffixRs2f || '', false, {
             name: 'suffix',
         })?.filter?.modules || []
-        
+
     const tabs = useMemo(() => {
         return (
             <Box

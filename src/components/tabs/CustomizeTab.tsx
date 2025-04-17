@@ -466,7 +466,7 @@ const ModuleSection: React.FC<{
                                                             ) => {
                                                                 const existingValue =
                                                                     config
-                                                                        .inputConfigs[
+                                                                        .inputConfigs?.[
                                                                         macroName
                                                                     ]
 
@@ -527,7 +527,7 @@ export const CustomizeTab: React.FC<{
     setEnabledModule,
     extraComponent,
     readonly,
-    sx
+    sx,
 }) => {
     const { siteConfig } = useSiteConfigStore()
     const [expandedModules, setExpandedModules] = useState<
