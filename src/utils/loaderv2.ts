@@ -5,7 +5,7 @@ export const loadFilterFromUrl = async (url: string): Promise<Filter> => {
     const response = await fetch(url)
     const filterText = await response.text()
 
-    const { errors, filter } = await parse(filterText)
+    const { errors, filter } = await parse(filterText, true)
 
     if (errors && errors.length > 0) {
         throw Error('Failed to parse filter: ' + JSON.stringify(errors))

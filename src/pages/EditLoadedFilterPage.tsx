@@ -1,4 +1,4 @@
-import { FormControlLabel, Switch, Typography } from '@mui/material'
+import { FormControlLabel, Switch, TextField, Typography } from '@mui/material'
 import { useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { ErrorBoundary } from '../components/ErrorBoundary'
@@ -67,13 +67,17 @@ export const EditorLoadedFilterPage: React.FC = () => {
             : 'prefixRs2f'
     )
     const setContent = (id: string, content: string) => {
+        console.log('setContent', id, content)
         if (id === 'filterRs2f') {
             const modules = parseModules(content)
-            updateFilter({
+            console.log('modules', modules)
+            const newFilter = {
                 ...filters[filterId],
                 ...(modules.modules ? { modules: modules.modules } : {}),
                 rs2f: content,
-            })
+            }
+            console.log('newFilter', newFilter)
+            updateFilter(newFilter)
         } else if (id === 'prefixRs2f' || id === 'suffixRs2f') {
             setFilterConfiguration(filterId, {
                 ...config,
@@ -84,6 +88,9 @@ export const EditorLoadedFilterPage: React.FC = () => {
         }
     }
 
+    const selectedModules =
+        parseModules(filesContent[selected!!] || '')?.modules || []
+
     return (
         <Rs2fEditor
             selected={selected}
@@ -91,30 +98,28 @@ export const EditorLoadedFilterPage: React.FC = () => {
             setSelected={setSelected as (selected: string | null) => void}
             filesContent={filesContent}
             allowEditDefaults={editDefaults}
-            configClearConfiguration={() => {
-                console.log('clear')
-            }}
-            configSetEnabledModule={() => {
-                console.log('set enabled module')
-            }}
             configOnChange={(config: FilterConfiguration) => {
-                console.log('config', config)
                 const content: string | undefined = filesContent[selected!!]
                 if (!content) {
                     return
                 }
-                const maybeModules = parseModules(content)
-                if (maybeModules.modules) {
-                    const newContent = maybeModules.modules
+                if (selectedModules) {
+                    const newContent = selectedModules
                         .map((m) => {
                             return applyModule(m, config.inputConfigs)
                         })
-                        .join('\n\n')
-                    console.log('newContent', newContent)
+                        .join('')
 
                     setContent(selected, newContent)
                 }
             }}
+            warningComponent={
+                <Typography variant="h5" color="error">
+                    {selected === 'filterRs2f' && filters[filterId].source
+                        ? 'Changes will not carry forward if filter updates'
+                        : null}
+                </Typography>
+            }
             extraTabComponent={
                 <div
                     style={{
@@ -132,11 +137,27 @@ export const EditorLoadedFilterPage: React.FC = () => {
                         }
                         label="Edit Defaults"
                     />
-                    <Typography variant="h5" color="error">
-                        {selected === 'filterRs2f' && filters[filterId].source
-                            ? 'Changes will not carry forward if filter updates'
-                            : null}
-                    </Typography>
+                    <TextField
+                        label="Filter Name"
+                        value={filters[filterId].name}
+                        onChange={(e) => {
+                            updateFilter({
+                                ...filters[filterId],
+                                name: e.target.value,
+                            })
+                        }}
+                    />
+                    <TextField
+                        sx={{ ml: 2, width: '20rem' }}
+                        label="Filter Description"
+                        value={filters[filterId].description}
+                        onChange={(e) => {
+                            updateFilter({
+                                ...filters[filterId],
+                                description: e.target.value,
+                            })
+                        }}
+                    />
                 </div>
             }
             options={[

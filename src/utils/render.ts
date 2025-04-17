@@ -45,7 +45,6 @@ export const applyModule = (
     config: { [key: MacroName]: any } | undefined
 ): string => {
     let updated = module.rs2f
-    console.log('apply', module, config)
 
     for (const input of module.inputs) {
         switch (input.type) {
@@ -62,7 +61,6 @@ export const applyModule = (
             }
             case 'number': {
                 const value = config?.[input.macroName] ?? input.default
-                console.log('number value', value)
                 if (value !== undefined) {
                     updated = updateMacro(
                         updated,
@@ -175,7 +173,6 @@ const updateMacro = (
     let inMultiline = false
     for (const line of filter.split('\n')) {
         if (isTargetMacro(line, macro)) {
-            console.log('hi')
             if (line.endsWith('\\')) {
                 inMultiline = true
             } else {

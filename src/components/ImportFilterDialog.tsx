@@ -291,6 +291,7 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                                                 }
                                             })
                                             .catch((error) => {
+                                                console.error(error)
                                                 setImportError(error.message)
                                             })
                                     }}

@@ -4,7 +4,7 @@ import { Button, Tab, Tabs, Typography } from '@mui/material'
 import { ReactNode, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { parse, ParseResult } from '../parsing/parse'
-import { FilterConfiguration, FilterId } from '../parsing/UiTypesSpec'
+import { DEFAULT_FILTER_CONFIGURATION, FilterConfiguration, FilterId } from '../parsing/UiTypesSpec'
 import { colors } from '../styles/MuiTheme'
 import { ErrorBoundary } from './ErrorBoundary'
 import { Option, UISelect } from './inputs/UISelect'
@@ -59,18 +59,10 @@ const VisualResults: React.FC<{
     parsed: ParseResult | null
     enableEdits: boolean
     configOnChange: (config: FilterConfiguration) => void
-    configClearConfiguration: () => void
-    configSetEnabledModule: (
-        filterId: FilterId,
-        moduleId: string,
-        enabled: boolean
-    ) => void
 }> = ({
     parsed,
     enableEdits,
     configOnChange,
-    configClearConfiguration,
-    configSetEnabledModule,
 }) => {
     if (!parsed) {
         return <div>No parsed result</div>
@@ -109,14 +101,12 @@ const VisualResults: React.FC<{
             <CustomizeTab
                 sx={{ marginTop: '-4rem' }}
                 filter={parsed.filter!!}
-                config={{
-                    enabledModules: {},
-                    inputConfigs: {},
-                }}
+                config={DEFAULT_FILTER_CONFIGURATION}
+                showSettings={false}
                 readonly={!enableEdits}
                 onChange={configOnChange}
-                clearConfiguration={configClearConfiguration}
-                setEnabledModule={configSetEnabledModule}
+                clearConfiguration={() => {}}
+                setEnabledModule={() => {}}
             />
         )
     }
@@ -133,17 +123,12 @@ export const Rs2fEditor: React.FC<{
     options?: Option[]
 
     extraTabComponent?: ReactNode
+    warningComponent?: ReactNode
 
     // For editing config options
     allowEditDefaults: boolean
     // only need these implemented if the above is true
     configOnChange: (config: FilterConfiguration) => void
-    configClearConfiguration: () => void
-    configSetEnabledModule: (
-        filterId: FilterId,
-        moduleId: string,
-        enabled: boolean
-    ) => void
 }> = ({
     selected,
     setSelected,
@@ -153,9 +138,8 @@ export const Rs2fEditor: React.FC<{
     requireMeta,
     extraTabComponent,
     allowEditDefaults,
+    warningComponent,
     configOnChange,
-    configClearConfiguration,
-    configSetEnabledModule,
 }) => {
     const selectedContent = selected ? filesContent[selected] || '' : ''
     const navigator = useNavigate()
@@ -223,6 +207,7 @@ export const Rs2fEditor: React.FC<{
                     disabled={false}
                     error={false}
                 />
+                {warningComponent}
             </div>
             <div
                 style={{
@@ -277,8 +262,6 @@ export const Rs2fEditor: React.FC<{
                         enableEdits={allowEditDefaults}
                         parsed={parsed}
                         configOnChange={configOnChange}
-                        configClearConfiguration={configClearConfiguration}
-                        configSetEnabledModule={configSetEnabledModule}
                     />
                 </div>
                 <div

@@ -11,8 +11,6 @@ import {
     Menu,
     MenuItem,
     Stack,
-    SxProps,
-    Theme,
     ToggleButton,
     ToggleButtonGroup,
     Tooltip,
@@ -203,6 +201,7 @@ const ModuleSection: React.FC<{
         moduleId: string,
         enabled: boolean
     ) => void
+    showSettings: boolean
 }> = ({
     activeFilterId,
     expanded,
@@ -213,6 +212,7 @@ const ModuleSection: React.FC<{
     onChange,
     clearConfiguration,
     setEnabledModule,
+    showSettings,
 }) => {
     const { siteConfig } = useSiteConfigStore()
     const [showJson, setShowJson] = useState<'json' | 'configJson' | 'none'>(
@@ -351,24 +351,31 @@ const ModuleSection: React.FC<{
                         </Stack>
                     )}
 
-                    <Tooltip
-                        title={
-                            configCount ? `${configCount} settings changed` : ''
-                        }
-                    >
-                        <IconButton
-                            onClick={(
-                                e: React.MouseEvent<HTMLButtonElement>
-                            ) => {
-                                e.stopPropagation()
-                                setMenuAnchor(e.currentTarget)
-                            }}
+                    {showSettings ? (
+                        <Tooltip
+                            title={
+                                configCount
+                                    ? `${configCount} settings changed`
+                                    : ''
+                            }
                         >
-                            <Badge badgeContent={configCount} color="secondary">
-                                <SettingsIcon />
-                            </Badge>
-                        </IconButton>
-                    </Tooltip>
+                            <IconButton
+                                onClick={(
+                                    e: React.MouseEvent<HTMLButtonElement>
+                                ) => {
+                                    e.stopPropagation()
+                                    setMenuAnchor(e.currentTarget)
+                                }}
+                            >
+                                <Badge
+                                    badgeContent={configCount}
+                                    color="secondary"
+                                >
+                                    <SettingsIcon />
+                                </Badge>
+                            </IconButton>
+                        </Tooltip>
+                    ) : null}
                 </AccordionSummary>
                 <AccordionDetails>
                     <Stack spacing={2} direction="column">
@@ -519,6 +526,7 @@ export const CustomizeTab: React.FC<{
     extraComponent?: React.ReactNode
     readonly: boolean
     sx?: CSSProperties
+    showSettings?: boolean
 }> = ({
     filter,
     config,
@@ -528,6 +536,7 @@ export const CustomizeTab: React.FC<{
     extraComponent,
     readonly,
     sx,
+    showSettings = true,
 }) => {
     const { siteConfig } = useSiteConfigStore()
     const [expandedModules, setExpandedModules] = useState<
@@ -629,6 +638,7 @@ export const CustomizeTab: React.FC<{
                             readonly={readonly}
                             activeFilterId={filter.id}
                             module={module}
+                            showSettings={showSettings}
                             config={config ?? DEFAULT_FILTER_CONFIGURATION}
                             onChange={onChange}
                             clearConfiguration={clearConfiguration}
