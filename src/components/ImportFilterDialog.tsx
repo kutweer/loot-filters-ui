@@ -19,8 +19,8 @@ import {
 import { useFilterStore } from '../store/filterStore'
 import { useOboardingStore } from '../store/onboarding'
 import { generateId } from '../utils/idgen'
-import { loadFilterFromUrl } from '../utils/loaderv2'
 import { createLink } from '../utils/link'
+import { loadFilterFromUrl } from '../utils/loaderv2'
 
 interface ImportFilterDialogProps {
     open: boolean
@@ -339,10 +339,9 @@ export const ImportFilterDialog: React.FC<ImportFilterDialogProps> = ({
                                         minHeight: '4lh',
                                     }}
                                 >
-                                    Import a filter from a pastebin or github
-                                    url. Documentation about writing and
-                                    importing filters on the website can be
-                                    found{' '}
+                                    Import a filter from a github url.
+                                    Documentation about writing and importing
+                                    filters on the website can be found{' '}
                                     <a href="https://github.com/Kaqemeex/loot-filters-ui/tree/main/module-system-docs/modular-filters-book">
                                         on GitHub
                                     </a>
