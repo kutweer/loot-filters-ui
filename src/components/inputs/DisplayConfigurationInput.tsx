@@ -5,8 +5,8 @@ import {
     AccordionSummary,
     Box,
     Checkbox,
-    Divider,
     Grid2,
+    SxProps,
     TextField,
     Typography,
 } from '@mui/material'
@@ -31,6 +31,32 @@ import { ItemLabelPreview, ItemMenuPreview } from '../Previews'
 import { ColorPickerInput } from './ColorPicker'
 import { UISelect } from './UISelect'
 
+const Label: React.FC<{ label: string; sx?: SxProps }> = ({ label, sx }) => {
+    return (
+        <Grid2
+            size={2}
+            sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                minHeight: '100%',
+                ...sx,
+            }}
+        >
+            <Typography
+                style={{
+                    fontFamily: 'RuneScape',
+                    fontSize: '24px',
+                    marginRight: 2,
+                    lineHeight: 1,
+                }}
+            >
+                {label}
+            </Typography>
+        </Grid2>
+    )
+}
+
 export const DisplayConfigurationInput: React.FC<{
     config: FilterConfiguration
     onChange: (style: StyleConfig) => void
@@ -44,21 +70,6 @@ export const DisplayConfigurationInput: React.FC<{
     const styleConfig = StyleConfigSpec.optional()
         .default({})
         .parse(config?.inputConfigs?.[input.macroName])
-
-    const Label: React.FC<{ label: string }> = ({ label }) => {
-        return (
-            <Typography
-                style={{
-                    fontFamily: 'RuneScape',
-                    textAlign: 'right',
-                    fontSize: '24px',
-                    marginRight: 2,
-                }}
-            >
-                {label}
-            </Typography>
-        )
-    }
 
     const displayLootbeamInput = (
         <Checkbox
@@ -149,19 +160,10 @@ export const DisplayConfigurationInput: React.FC<{
 
     const soundFileInput = (
         <TextField
-            sx={{ width: '15rem', marginLeft: 1, marginBottom: '-25px' }}
+            sx={{ minWidth: '10rem', marginBottom: '-25px' }}
             placeholder="Sound File or Id"
             value={styleConfig?.sound ?? input.default?.sound ?? ''}
             onChange={(e) => onChange({ sound: e.target.value })}
-            helperText={
-                <Typography variant="body2">
-                    Sound config{' '}
-                    <a href="https://github.com/riktenx/loot-filters/blob/userguide/filter-lang.md#sound">
-                        docs
-                    </a>
-                    .
-                </Typography>
-            }
             disabled={readonly}
         />
     )
@@ -384,91 +386,62 @@ export const DisplayConfigurationInput: React.FC<{
                     <HeaderCol text="Label" />
                     <Column>
                         <Row>
-                            <Grid2 size={2}>
-                                <Label label="Text Color" />
-                            </Grid2>
+                            <Label label="Text Color" />
                             <Grid2 size={1}>{textColorInput}</Grid2>
-                            <Grid2 size={2}>
-                                <Label label="Font Type" />
-                            </Grid2>
+                            <Label label="Font Type" />
                             <Grid2 size={2}>{fontTypeInput}</Grid2>
                         </Row>
                         <Row>
-                            <Grid2 size={2}>
-                                <Label label="Background Color" />
-                            </Grid2>
+                            <Label label="Background Color" />
                             <Grid2 size={1}>{backgroundColorInput}</Grid2>
-                            <Grid2 size={2}>
-                                <Label label="Text Accent" />
-                            </Grid2>
+                            <Label label="Text Accent" />
                             <Grid2 size={1}>{textAccentInput}</Grid2>
                         </Row>
                         <Row>
-                            <Grid2 size={2}>
-                                <Label label="Border Color" />
-                            </Grid2>
+                            <Label label="Border Color" />
                             <Grid2 size={1}>{borderColorInput}</Grid2>
-                            <Grid2 size={2}>
-                                <Label label="Text Accent Color" />
-                            </Grid2>
+                            <Label label="Text Accent Color" />
                             <Grid2 size={1}>{textAccentColorInput}</Grid2>
                         </Row>
                     </Column>
                     <HeaderCol text="Menu" />
                     <Column>
                         <Grid2 container size={11}>
-                            <Grid2 size={2}>
-                                <Label label="Menu Color" />
-                            </Grid2>
+                            <Label label="Menu Color" />
                             <Grid2 size={1}>{menuColorInput}</Grid2>
                         </Grid2>
                     </Column>
                     <HeaderCol text="General" />
                     <Grid2 rowSpacing={0} container size={11}>
                         <Row>
-                            <Grid2 size={2}>
-                                <Label label="Lootbeam" />
-                            </Grid2>
+                            <Label label="Lootbeam" />
                             <Grid2 size={1}>{displayLootbeamInput}</Grid2>
-                            <Grid2 size={2}>
-                                <Label label="Hilight Tile" />
-                            </Grid2>
+                            <Label label="Hilight Tile" />
                             <Grid2 size={1}>{highlightTileComponent}</Grid2>
-                            <Grid2 size={2}>
-                                <Label label="Show Item Value" />
-                            </Grid2>
+                            <Label label="Show Item Value" />
                             <Grid2 size={1}>{valueComponent}</Grid2>
-                            <Grid2 size={1}>
-                                <Label label="Sound" />
-                            </Grid2>
-                            <Grid2 size={2}>{soundFileInput}</Grid2>
+                            <Label
+                                sx={{ justifyContent: 'flex-start' }}
+                                label="Drop Sound"
+                            />
                         </Row>
                         <Row>
-                            <Grid2 size={2}>
-                                <Label label="Lootbeam Color" />
-                            </Grid2>
+                            <Label label="Lootbeam Color" />
                             <Grid2 size={1}>{lootbeamColorInput}</Grid2>
-                            <Grid2 size={2}>
-                                <Label label="Hilight Tile Fill Color" />
-                            </Grid2>
+                            <Label label="Hilight Tile Fill Color" />
                             <Grid2 size={1}>{hilightTileFillColorInput}</Grid2>
-                            <Grid2 size={2}>
-                                <Label label="Show Despawn Timer" />
-                            </Grid2>
+                            <Label label="Show Despawn Timer" />
                             <Grid2 size={1}>{despawnComponent}</Grid2>
+                            <Grid2 size={2}>{soundFileInput}</Grid2>
                         </Row>
                         <Row>
                             <Grid2 size={2} />
                             <Grid2 size={1} />
-                            <Grid2 size={2}>
-                                <Label label="Hilight Tile Stroke" />
-                            </Grid2>
+                            <Label label="Hilight Tile Stroke" />
                             <Grid2 size={1}>
                                 {hilightTileStrokeColorInput}
                             </Grid2>
-                            <Grid2 size={2}>
-                                <Label label="Notify on Drop" />
-                            </Grid2>
+                            <Label label="Notify on Drop" />
                             <Grid2 size={1}>{notifyComponent}</Grid2>
                         </Row>
                         <Row>
@@ -476,9 +449,7 @@ export const DisplayConfigurationInput: React.FC<{
                             <Grid2 size={1} />
                             <Grid2 size={2} />
                             <Grid2 size={1} />
-                            <Grid2 size={2}>
-                                <Label label="Hide Overlay" />
-                            </Grid2>
+                            <Label label="Hide Overlay" />
                             <Grid2 size={1}>{hideOverlayComponent}</Grid2>
                         </Row>
                     </Grid2>

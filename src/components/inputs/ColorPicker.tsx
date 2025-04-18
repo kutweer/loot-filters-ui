@@ -1,4 +1,10 @@
-import { FormControl, Popover, Tooltip, Typography } from '@mui/material'
+import {
+    Button,
+    FormControl,
+    Popover,
+    Tooltip,
+    Typography,
+} from '@mui/material'
 import React, { useState } from 'react'
 import { RgbaColorPicker } from 'react-colorful'
 import { isNumber } from 'underscore'
@@ -187,6 +193,16 @@ const ColorPicker: React.FC<{
                         <span style={{ fontFamily: 'monospace' }}>
                             #AARRGGBB
                         </span>
+                        <Button
+                            variant="text"
+                            size="small"
+                            onClick={() => {
+                                onChange(undefined)
+                                setAnchorEl(null)
+                            }}
+                        >
+                            Reset to Default
+                        </Button>
                     </div>
                     <div>
                         <Typography fontSize="12px" color="red">
