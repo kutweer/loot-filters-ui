@@ -226,9 +226,12 @@ export const ItemLabelPreview: React.FC<{
     }, [activeBackground])
 
     const activeBackgroundImage =
-        activeBackground === BackgroundImage.Random
-            ? backgroundImages[randomBackgroundImageIndex]
-            : imageFromBackgroundImage(activeBackground)
+        input.backgroundImage &&
+        (input.backgroundImage as BackgroundImage)
+            ? imageFromBackgroundImage(input.backgroundImage as BackgroundImage)
+            : activeBackground === BackgroundImage.Random
+              ? backgroundImages[randomBackgroundImageIndex]
+              : imageFromBackgroundImage(activeBackground)
 
     return (
         <div

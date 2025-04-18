@@ -3,6 +3,7 @@ import {
     InputSpec as FilterSpecInput,
     ModuleSpec as FilterSpecModule,
 } from './FilterTypesSpec'
+import { BackgroundImage, backgroundImages } from '../types/Images'
 
 export const InputSpec = FilterSpecInput.extend({
     macroName: z.string().nonempty(),
@@ -96,6 +97,7 @@ export type StyleConfig = z.infer<typeof StyleConfigSpec>
 export const StyleInputSpec = InputSpec.extend({
     type: z.literal('style'),
     default: StyleConfigSpec.optional(),
+    backgroundImage: z.enum(backgroundImages as [string, ...string[]]).optional(),
 })
 
 export const TextInputDefaultSpec = z.string().optional().default('')
