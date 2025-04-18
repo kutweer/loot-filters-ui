@@ -17,12 +17,13 @@ import {
     Typography,
     useMediaQuery,
 } from '@mui/material'
-import React, { useEffect, useState } from 'react'
+import React, { CSSProperties, useEffect, useState } from 'react'
 import { groupBy, isObject } from 'underscore'
 import { colors, MuiRsTheme } from '../../styles/MuiTheme'
 
 import { ExpandLess } from '@mui/icons-material'
 import SettingsIcon from '@mui/icons-material/Settings'
+import { parseModules } from '../../parsing/parse'
 import {
     BooleanInput,
     DEFAULT_FILTER_CONFIGURATION,
@@ -200,6 +201,7 @@ const ModuleSection: React.FC<{
         moduleId: string,
         enabled: boolean
     ) => void
+    showSettings: boolean
 }> = ({
     activeFilterId,
     expanded,
@@ -210,6 +212,7 @@ const ModuleSection: React.FC<{
     onChange,
     clearConfiguration,
     setEnabledModule,
+    showSettings,
 }) => {
     const { siteConfig } = useSiteConfigStore()
     const [showJson, setShowJson] = useState<'json' | 'configJson' | 'none'>(
@@ -236,8 +239,8 @@ const ModuleSection: React.FC<{
 
     const moduleEnabledDefaultValue = module.enabled
 
-    const configuredEnableValue =
-        config.inputConfigs?.enabledModules?.[module.id]
+    const configuredEnableValue = config.enabledModules?.[module.id]
+
     const enabled = configuredEnableValue ?? moduleEnabledDefaultValue
 
     const showPreviews = useMediaQuery(MuiRsTheme.breakpoints.up('sm'))
@@ -348,24 +351,31 @@ const ModuleSection: React.FC<{
                         </Stack>
                     )}
 
-                    <Tooltip
-                        title={
-                            configCount ? `${configCount} settings changed` : ''
-                        }
-                    >
-                        <IconButton
-                            onClick={(
-                                e: React.MouseEvent<HTMLButtonElement>
-                            ) => {
-                                e.stopPropagation()
-                                setMenuAnchor(e.currentTarget)
-                            }}
+                    {showSettings ? (
+                        <Tooltip
+                            title={
+                                configCount
+                                    ? `${configCount} settings changed`
+                                    : ''
+                            }
                         >
-                            <Badge badgeContent={configCount} color="secondary">
-                                <SettingsIcon />
-                            </Badge>
-                        </IconButton>
-                    </Tooltip>
+                            <IconButton
+                                onClick={(
+                                    e: React.MouseEvent<HTMLButtonElement>
+                                ) => {
+                                    e.stopPropagation()
+                                    setMenuAnchor(e.currentTarget)
+                                }}
+                            >
+                                <Badge
+                                    badgeContent={configCount}
+                                    color="secondary"
+                                >
+                                    <SettingsIcon />
+                                </Badge>
+                            </IconButton>
+                        </Tooltip>
+                    ) : null}
                 </AccordionSummary>
                 <AccordionDetails>
                     <Stack spacing={2} direction="column">
@@ -463,7 +473,7 @@ const ModuleSection: React.FC<{
                                                             ) => {
                                                                 const existingValue =
                                                                     config
-                                                                        .inputConfigs[
+                                                                        .inputConfigs?.[
                                                                         macroName
                                                                     ]
 
@@ -515,6 +525,8 @@ export const CustomizeTab: React.FC<{
     ) => void
     extraComponent?: React.ReactNode
     readonly: boolean
+    sx?: CSSProperties
+    showSettings?: boolean
 }> = ({
     filter,
     config,
@@ -523,6 +535,8 @@ export const CustomizeTab: React.FC<{
     setEnabledModule,
     extraComponent,
     readonly,
+    sx,
+    showSettings = true,
 }) => {
     const { siteConfig } = useSiteConfigStore()
     const [expandedModules, setExpandedModules] = useState<
@@ -559,8 +573,14 @@ export const CustomizeTab: React.FC<{
         )
     }
 
+    const modules = [
+        ...(parseModules(config?.prefixRs2f || '')?.modules || []),
+        ...filter.modules,
+        ...(parseModules(config?.suffixRs2f || '')?.modules || []),
+    ]
+
     return (
-        <div>
+        <div style={{ ...sx }}>
             <div
                 style={{
                     display: 'flex',
@@ -610,28 +630,31 @@ export const CustomizeTab: React.FC<{
                 </div>
             </div>
             <Stack>
-                {filter?.modules.map((module, index: number) => (
-                    <ModuleSection
-                        key={index}
-                        readonly={readonly}
-                        activeFilterId={filter.id}
-                        module={module}
-                        config={config ?? DEFAULT_FILTER_CONFIGURATION}
-                        onChange={onChange}
-                        clearConfiguration={clearConfiguration}
-                        setEnabledModule={setEnabledModule}
-                        expanded={
-                            expandedModules[module.name] ??
-                            (false || siteConfig.devMode)
-                        }
-                        setExpanded={(expanded) =>
-                            setExpandedModules((prev) => ({
-                                ...prev,
-                                [module.name]: expanded,
-                            }))
-                        }
-                    />
-                ))}
+                {modules
+                    .filter((m) => !m.hidden)
+                    .map((module, index: number) => (
+                        <ModuleSection
+                            key={index}
+                            readonly={readonly}
+                            activeFilterId={filter.id}
+                            module={module}
+                            showSettings={showSettings}
+                            config={config ?? DEFAULT_FILTER_CONFIGURATION}
+                            onChange={onChange}
+                            clearConfiguration={clearConfiguration}
+                            setEnabledModule={setEnabledModule}
+                            expanded={
+                                expandedModules[module.name] ??
+                                (false || siteConfig.devMode)
+                            }
+                            setExpanded={(expanded) =>
+                                setExpandedModules((prev) => ({
+                                    ...prev,
+                                    [module.name]: expanded,
+                                }))
+                            }
+                        />
+                    ))}
             </Stack>
         </div>
     )

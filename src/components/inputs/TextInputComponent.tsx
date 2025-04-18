@@ -1,5 +1,5 @@
 import { TextField } from '@mui/material'
-import { FilterConfiguration, TextInput } from '../../parsing/UiTypesSpec'
+import { TextInput, FilterConfiguration } from '../../parsing/UiTypesSpec'
 
 export const TextInputComponent: React.FC<{
     input: TextInput

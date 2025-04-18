@@ -1,3 +1,4 @@
+import { parseModules } from '../parsing/parse'
 import {
     Filter,
     FilterConfiguration,
@@ -12,26 +13,38 @@ export const renderFilter = (
     filter: Filter,
     activeConfig: FilterConfiguration | undefined
 ): string => {
-    let filterText = filter.rs2f
-
-    filter.modules.forEach((m) => {
-        filterText = applyModule(filterText, m, activeConfig?.inputConfigs)
+    const filterModules = filter.modules.filter((module) => {
+        const enabledConfig = activeConfig?.enabledModules?.[module.id]
+        return enabledConfig ?? module.enabled
     })
 
-    filterText = filterText.replace(/^meta\s*{([^}]*)}/, '')
-    filterText =
-        `meta { name = \"${filter.name}\"; description = \"${filter.description}\"; }` +
-        filterText
+    const modules = [
+        ...(parseModules(activeConfig?.prefixRs2f || '')?.modules || []),
+        ...filterModules,
+        ...(parseModules(activeConfig?.suffixRs2f || '')?.modules || []),
+    ]
+
+    let filterText = modules
+        .map((m) => applyModule(m, activeConfig?.inputConfigs))
+        .join('\n')
+
+    filterText = filterText.replace(
+        /meta\s*{([^}]*)}/,
+        `meta { name = \"${filter.name}\";${
+            filter.description
+                ? ` description = \"${filter.description}\";`
+                : ''
+        } }`
+    )
 
     return filterText
 }
 
-const applyModule = (
-    filterText: string,
+export const applyModule = (
     module: Module,
     config: { [key: MacroName]: any } | undefined
 ): string => {
-    let updated = filterText
+    let updated = module.rs2f
 
     for (const input of module.inputs) {
         switch (input.type) {

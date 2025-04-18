@@ -13,6 +13,7 @@ type UISelectPropsBase<T> = {
     disabled?: boolean
     error?: boolean
     helperText?: string
+    disableClearable?: boolean
     sx?: SxProps<Theme>
 }
 
@@ -40,6 +41,7 @@ export const UISelect = <T = string,>({
     multiple = false,
     freeSolo = false,
     disabled = false,
+    disableClearable = false,
     error = false,
     helperText,
     sx,
@@ -102,6 +104,7 @@ export const UISelect = <T = string,>({
             multiple={multiple}
             freeSolo={freeSolo}
             options={options}
+            disableClearable={disableClearable}
             value={value}
             onChange={handleChange}
             getOptionLabel={getOptionLabel}

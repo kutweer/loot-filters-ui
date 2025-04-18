@@ -49,9 +49,9 @@ export const useFilterStore = create<FilterStoreState>()(
             },
             {
                 name: 'filter-store',
-                version: 2,
-                migrate: (state: unknown, version: number) => {
-                    return migrateFilterStore(
+                version: 3,
+                migrate: async (state: unknown, version: number) => {
+                    return await migrateFilterStore(
                         state as FilterStoreState,
                         version
                     )

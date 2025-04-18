@@ -7,7 +7,7 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { FilterSelector } from './components/FilterSelector'
 import { FilterTabs } from './pages/CustomizeFilterPage'
 import { DebugPage } from './pages/DebugPage'
-import { EditorPage } from './pages/EditorPage'
+import { EditorLoadedFilterPage } from './pages/EditLoadedFilterPage'
 import { ImportPage } from './pages/ImportPage'
 import { useAlertStore } from './store/alerts'
 import {
@@ -101,8 +101,10 @@ export const App = () => {
                         }
                     />
                     <Route
-                        path="/editor"
-                        element={<Page component={<EditorPage />} />}
+                        path="/editor/:filterId"
+                        element={
+                            <Page component={<EditorLoadedFilterPage />} />
+                        }
                     />
                     <Route
                         path="/import"

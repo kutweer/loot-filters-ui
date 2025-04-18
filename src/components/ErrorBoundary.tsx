@@ -5,6 +5,7 @@ import { downloadFile, localState } from '../utils/file'
 
 interface Props {
     children: ReactNode
+    error?: Error
     beforeErrorComponent?: ReactNode
 }
 
@@ -15,7 +16,8 @@ interface State {
 
 export class ErrorBoundary extends Component<Props, State> {
     public state: State = {
-        hasError: false,
+        hasError: this.props.error ? true : false,
+        error: this.props.error,
     }
 
     public static getDerivedStateFromError(error: Error): State {

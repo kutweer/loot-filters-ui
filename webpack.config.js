@@ -52,5 +52,19 @@ module.exports = {
         compress: true,
         port: 3000,
         historyApiFallback: true,
+        client: {
+            overlay: {
+                runtimeErrors: (error) => {
+                    if (
+                        error?.message ===
+                        'ResizeObserver loop completed with undelivered notifications.'
+                    ) {
+                        console.error(error)
+                        return false
+                    }
+                    return true
+                },
+            },
+        },
     },
 }

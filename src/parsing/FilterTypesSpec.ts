@@ -5,6 +5,7 @@ export const ModuleSpec = z.object({
     subtitle: z.string().optional(),
     description: z.string().optional(),
     enabled: z.boolean().optional().default(true),
+    hidden: z.boolean().optional().default(false),
 })
 
 export type Module = z.infer<typeof ModuleSpec>

@@ -1,8 +1,9 @@
 import { Box, Tab, Tabs } from '@mui/material'
-import { useMemo, useState } from 'react'
+import { act, useMemo, useState } from 'react'
 import { FilterSelector } from '../components/FilterSelector'
 import { CustomizeTab } from '../components/tabs/CustomizeTab'
 import { RenderedFilterTab } from '../components/tabs/RenderedFilterTab'
+import { parse } from '../parsing/parse'
 import { useFilterConfigStore } from '../store/filterConfigurationStore'
 import { useFilterStore } from '../store/filterStore'
 import { useSiteConfigStore } from '../store/siteConfig'
@@ -29,6 +30,16 @@ export const FilterTabs: React.FC = () => {
     const setEnabledModule = useFilterConfigStore(
         (state) => state.setEnabledModule
     )
+
+    const prefixModules =
+        parse(config?.prefixRs2f || '', false, {
+            name: 'prefix',
+        })?.filter?.modules || []
+
+    const suffixModules =
+        parse(config?.suffixRs2f || '', false, {
+            name: 'suffix',
+        })?.filter?.modules || []
 
     const tabs = useMemo(() => {
         return (

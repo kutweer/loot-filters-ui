@@ -12,7 +12,7 @@ import {
     DEFAULT_FILTER_CONFIGURATION,
     FilterConfiguration,
 } from '../parsing/UiTypesSpec'
-import { parse, ParseResult } from '../parsing/parse'
+import { parseAsync as parse, ParseResult } from '../parsing/parse'
 import { useFilterConfigStore } from '../store/filterConfigurationStore'
 import { useFilterStore } from '../store/filterStore'
 import { colors } from '../styles/MuiTheme'
@@ -83,8 +83,6 @@ export const ImportPage: React.FC = () => {
         </Typography>
     ) : null
 
-    console.log('parsedFilter', parsedFilter)
-    console.log('filterConfig', filterConfig)
     const customizationCount = Object.keys(filterConfig ?? {}).length
 
     const filterComponent = parsedFilter ? (
@@ -103,7 +101,6 @@ export const ImportPage: React.FC = () => {
                     }
                     error={parsedFilter.filter?.name.trim() === ''}
                     onChange={(e) => {
-                        console.log('onChange', e.target.value)
                         if (parsedFilter?.filter) {
                             setParsedFilter({
                                 ...parsedFilter,
