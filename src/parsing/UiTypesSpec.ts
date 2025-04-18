@@ -97,7 +97,9 @@ export type StyleConfig = z.infer<typeof StyleConfigSpec>
 export const StyleInputSpec = InputSpec.extend({
     type: z.literal('style'),
     default: StyleConfigSpec.optional(),
-    backgroundImage: z.enum(backgroundImages as [string, ...string[]]).optional(),
+    backgroundImage: z
+        .enum(backgroundImages as [string, ...string[]])
+        .optional(),
 })
 
 export const TextInputDefaultSpec = z.string().optional().default('')
