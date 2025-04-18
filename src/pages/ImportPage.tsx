@@ -49,12 +49,15 @@ export const ImportPage: React.FC = () => {
                 return fetch(filterUrl)
             })
             .then((res) => {
+                console.log('res', res)
                 return res.text()
             })
             .then((text: string) => {
+                console.log('text', text)
                 return parse(text)
             })
             .then((parsed: ParseResult) => {
+                console.log('parsed', parsed)
                 setParsedFilter(parsed)
                 setError(null)
                 setLoadingFilter(false)
@@ -65,6 +68,8 @@ export const ImportPage: React.FC = () => {
                 setLoadingFilter(false)
             })
     }, [])
+    console.log('filterUrl', filterUrl)
+    console.log('parsedFilter', parsedFilter)
 
     const errorComponent = error ? (
         <div>
