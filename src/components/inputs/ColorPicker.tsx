@@ -1,8 +1,18 @@
-import { FormControl, Popover, Tooltip, Typography } from '@mui/material'
+import {
+    Button,
+    FormControl,
+    Popover,
+    Tooltip,
+    Typography,
+} from '@mui/material'
 import React, { useState } from 'react'
 import { RgbaColorPicker } from 'react-colorful'
 import { isNumber } from 'underscore'
-import { ArgbHexColorSpec } from '../../parsing/UiTypesSpec'
+import {
+    ArgbHexColorSpec,
+    StyleConfig,
+    StyleInput,
+} from '../../parsing/UiTypesSpec'
 import {
     ArgbHexColor,
     argbHexColorToRGBColor,
@@ -38,10 +48,10 @@ const Swatch: React.FC<{
         if (!ctx) return
 
         // Create checkerboard pattern
-        const size = 5
+        const size = 10
         for (let x = 0; x < canvas.width; x += size) {
             for (let y = 0; y < canvas.height; y += size) {
-                ctx.fillStyle = ((x + y) / size) % 2 ? '#000000' : '#FF00FF'
+                ctx.fillStyle = ((x + y) / size) % 2 ? '#CCCCCC' : '#FFFFFF'
                 ctx.fillRect(x, y, size, size)
             }
         }
@@ -59,8 +69,8 @@ const Swatch: React.FC<{
     return (
         <canvas
             ref={canvasRef}
-            width={40}
-            height={20}
+            width={50}
+            height={30}
             style={{
                 borderRadius: '4px',
                 border: '1px solid #564e43',
@@ -72,10 +82,8 @@ const Swatch: React.FC<{
 const ColorPicker: React.FC<{
     color?: ArgbHexColor
     onChange: (color: ArgbHexColor | undefined) => void
-    labelText: string
-    labelLocation: 'right' | 'bottom'
     disabled: boolean
-}> = ({ color, onChange, labelText, labelLocation, disabled }) => {
+}> = ({ color, onChange, disabled }) => {
     const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null)
     const open = Boolean(anchorEl)
 
@@ -114,55 +122,34 @@ const ColorPicker: React.FC<{
     const unset = color === undefined || color === '00000000'
 
     return (
-        <div>
-            <div>
+        <>
+            <Tooltip
+                title={
+                    disabled
+                        ? 'Color picker is disabled'
+                        : !unset
+                          ? 'Shift + Click to revert to default color'
+                          : 'Click to pick a color'
+                }
+            >
                 <div
-                    style={
-                        labelLocation == 'right'
-                            ? { display: 'flex', gap: 2 }
-                            : {}
-                    }
-                >
-                    <Tooltip
-                        title={
-                            disabled
-                                ? 'Color picker is disabled'
-                                : !unset
-                                  ? 'Shift + Click to revert to default color'
-                                  : 'Click to pick a color'
+                    style={{
+                        padding: '5px',
+                        display: 'inline-block',
+                        cursor: disabled ? 'not-allowed' : 'pointer',
+                    }}
+                    onClick={(e) => {
+                        if (e.shiftKey) {
+                            onChange(undefined)
+                            setAnchorEl(null)
+                        } else {
+                            handleClick(e)
                         }
-                    >
-                        <div
-                            style={{
-                                padding: '5px',
-                                display: 'inline-block',
-                                cursor: disabled ? 'not-allowed' : 'pointer',
-                            }}
-                            onClick={(e) => {
-                                if (e.shiftKey) {
-                                    onChange(undefined)
-                                    setAnchorEl(null)
-                                } else {
-                                    handleClick(e)
-                                }
-                            }}
-                        >
-                            <Swatch color={color} />
-                        </div>
-                    </Tooltip>
-                    <Typography
-                        style={{
-                            fontFamily: 'RuneScape',
-                            textAlign: 'left',
-                            marginLeft:
-                                labelLocation == 'right' ? '10px' : '0px',
-                        }}
-                        color={disabled ? '#cccccc' : 'inherit'}
-                    >
-                        {labelText}
-                    </Typography>
+                    }}
+                >
+                    <Swatch color={color} />
                 </div>
-            </div>
+            </Tooltip>
             <Popover
                 open={open}
                 anchorEl={anchorEl}
@@ -206,6 +193,16 @@ const ColorPicker: React.FC<{
                         <span style={{ fontFamily: 'monospace' }}>
                             #AARRGGBB
                         </span>
+                        <Button
+                            variant="text"
+                            size="small"
+                            onClick={() => {
+                                onChange(undefined)
+                                setAnchorEl(null)
+                            }}
+                        >
+                            Reset to Default
+                        </Button>
                     </div>
                     <div>
                         <Typography fontSize="12px" color="red">
@@ -214,32 +211,40 @@ const ColorPicker: React.FC<{
                     </div>
                 </div>
             </Popover>
-        </div>
+        </>
     )
 }
 
 const ColorPickerInput: React.FC<{
-    color?: ArgbHexColor
-    labelText: string
-    onChange: (color: ArgbHexColor | undefined) => void
-    labelLocation?: 'right' | 'bottom'
+    configField:
+        | 'textColor'
+        | 'backgroundColor'
+        | 'borderColor'
+        | 'textAccentColor'
+        | 'tileStrokeColor'
+        | 'tileFillColor'
+        | 'lootbeamColor'
+        | 'menuTextColor'
+    config?: StyleConfig
+    input?: StyleInput
+
+    onChange: (config: StyleConfig) => void
     disabled?: boolean
     helpText?: string
-}> = ({ color, onChange, labelText, labelLocation, disabled, helpText }) => {
-    const labelLocationValue = labelLocation ?? 'bottom'
+}> = ({ configField, config, input, onChange, disabled, helpText }) => {
     return (
-        <FormControl sx={{ marginTop: 'auto', marginBottom: 'auto' }}>
+        <FormControl component="div">
             <ColorPicker
-                labelLocation={labelLocationValue}
-                labelText={labelText}
-                color={color}
-                onChange={onChange}
+                color={config?.[configField] ?? input?.default?.[configField]}
+                onChange={(color: ArgbHexColor | undefined) => {
+                    onChange({ [configField]: color })
+                }}
                 disabled={disabled || false}
             />
             {helpText && (
                 <Typography
                     sx={{
-                        color: '#ff0000',
+                        color: 'red',
                         fontFamily: 'RuneScape',
                         fontSize: '20px',
                         marginTop: '2px',

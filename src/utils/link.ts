@@ -5,11 +5,11 @@ import {
 import { Filter, FilterConfiguration } from '../parsing/UiTypesSpec'
 
 export const createLink = (
-    filter: Filter,
+    filter: Filter | string,
     config: FilterConfiguration | undefined
 ) => {
     const data = {
-        filterUrl: filter.source,
+        filterUrl: typeof filter === 'string' ? filter : filter.source,
         config: config,
     }
 
