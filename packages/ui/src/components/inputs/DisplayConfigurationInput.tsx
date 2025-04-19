@@ -31,6 +31,41 @@ import { ItemLabelPreview, ItemMenuPreview } from '../Previews'
 import { ColorPickerInput } from './ColorPicker'
 import { UISelect } from './UISelect'
 
+const Column: React.FC<{
+    children: React.ReactNode[] | React.ReactNode
+}> = ({ children }) => {
+    return (
+        <Grid2 size={11}>
+            {Array.isArray(children)
+                ? children.map((child, index) => (
+                      <React.Fragment key={index}>{child}</React.Fragment>
+                  ))
+                : children}
+        </Grid2>
+    )
+}
+
+const Row: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    return (
+        <Grid2 container size={11}>
+            {children}
+        </Grid2>
+    )
+}
+
+const HeaderCol: React.FC<{ text: string }> = ({ text }) => {
+    return (
+        <Grid2
+            size={1}
+            rowSpacing={0}
+            container
+            style={{ alignSelf: 'center' }}
+        >
+            <Typography variant="h4">{text}</Typography>
+        </Grid2>
+    )
+}
+
 const Label: React.FC<{ label: string; sx?: SxProps }> = ({ label, sx }) => {
     return (
         <Grid2
@@ -74,7 +109,9 @@ export const DisplayConfigurationInput: React.FC<{
     const displayLootbeamInput = (
         <Checkbox
             disabled={readonly}
-            checked={styleConfig.showLootbeam ?? input.default?.showLootbeam}
+            checked={
+                styleConfig.showLootbeam ?? input.default?.showLootbeam ?? false
+            }
             onChange={(e) => onChange({ showLootbeam: e.target.checked })}
         />
     )
@@ -95,7 +132,7 @@ export const DisplayConfigurationInput: React.FC<{
     const valueComponent = (
         <Checkbox
             disabled={readonly}
-            checked={styleConfig.showValue ?? input.default?.showValue}
+            checked={styleConfig.showValue ?? input.default?.showValue ?? false}
             onChange={(e) => onChange({ showValue: e.target.checked })}
         />
     )
@@ -103,7 +140,9 @@ export const DisplayConfigurationInput: React.FC<{
     const despawnComponent = (
         <Checkbox
             disabled={readonly}
-            checked={styleConfig.showDespawn ?? input.default?.showDespawn}
+            checked={
+                styleConfig.showDespawn ?? input.default?.showDespawn ?? false
+            }
             onChange={(e) => onChange({ showDespawn: e.target.checked })}
         />
     )
@@ -111,7 +150,7 @@ export const DisplayConfigurationInput: React.FC<{
     const notifyComponent = (
         <Checkbox
             disabled={readonly}
-            checked={styleConfig.notify ?? input.default?.notify}
+            checked={styleConfig.notify ?? input.default?.notify ?? false}
             onChange={(e) => onChange({ notify: e.target.checked })}
         />
     )
@@ -119,7 +158,9 @@ export const DisplayConfigurationInput: React.FC<{
     const hideOverlayComponent = (
         <Checkbox
             disabled={readonly}
-            checked={styleConfig.hideOverlay ?? input.default?.hideOverlay}
+            checked={
+                styleConfig.hideOverlay ?? input.default?.hideOverlay ?? false
+            }
             onChange={(e) => onChange({ hideOverlay: e.target.checked })}
         />
     )
@@ -127,7 +168,11 @@ export const DisplayConfigurationInput: React.FC<{
     const highlightTileComponent = (
         <Checkbox
             disabled={readonly}
-            checked={styleConfig.highlightTile ?? input.default?.highlightTile}
+            checked={
+                styleConfig.highlightTile ??
+                input.default?.highlightTile ??
+                false
+            }
             onChange={(e) => onChange({ highlightTile: e.target.checked })}
         />
     )
@@ -272,90 +317,6 @@ export const DisplayConfigurationInput: React.FC<{
             }}
         />
     )
-
-    const label = (
-        <Grid2 container spacing={2}>
-            <Grid2 size={1.5}>
-                <Typography
-                    style={{
-                        fontFamily: 'RuneScape',
-                        textAlign: 'right',
-                        fontSize: '24px',
-                    }}
-                >
-                    Font Type
-                </Typography>
-                <Typography
-                    style={{
-                        fontFamily: 'RuneScape',
-                        textAlign: 'right',
-                        fontSize: '24px',
-                    }}
-                >
-                    Text Accent
-                </Typography>
-                <Typography
-                    style={{
-                        fontFamily: 'RuneScape',
-                        textAlign: 'right',
-                        fontSize: '24px',
-                    }}
-                >
-                    Text Accent Color
-                </Typography>
-            </Grid2>
-            <Grid2
-                size={2}
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 1,
-                }}
-            >
-                <div
-                    style={{
-                        width: '100%',
-                        marginLeft: 2,
-                    }}
-                ></div>
-            </Grid2>
-        </Grid2>
-    )
-
-    const Column: React.FC<{
-        children: React.ReactNode[] | React.ReactNode
-    }> = ({ children }) => {
-        return (
-            <Grid2 size={11}>
-                {Array.isArray(children)
-                    ? children.map((child, index) => (
-                          <React.Fragment key={index}>{child}</React.Fragment>
-                      ))
-                    : children}
-            </Grid2>
-        )
-    }
-
-    const Row: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-        return (
-            <Grid2 container size={11}>
-                {children}
-            </Grid2>
-        )
-    }
-
-    const HeaderCol: React.FC<{ text: string }> = ({ text }) => {
-        return (
-            <Grid2
-                size={1}
-                rowSpacing={0}
-                container
-                style={{ alignSelf: 'center' }}
-            >
-                <Typography variant="h4">{text}</Typography>
-            </Grid2>
-        )
-    }
 
     return (
         <Accordion
