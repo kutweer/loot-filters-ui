@@ -36,7 +36,7 @@ const rGBColorToArgbHex = (color: RGBColor): ArgbHexColor => {
 }
 
 const Swatch: React.FC<{
-    color: ArgbHexColor | undefined
+    color: ArgbHexColor | null
 }> = ({ color }) => {
     const canvasRef = React.useRef<HTMLCanvasElement>(null)
 
@@ -58,7 +58,7 @@ const Swatch: React.FC<{
 
         // Draw the actual color on top if set
         if (color !== '#00000000') {
-            const rgba = colorHexToRgbaCss(color)
+            const rgba = colorHexToRgbaCss(color ?? undefined)
             if (rgba) {
                 ctx.fillStyle = rgba
                 ctx.fillRect(0, 0, canvas.width, canvas.height)
@@ -80,7 +80,7 @@ const Swatch: React.FC<{
 }
 
 const ColorPicker: React.FC<{
-    color?: ArgbHexColor
+    color: ArgbHexColor | null
     onChange: (color: ArgbHexColor | undefined) => void
     disabled: boolean
 }> = ({ color, onChange, disabled }) => {
@@ -173,7 +173,7 @@ const ColorPicker: React.FC<{
                     <RgbaColorPicker
                         color={
                             colorOrError.success
-                                ? argbHexColorToRGBColor(color)
+                                ? argbHexColorToRGBColor(color ?? undefined)
                                 : {
                                       r: 0,
                                       g: 0,
@@ -235,7 +235,11 @@ const ColorPickerInput: React.FC<{
     return (
         <FormControl component="div">
             <ColorPicker
-                color={config?.[configField] ?? input?.default?.[configField]}
+                color={
+                    config?.[configField] ??
+                    input?.default?.[configField] ??
+                    null
+                }
                 onChange={(color: ArgbHexColor | undefined) => {
                     onChange({ [configField]: color })
                 }}

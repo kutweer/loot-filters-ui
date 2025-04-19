@@ -109,7 +109,7 @@ export const DisplayConfigurationInput: React.FC<{
     const displayLootbeamInput = (
         <Checkbox
             disabled={readonly}
-            checked={styleConfig.showLootbeam ?? input.default?.showLootbeam}
+            checked={styleConfig.showLootbeam ?? input.default?.showLootbeam ?? false}
             onChange={(e) => onChange({ showLootbeam: e.target.checked })}
         />
     )
@@ -130,7 +130,7 @@ export const DisplayConfigurationInput: React.FC<{
     const valueComponent = (
         <Checkbox
             disabled={readonly}
-            checked={styleConfig.showValue ?? input.default?.showValue}
+            checked={styleConfig.showValue ?? input.default?.showValue ?? false}
             onChange={(e) => onChange({ showValue: e.target.checked })}
         />
     )
@@ -138,7 +138,7 @@ export const DisplayConfigurationInput: React.FC<{
     const despawnComponent = (
         <Checkbox
             disabled={readonly}
-            checked={styleConfig.showDespawn ?? input.default?.showDespawn}
+            checked={styleConfig.showDespawn ?? input.default?.showDespawn ?? false}
             onChange={(e) => onChange({ showDespawn: e.target.checked })}
         />
     )
@@ -146,7 +146,7 @@ export const DisplayConfigurationInput: React.FC<{
     const notifyComponent = (
         <Checkbox
             disabled={readonly}
-            checked={styleConfig.notify ?? input.default?.notify}
+            checked={styleConfig.notify ?? input.default?.notify ?? false}
             onChange={(e) => onChange({ notify: e.target.checked })}
         />
     )
@@ -154,7 +154,7 @@ export const DisplayConfigurationInput: React.FC<{
     const hideOverlayComponent = (
         <Checkbox
             disabled={readonly}
-            checked={styleConfig.hideOverlay ?? input.default?.hideOverlay}
+            checked={styleConfig.hideOverlay ?? input.default?.hideOverlay ?? false}
             onChange={(e) => onChange({ hideOverlay: e.target.checked })}
         />
     )
@@ -162,7 +162,9 @@ export const DisplayConfigurationInput: React.FC<{
     const highlightTileComponent = (
         <Checkbox
             disabled={readonly}
-            checked={styleConfig.highlightTile ?? input.default?.highlightTile}
+            checked={
+                styleConfig.highlightTile ?? input.default?.highlightTile ?? false
+            }
             onChange={(e) => onChange({ highlightTile: e.target.checked })}
         />
     )
