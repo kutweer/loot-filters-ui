@@ -29,7 +29,7 @@ export const requiresMigration = () => {
 
     try {
         const date = Date.parse(migrated)
-        if (date < new Date(LAST_MIGRATION_DATE).getTime() || isNaN(date)) {
+        if (date < new Date(LAST_MIGRATION_DATE).getTime()) {
             console.log(
                 `Migration date is before ${LAST_MIGRATION_DATE}, requiring migration`
             )
