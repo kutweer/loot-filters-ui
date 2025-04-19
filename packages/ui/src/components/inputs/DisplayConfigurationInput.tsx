@@ -109,7 +109,9 @@ export const DisplayConfigurationInput: React.FC<{
     const displayLootbeamInput = (
         <Checkbox
             disabled={readonly}
-            checked={styleConfig.showLootbeam ?? input.default?.showLootbeam ?? false}
+            checked={
+                styleConfig.showLootbeam ?? input.default?.showLootbeam ?? false
+            }
             onChange={(e) => onChange({ showLootbeam: e.target.checked })}
         />
     )
@@ -138,7 +140,9 @@ export const DisplayConfigurationInput: React.FC<{
     const despawnComponent = (
         <Checkbox
             disabled={readonly}
-            checked={styleConfig.showDespawn ?? input.default?.showDespawn ?? false}
+            checked={
+                styleConfig.showDespawn ?? input.default?.showDespawn ?? false
+            }
             onChange={(e) => onChange({ showDespawn: e.target.checked })}
         />
     )
@@ -154,7 +158,9 @@ export const DisplayConfigurationInput: React.FC<{
     const hideOverlayComponent = (
         <Checkbox
             disabled={readonly}
-            checked={styleConfig.hideOverlay ?? input.default?.hideOverlay ?? false}
+            checked={
+                styleConfig.hideOverlay ?? input.default?.hideOverlay ?? false
+            }
             onChange={(e) => onChange({ hideOverlay: e.target.checked })}
         />
     )
@@ -163,7 +169,9 @@ export const DisplayConfigurationInput: React.FC<{
         <Checkbox
             disabled={readonly}
             checked={
-                styleConfig.highlightTile ?? input.default?.highlightTile ?? false
+                styleConfig.highlightTile ??
+                input.default?.highlightTile ??
+                false
             }
             onChange={(e) => onChange({ highlightTile: e.target.checked })}
         />
