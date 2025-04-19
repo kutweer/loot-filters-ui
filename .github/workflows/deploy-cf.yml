@@ -35,5 +35,5 @@ jobs:
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  command: pages deploy dist --project-name=loot-filters-ui --branch="${{ github.ref == 'refs/heads/main' && 'main' ||github.actor }}"
+                  command: pages deploy packages/ui/dist --project-name=loot-filters-ui --branch="${{ github.ref == 'refs/heads/main' && 'main' ||github.actor }}"
                   gitHubToken: ${{ secrets.GITHUB_TOKEN }}
