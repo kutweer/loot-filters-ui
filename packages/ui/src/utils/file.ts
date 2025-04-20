@@ -14,7 +14,7 @@ export const downloadFile = (file: File) => {
     }
 }
 
-const keys = [
+export const localStorageKeys = [
     'background-image-selected',
     'filter-store',
     'modular-filter-storage',
@@ -23,7 +23,7 @@ const keys = [
 ]
 export const localState = () => {
     return Object.fromEntries(
-        keys
+        localStorageKeys
             .map((key) => {
                 return [key, localStorage.getItem(key)]
             })

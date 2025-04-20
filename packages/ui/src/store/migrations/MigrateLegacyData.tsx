@@ -17,7 +17,6 @@ export const legacyFilterUrls: Record<string, string> = {
 
 const LAST_MIGRATION_DATE = '2025-04-19'
 export const requiresMigration = () => {
-    console.log('Checking for migration')
     const legacyData = localStorage.getItem('modular-filter-storage')
 
     if (!legacyData) {
@@ -27,18 +26,12 @@ export const requiresMigration = () => {
     const migrated = localStorage.getItem('modular-filter-storage-migrated')
 
     if (!migrated) {
-        console.log('No migration date found, requiring migration')
         return true
     }
-
-    console.log('Migration date found:', migrated)
 
     try {
         const date = Date.parse(migrated)
         if (date < new Date(LAST_MIGRATION_DATE).getTime() || isNaN(date)) {
-            console.log(
-                `Migration date is before ${LAST_MIGRATION_DATE}, requiring migration`
-            )
             return true
         }
         return false
@@ -49,7 +42,6 @@ export const requiresMigration = () => {
 }
 
 export const MigrateLegacyData: React.FC = () => {
-    console.log('Migrating legacy data')
     const { setFilterConfiguration } = useFilterConfigStore()
     const { filters, updateFilter } = useFilterStore()
 

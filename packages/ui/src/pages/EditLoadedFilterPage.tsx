@@ -67,16 +67,13 @@ export const EditorLoadedFilterPage: React.FC = () => {
             : 'prefixRs2f'
     )
     const setContent = (id: string, content: string) => {
-        console.log('setContent', id, content)
         if (id === 'filterRs2f') {
             const modules = parseModules(content)
-            console.log('modules', modules)
             const newFilter = {
                 ...filters[filterId],
                 ...(modules.modules ? { modules: modules.modules } : {}),
                 rs2f: content,
             }
-            console.log('newFilter', newFilter)
             updateFilter(newFilter)
         } else if (id === 'prefixRs2f' || id === 'suffixRs2f') {
             setFilterConfiguration(filterId, {

@@ -13,6 +13,10 @@ export const createLink = (
         config: config,
     }
 
+    if (!data.filterUrl) {
+        return Promise.reject(new Error('This filter has no source URL'))
+    }
+
     const component = compressToEncodedURIComponent(JSON.stringify(data))
 
     if (component.length >= 15 * 1024) {
@@ -31,6 +35,7 @@ export const parseComponent = async (
     config: FilterConfiguration
 }> => {
     const data = decompressFromEncodedURIComponent(component)
+    console.log('data', data)
     const parsedData = JSON.parse(data)
     return parsedData
 }

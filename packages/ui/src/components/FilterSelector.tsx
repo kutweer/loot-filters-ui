@@ -310,27 +310,25 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                                     return
                                 }
 
-                                createLink(
-                                    activeFilter,
-                                    activeFilterConfig
-                                ).then((link) =>
-                                    navigator.clipboard
-                                        .writeText(link)
-                                        .then(() => {
-                                            addAlert({
-                                                children:
-                                                    'Filter link copied to clipboard',
-                                                severity: 'success',
+                                createLink(activeFilter, activeFilterConfig)
+                                    .then((link) => {
+                                        return navigator.clipboard
+                                            .writeText(link)
+                                            .then(() => {
+                                                addAlert({
+                                                    children:
+                                                        'Filter link copied to clipboard',
+                                                    severity: 'success',
+                                                })
                                             })
+                                    })
+                                    .catch((error) => {
+                                        console.error(error)
+                                        addAlert({
+                                            children: `Failed to copy filter link to clipboard: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                                            severity: 'error',
                                         })
-                                        .catch((error) => {
-                                            addAlert({
-                                                children:
-                                                    'Failed to copy filter link to clipboard',
-                                                severity: 'error',
-                                            })
-                                        })
-                                )
+                                    })
                             }}
                         >
                             <ListItemIcon>

@@ -28,13 +28,13 @@ export const AppHeader: React.FC = () => {
                 }}
             >
                 <Typography variant="h4" color="primary">
-                    Loot Filter Builder
+                    FilterScape.xyz
                     <Typography
                         sx={{ paddingLeft: '1em', display: 'inline-block' }}
                         gutterBottom
                     >
                         <span style={{ color: colors.rsYellow }}>
-                            A LootFilter builder for{' '}
+                            A LootFilter configuration tool for{' '}
                             <Link
                                 style={{
                                     color: colors.rsYellow,
