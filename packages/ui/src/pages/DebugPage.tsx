@@ -68,6 +68,16 @@ export const DebugPage = () => {
                         }}
                     />
                 </Button>
+                <Button
+                    sx={{ width: '250px' }}
+                    variant="outlined"
+                    onClick={() => {
+                        localStorage.clear()
+                        window.location.href = `${window.location.protocol}://${window.location.host}`
+                    }}
+                >
+                    Delete All Stored Data
+                </Button>
             </Box>
         </Container>
     )
