@@ -141,6 +141,7 @@ const renderStyle = (style: StyleConfig): string => {
         renderStyleBool('hideOverlay', style.hideOverlay),
         renderStyleBool('highlightTile', style.highlightTile),
         renderStyleString('sound', style.sound),
+        renderStyleInt('menuSort', style.menuSort),
     ].join('')
 }
 

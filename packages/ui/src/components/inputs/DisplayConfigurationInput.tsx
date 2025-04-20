@@ -31,6 +31,15 @@ import { ItemLabelPreview, ItemMenuPreview } from '../Previews'
 import { ColorPickerInput } from './ColorPicker'
 import { UISelect } from './UISelect'
 
+const maybeInt = (value: string): string | number => {
+    for (const ch of value) {
+        if (ch < '0' || ch > '9') {
+            return value
+        }
+    }
+    return parseInt(value)
+}
+
 const Column: React.FC<{
     children: React.ReactNode[] | React.ReactNode
 }> = ({ children }) => {
@@ -208,7 +217,7 @@ export const DisplayConfigurationInput: React.FC<{
             sx={{ minWidth: '10rem', marginBottom: '-25px' }}
             placeholder="Sound File or Id"
             value={styleConfig?.sound ?? input.default?.sound ?? ''}
-            onChange={(e) => onChange({ sound: e.target.value })}
+            onChange={(e) => onChange({ sound: maybeInt(e.target.value) })}
             disabled={readonly}
         />
     )
@@ -255,6 +264,16 @@ export const DisplayConfigurationInput: React.FC<{
             config={styleConfig}
             input={input}
             onChange={onChange}
+        />
+    )
+    const menuSortInput = (
+        <TextField
+            sx={{ minWidth: '10rem', marginBottom: '-25px' }}
+            placeholder="priority"
+            type="number"
+            value={styleConfig?.menuSort ?? input.default?.menuSort ?? 0}
+            onChange={(e) => onChange({ menuSort: parseInt(e.target.value) })}
+            disabled={readonly}
         />
     )
 
@@ -370,6 +389,8 @@ export const DisplayConfigurationInput: React.FC<{
                         <Grid2 container size={11}>
                             <Label label="Menu Color" />
                             <Grid2 size={1}>{menuColorInput}</Grid2>
+                            <Label label="Menu Sort" />
+                            <Grid2 size={1}>{menuSortInput}</Grid2>
                         </Grid2>
                     </Column>
                     <HeaderCol text="General" />
