@@ -25,7 +25,6 @@ import {
 import { useAlertStore } from '../store/alerts'
 import { useFilterConfigStore } from '../store/filterConfigurationStore'
 import { useFilterStore } from '../store/filterStore'
-import { useSiteConfigStore } from '../store/siteConfig'
 import { downloadFile } from '../utils/file'
 import { createLink } from '../utils/link'
 import { loadFilterFromUrl } from '../utils/loaderv2'
@@ -37,7 +36,6 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
     reloadOnChange,
 }) => {
     const [editDialogOpen, setEditDialogOpen] = useState(false)
-    const { siteConfig } = useSiteConfigStore()
 
     const { filters, removeFilter, setActiveFilter, updateFilter } =
         useFilterStore()

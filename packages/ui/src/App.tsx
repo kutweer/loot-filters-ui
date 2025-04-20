@@ -14,25 +14,16 @@ import {
     MigrateLegacyData,
     requiresMigration,
 } from './store/migrations/MigrateLegacyData'
-import { useSiteConfigStore } from './store/siteConfig'
 import { MuiRsTheme } from './styles/MuiTheme'
 
 const Page: React.FC<{
     component?: ReactNode
 }> = ({ component }) => {
-    const { setSiteConfig } = useSiteConfigStore()
     const params = new URLSearchParams(window.location.search)
-    const devMode = params.get('dev') === 'true'
 
     const alerts = useAlertStore((state) => state.alerts)
     const isAlerts = Boolean(alerts.length)
     const closeAlert = useAlertStore((state) => state.removeAlert)
-
-    useEffect(() => {
-        if (devMode) {
-            setSiteConfig({ devMode })
-        }
-    }, [devMode, setSiteConfig])
 
     return (
         <Container className="rs-container" maxWidth="xl">

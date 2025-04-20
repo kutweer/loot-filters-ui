@@ -7,12 +7,9 @@ import {
     Switch,
     Typography,
 } from '@mui/material'
-import { useSiteConfigStore } from '../store/siteConfig'
 import { colors } from '../styles/MuiTheme'
 
 export const AppHeader: React.FC = () => {
-    const { siteConfig, setSiteConfig } = useSiteConfigStore()
-
     let buildInfo = { gitSha: 'main' }
     try {
         buildInfo = require('../build-info.json')
@@ -48,24 +45,6 @@ export const AppHeader: React.FC = () => {
                         </span>
                     </Typography>
                 </Typography>
-                {siteConfig.isLocal ? (
-                    <FormControl sx={{ marginLeft: 'auto' }}>
-                        <FormGroup>
-                            <FormControlLabel
-                                sx={{ color: colors.rsYellow }}
-                                control={
-                                    <Switch checked={siteConfig.devMode} />
-                                }
-                                onChange={(_, checked: boolean) =>
-                                    setSiteConfig({
-                                        devMode: checked,
-                                    })
-                                }
-                                label="Dev Mode"
-                            />
-                        </FormGroup>
-                    </FormControl>
-                ) : null}
                 <Typography
                     sx={{ marginLeft: 'auto' }}
                     variant="body2"

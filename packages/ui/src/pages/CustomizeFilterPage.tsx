@@ -6,10 +6,8 @@ import { RenderedFilterTab } from '../components/tabs/RenderedFilterTab'
 import { parse } from '../parsing/parse'
 import { useFilterConfigStore } from '../store/filterConfigurationStore'
 import { useFilterStore } from '../store/filterStore'
-import { useSiteConfigStore } from '../store/siteConfig'
 
 export const FilterTabs: React.FC = () => {
-    const { siteConfig } = useSiteConfigStore()
     const [activeTab, setActiveTab] = useState(0)
 
     const activeFilter = useFilterStore((state) =>
