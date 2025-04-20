@@ -1,22 +1,96 @@
-import { Box, Button, Container } from '@mui/material'
+import { Editor } from '@monaco-editor/react'
+import { ArrowBack } from '@mui/icons-material'
+import { Box, Button, Container, Tab, Tabs } from '@mui/material'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { downloadFile, localState } from '../utils/file'
+import { downloadFile, localState, localStorageKeys } from '../utils/file'
+
+const FilterStoreTabs = ({
+    filterStoreTab,
+    setFilterStoreTab,
+}: {
+    filterStoreTab: string
+    setFilterStoreTab: (tab: string) => void
+}) => {
+    const filterStore = JSON.parse(localStorage.getItem('filter-store') ?? '{}')
+
+    if (Object.keys(filterStore).length === 0) {
+        return null
+    }
+
+    return (
+        <Tabs
+            value={filterStoreTab}
+            onChange={(_, newValue) => setFilterStoreTab(newValue)}
+        >
+            <Tab value="everything" label="Everything" />
+            {Object.keys(filterStore['state']['filters']).map((key, i) => {
+                return (
+                    <Tab
+                        key={i}
+                        value={key}
+                        label={filterStore['state']['filters'][key].name}
+                    />
+                )
+            })}
+        </Tabs>
+    )
+}
+
+const renderContent = (tab: string, filterStoreTab: string) => {
+    const content = localStorage.getItem(tab)
+
+    if (!content) {
+        return 'No data found for this tab'
+    }
+
+    if (!content.startsWith('{')) {
+        return content
+    }
+
+    let json = JSON.parse(content)
+
+    if (tab === 'filter-store' && filterStoreTab !== 'everything') {
+        json = json['state']['filters'][filterStoreTab]
+    } else if (
+        tab === 'filter-configuration-store' &&
+        filterStoreTab !== 'everything'
+    ) {
+        json = json['state']['filterConfigurations'][filterStoreTab]
+    }
+
+    return JSON.stringify(json, null, 2)
+}
 
 export const DebugPage = () => {
-    const nav = useNavigate()
+    const navigator = useNavigate()
+    const [tab, setTab] = useState('filter-store')
+    const [filterStoreTab, setFilterStoreTab] = useState('everything')
     return (
         <Container maxWidth="lg">
             <Box
                 sx={{
-                    display: 'flex',
+                    mt: 5,
                     justifyContent: 'center',
-                    flexDirection: 'column',
+                    display: 'flex',
+                    flexDirection: 'row',
                     alignItems: 'center',
                     gap: 2,
                 }}
             >
                 <Button
-                    sx={{ width: '250px', mt: 10 }}
+                    color="secondary"
+                    variant="outlined"
+                    sx={{ fontFamily: 'RuneScape' }}
+                    onClick={() => {
+                        navigator('/')
+                    }}
+                >
+                    <ArrowBack />
+                    Back to Customizer
+                </Button>
+                <Button
+                    sx={{ width: '250px' }}
                     variant="outlined"
                     onClick={() => {
                         const state = localState()
@@ -69,7 +143,7 @@ export const DebugPage = () => {
                     />
                 </Button>
                 <Button
-                    sx={{ width: '250px' }}
+                    sx={{ width: '250px', color: 'red' }}
                     variant="outlined"
                     onClick={() => {
                         localStorage.clear()
@@ -78,6 +152,37 @@ export const DebugPage = () => {
                 >
                     Delete All Stored Data
                 </Button>
+            </Box>
+            <Box>
+                <Tabs value={tab} onChange={(_, newValue) => setTab(newValue)}>
+                    {localStorageKeys.map((key, i) => {
+                        return <Tab key={i} value={key} label={key} />
+                    })}
+                </Tabs>
+                {(tab === 'filter-store' ||
+                    tab === 'filter-configuration-store') && (
+                    <FilterStoreTabs
+                        filterStoreTab={filterStoreTab}
+                        setFilterStoreTab={setFilterStoreTab}
+                    />
+                )}
+
+                <Editor
+                    height="70vh"
+                    language={
+                        (localStorage.getItem(tab) ?? '').startsWith('{')
+                            ? 'json'
+                            : 'text'
+                    }
+                    theme="vs-dark"
+                    options={{
+                        minimap: {
+                            enabled: false,
+                        },
+                        readOnly: true,
+                    }}
+                    value={renderContent(tab, filterStoreTab)}
+                />
             </Box>
         </Container>
     )
