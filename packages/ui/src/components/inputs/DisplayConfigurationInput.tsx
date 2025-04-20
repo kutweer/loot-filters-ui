@@ -18,7 +18,6 @@ import {
     StyleConfigSpec,
     StyleInput,
 } from '../../parsing/UiTypesSpec'
-import { useSiteConfigStore } from '../../store/siteConfig'
 import { colors } from '../../styles/MuiTheme'
 import {
     FontType,
@@ -111,8 +110,7 @@ export const DisplayConfigurationInput: React.FC<{
     module: Module
     input: StyleInput
 }> = ({ config, onChange, readonly, module, input }) => {
-    const { siteConfig } = useSiteConfigStore()
-    const [expanded, setExpanded] = useState(siteConfig.devMode)
+    const [expanded, setExpanded] = useState(false)
 
     const styleConfig = StyleConfigSpec.optional()
         .default({})

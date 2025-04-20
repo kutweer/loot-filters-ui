@@ -4,7 +4,6 @@ import {
     AccordionDetails,
     AccordionSummary,
     Badge,
-    Box,
     Divider,
     Grid2,
     IconButton,
@@ -41,7 +40,6 @@ import {
 } from '../../parsing/UiTypesSpec'
 import { useFilterConfigStore } from '../../store/filterConfigurationStore'
 import { useFilterStore } from '../../store/filterStore'
-import { useSiteConfigStore } from '../../store/siteConfig'
 import { isConfigEmpty } from '../../utils/configUtils'
 import { generateId } from '../../utils/idgen'
 import { BackgroundSelector } from '../BackgroundSelector'
@@ -214,19 +212,6 @@ const ModuleSection: React.FC<{
     setEnabledModule,
     showSettings,
 }) => {
-    const { siteConfig } = useSiteConfigStore()
-    const [showJson, setShowJson] = useState<'json' | 'configJson' | 'none'>(
-        'none'
-    )
-
-    let json: string | null = null
-    let configJson: string | null = null
-
-    if (siteConfig.devMode) {
-        json = JSON.stringify(module, null, 2)
-        configJson = JSON.stringify(config, null, 2)
-    }
-
     const defaultGroupId = generateId()
 
     const groupedInputs = groupBy(
@@ -388,47 +373,6 @@ const ModuleSection: React.FC<{
                                 gfmd={module.description ?? ''}
                             />
                         </Stack>
-                        {siteConfig.devMode ? (
-                            <Box display="flex" justifyContent="flex-end">
-                                <ToggleButtonGroup
-                                    value={showJson}
-                                    onChange={(event, value) =>
-                                        setShowJson(value)
-                                    }
-                                    exclusive
-                                >
-                                    <ToggleButton value="json">
-                                        Show Module JSON
-                                    </ToggleButton>
-                                    <ToggleButton value="configJson">
-                                        Show Config JSON
-                                    </ToggleButton>
-                                </ToggleButtonGroup>
-                            </Box>
-                        ) : null}
-                        {showJson !== 'none' && !!showJson ? (
-                            <Box
-                                sx={{
-                                    backgroundColor: 'background.paper',
-                                    p: 2,
-                                    borderRadius: 1,
-                                }}
-                            >
-                                <pre
-                                    style={{
-                                        margin: 0,
-                                        whiteSpace: 'pre-wrap',
-                                        wordWrap: 'break-word',
-                                    }}
-                                >
-                                    {showJson === 'json'
-                                        ? json
-                                        : showJson === 'configJson'
-                                          ? configJson
-                                          : null}
-                                </pre>
-                            </Box>
-                        ) : null}
                         {Object.entries(groupedInputs).map(
                             ([group, inputs], index) => {
                                 return (
@@ -538,7 +482,17 @@ export const CustomizeTab: React.FC<{
     sx,
     showSettings = true,
 }) => {
-    const { siteConfig } = useSiteConfigStore()
+    const defaultExpanded =
+        window.location.host === 'localhost' &&
+        filter?.modules.length &&
+        filter?.modules.length < 5
+            ? {
+                  ...filter.modules.map((module) => ({
+                      [module.name]: true,
+                  })),
+              }
+            : {}
+
     const [expandedModules, setExpandedModules] = useState<
         Record<string, boolean>
     >({})
@@ -643,10 +597,7 @@ export const CustomizeTab: React.FC<{
                             onChange={onChange}
                             clearConfiguration={clearConfiguration}
                             setEnabledModule={setEnabledModule}
-                            expanded={
-                                expandedModules[module.name] ??
-                                (false || siteConfig.devMode)
-                            }
+                            expanded={expandedModules[module.name] ?? false}
                             setExpanded={(expanded) =>
                                 setExpandedModules((prev) => ({
                                     ...prev,
