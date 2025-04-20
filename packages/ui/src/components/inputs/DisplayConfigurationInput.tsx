@@ -31,7 +31,10 @@ import { ItemLabelPreview, ItemMenuPreview } from '../Previews'
 import { ColorPickerInput } from './ColorPicker'
 import { UISelect } from './UISelect'
 
-const maybeInt = (value: string): string | number => {
+const parseSoundInput = (value: string): string | number | undefined => {
+    if (value.length === 0) {
+        return undefined
+    }
     for (const ch of value) {
         if (ch < '0' || ch > '9') {
             return value
@@ -217,7 +220,9 @@ export const DisplayConfigurationInput: React.FC<{
             sx={{ minWidth: '10rem', marginBottom: '-25px' }}
             placeholder="Sound File or Id"
             value={styleConfig?.sound ?? input.default?.sound ?? ''}
-            onChange={(e) => onChange({ sound: maybeInt(e.target.value) })}
+            onChange={(e) =>
+                onChange({ sound: parseSoundInput(e.target.value) })
+            }
             disabled={readonly}
         />
     )
