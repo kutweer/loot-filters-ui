@@ -1,4 +1,10 @@
-import { AddBox, Edit, IosShare, SystemUpdateAlt } from '@mui/icons-material'
+import {
+    AddBox,
+    Edit,
+    FileCopy,
+    IosShare,
+    SystemUpdateAlt,
+} from '@mui/icons-material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import DeleteIcon from '@mui/icons-material/Delete'
 import DownloadIcon from '@mui/icons-material/Download'
@@ -18,6 +24,7 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
+    DEFAULT_FILTER_CONFIGURATION,
     Filter,
     FilterConfigurationSpec,
     FilterId,
@@ -32,6 +39,26 @@ import { loadFilterFromUrl } from '../utils/loaderv2'
 import { renderFilter } from '../utils/render'
 import { ImportFilterDialog } from './ImportFilterDialog'
 import { Option, UISelect } from './inputs/UISelect'
+import { generateId } from '../utils/idgen'
+
+const SmartTooltip = ({
+    enabledTitle,
+    disabledTitle,
+    enabled,
+    children,
+}: {
+    enabledTitle: string
+    disabledTitle: string
+    enabled: boolean
+    children: React.ReactNode
+}) => {
+    return (
+        <Tooltip title={enabled ? enabledTitle : disabledTitle}>
+            {/* span is required to prevent tooltip from being disabled when input is disabled */}
+            <span>{children}</span>
+        </Tooltip>
+    )
+}
 
 export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
     reloadOnChange,
@@ -140,7 +167,11 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
     )
 
     const copyToClipboardButton = (
-        <Tooltip title="Copy filter to clipboard">
+        <SmartTooltip
+            enabledTitle="Copy filter to clipboard"
+            disabledTitle="No filter selected"
+            enabled={activeFilter != null}
+        >
             <IconButton
                 color="primary"
                 disabled={!activeFilter}
@@ -170,11 +201,15 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
             >
                 <ContentCopyIcon style={{ color: colors.rsOrange }} />
             </IconButton>
-        </Tooltip>
+        </SmartTooltip>
     )
 
     const updateFilterButton = (
-        <Tooltip title={updateAvailable ? 'Update filter' : 'No updates available'}>
+        <SmartTooltip
+            enabledTitle="Update filter"
+            disabledTitle="No updates available"
+            enabled={updateAvailable}
+        >
             <span>
                 <IconButton
                     disabled={!updateAvailable}
@@ -217,16 +252,14 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                     />
                 </IconButton>
             </span>
-        </Tooltip>
+        </SmartTooltip>
     )
 
     const shareFilterButton = (
-        <Tooltip
-            title={
-                activeFilter?.source
-                    ? 'Share filter link'
-                    : 'Filters without a source URL cannot be shared'
-            }
+        <SmartTooltip
+            enabledTitle="Share filter link"
+            disabledTitle="Filters without a source URL cannot be shared"
+            enabled={activeFilter?.source != null}
         >
             <span>
                 <IconButton
@@ -275,7 +308,7 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                     />
                 </IconButton>
             </span>
-        </Tooltip>
+        </SmartTooltip>
     )
 
     const menuButton = (
@@ -294,45 +327,101 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
             onClose={() => setFilterMenuAnchor(null)}
             anchorEl={filterMenuAnchor}
         >
-            <MenuItem
-                disabled={!activeFilter}
-                onClick={() => {
-                    navigate(`/editor/${activeFilter!!.id}`)
-                }}
+            <SmartTooltip
+                enabledTitle="Edit filter"
+                disabledTitle="No filter selected"
+                enabled={activeFilter != null}
             >
-                <ListItemIcon>
-                    <Edit />
-                </ListItemIcon>
-                <ListItemText>Edit Filter</ListItemText>
-            </MenuItem>
-            <MenuItem disabled={!activeFilter} onClick={handleDeleteFilter}>
-                <ListItemIcon>
-                    <DeleteIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>Delete</ListItemText>
-            </MenuItem>
-            <MenuItem
-                disabled={!activeFilter}
-                onClick={() => {
-                    if (!activeFilter) {
-                        return
-                    }
-                    const renderedFilter = renderFilter(
-                        activeFilter,
-                        activeFilterConfig
-                    )
-                    const fileName = `${activeFilter.name}.rs2f`
-                    const file = new File([renderedFilter], fileName, {
-                        type: 'text/plain',
-                    })
-                    downloadFile(file)
-                }}
+                <MenuItem
+                    disabled={!activeFilter}
+                    onClick={() => {
+                        navigate(`/editor/${activeFilter!!.id}`)
+                    }}
+                >
+                    <ListItemIcon>
+                        <Edit />
+                    </ListItemIcon>
+                    <ListItemText>Edit Filter</ListItemText>
+                </MenuItem>
+            </SmartTooltip>
+            <SmartTooltip
+                enabledTitle="Delete filter"
+                disabledTitle="No filter selected"
+                enabled={activeFilter != null}
             >
-                <ListItemIcon>
-                    <DownloadIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>Download</ListItemText>
-            </MenuItem>
+                <MenuItem disabled={!activeFilter} onClick={handleDeleteFilter}>
+                    <ListItemIcon>
+                        <DeleteIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Delete</ListItemText>
+                </MenuItem>
+            </SmartTooltip>
+            <SmartTooltip
+                enabledTitle="Download filter"
+                disabledTitle="No filter selected"
+                enabled={activeFilter != null}
+            >
+                <MenuItem
+                    disabled={!activeFilter}
+                    onClick={() => {
+                        if (!activeFilter) {
+                            return
+                        }
+                        const renderedFilter = renderFilter(
+                            activeFilter,
+                            activeFilterConfig
+                        )
+                        const fileName = `${activeFilter.name}.rs2f`
+                        const file = new File([renderedFilter], fileName, {
+                            type: 'text/plain',
+                        })
+                        downloadFile(file)
+                    }}
+                >
+                    <ListItemIcon>
+                        <DownloadIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Download</ListItemText>
+                </MenuItem>
+            </SmartTooltip>
+            <SmartTooltip
+                enabledTitle="Duplicate filter with current settings"
+                disabledTitle="No filter selected"
+                enabled={activeFilter != null}
+            >
+                <MenuItem
+                    disabled={!activeFilter}
+                    onClick={() => {
+                        if (!activeFilter) {
+                            return
+                        }
+
+                        const newId = generateId()
+
+                        setFilterConfiguration(
+                            newId,
+                            activeFilterConfig || DEFAULT_FILTER_CONFIGURATION
+                        )
+
+                        updateFilter({
+                            ...activeFilter,
+                            id: newId,
+                            name: `${activeFilter.name} (copy)`,
+                        })
+
+                        setActiveFilter(newId)
+                        addAlert({
+                            children: 'Filter duplicated',
+                            severity: 'success',
+                        })
+                    }}
+                >
+                    <ListItemIcon>
+                        <FileCopy fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Duplicate</ListItemText>
+                </MenuItem>
+            </SmartTooltip>
         </Menu>
     )
 
