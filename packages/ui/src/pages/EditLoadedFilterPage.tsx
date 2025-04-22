@@ -22,7 +22,6 @@ export const EditorLoadedFilterPage: React.FC = () => {
     const { filterConfigurations, setFilterConfiguration } =
         useFilterConfigStore()
     const { filters, updateFilter } = useFilterStore()
-    const [editDefaults, setEditDefaults] = useState<boolean>(false)
     const [searchParams] = useSearchParams()
     const initialFile = searchParams.get('initialFile')
 
@@ -94,7 +93,6 @@ export const EditorLoadedFilterPage: React.FC = () => {
             setEditorContent={setContent}
             setSelected={setSelected as (selected: string | null) => void}
             filesContent={filesContent}
-            allowEditDefaults={editDefaults}
             configOnChange={(config: FilterConfiguration) => {
                 const content: string | undefined = filesContent[selected!!]
                 if (!content) {
@@ -126,14 +124,6 @@ export const EditorLoadedFilterPage: React.FC = () => {
                         gap: 2,
                     }}
                 >
-                    <FormControlLabel
-                        sx={{ color: colors.rsYellow }}
-                        control={<Switch checked={editDefaults} />}
-                        onChange={(_, checked: boolean) =>
-                            setEditDefaults(checked)
-                        }
-                        label="Edit Defaults"
-                    />
                     <TextField
                         label="Filter Name"
                         value={filters[filterId].name}

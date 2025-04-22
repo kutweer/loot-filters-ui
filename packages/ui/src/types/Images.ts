@@ -24,8 +24,8 @@ import ZanarisImage from '../images/zanaris.png'
 import ZulAndraImage from '../images/zul_andra.png'
 
 export const BackgroundImage = {
+    Default: 'Default',
     Random: 'Random',
-    GodWarsDungeon: 'God Wars Dungeon',
     AbyssalNexus: 'Abyssal Nexus',
     Akkha: 'Akkha',
     Baba: 'Ba-Ba',
@@ -35,6 +35,7 @@ export const BackgroundImage = {
     CorruptedGauntlet: 'Corrupted Gauntlet',
     Gauntlet: 'Gauntlet',
     Grass: 'Grass',
+    GodWarsDungeon: 'God Wars Dungeon',
     Kephri: 'Kephri',
     Nightmare: 'Nightmare',
     Prifddinas: 'Prifddinas',
