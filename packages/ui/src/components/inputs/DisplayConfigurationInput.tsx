@@ -275,7 +275,14 @@ export const DisplayConfigurationInput: React.FC<{
             placeholder="priority"
             type="number"
             value={styleConfig?.menuSort ?? input.default?.menuSort ?? 0}
-            onChange={(e) => onChange({ menuSort: parseInt(e.target.value) })}
+            onChange={(e) =>
+                onChange({
+                    menuSort:
+                        e.target.value.length > 0
+                            ? parseInt(e.target.value)
+                            : undefined,
+                })
+            }
             disabled={readonly}
         />
     )
