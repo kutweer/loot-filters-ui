@@ -225,12 +225,17 @@ export const ItemLabelPreview: React.FC<{
         }
     }, [activeBackground])
 
-    const activeBackgroundImage =
-        input.backgroundImage && (input.backgroundImage as BackgroundImage)
-            ? imageFromBackgroundImage(input.backgroundImage as BackgroundImage)
-            : activeBackground === BackgroundImage.Random
-              ? backgroundImages[randomBackgroundImageIndex]
-              : imageFromBackgroundImage(activeBackground)
+    let activeBackgroundImage = null
+    if (activeBackground === BackgroundImage.Default) {
+        activeBackgroundImage = imageFromBackgroundImage(
+            (input.backgroundImage as BackgroundImage) ??
+                BackgroundImage.GodWarsDungeon
+        )
+    } else if (activeBackground === BackgroundImage.Random) {
+        activeBackgroundImage = backgroundImages[randomBackgroundImageIndex]
+    } else {
+        activeBackgroundImage = imageFromBackgroundImage(activeBackground)
+    }
 
     return (
         <div
