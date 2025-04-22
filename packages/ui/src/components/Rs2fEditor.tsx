@@ -61,9 +61,8 @@ const causeList = (error: Error): Error[] => {
 
 const VisualResults: React.FC<{
     parsed: ParseResult | null
-    enableEdits: boolean
     configOnChange: (config: FilterConfiguration) => void
-}> = ({ parsed, enableEdits, configOnChange }) => {
+}> = ({ parsed, configOnChange }) => {
     if (!parsed) {
         return <div>No parsed result</div>
     }
@@ -103,7 +102,7 @@ const VisualResults: React.FC<{
                 filter={parsed.filter!!}
                 config={DEFAULT_FILTER_CONFIGURATION}
                 showSettings={false}
-                readonly={!enableEdits}
+                readonly={false}
                 onChange={configOnChange}
                 clearConfiguration={() => {}}
                 setEnabledModule={() => {}}
@@ -124,10 +123,6 @@ export const Rs2fEditor: React.FC<{
 
     extraTabComponent?: ReactNode
     warningComponent?: ReactNode
-
-    // For editing config options
-    allowEditDefaults: boolean
-    // only need these implemented if the above is true
     configOnChange: (config: FilterConfiguration) => void
 }> = ({
     selected,
@@ -137,7 +132,6 @@ export const Rs2fEditor: React.FC<{
     options,
     requireMeta,
     extraTabComponent,
-    allowEditDefaults,
     warningComponent,
     configOnChange,
 }) => {
@@ -259,7 +253,6 @@ export const Rs2fEditor: React.FC<{
                     }}
                 >
                     <VisualResults
-                        enableEdits={allowEditDefaults}
                         parsed={parsed}
                         configOnChange={configOnChange}
                     />
