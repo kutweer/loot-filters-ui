@@ -1,17 +1,17 @@
-import { Edit, IosShare, Update } from '@mui/icons-material'
+import { AddBox, Edit, IosShare, SystemUpdateAlt } from '@mui/icons-material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import DeleteIcon from '@mui/icons-material/Delete'
 import DownloadIcon from '@mui/icons-material/Download'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import {
     Box,
-    Button,
     FormControl,
     IconButton,
     ListItemText,
     Menu,
     MenuItem,
     Stack,
+    Tooltip,
     Typography,
 } from '@mui/material'
 import ListItemIcon from '@mui/material/ListItemIcon'
@@ -25,6 +25,7 @@ import {
 import { useAlertStore } from '../store/alerts'
 import { useFilterConfigStore } from '../store/filterConfigurationStore'
 import { useFilterStore } from '../store/filterStore'
+import { colors } from '../styles/MuiTheme'
 import { downloadFile } from '../utils/file'
 import { createLink } from '../utils/link'
 import { loadFilterFromUrl } from '../utils/loaderv2'
@@ -125,6 +126,216 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
     const updateAvailable =
         updatedFilterSha !== undefined && activeFilterSha !== updatedFilterSha
 
+    const importFilterButton = (
+        <Tooltip title="Import a new filter">
+            <IconButton
+                color="primary"
+                onClick={() => {
+                    setImportDialogOpen(true)
+                }}
+            >
+                <AddBox style={{ color: colors.rsOrange }} />
+            </IconButton>
+        </Tooltip>
+    )
+
+    const copyToClipboardButton = (
+        <Tooltip title="Copy filter to clipboard">
+            <IconButton
+                color="primary"
+                disabled={!activeFilter}
+                onClick={() => {
+                    if (!activeFilter) {
+                        return
+                    }
+                    const renderedFilter = renderFilter(
+                        activeFilter,
+                        activeFilterConfig
+                    )
+                    navigator.clipboard
+                        .writeText(renderedFilter)
+                        .then(() => {
+                            addAlert({
+                                children: 'Filter copied to clipboard',
+                                severity: 'success',
+                            })
+                        })
+                        .catch(() => {
+                            addAlert({
+                                children: 'Failed to copy filter to clipboard',
+                                severity: 'error',
+                            })
+                        })
+                }}
+            >
+                <ContentCopyIcon style={{ color: colors.rsOrange }} />
+            </IconButton>
+        </Tooltip>
+    )
+
+    const updateFilterButton = (
+        <Tooltip title={updateAvailable ? 'Update filter' : 'No updates available'}>
+            <span>
+                <IconButton
+                    disabled={!updateAvailable}
+                    onClick={() => {
+                        if (!activeFilter) {
+                            return
+                        }
+                        if (updatedFilter != null) {
+                            let name = activeFilter.name
+
+                            const updatedAt = new Date().toLocaleDateString()
+
+                            updateFilter({
+                                ...updatedFilter,
+                                name:
+                                    name.replace(/ \(updated: .*\)$/, '') +
+                                    ` (updated: ${updatedAt})`,
+                            })
+                            setActiveFilter(updatedFilter.id)
+                            setFilterConfiguration(
+                                updatedFilter.id,
+                                activeFilterConfig || {
+                                    enabledModules: {},
+                                    inputConfigs: {},
+                                }
+                            )
+                            addAlert({
+                                children: 'Filter updated',
+                                severity: 'success',
+                            })
+                        }
+                    }}
+                >
+                    <SystemUpdateAlt
+                        style={{
+                            color: updateAvailable
+                                ? colors.rsOrange
+                                : 'disabled',
+                        }}
+                    />
+                </IconButton>
+            </span>
+        </Tooltip>
+    )
+
+    const shareFilterButton = (
+        <Tooltip
+            title={
+                activeFilter?.source
+                    ? 'Share filter link'
+                    : 'Filters without a source URL cannot be shared'
+            }
+        >
+            <span>
+                <IconButton
+                    disabled={!activeFilter || !activeFilter.source}
+                    onClick={() => {
+                        if (!activeFilter) {
+                            return
+                        }
+
+                        if (activeFilter.source === null) {
+                            addAlert({
+                                children:
+                                    'Filters without a source URL cannot be shared',
+                                severity: 'error',
+                            })
+                            return
+                        }
+
+                        createLink(activeFilter, activeFilterConfig)
+                            .then((link) => {
+                                return navigator.clipboard
+                                    .writeText(link)
+                                    .then(() => {
+                                        addAlert({
+                                            children:
+                                                'Filter link copied to clipboard',
+                                            severity: 'success',
+                                        })
+                                    })
+                            })
+                            .catch((error) => {
+                                console.error(error)
+                                addAlert({
+                                    children: `Failed to copy filter link to clipboard: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                                    severity: 'error',
+                                })
+                            })
+                    }}
+                >
+                    <IosShare
+                        style={{
+                            color: activeFilter?.source
+                                ? colors.rsOrange
+                                : 'disabled',
+                        }}
+                    />
+                </IconButton>
+            </span>
+        </Tooltip>
+    )
+
+    const menuButton = (
+        <IconButton onClick={(e) => setFilterMenuAnchor(e.currentTarget)}>
+            <MoreVertIcon
+                style={{
+                    color: colors.rsDarkOrange,
+                }}
+            />
+        </IconButton>
+    )
+
+    const menu = (
+        <Menu
+            open={filterMenuAnchor != null}
+            onClose={() => setFilterMenuAnchor(null)}
+            anchorEl={filterMenuAnchor}
+        >
+            <MenuItem
+                disabled={!activeFilter}
+                onClick={() => {
+                    navigate(`/editor/${activeFilter!!.id}`)
+                }}
+            >
+                <ListItemIcon>
+                    <Edit />
+                </ListItemIcon>
+                <ListItemText>Edit Filter</ListItemText>
+            </MenuItem>
+            <MenuItem disabled={!activeFilter} onClick={handleDeleteFilter}>
+                <ListItemIcon>
+                    <DeleteIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>Delete</ListItemText>
+            </MenuItem>
+            <MenuItem
+                disabled={!activeFilter}
+                onClick={() => {
+                    if (!activeFilter) {
+                        return
+                    }
+                    const renderedFilter = renderFilter(
+                        activeFilter,
+                        activeFilterConfig
+                    )
+                    const fileName = `${activeFilter.name}.rs2f`
+                    const file = new File([renderedFilter], fileName, {
+                        type: 'text/plain',
+                    })
+                    downloadFile(file)
+                }}
+            >
+                <ListItemIcon>
+                    <DownloadIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>Download</ListItemText>
+            </MenuItem>
+        </Menu>
+    )
+
     return (
         <>
             <Stack spacing={2}>
@@ -154,187 +365,13 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                             multiple={false}
                         />
                     </FormControl>
-                    <Button
-                        variant="outlined"
-                        color="primary"
-                        startIcon={<ContentCopyIcon />}
-                        disabled={!activeFilter}
-                        onClick={() => {
-                            if (!activeFilter) {
-                                return
-                            }
-                            const renderedFilter = renderFilter(
-                                activeFilter,
-                                activeFilterConfig
-                            )
-                            navigator.clipboard
-                                .writeText(renderedFilter)
-                                .then(() => {
-                                    addAlert({
-                                        children: 'Filter copied to clipboard',
-                                        severity: 'success',
-                                    })
-                                })
-                                .catch(() => {
-                                    addAlert({
-                                        children:
-                                            'Failed to copy filter to clipboard',
-                                        severity: 'error',
-                                    })
-                                })
-                        }}
-                    >
-                        Copy to clipboard
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        color="primary"
-                        onClick={() => {
-                            setImportDialogOpen(true)
-                        }}
-                    >
-                        Import New Filter
-                    </Button>
 
-                    <Button
-                        variant="outlined"
-                        startIcon={<Update />}
-                        disabled={!updateAvailable}
-                        onClick={() => {
-                            if (!activeFilter) {
-                                return
-                            }
-                            if (updatedFilter != null) {
-                                let name = activeFilter.name
-
-                                const updatedAt =
-                                    new Date().toLocaleDateString()
-
-                                updateFilter({
-                                    ...updatedFilter,
-                                    name:
-                                        name.replace(/ \(updated: .*\)$/, '') +
-                                        ` (updated: ${updatedAt})`,
-                                })
-                                setActiveFilter(updatedFilter.id)
-                                setFilterConfiguration(
-                                    updatedFilter.id,
-                                    activeFilterConfig || {
-                                        enabledModules: {},
-                                        inputConfigs: {},
-                                    }
-                                )
-                                addAlert({
-                                    children: 'Filter updated',
-                                    severity: 'success',
-                                })
-                            }
-                        }}
-                    >
-                        Update Filter
-                    </Button>
-
-                    <IconButton
-                        onClick={(e) => setFilterMenuAnchor(e.currentTarget)}
-                    >
-                        <MoreVertIcon />
-                    </IconButton>
-
-                    <Menu
-                        open={filterMenuAnchor != null}
-                        onClose={() => setFilterMenuAnchor(null)}
-                        anchorEl={filterMenuAnchor}
-                    >
-                        <MenuItem
-                            disabled={!activeFilter}
-                            onClick={() => {
-                                navigate(`/editor/${activeFilter!!.id}`)
-                            }}
-                        >
-                            <ListItemIcon>
-                                <Edit />
-                            </ListItemIcon>
-                            <ListItemText>Edit Filter</ListItemText>
-                        </MenuItem>
-                        <MenuItem
-                            disabled={!activeFilter}
-                            onClick={handleDeleteFilter}
-                        >
-                            <ListItemIcon>
-                                <DeleteIcon fontSize="small" />
-                            </ListItemIcon>
-                            <ListItemText>Delete</ListItemText>
-                        </MenuItem>
-                        <MenuItem
-                            disabled={!activeFilter}
-                            onClick={() => {
-                                if (!activeFilter) {
-                                    return
-                                }
-                                const renderedFilter = renderFilter(
-                                    activeFilter,
-                                    activeFilterConfig
-                                )
-                                const fileName = `${activeFilter.name}.rs2f`
-                                const file = new File(
-                                    [renderedFilter],
-                                    fileName,
-                                    {
-                                        type: 'text/plain',
-                                    }
-                                )
-                                downloadFile(file)
-                            }}
-                        >
-                            <ListItemIcon>
-                                <DownloadIcon fontSize="small" />
-                            </ListItemIcon>
-                            <ListItemText>Download</ListItemText>
-                        </MenuItem>
-
-                        <MenuItem
-                            disabled={!activeFilter}
-                            onClick={() => {
-                                if (!activeFilter) {
-                                    return
-                                }
-
-                                if (activeFilter.source === null) {
-                                    addAlert({
-                                        children:
-                                            'Filters without a source URL cannot be shared',
-                                        severity: 'error',
-                                    })
-                                    return
-                                }
-
-                                createLink(activeFilter, activeFilterConfig)
-                                    .then((link) => {
-                                        return navigator.clipboard
-                                            .writeText(link)
-                                            .then(() => {
-                                                addAlert({
-                                                    children:
-                                                        'Filter link copied to clipboard',
-                                                    severity: 'success',
-                                                })
-                                            })
-                                    })
-                                    .catch((error) => {
-                                        console.error(error)
-                                        addAlert({
-                                            children: `Failed to copy filter link to clipboard: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                                            severity: 'error',
-                                        })
-                                    })
-                            }}
-                        >
-                            <ListItemIcon>
-                                <IosShare fontSize="small" />
-                            </ListItemIcon>
-                            <ListItemText>Share Link</ListItemText>
-                        </MenuItem>
-                    </Menu>
+                    {importFilterButton}
+                    {copyToClipboardButton}
+                    {updateFilterButton}
+                    {shareFilterButton}
+                    {menuButton}
+                    {menu}
                 </Box>
 
                 <Typography variant="h4" color="secondary">
