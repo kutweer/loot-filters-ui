@@ -116,6 +116,10 @@ export const DisplayConfigurationInput: React.FC<{
         .default({})
         .parse(config?.inputConfigs?.[input.macroName])
 
+    const [iconType, setIconType] = useState<
+        'none' | 'current' | 'file' | 'sprite' | 'itemId'
+    >(styleConfig?.icon?.type ?? input.default?.icon?.type ?? 'none')
+
     const displayLootbeamInput = (
         <Checkbox
             disabled={readonly}
@@ -346,6 +350,122 @@ export const DisplayConfigurationInput: React.FC<{
             }}
         />
     )
+    const iconOpts = [
+        {
+            label: 'None',
+            value: 'none',
+        },
+        {
+            label: 'Current Item',
+            value: 'current',
+        },
+        {
+            label: 'File',
+            value: 'file',
+        },
+        {
+            label: 'Sprite Id',
+            value: 'sprite',
+        },
+        {
+            label: 'Item Id',
+            value: 'itemId',
+        },
+    ]
+
+    const itemIconTypeSelect = (
+        <UISelect<string>
+            sx={{ width: '15rem' }}
+            disabled={readonly}
+            options={iconOpts}
+            multiple={false}
+            freeSolo={false}
+            value={
+                iconOpts.find((opt) => opt.value === iconType) || {
+                    label: 'None',
+                    value: 'none',
+                }
+            }
+            onChange={(newValue) => {
+                switch (newValue?.value) {
+                    case 'none':
+                        setIconType('none')
+                        onChange({ icon: { type: 'none' } })
+                        break
+                    case 'current':
+                        setIconType('current')
+                        onChange({ icon: { type: 'current' } })
+                        break
+                    case 'file':
+                        setIconType('file')
+                        onChange({ icon: { type: 'file', path: null } })
+                        break
+                    case 'sprite':
+                        setIconType('sprite')
+                        onChange({ icon: { type: 'sprite', id: 0, index: 0 } })
+                        break
+                    case 'itemId':
+                        setIconType('itemId')
+                        onChange({ icon: { type: 'itemId', id: 0 } })
+                        break
+                    default:
+                        setIconType('none')
+                        onChange({ icon: { type: 'none' } })
+                        break
+                }
+            }}
+        />
+    )
+
+    const iconItemIdInput = (
+        <TextField
+            sx={{ minWidth: '10rem' }}
+            placeholder="Item Id"
+            type="number"
+            value={input.default?.icon?.id ?? ''}
+        />
+    )
+
+    const iconFileInput = (
+        <TextField
+            size="small"
+            sx={{ minWidth: '10rem' }}
+            placeholder="Icon Path"
+            value={''}
+        />
+    )
+
+    const iconSpriteInput = (
+        <span style={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+            <TextField
+                size="small"
+                sx={{ minWidth: '4rem' }}
+                placeholder="Sprite Id"
+                type="number"
+                value={input.default?.icon?.spriteId ?? ''}
+                onChange={(e) => {
+                    let number : number | '' = parseInt(e.target.value)
+                    if (isNaN(number)) {
+                        number = ''
+                    }
+                    onChange({
+                        icon: {
+                            ...input.default?.icon,
+                            type: 'sprite',
+                            spriteId: number,
+                        },
+                    })
+                }}
+            />
+            <TextField
+                size="small"
+                sx={{ minWidth: '5rem', pl: '1rem' }}
+                placeholder="Sprite Index"
+                type="number"
+                value={input.default?.icon?.spriteIndex ?? ''}
+            />
+        </span>
+    )
 
     return (
         <Accordion
@@ -379,13 +499,19 @@ export const DisplayConfigurationInput: React.FC<{
                             <Label label="Text Color" />
                             <Grid2 size={1}>{textColorInput}</Grid2>
                             <Label label="Font Type" />
-                            <Grid2 size={2}>{fontTypeInput}</Grid2>
+                            <Grid2 size={3}>{fontTypeInput}</Grid2>
+                            <Grid2 size={4}>{itemIconTypeSelect}</Grid2>
                         </Row>
                         <Row>
                             <Label label="Background Color" />
                             <Grid2 size={1}>{backgroundColorInput}</Grid2>
                             <Label label="Text Accent" />
-                            <Grid2 size={1}>{textAccentInput}</Grid2>
+                            <Grid2 size={3}>{textAccentInput}</Grid2>
+                            <Grid2 size={3}>
+                                {iconType === 'itemId' && iconItemIdInput}
+                                {iconType === 'file' && iconFileInput}
+                                {iconType === 'sprite' && iconSpriteInput}
+                            </Grid2>
                         </Row>
                         <Row>
                             <Label label="Border Color" />
