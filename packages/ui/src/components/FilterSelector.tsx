@@ -37,6 +37,7 @@ import { Option, UISelect } from './inputs/UISelect'
 const SmartTooltip = ({
     enabledTitle,
     disabledTitle,
+    tooltipSide = 'top',
     enabled,
     children,
 }: {
@@ -44,18 +45,39 @@ const SmartTooltip = ({
     disabledTitle: string
     enabled: boolean
     children: React.ReactNode
+    tooltipSide?: 'top' | 'bottom' | 'left' | 'right'
 }) => {
     return (
-        <Tooltip title={enabled ? enabledTitle : disabledTitle}>
+        <Tooltip
+            title={enabled ? enabledTitle : disabledTitle}
+            placement={tooltipSide}
+        >
             {/* span is required to prevent tooltip from being disabled when input is disabled */}
             <span>{children}</span>
         </Tooltip>
     )
 }
 
+const updateAvailableFn = (
+    activeFilter?: Filter | null,
+    updatedFilter?: Filter | null
+) => {
+    try {
+        return (
+            updatedFilter?.rs2fHash !== undefined &&
+            activeFilter?.rs2fHash !== updatedFilter?.rs2fHash
+        )
+    } catch (e) {
+        console.log('error', e)
+        return false
+    }
+}
+
 export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
     reloadOnChange,
 }) => {
+    const navigate = useNavigate()
+
     const { filters, removeFilter, setActiveFilter, updateFilter } =
         useFilterStore()
 
@@ -65,10 +87,6 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
     const [importDialogOpen, setImportDialogOpen] = useState(
         Object.keys(filters).length === 0
     )
-    const [prefixDialogOpen, setPrefixDialogOpen] = useState(false)
-
-    const navigate = useNavigate()
-
     const activeFilter = useMemo(
         () => Object.values(filters).find((filter) => filter.active),
         [filters]
@@ -80,10 +98,12 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                 activeFilter && state.filterConfigurations?.[activeFilter?.id]
         )
     )
+    const [updatedFilter, setUpdatedFilter] = useState<Filter | null>(null)
 
     const handleFilterChange = useCallback(
         (newValue: Option<FilterId> | null) => {
             if (newValue) {
+                setUpdatedFilter(null)
                 setActiveFilter(newValue.value)
                 if (reloadOnChange) {
                     window.location.reload()
@@ -116,12 +136,20 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
           }
         : null
 
-    const [updatedFilter, setUpdatedFilter] = useState<Filter | null>(null)
-
     const addAlert = useAlertStore((state) => state.addAlert)
 
+    const updateAvailable = useMemo(() => {
+        const result = updateAvailableFn(activeFilter, updatedFilter)
+        console.log('result', result)
+        return result
+    }, [activeFilter, updatedFilter])
+
     useEffect(() => {
-        if (activeFilter != null && activeFilter.source != null) {
+        if (
+            activeFilter != null &&
+            activeFilter.source != null &&
+            updatedFilter == null
+        ) {
             loadFilterFromUrl(activeFilter.source)
                 .then((newFilter) => {
                     setUpdatedFilter(newFilter)
@@ -137,12 +165,6 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
 
     const [filterMenuAnchor, setFilterMenuAnchor] =
         useState<HTMLElement | null>(null)
-
-    const activeFilterSha = activeFilter?.rs2fHash
-    const updatedFilterSha = updatedFilter?.rs2fHash
-
-    const updateAvailable =
-        updatedFilterSha !== undefined && activeFilterSha !== updatedFilterSha
 
     const importFilterButton = (
         <Tooltip title="Import a new filter">
@@ -201,48 +223,42 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
             disabledTitle="No updates available"
             enabled={updateAvailable}
         >
-            <span>
-                <IconButton
-                    disabled={!updateAvailable}
-                    onClick={() => {
-                        if (!activeFilter) {
-                            return
-                        }
-                        if (updatedFilter != null) {
-                            let name = activeFilter.name
+            <IconButton
+                disabled={!updateAvailable}
+                onClick={() => {
+                    if (!activeFilter) {
+                        return
+                    }
+                    if (updatedFilter != null) {
+                        let name = activeFilter.name
 
-                            const updatedAt = new Date().toLocaleDateString()
+                        const updatedAt = new Date().toISOString()
 
-                            updateFilter({
-                                ...updatedFilter,
-                                name:
-                                    name.replace(/ \(updated: .*\)$/, '') +
-                                    ` (updated: ${updatedAt})`,
-                            })
-                            setActiveFilter(updatedFilter.id)
-                            setFilterConfiguration(
-                                updatedFilter.id,
-                                activeFilterConfig || {
-                                    enabledModules: {},
-                                    inputConfigs: {},
-                                }
-                            )
-                            addAlert({
-                                children: 'Filter updated',
-                                severity: 'success',
-                            })
-                        }
+                        updateFilter({
+                            ...updatedFilter,
+                            id: activeFilter.id,
+                            name: activeFilter.name,
+                            importedOn: activeFilter.importedOn,
+                            updatedOn: updatedAt,
+                            active: true,
+                            description: updatedFilter?.description,
+                        })
+                        setUpdatedFilter(null)
+                        addAlert({
+                            children: 'Filter updated',
+                            severity: 'success',
+                        })
+                    }
+                }}
+            >
+                <Update
+                    style={{
+                        color: updateAvailable
+                            ? colors.rsOrange
+                            : colors.rsGrey,
                     }}
-                >
-                    <Update
-                        style={{
-                            color: updateAvailable
-                                ? colors.rsOrange
-                                : 'disabled',
-                        }}
-                    />
-                </IconButton>
-            </span>
+                />
+            </IconButton>
         </SmartTooltip>
     )
 
@@ -294,7 +310,7 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                         style={{
                             color: activeFilter?.source
                                 ? colors.rsOrange
-                                : 'disabled',
+                                : colors.rsGrey,
                         }}
                     />
                 </IconButton>
@@ -322,6 +338,7 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                 enabledTitle="Edit filter"
                 disabledTitle="No filter selected"
                 enabled={activeFilter != null}
+                tooltipSide="right"
             >
                 <MenuItem
                     disabled={!activeFilter}
@@ -339,6 +356,7 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                 enabledTitle="Delete filter"
                 disabledTitle="No filter selected"
                 enabled={activeFilter != null}
+                tooltipSide="right"
             >
                 <MenuItem disabled={!activeFilter} onClick={handleDeleteFilter}>
                     <ListItemIcon>
@@ -351,6 +369,7 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                 enabledTitle="Download filter"
                 disabledTitle="No filter selected"
                 enabled={activeFilter != null}
+                tooltipSide="right"
             >
                 <MenuItem
                     disabled={!activeFilter}
@@ -379,6 +398,7 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                 enabledTitle="Duplicate filter with current settings"
                 disabledTitle="No filter selected"
                 enabled={activeFilter != null}
+                tooltipSide="right"
             >
                 <MenuItem
                     disabled={!activeFilter}

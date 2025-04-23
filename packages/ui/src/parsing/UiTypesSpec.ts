@@ -124,6 +124,7 @@ export const FilterSpec = z.object({
     rs2fHash: z.string(),
     active: z.boolean().default(false),
     importedOn: z.string().datetime().default(new Date().toISOString()),
+    updatedOn: z.string().datetime().optional(),
     source: z.string().url().optional(),
     modules: z.array(ModuleSpec),
     rs2f: z.string(),

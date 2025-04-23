@@ -45,8 +45,14 @@ export const FilterTabs: React.FC = () => {
                 <CustomizeTab
                     readonly={false}
                     extraComponent={
-                        <Typography variant="h4" color="secondary">
-                            {activeFilter?.name || 'Select a filter'}
+                        <Typography variant="h6" color="secondary">
+                            {!activeFilter?.description
+                                ? 'No description'
+                                : activeFilter?.description}
+                            {activeFilter?.updatedOn
+                                ? ` (updated: ${new Date(activeFilter?.updatedOn).toLocaleDateString()})`
+                                : null}
+                            {!activeFilter ? 'Select a Filter' : null}
                             <Typography
                                 variant="caption"
                                 color="text.secondary"
