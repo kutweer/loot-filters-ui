@@ -46,7 +46,7 @@ export const ImportPage: React.FC = () => {
             .then(({ filterUrl, config }) => {
                 setFilterUrl(filterUrl)
                 setFilterConfig(config)
-                
+
                 return fetch(filterUrl)
             })
             .then((res) => {
