@@ -46,8 +46,7 @@ export const ImportPage: React.FC = () => {
             .then(({ filterUrl, config }) => {
                 setFilterUrl(filterUrl)
                 setFilterConfig(config)
-                console.log('filterUrl', filterUrl)
-                console.log('config', config)
+                
                 return fetch(filterUrl)
             })
             .then((res) => {
@@ -131,7 +130,11 @@ export const ImportPage: React.FC = () => {
                     variant="outlined"
                     color="secondary"
                     onClick={() => {
-                        updateFilter(parsedFilter.filter!!)
+                        updateFilter({
+                            ...parsedFilter.filter!!,
+                            source: filterUrl!!,
+                            importedOn: new Date().toISOString(),
+                        })
                         setActiveFilter(parsedFilter.filter!!.id)
                         setFilterConfiguration(
                             parsedFilter.filter!!.id,
