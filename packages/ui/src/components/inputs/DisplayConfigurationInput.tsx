@@ -444,7 +444,7 @@ export const DisplayConfigurationInput: React.FC<{
                 type="number"
                 value={input.default?.icon?.spriteId ?? ''}
                 onChange={(e) => {
-                    let number : number | '' = parseInt(e.target.value)
+                    let number: number | '' = parseInt(e.target.value)
                     if (isNaN(number)) {
                         number = ''
                     }
