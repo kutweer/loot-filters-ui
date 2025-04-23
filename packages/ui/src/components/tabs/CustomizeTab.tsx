@@ -482,17 +482,6 @@ export const CustomizeTab: React.FC<{
     sx,
     showSettings = true,
 }) => {
-    const defaultExpanded =
-        window.location.host === 'localhost' &&
-        filter?.modules.length &&
-        filter?.modules.length < 5
-            ? {
-                  ...filter.modules.map((module) => ({
-                      [module.name]: true,
-                  })),
-              }
-            : {}
-
     const [expandedModules, setExpandedModules] = useState<
         Record<string, boolean>
     >({})
@@ -539,7 +528,7 @@ export const CustomizeTab: React.FC<{
                 style={{
                     display: 'flex',
                     flexDirection: 'row',
-                    marginBottom: extraComponent === null ? undefined : '1rem',
+                    marginBottom: '1rem',
                 }}
             >
                 {extraComponent}

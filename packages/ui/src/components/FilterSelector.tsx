@@ -1,10 +1,4 @@
-import {
-    AddBox,
-    Edit,
-    FileCopy,
-    IosShare,
-    SystemUpdateAlt,
-} from '@mui/icons-material'
+import { Edit, FiberNew, FileCopy, IosShare, Update } from '@mui/icons-material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import DeleteIcon from '@mui/icons-material/Delete'
 import DownloadIcon from '@mui/icons-material/Download'
@@ -18,7 +12,6 @@ import {
     MenuItem,
     Stack,
     Tooltip,
-    Typography,
 } from '@mui/material'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
@@ -34,12 +27,12 @@ import { useFilterConfigStore } from '../store/filterConfigurationStore'
 import { useFilterStore } from '../store/filterStore'
 import { colors } from '../styles/MuiTheme'
 import { downloadFile } from '../utils/file'
+import { generateId } from '../utils/idgen'
 import { createLink } from '../utils/link'
 import { loadFilterFromUrl } from '../utils/loaderv2'
 import { renderFilter } from '../utils/render'
 import { ImportFilterDialog } from './ImportFilterDialog'
 import { Option, UISelect } from './inputs/UISelect'
-import { generateId } from '../utils/idgen'
 
 const SmartTooltip = ({
     enabledTitle,
@@ -63,8 +56,6 @@ const SmartTooltip = ({
 export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
     reloadOnChange,
 }) => {
-    const [editDialogOpen, setEditDialogOpen] = useState(false)
-
     const { filters, removeFilter, setActiveFilter, updateFilter } =
         useFilterStore()
 
@@ -161,7 +152,7 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                     setImportDialogOpen(true)
                 }}
             >
-                <AddBox style={{ color: colors.rsOrange }} />
+                <FiberNew style={{ color: colors.rsOrange }} />
             </IconButton>
         </Tooltip>
     )
@@ -243,7 +234,7 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                         }
                     }}
                 >
-                    <SystemUpdateAlt
+                    <Update
                         style={{
                             color: updateAvailable
                                 ? colors.rsOrange
@@ -462,19 +453,6 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                     {menuButton}
                     {menu}
                 </Box>
-
-                <Typography variant="h4" color="secondary">
-                    {activeFilter?.name || 'Select a filter'}
-                    <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ ml: 1 }}
-                    >
-                        {activeFilter?.importedOn
-                            ? `Imported on ${new Date(activeFilter?.importedOn).toLocaleDateString()}`
-                            : null}
-                    </Typography>
-                </Typography>
             </Stack>
 
             <ImportFilterDialog
