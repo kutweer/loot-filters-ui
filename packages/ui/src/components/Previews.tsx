@@ -271,6 +271,8 @@ export const ItemLabelPreview: React.FC<{
                 backgroundRepeat: 'repeat',
                 backgroundPosition: 'center',
                 backgroundImage: `url(${activeBackgroundImage})`,
+                display: 'flex',
+                alignItems: 'center',
             }}
         >
             {hidden && (
@@ -295,6 +297,16 @@ export const ItemLabelPreview: React.FC<{
                     Hidden
                 </div>
             )}
+            {icon && (
+                <img
+                    style={{
+                        verticalAlign: 'middle',
+                        marginLeft: '4px',
+                    }}
+                    src={icon.src}
+                    alt={icon.name}
+                />
+            )}
             <div
                 style={{
                     margin: '6px',
@@ -314,16 +326,6 @@ export const ItemLabelPreview: React.FC<{
                         fontFamily: fontFamily,
                     }}
                 >
-                    {icon && (
-                        <img
-                            style={{
-                                verticalAlign: 'middle',
-                                marginRight: '4px',
-                            }}
-                            src={icon.src}
-                            alt={icon.name}
-                        />
-                    )}
                     <span style={{ verticalAlign: 'middle' }}>
                         {input.exampleItem || itemName || 'Item Name'}
                     </span>
