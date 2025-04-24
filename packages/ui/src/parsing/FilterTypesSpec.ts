@@ -22,7 +22,6 @@ export const InputSpec = z
         ]),
         label: z.string().nonempty(),
         group: z.string().optional(),
-        exampleItem: z.string().optional(),
     })
     .catchall(z.any())
 

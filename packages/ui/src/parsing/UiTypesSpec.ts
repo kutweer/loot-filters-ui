@@ -139,6 +139,8 @@ export const StyleInputSpec = InputSpec.extend({
     backgroundImage: z
         .enum(backgroundImages as [string, ...string[]])
         .optional(),
+    exampleItem: z.string().optional(),
+    exampleItemId: z.number().optional(),
 })
 
 export const TextInputDefaultSpec = z.string().optional().default('')
