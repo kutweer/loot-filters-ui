@@ -167,6 +167,7 @@ const parseStyleIcon = (tokens: TokenStream): Icon => {
             tokens.takeExpect(TokenType.EXPR_END)
             return { type: 'file', filePath }
         case 'CurrentItem':
+            tokens.takeExpect(TokenType.EXPR_END)
             return { type: 'current' }
         default:
             throw new TokenStreamError('unexpected icon expression', exprName)
