@@ -11,6 +11,7 @@ import {
     Typography,
 } from '@mui/material'
 import React, { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import {
     FilterConfiguration,
     Module,
@@ -58,7 +59,7 @@ const Column: React.FC<{
 
 const Row: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
-        <Grid2 container size={11}>
+        <Grid2 container size={11} sx={{ mb: 1 }}>
             {children}
         </Grid2>
     )
@@ -110,11 +111,16 @@ export const DisplayConfigurationInput: React.FC<{
     module: Module
     input: StyleInput
 }> = ({ config, onChange, readonly, module, input }) => {
-    const [expanded, setExpanded] = useState(false)
+    const [searchParams] = useSearchParams()
+    const [expanded, setExpanded] = useState(
+        searchParams.get('expanded') === 'true'
+    )
 
     const styleConfig = StyleConfigSpec.optional()
         .default({})
         .parse(config?.inputConfigs?.[input.macroName])
+
+    console.log('styleConfig', styleConfig)
 
     const [iconType, setIconType] = useState<
         'none' | 'current' | 'file' | 'sprite' | 'itemId'
@@ -275,7 +281,7 @@ export const DisplayConfigurationInput: React.FC<{
     )
     const menuSortInput = (
         <TextField
-            sx={{ minWidth: '10rem', marginBottom: '-25px' }}
+            sx={{ minWidth: '10rem', ml: 1 }}
             placeholder="priority"
             type="number"
             value={styleConfig?.menuSort ?? input.default?.menuSort ?? 0}
@@ -293,7 +299,7 @@ export const DisplayConfigurationInput: React.FC<{
 
     const fontTypeInput = (
         <UISelect<number>
-            sx={{ width: '15rem', marginLeft: 1, marginBottom: 1 }}
+            sx={{ width: '15rem', marginLeft: 1 }}
             disabled={readonly}
             options={fontTypes.map((fontType) => ({
                 label: labelFromFontType(fontType),
@@ -398,15 +404,21 @@ export const DisplayConfigurationInput: React.FC<{
                         break
                     case 'file':
                         setIconType('file')
-                        onChange({ icon: { type: 'file', path: null } })
+                        onChange({ icon: { type: 'file', path: undefined } })
                         break
                     case 'sprite':
                         setIconType('sprite')
-                        onChange({ icon: { type: 'sprite', id: 0, index: 0 } })
+                        onChange({
+                            icon: {
+                                type: 'sprite',
+                                id: undefined,
+                                index: undefined,
+                            },
+                        })
                         break
                     case 'itemId':
                         setIconType('itemId')
-                        onChange({ icon: { type: 'itemId', id: 0 } })
+                        onChange({ icon: { type: 'itemId', id: undefined } })
                         break
                     default:
                         setIconType('none')
@@ -419,19 +431,40 @@ export const DisplayConfigurationInput: React.FC<{
 
     const iconItemIdInput = (
         <TextField
-            sx={{ minWidth: '10rem' }}
+            sx={{ maxWidth: '6rem' }}
+            size="small"
             placeholder="Item Id"
             type="number"
-            value={input.default?.icon?.id ?? ''}
+            value={
+                styleConfig?.icon?.itemId ?? input.default?.icon?.itemId ?? 0
+            }
+            onChange={(e) => {
+                onChange({
+                    icon: {
+                        type: 'itemId',
+                        itemId:
+                            e.target.value.length > 0
+                                ? parseInt(e.target.value)
+                                : undefined,
+                    },
+                })
+            }}
         />
     )
 
     const iconFileInput = (
         <TextField
             size="small"
-            sx={{ minWidth: '10rem' }}
+            sx={{ minWidth: '10rem', maxWidth: '10rem' }}
             placeholder="Icon Path"
-            value={''}
+            onChange={(e) => {
+                let path: string | undefined = e.target.value
+                if (path.length === 0) {
+                    path = undefined
+                }
+                onChange({ icon: { type: 'file', path } })
+            }}
+            value={styleConfig?.icon?.path ?? input.default?.icon?.path ?? ''}
         />
     )
 
@@ -442,17 +475,20 @@ export const DisplayConfigurationInput: React.FC<{
                 sx={{ minWidth: '4rem' }}
                 placeholder="Sprite Id"
                 type="number"
-                value={input.default?.icon?.spriteId ?? ''}
+                value={
+                    styleConfig?.icon?.spriteId ??
+                    input.default?.icon?.spriteId ??
+                    0
+                }
                 onChange={(e) => {
-                    let number: number | '' = parseInt(e.target.value)
-                    if (isNaN(number)) {
-                        number = ''
-                    }
                     onChange({
                         icon: {
-                            ...input.default?.icon,
+                            ...(styleConfig?.icon || {}),
                             type: 'sprite',
-                            spriteId: number,
+                            spriteId:
+                                e.target.value.length > 0
+                                    ? parseInt(e.target.value)
+                                    : undefined,
                         },
                     })
                 }}
@@ -462,7 +498,23 @@ export const DisplayConfigurationInput: React.FC<{
                 sx={{ minWidth: '5rem', pl: '1rem' }}
                 placeholder="Sprite Index"
                 type="number"
-                value={input.default?.icon?.spriteIndex ?? ''}
+                onChange={(e) => {
+                    onChange({
+                        icon: {
+                            ...(styleConfig?.icon || {}),
+                            type: 'sprite',
+                            spriteIndex:
+                                e.target.value.length > 0
+                                    ? parseInt(e.target.value)
+                                    : undefined,
+                        },
+                    })
+                }}
+                value={
+                    styleConfig?.icon?.spriteIndex ??
+                    input.default?.icon?.spriteIndex ??
+                    0
+                }
             />
         </span>
     )
@@ -518,6 +570,92 @@ export const DisplayConfigurationInput: React.FC<{
                             <Grid2 size={1}>{borderColorInput}</Grid2>
                             <Label label="Text Accent Color" />
                             <Grid2 size={1}>{textAccentColorInput}</Grid2>
+                            <Grid2 size={2} />
+                            <Grid2 size={3}>
+                                {iconType === 'file' && (
+                                    <Typography
+                                        variant="caption"
+                                        color={colors.rsDarkOrange}
+                                        sx={{ lineHeight: 1.0 }}
+                                    >
+                                        Icon files must live in the folder
+                                        <br />
+                                        .runelite/loot-filters/icons
+                                    </Typography>
+                                )}
+                                {iconType === 'itemId' && (
+                                    <div>
+                                        <Typography
+                                            component="div"
+                                            variant="caption"
+                                            color={colors.rsDarkOrange}
+                                        >
+                                            Item Id
+                                        </Typography>
+                                        <Typography
+                                            component="div"
+                                            style={{ marginTop: '-0.5rem' }}
+                                            variant="caption"
+                                            color={colors.rsDarkOrange}
+                                        >
+                                            You can use{' '}
+                                            <a
+                                                style={{
+                                                    color: colors.rsDarkYellow,
+                                                }}
+                                                href="https://chisel.weirdgloop.org/moid/"
+                                            >
+                                                this tool
+                                            </a>{' '}
+                                            to browse items by ID.
+                                        </Typography>
+                                    </div>
+                                )}
+                                {iconType === 'sprite' && (
+                                    <div>
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                flexDirection: 'row',
+                                                gap: 1,
+                                            }}
+                                        >
+                                            <Typography
+                                                variant="caption"
+                                                color={colors.rsDarkOrange}
+                                                sx={{ lineHeight: 1.0 }}
+                                            >
+                                                Sprite Id
+                                            </Typography>
+                                            <Typography
+                                                sx={{
+                                                    lineHeight: 1.0,
+                                                    marginLeft: '7rem',
+                                                }}
+                                                variant="caption"
+                                                color={colors.rsDarkOrange}
+                                            >
+                                                Sprite Index
+                                            </Typography>
+                                        </div>
+                                        <Typography
+                                            variant="caption"
+                                            color={colors.rsDarkOrange}
+                                        >
+                                            You can use{' '}
+                                            <a
+                                                style={{
+                                                    color: colors.rsDarkYellow,
+                                                }}
+                                                href="https://abextm.github.io/cache2/#/viewer/sprite/"
+                                            >
+                                                this tool
+                                            </a>{' '}
+                                            to browse sprites.
+                                        </Typography>
+                                    </div>
+                                )}
+                            </Grid2>
                         </Row>
                     </Column>
                     <HeaderCol text="Menu" />

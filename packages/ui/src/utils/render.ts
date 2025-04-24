@@ -2,6 +2,7 @@ import { parseModules } from '../parsing/parse'
 import {
     Filter,
     FilterConfiguration,
+    Icon,
     ListDiff,
     MacroName,
     Module,
@@ -142,6 +143,7 @@ const renderStyle = (style: StyleConfig): string => {
         renderStyleBool('highlightTile', style.highlightTile),
         renderStyleString('sound', style.sound),
         renderStyleInt('menuSort', style.menuSort),
+        renderStyleIcon(style.icon),
     ].join('')
 }
 
@@ -153,6 +155,22 @@ const renderStyleInt = (name: string, int: number | undefined): string =>
 
 const renderStyleBool = (name: string, value: boolean | undefined): string =>
     value !== undefined ? `${name} = ${value};` : ''
+
+const renderStyleIcon = (icon: Icon | undefined): string => {
+    switch (icon?.type) {
+        case 'sprite':
+            return `icon = Sprite(${icon.spriteId}, ${icon.spriteIndex});`
+        case 'file':
+            return `icon = File("${icon.path}");`
+        case 'itemId':
+            return `icon = Item(${icon.itemId});`
+        case 'current':
+            return 'icon = CurrentItem();'
+        case 'none':
+        default:
+            return ''
+    }
+}
 
 const renderStyleString = (
     name: string,
