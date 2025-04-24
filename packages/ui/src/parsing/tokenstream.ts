@@ -10,9 +10,11 @@ import { Token, TokenType } from './token'
  */
 export class TokenStream {
     private readonly tokens: Token[]
+    private readonly firstToken: Token
 
     constructor(tokens: Token[]) {
         this.tokens = [...tokens]
+        this.firstToken = tokens[0]
     }
 
     getTokens(): Token[] {
@@ -41,7 +43,7 @@ export class TokenStream {
                 return next
             }
         }
-        throw new Error('unexpected end of token stream')
+        throw new TokenStreamEOFError(this.firstToken)
     }
 
     /**
@@ -50,12 +52,12 @@ export class TokenStream {
      */
     takeExpect(expect: TokenType): Token {
         if (!this.hasTokens()) {
-            throw new Error('unexpected end of token stream')
+            throw new TokenStreamEOFError(this.firstToken)
         }
 
         const first = this.take()
         if (first?.type !== expect) {
-            throw new Error('unexpected token' + first)
+            throw new TokenStreamError('unexpected token', first)
         }
         return first
     }
@@ -96,7 +98,7 @@ export class TokenStream {
             case TokenType.FALSE:
                 return false
             default:
-                throw new Error('unexpected token ' + first)
+                throw new TokenStreamError('unexpected token', first)
         }
     }
 
@@ -107,7 +109,7 @@ export class TokenStream {
     takeStringList(): string[] {
         return this.takeList().map((token) => {
             if (token.type !== TokenType.LITERAL_STRING) {
-                throw new Error('unexpected token ' + token)
+                throw new TokenStreamError('unexpected token', token)
             }
             return token.value
         })
@@ -130,7 +132,7 @@ export class TokenStream {
                 this.take()
                 break
             } else {
-                throw new Error('unexpected token ' + next)
+                throw new TokenStreamError('unexpected token', next)
             }
         }
         return list
@@ -141,4 +143,19 @@ export function isWhitespace(token: Token): boolean {
     return (
         token.type === TokenType.WHITESPACE || token.type === TokenType.NEWLINE
     )
+}
+
+export class TokenStreamError extends Error {
+    constructor(message: string, token: Token) {
+        var loc = token.location
+        super(
+            `${message} '${token.value}' at line ${loc.line}, char ${loc.char}`
+        )
+    }
+}
+
+export class TokenStreamEOFError extends Error {
+    constructor(token: Token) {
+        super(`unexpected end of token stream near line ${token.location.line}`)
+    }
 }

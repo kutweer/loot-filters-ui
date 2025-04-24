@@ -100,8 +100,17 @@ export const parse = (
 
                 modulesById[currentModule].rs2f += next.value
             } else if (isInputDeclaration(next)) {
+                // define MUST come after the input declaration
+                if (
+                    !tokens.hasTokens() ||
+                    tokens.peek()!!.type !== TokenType.PREPROC_DEFINE
+                ) {
+                    throw new Error(
+                        `missing define after block comment on line ${next.location.line}`
+                    )
+                }
+
                 const define = new TokenStream([
-                    // define MUST come after the input declaration
                     tokens.takeExpect(TokenType.PREPROC_DEFINE),
                     ...tokens.takeLine().getTokens(),
                 ])

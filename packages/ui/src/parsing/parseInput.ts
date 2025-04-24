@@ -13,7 +13,7 @@ import {
     Icon,
 } from './UiTypesSpec'
 import { TokenType } from './token'
-import { TokenStream } from './tokenstream'
+import { TokenStream, TokenStreamError } from './tokenstream'
 
 export const parseInput = (comment: string, define: TokenStream): Input => {
     const declarationContent = comment.substring(
@@ -22,10 +22,10 @@ export const parseInput = (comment: string, define: TokenStream): Input => {
     )
 
     define.takeExpect(TokenType.PREPROC_DEFINE)
-    var macroName = define.takeExpect(TokenType.IDENTIFIER).value
+    const macroName = define.takeExpect(TokenType.IDENTIFIER).value
 
     const declaration = parseYaml(declarationContent)
-    if (!!declaration.default) {
+    if (declaration.default !== undefined) {
         throw new Error('input declaration must not have a default')
     }
     const baseInput = {
@@ -40,7 +40,7 @@ export const parseInput = (comment: string, define: TokenStream): Input => {
         case 'boolean':
             input.default = define.takeBool()
             return BooleanInputSpec.parse(input)
-        case 'number':
+        case 'number': 
             input.default = define.takeInt()
             return NumberInputSpec.parse(input)
         case 'stringlist':
@@ -128,7 +128,7 @@ const parseStyle = (tokens: TokenStream): StyleConfig => {
                 } else if (value.type === TokenType.LITERAL_STRING) {
                     style.sound = tokens.takeString()
                 } else {
-                    throw new Error('unexpected sound expression ' + value)
+                    throw new TokenStreamError('invalid sound value', value)
                 }
                 break
             case 'menuSort':
@@ -138,7 +138,7 @@ const parseStyle = (tokens: TokenStream): StyleConfig => {
                 style.icon = parseStyleIcon(tokens)
                 break
             default:
-                throw new Error('unexpected style identifier ' + ident.value)
+                throw new TokenStreamError('invalid style property', ident)
         }
 
         tokens.takeExpect(TokenType.STMT_END)
@@ -169,6 +169,6 @@ const parseStyleIcon = (tokens: TokenStream): Icon => {
         case 'CurrentItem':
             return { type: 'current' }
         default:
-            throw new Error('unexpected icon expression ' + exprName)
+            throw new TokenStreamError('unexpected icon expression', exprName)
     }
 }
