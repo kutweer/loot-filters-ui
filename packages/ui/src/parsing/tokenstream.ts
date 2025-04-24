@@ -5,8 +5,8 @@ import { Token, TokenType } from './token'
  *
  * This is conceptually equivalent to, BUT behaviorally different from the
  * plugin version of TokenStream - that one ignores comments and needs a bunch
- * more logic for handling expressions, etc. - this one _needs_ comments and
- * not much else.
+ * more logic for handling expressions, etc. - this one _needs_ comments in
+ * certain situations.
  */
 export class TokenStream {
     private readonly tokens: Token[]
@@ -34,13 +34,14 @@ export class TokenStream {
     /**
      * Consume the first token in the stream, optionally including whitespace.
      */
-    take(includeWhitespace?: boolean): Token | undefined {
+    take(includeWhitespace?: boolean): Token {
         while (this.tokens.length !== 0) {
-            const next = this.tokens.shift()
+            const next = this.tokens.shift()!!
             if (includeWhitespace || !isWhitespace(next)) {
                 return next
             }
         }
+        throw new Error('unexpected end of token stream')
     }
 
     /**
@@ -48,7 +49,7 @@ export class TokenStream {
      * that it is of the given type.
      */
     takeExpect(expect: TokenType): Token {
-        if (this.tokens.length === 0) {
+        if (!this.hasTokens()) {
             throw new Error('unexpected end of token stream')
         }
 
@@ -82,11 +83,62 @@ export class TokenStream {
             )
             .join('')
     }
+
+    takeInt(): number {
+        return parseInt(this.takeExpect(TokenType.LITERAL_INT).value)
+    }
+
+    takeBool(): boolean {
+        const first = this.take()!!
+        switch (first.type) {
+            case TokenType.TRUE:
+                return true
+            case TokenType.FALSE:
+                return false
+            default:
+                throw new Error('unexpected token ' + first)
+        }
+    }
+
+    takeString(): string {
+        return this.takeExpect(TokenType.LITERAL_STRING).value
+    }
+
+    takeStringList(): string[] {
+        return this.takeList().map((token) => {
+            if (token.type !== TokenType.LITERAL_STRING) {
+                throw new Error('unexpected token ' + token)
+            }
+            return token.value
+        })
+    }
+
+    private takeList(): Token[] {
+        const list: Token[] = []
+        this.takeExpect(TokenType.LIST_START)
+        while (this.hasTokens()) {
+            if (this.peek()!!.type === TokenType.LIST_END) {
+                return list
+            }
+
+            list.push(this.take()!!)
+
+            const next = this.peek()!!
+            if (next.type === TokenType.COMMA) {
+                this.take()
+            } else if (next.type === TokenType.LIST_END) {
+                this.take()
+                break
+            } else {
+                throw new Error('unexpected token ' + next)
+            }
+        }
+        return list
+    }
 }
 
-export function isWhitespace(token?: Token): boolean {
+export function isWhitespace(token: Token): boolean {
     return (
-        token?.type === TokenType.WHITESPACE ||
-        token?.type === TokenType.NEWLINE
+        token.type === TokenType.WHITESPACE || token.type === TokenType.NEWLINE
     )
 }
