@@ -22,6 +22,7 @@ import ZanarisImage from '../images/zanaris.png'
 import ZulAndraImage from '../images/zul_andra.png'
 
 import { useEffect, useState } from 'react'
+import { getIcon, getSprite } from '../images/osrs/imageUtils'
 import { StyleConfig, StyleInput } from '../parsing/UiTypesSpec'
 import { useBackgroundStore } from '../store/background'
 import { useFilterConfigStore } from '../store/filterConfigurationStore'
@@ -176,6 +177,32 @@ export const ItemLabelPreview: React.FC<{
     let textAccentStyle: React.CSSProperties & {
         webkitTextStroke?: string
     } = {}
+
+    const [icon, setIcon] = useState<HTMLImageElement | undefined>(undefined)
+
+    let iconConfig = activeConfig?.icon ?? input.default?.icon
+    useEffect(() => {
+        switch (iconConfig?.type) {
+            case 'itemId':
+                getIcon(iconConfig.itemId, setIcon)
+                break
+            case 'sprite':
+                getSprite(
+                    iconConfig.spriteId ?? 0,
+                    iconConfig.spriteIndex ?? 0,
+                    setIcon
+                )
+                break
+            case 'current':
+                if (input.exampleItemId) {
+                    getIcon(input.exampleItemId, setIcon)
+                }
+                break
+            default:
+                break
+        }
+    }, [setIcon, iconConfig, input.exampleItemId])
+
     switch (textAccent) {
         // Outline
         case 2:
@@ -244,6 +271,8 @@ export const ItemLabelPreview: React.FC<{
                 backgroundRepeat: 'repeat',
                 backgroundPosition: 'center',
                 backgroundImage: `url(${activeBackgroundImage})`,
+                display: 'flex',
+                alignItems: 'center',
             }}
         >
             {hidden && (
@@ -268,6 +297,16 @@ export const ItemLabelPreview: React.FC<{
                     Hidden
                 </div>
             )}
+            {icon && (
+                <img
+                    style={{
+                        verticalAlign: 'middle',
+                        marginLeft: '4px',
+                    }}
+                    src={icon.src}
+                    alt={icon.name}
+                />
+            )}
             <div
                 style={{
                     margin: '6px',
@@ -287,7 +326,9 @@ export const ItemLabelPreview: React.FC<{
                         fontFamily: fontFamily,
                     }}
                 >
-                    {input.exampleItem || itemName || 'Item Name'}
+                    <span style={{ verticalAlign: 'middle' }}>
+                        {input.exampleItem || itemName || 'Item Name'}
+                    </span>
                 </span>
             </div>
         </div>

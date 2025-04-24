@@ -1,10 +1,11 @@
 import { Alert, Container, Snackbar } from '@mui/material'
 import { ThemeProvider } from '@mui/material/styles'
-import { ReactNode, useEffect } from 'react'
+import { ReactNode } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AppHeader } from './components/AppHeader'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { FilterSelector } from './components/FilterSelector'
+import { initImages } from './images/osrs/imageUtils'
 import { FilterTabs } from './pages/CustomizeFilterPage'
 import { DebugPage } from './pages/DebugPage'
 import { EditorLoadedFilterPage } from './pages/EditLoadedFilterPage'
@@ -20,6 +21,7 @@ const Page: React.FC<{
     component?: ReactNode
 }> = ({ component }) => {
     const params = new URLSearchParams(window.location.search)
+    initImages()
 
     const alerts = useAlertStore((state) => state.alerts)
     const isAlerts = Boolean(alerts.length)

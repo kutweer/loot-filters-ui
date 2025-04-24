@@ -31,6 +31,13 @@ module.exports = {
                 type: 'json',
             },
             {
+                test: /\.json\.gz$/,
+                type: 'asset/resource',
+                generator: {
+                    filename: 'assets/[name][ext]',
+                },
+            },
+            {
                 test: /\.ttf$/,
                 type: 'asset/resource',
             },

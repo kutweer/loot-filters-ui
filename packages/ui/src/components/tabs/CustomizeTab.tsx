@@ -51,6 +51,7 @@ import { NumberInputComponent } from '../inputs/NumberInputComponent'
 import { StringListInputComponent } from '../inputs/StringListInputComponent'
 import { TextInputComponent } from '../inputs/TextInputComponent'
 import { ItemLabelPreview } from '../Previews'
+import { useParams, useSearchParams } from 'react-router-dom'
 
 const InputComponent: React.FC<{
     config: FilterConfiguration
@@ -482,9 +483,18 @@ export const CustomizeTab: React.FC<{
     sx,
     showSettings = true,
 }) => {
+    const [searchParams] = useSearchParams()
+    const expandByDefault = searchParams.get('expanded') === 'true'
+
     const [expandedModules, setExpandedModules] = useState<
         Record<string, boolean>
-    >({})
+    >(
+        expandByDefault
+            ? Object.fromEntries(
+                  filter?.modules.map((module) => [module.name, true]) ?? []
+              )
+            : {}
+    )
 
     const setAllExpanded = (expanded: boolean) => {
         const newExpandedModules: Record<string, boolean> = {}

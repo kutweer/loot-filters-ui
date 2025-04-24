@@ -121,15 +121,19 @@ export class Lexer {
             return false
         }
 
-        var startLine = this.cLine
-        var startOffset = this.cChar
+        const line = this.cLine
+        const char = this.cChar
         for (let i = this.cOffset + 2; i < this.input.length; ++i) {
             if (this.input.startsWith('*/', i)) {
                 this.cChar += 2
 
-                const text = this.input.substring(this.cOffset, i + 2)
-                this.pushToken(TokenType.COMMENT, text)
-                this.cOffset += text.length
+                const value = this.input.substring(this.cOffset, i + 2)
+                this.tokens.push({
+                    type: TokenType.COMMENT,
+                    value,
+                    location: { line, char },
+                })
+                this.cOffset += value.length
                 return true
             } else if (this.input.charAt(i) == '\n') {
                 ++this.cLine
@@ -140,7 +144,7 @@ export class Lexer {
         }
 
         throw new Error(
-            `unterminated block comment at line ${startLine}, char ${startOffset}`
+            `unterminated block comment at line ${line}, char ${char}`
         )
     }
 
