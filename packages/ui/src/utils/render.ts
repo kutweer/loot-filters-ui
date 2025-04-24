@@ -159,11 +159,11 @@ const renderStyleBool = (name: string, value: boolean | undefined): string =>
 const renderStyleIcon = (icon: Icon | undefined): string => {
     switch (icon?.type) {
         case 'sprite':
-            return `icon = Sprite(${icon.spriteId}, ${icon.spriteIndex});`
+            return `icon = Sprite(${icon.spriteId ?? 0}, ${icon.spriteIndex ?? 0});`
         case 'file':
             return `icon = File("${icon.path}");`
         case 'itemId':
-            return `icon = Item(${icon.itemId});`
+            return `icon = Item(${icon.itemId ?? 0});`
         case 'current':
             return 'icon = CurrentItem();'
         case 'none':
