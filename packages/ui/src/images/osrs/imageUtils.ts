@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-const sprites = require('./sprites.json')
-const icons: Array<IconRecord> = require('./icons.json')['byId']
+const sprites = require('./sprites.json.gz')
+const icons: Array<IconRecord> = require('./icons.json.gz')['byId']
 
 const IconRecordSpec = z.object({
     id: z.number(),

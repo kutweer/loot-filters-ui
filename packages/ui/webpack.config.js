@@ -31,6 +31,17 @@ module.exports = {
                 type: 'json',
             },
             {
+                test: /\.json\.gz$/,
+                use: [
+                    {
+                        loader: 'json-loader',
+                    },
+                    {
+                        loader: 'gzip-loader',
+                    },
+                ],
+            },
+            {
                 test: /\.ttf$/,
                 type: 'asset/resource',
             },
