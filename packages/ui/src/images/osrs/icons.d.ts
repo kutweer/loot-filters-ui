@@ -7,9 +7,6 @@ declare module '*/icons.json' {
 }
 
 declare module '*/icons.json.gz' {
-    interface Icons {
-        byId: Array<IconRecord>
-    }
-    const value: Icons
+    const value: string
     export = value
 }

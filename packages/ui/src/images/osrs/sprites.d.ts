@@ -7,9 +7,6 @@ declare module '*/sprites.json' {
 }
 
 declare module '*/sprites.json.gz' {
-    interface Sprites {
-        byId: Array<Array<string>>
-    }
-    const value: Sprites
+    const value: string
     export = value
 }

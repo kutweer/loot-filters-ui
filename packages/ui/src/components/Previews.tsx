@@ -178,23 +178,30 @@ export const ItemLabelPreview: React.FC<{
         webkitTextStroke?: string
     } = {}
 
-    let icon: HTMLImageElement | undefined = undefined
+    const [icon, setIcon] = useState<HTMLImageElement | undefined>(undefined)
+
     let iconConfig = activeConfig?.icon ?? input.default?.icon
-    switch (iconConfig?.type) {
-        case 'itemId':
-            icon = getIcon(iconConfig.itemId)
-            break
-        case 'sprite':
-            icon = getSprite(iconConfig.spriteId, iconConfig.spriteIndex)
-            break
-        case 'current':
-            if (input.exampleItemId) {
-                icon = getIcon(input.exampleItemId)
-            }
-            break
-        default:
-            break
-    }
+    useEffect(() => {
+        switch (iconConfig?.type) {
+            case 'itemId':
+                getIcon(iconConfig.itemId, setIcon)
+                break
+            case 'sprite':
+                getSprite(
+                    iconConfig.spriteId ?? 0,
+                    iconConfig.spriteIndex ?? 0,
+                    setIcon
+                )
+                break
+            case 'current':
+                if (input.exampleItemId) {
+                    getIcon(input.exampleItemId, setIcon)
+                }
+                break
+            default:
+                break
+        }
+    }, [setIcon, iconConfig, input.exampleItemId])
 
     switch (textAccent) {
         // Outline
