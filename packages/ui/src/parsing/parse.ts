@@ -60,7 +60,7 @@ export const parse = (
         }
     }
 
-    const first = tokens.peek()!!
+    const first = tokens.peek()
     if (!isModuleDeclaration(first)) {
         // If the filter doesn't start with a module declaration, we need to add a header module
         // but ONLY if we're doing the migration from v2 to v3...
@@ -103,7 +103,7 @@ export const parse = (
                 // define MUST come after the input declaration
                 if (
                     !tokens.hasTokens() ||
-                    tokens.peek()!!.type !== TokenType.PREPROC_DEFINE
+                    tokens.peek().type !== TokenType.PREPROC_DEFINE
                 ) {
                     throw new Error(
                         `missing define after block comment on line ${next.location.line}`

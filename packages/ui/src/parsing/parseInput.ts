@@ -40,7 +40,7 @@ export const parseInput = (comment: string, define: TokenStream): Input => {
         case 'boolean':
             input.default = define.takeBool()
             return BooleanInputSpec.parse(input)
-        case 'number': 
+        case 'number':
             input.default = define.takeInt()
             return NumberInputSpec.parse(input)
         case 'stringlist':
@@ -122,7 +122,7 @@ const parseStyle = (tokens: TokenStream): StyleConfig => {
                 style.hideOverlay = tokens.takeBool()
                 break
             case 'sound':
-                const value = tokens.peek()!!
+                const value = tokens.peek()
                 if (value.type === TokenType.LITERAL_INT) {
                     style.sound = tokens.takeInt()
                 } else if (value.type === TokenType.LITERAL_STRING) {

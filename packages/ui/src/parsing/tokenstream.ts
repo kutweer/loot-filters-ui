@@ -22,15 +22,19 @@ export class TokenStream {
     }
 
     hasTokens(): boolean {
-        return this.peek() !== undefined
+        return this.tokens.some((t) => !isWhitespace(t))
     }
 
     /**
      * Peek at the first non-whitespace token in the stream without consuming
      * it.
      */
-    peek(): Token | undefined {
-        return this.tokens.find((t) => !isWhitespace(t))
+    peek(): Token {
+        const token = this.tokens.find((t) => !isWhitespace(t))
+        if (token === undefined) {
+            throw new TokenStreamEOFError(this.firstToken)
+        }
+        return token
     }
 
     /**
@@ -119,13 +123,13 @@ export class TokenStream {
         const list: Token[] = []
         this.takeExpect(TokenType.LIST_START)
         while (this.hasTokens()) {
-            if (this.peek()!!.type === TokenType.LIST_END) {
+            if (this.peek().type === TokenType.LIST_END) {
                 return list
             }
 
-            list.push(this.take()!!)
+            list.push(this.take())
 
-            const next = this.peek()!!
+            const next = this.peek()
             if (next.type === TokenType.COMMA) {
                 this.take()
             } else if (next.type === TokenType.LIST_END) {
