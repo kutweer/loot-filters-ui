@@ -82,6 +82,11 @@ export const StringListInputComponent: React.FC<{
                                 .split(',')
                                 .map((v) => v.trim())
                                 .filter((v) => v)
+                                .map((v) =>
+                                    v.startsWith('"') && v.endsWith('"')
+                                        ? v.slice(1, -1)
+                                        : v
+                                )
                         )
                         .flat()
                     onChange(convertToListDiff(splitValues, input.default))
