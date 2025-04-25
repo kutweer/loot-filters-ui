@@ -1,5 +1,4 @@
-import { ContentPaste, CopyAll } from '@mui/icons-material'
-import { IconButton } from '@mui/material'
+import { Typography } from '@mui/material'
 import {
     EnumListInput,
     FilterConfiguration,
@@ -8,15 +7,13 @@ import {
 } from '../../parsing/UiTypesSpec'
 import { useAlertStore } from '../../store/alerts'
 import { useSettingsCopyStore } from '../../store/settingsCopyStore'
-import { colors } from '../../styles/MuiTheme'
 import {
     applyDiff,
     convertToListDiff,
     EMPTY_DIFF,
 } from '../../utils/ListDiffUtils'
-import { SmartTooltip } from '../SmartTooltip'
-import { Option, UISelect } from './UISelect'
 import { CopyInputSettings } from './CopyInputSettings'
+import { Option, UISelect } from './UISelect'
 
 export const EnumInputComponent: React.FC<{
     input: EnumListInput
@@ -59,7 +56,22 @@ export const EnumInputComponent: React.FC<{
         : []
 
     return (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <div>
+            <div style={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                <Typography variant="h6" color="primary">
+                    {input.label}
+                </Typography>
+                <CopyInputSettings
+                    input={input}
+                    configToCopy={currentSetting.map((v) => {
+                        if (typeof v === 'string') {
+                            return v
+                        }
+                        return v.value
+                    })}
+                    onChange={onChange}
+                />
+            </div>
             <UISelect<string>
                 disabled={readonly}
                 options={options}
@@ -76,17 +88,6 @@ export const EnumInputComponent: React.FC<{
                 }}
                 multiple
                 label="Select options"
-            />
-
-            <CopyInputSettings
-                input={input}
-                configToCopy={currentSetting.map((v) => {
-                    if (typeof v === 'string') {
-                        return v
-                    }
-                    return v.value
-                })}
-                onChange={onChange}
             />
         </div>
     )

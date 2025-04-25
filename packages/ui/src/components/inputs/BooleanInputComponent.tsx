@@ -1,4 +1,4 @@
-import { Checkbox } from '@mui/material'
+import { Checkbox, Typography } from '@mui/material'
 import {
     BooleanInput,
     BooleanInputDefaultSpec,
@@ -16,13 +16,18 @@ export const BooleanInputComponent: React.FC<{
     )
 
     return (
-        <Checkbox
-            disabled={readonly}
-            checked={currentSetting}
-            onChange={(event) => {
-                const value = event.target.checked
-                onChange(value)
-            }}
-        />
+        <div>
+            <Typography variant="h6" color="primary">
+                {input.label}
+            </Typography>
+            <Checkbox
+                disabled={readonly}
+                checked={currentSetting}
+                onChange={(event) => {
+                    const value = event.target.checked
+                    onChange(value)
+                }}
+            />
+        </div>
     )
 }

@@ -1,4 +1,4 @@
-import { TextField } from '@mui/material'
+import { TextField, Typography } from '@mui/material'
 import {
     FilterConfiguration,
     NumberInput,
@@ -20,14 +20,19 @@ export const NumberInputComponent: React.FC<{
     const currentSetting = userConfigValue ?? input.default
 
     return (
-        <TextField
-            disabled={readonly}
-            type="number"
-            value={currentSetting}
-            onChange={(event) => {
-                const value = event.target.value
-                onChange(parseInt(value))
-            }}
-        />
+        <div>
+            <Typography variant="h6" color="primary">
+                {input.label}
+            </Typography>
+            <TextField
+                disabled={readonly}
+                type="number"
+                value={currentSetting}
+                onChange={(event) => {
+                    const value = event.target.value
+                    onChange(parseInt(value))
+                }}
+            />
+        </div>
     )
 }

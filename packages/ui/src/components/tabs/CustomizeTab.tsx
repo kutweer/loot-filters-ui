@@ -408,12 +408,6 @@ const ModuleSection: React.FC<{
                                                         key={index}
                                                         size={sizeOf(input)}
                                                     >
-                                                        <Typography
-                                                            variant="h6"
-                                                            color="primary"
-                                                        >
-                                                            {input.label}
-                                                        </Typography>
                                                         <InputComponent
                                                             config={config}
                                                             module={module}
