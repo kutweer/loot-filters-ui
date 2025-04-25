@@ -57,28 +57,10 @@ export const EnumInputComponent: React.FC<{
 
     return (
         <div>
-            <Typography variant="h6" color="primary">
-                {input.label}
-            </Typography>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <UISelect<string>
-                    disabled={readonly}
-                    options={options}
-                    value={selectedOptions}
-                    onChange={(newValue: Option<string>[] | null) => {
-                        onChange(
-                            convertToListDiff(
-                                newValue
-                                    ? newValue.map((option) => option.value)
-                                    : [],
-                                input.default
-                            )
-                        )
-                    }}
-                    multiple
-                    label="Select options"
-                />
-
+            <div style={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                <Typography variant="h6" color="primary">
+                    {input.label}
+                </Typography>
                 <CopyInputSettings
                     input={input}
                     configToCopy={currentSetting.map((v) => {
@@ -90,6 +72,23 @@ export const EnumInputComponent: React.FC<{
                     onChange={onChange}
                 />
             </div>
+            <UISelect<string>
+                disabled={readonly}
+                options={options}
+                value={selectedOptions}
+                onChange={(newValue: Option<string>[] | null) => {
+                    onChange(
+                        convertToListDiff(
+                            newValue
+                                ? newValue.map((option) => option.value)
+                                : [],
+                            input.default
+                        )
+                    )
+                }}
+                multiple
+                label="Select options"
+            />
         </div>
     )
 }
