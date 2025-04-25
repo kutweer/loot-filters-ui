@@ -45,7 +45,23 @@ export const CopyInputSettings: React.FC<{
     }, [configToCopy, onChange])
 
     return (
-        <div style={{ display: 'flex', gap: 2 }}>
+        <div style={{ display: 'flex', gap: 2, marginLeft: 'auto' }}>
+            <SmartTooltip
+                enabledTitle="Copy Settings and Defaults"
+                disabledTitle=""
+                enabled={true}
+            >
+                <IconButton
+                    component="div"
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        e.preventDefault()
+                        doCopy()
+                    }}
+                >
+                    <CopyAll sx={{ color: colors.rsOrange }} />
+                </IconButton>
+            </SmartTooltip>
             <SmartTooltip
                 enabledTitle="Paste Settings"
                 disabledTitle="No settings copied"
@@ -112,22 +128,6 @@ export const CopyInputSettings: React.FC<{
                             }}
                         />
                     )}
-                </IconButton>
-            </SmartTooltip>
-            <SmartTooltip
-                enabledTitle="Copy Settings and Defaults"
-                disabledTitle=""
-                enabled={true}
-            >
-                <IconButton
-                    component="div"
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        e.preventDefault()
-                        doCopy()
-                    }}
-                >
-                    <CopyAll sx={{ color: colors.rsOrange }} />
                 </IconButton>
             </SmartTooltip>
         </div>
