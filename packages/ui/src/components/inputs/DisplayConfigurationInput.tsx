@@ -551,14 +551,15 @@ export const DisplayConfigurationInput: React.FC<{
                             <Label label="Text Color" />
                             <Grid2 size={1}>{textColorInput}</Grid2>
                             <Label label="Font Type" />
-                            <Grid2 size={3}>{fontTypeInput}</Grid2>
-                            <Grid2 size={4}>{itemIconTypeSelect}</Grid2>
+                            <Grid2 size={2}>{fontTypeInput}</Grid2>
+                            <Label label="Item Icon" />
+                            <Grid2 size={2}>{itemIconTypeSelect}</Grid2>
                         </Row>
                         <Row>
                             <Label label="Background Color" />
                             <Grid2 size={1}>{backgroundColorInput}</Grid2>
                             <Label label="Text Accent" />
-                            <Grid2 size={3}>{textAccentInput}</Grid2>
+                            <Grid2 size={4}>{textAccentInput}</Grid2>
                             <Grid2 size={3}>
                                 {iconType === 'itemId' && iconItemIdInput}
                                 {iconType === 'file' && iconFileInput}
@@ -570,7 +571,7 @@ export const DisplayConfigurationInput: React.FC<{
                             <Grid2 size={1}>{borderColorInput}</Grid2>
                             <Label label="Text Accent Color" />
                             <Grid2 size={1}>{textAccentColorInput}</Grid2>
-                            <Grid2 size={2} />
+                            <Grid2 size={3} />
                             <Grid2 size={3}>
                                 {iconType === 'file' && (
                                     <Typography
