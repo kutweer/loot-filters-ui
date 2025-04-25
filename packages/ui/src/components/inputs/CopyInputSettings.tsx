@@ -25,9 +25,7 @@ export const CopyInputSettings: React.FC<{
     const doCopy = useCallback(() => {
         console.log('doCopy', configToCopy)
         setSettingsCopy(input, configToCopy)
-        const formattedConfig = Array.isArray(configToCopy)
-            ? configToCopy.join(', ')
-            : JSON.stringify(configToCopy).replace(/[\[\]"]/g, '')
+        const formattedConfig = JSON.stringify(configToCopy)
         navigator.clipboard
             .writeText(formattedConfig)
             .then(() => {
