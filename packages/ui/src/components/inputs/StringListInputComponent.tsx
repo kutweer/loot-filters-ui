@@ -71,7 +71,16 @@ export const StringListInputComponent: React.FC<{
                         const values = ((newValue as Option[]) || []).map(
                             (option) => option.value
                         )
-                        onChange(convertToListDiff(values, input.default))
+
+                        const splitValues = values
+                            .map((v) =>
+                                v
+                                    .split(',')
+                                    .map((v) => v.trim())
+                                    .filter((v) => v)
+                            )
+                            .flat()
+                        onChange(convertToListDiff(splitValues, input.default))
                     }}
                 />
             </div>
