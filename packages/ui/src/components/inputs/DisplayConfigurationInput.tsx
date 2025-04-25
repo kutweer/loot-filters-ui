@@ -1,4 +1,4 @@
-import { ExpandMore } from '@mui/icons-material'
+import { ContentPaste, CopyAll, ExpandMore } from '@mui/icons-material'
 import {
     Accordion,
     AccordionDetails,
@@ -19,6 +19,8 @@ import {
     StyleConfigSpec,
     StyleInput,
 } from '../../parsing/UiTypesSpec'
+import { useAlertStore } from '../../store/alerts'
+import { useSettingsCopyStore } from '../../store/settingsCopyStore'
 import { colors } from '../../styles/MuiTheme'
 import {
     FontType,
@@ -28,6 +30,7 @@ import {
     TextAccent,
 } from '../../types/Rs2fEnum'
 import { ItemLabelPreview, ItemMenuPreview } from '../Previews'
+import { SmartTooltip } from '../SmartTooltip'
 import { ColorPickerInput } from './ColorPicker'
 import { UISelect } from './UISelect'
 
@@ -112,6 +115,9 @@ export const DisplayConfigurationInput: React.FC<{
     input: StyleInput
 }> = ({ config, onChange, readonly, module, input }) => {
     const [searchParams] = useSearchParams()
+    const { addAlert } = useAlertStore()
+    const { copiedInput, pasteableConfig, setSettingsCopy } =
+        useSettingsCopyStore()
     const [expanded, setExpanded] = useState(
         searchParams.get('expanded') === 'true'
     )
@@ -538,6 +544,44 @@ export const DisplayConfigurationInput: React.FC<{
                     <ItemLabelPreview input={input} itemName={input.label} />
                     <ItemMenuPreview input={input} itemName={input.label} />
                 </Box>
+                <SmartTooltip
+                    enabledTitle="Paste style settings"
+                    disabledTitle="No style settings copied"
+                    enabled={pasteableConfig !== null}
+                >
+                    <ContentPaste
+                        sx={{
+                            marginLeft: 'auto',
+                            color:
+                                pasteableConfig == null ||
+                                copiedInput?.type !== 'style'
+                                    ? 'grey'
+                                    : colors.rsOrange,
+                        }}
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            onChange(pasteableConfig ?? {})
+                        }}
+                    />
+                </SmartTooltip>
+                <SmartTooltip
+                    enabledTitle="Copy style settings to clipboard"
+                    disabledTitle=""
+                    enabled={true}
+                >
+                    <CopyAll
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            setSettingsCopy(input, styleConfig)
+                            addAlert({
+                                children:
+                                    'Copied style settings for style input: ' +
+                                    input.label,
+                                severity: 'success',
+                            })
+                        }}
+                    />
+                </SmartTooltip>
             </AccordionSummary>
             <AccordionDetails
                 sx={{

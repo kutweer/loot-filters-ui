@@ -12,7 +12,6 @@ export const NumberInputComponent: React.FC<{
     onChange: (number: number) => void
 }> = ({ config, input, readonly, onChange }) => {
     const activeConfigValue = config?.inputConfigs?.[input.macroName]
-
     const userConfigValue =
         activeConfigValue || activeConfigValue === 0
             ? NumberInputDefaultSpec.optional().parse(activeConfigValue)
