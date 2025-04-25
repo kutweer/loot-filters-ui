@@ -1,5 +1,5 @@
-import { TextField } from '@mui/material'
-import { TextInput, FilterConfiguration } from '../../parsing/UiTypesSpec'
+import { TextField, Typography } from '@mui/material'
+import { FilterConfiguration, TextInput } from '../../parsing/UiTypesSpec'
 
 export const TextInputComponent: React.FC<{
     input: TextInput
@@ -11,14 +11,19 @@ export const TextInputComponent: React.FC<{
     const currentSetting = userConfigValue ?? input?.default
 
     return (
-        <TextField
-            disabled={readonly}
-            value={currentSetting}
-            onChange={(event) => {
-                const value = event.target.value
-                onChange(value)
-            }}
-            fullWidth
-        />
+        <div>
+            <Typography variant="h6" color="primary">
+                {input.label}
+            </Typography>
+            <TextField
+                disabled={readonly}
+                value={currentSetting}
+                onChange={(event) => {
+                    const value = event.target.value
+                    onChange(value)
+                }}
+                fullWidth
+            />
+        </div>
     )
 }

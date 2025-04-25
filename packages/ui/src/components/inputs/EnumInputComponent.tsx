@@ -1,5 +1,4 @@
-import { ContentPaste, CopyAll } from '@mui/icons-material'
-import { IconButton } from '@mui/material'
+import { Typography } from '@mui/material'
 import {
     EnumListInput,
     FilterConfiguration,
@@ -8,15 +7,13 @@ import {
 } from '../../parsing/UiTypesSpec'
 import { useAlertStore } from '../../store/alerts'
 import { useSettingsCopyStore } from '../../store/settingsCopyStore'
-import { colors } from '../../styles/MuiTheme'
 import {
     applyDiff,
     convertToListDiff,
     EMPTY_DIFF,
 } from '../../utils/ListDiffUtils'
-import { SmartTooltip } from '../SmartTooltip'
-import { Option, UISelect } from './UISelect'
 import { CopyInputSettings } from './CopyInputSettings'
+import { Option, UISelect } from './UISelect'
 
 export const EnumInputComponent: React.FC<{
     input: EnumListInput
@@ -59,35 +56,40 @@ export const EnumInputComponent: React.FC<{
         : []
 
     return (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <UISelect<string>
-                disabled={readonly}
-                options={options}
-                value={selectedOptions}
-                onChange={(newValue: Option<string>[] | null) => {
-                    onChange(
-                        convertToListDiff(
-                            newValue
-                                ? newValue.map((option) => option.value)
-                                : [],
-                            input.default
+        <div>
+            <Typography variant="h6" color="primary">
+                {input.label}
+            </Typography>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <UISelect<string>
+                    disabled={readonly}
+                    options={options}
+                    value={selectedOptions}
+                    onChange={(newValue: Option<string>[] | null) => {
+                        onChange(
+                            convertToListDiff(
+                                newValue
+                                    ? newValue.map((option) => option.value)
+                                    : [],
+                                input.default
+                            )
                         )
-                    )
-                }}
-                multiple
-                label="Select options"
-            />
+                    }}
+                    multiple
+                    label="Select options"
+                />
 
-            <CopyInputSettings
-                input={input}
-                configToCopy={currentSetting.map((v) => {
-                    if (typeof v === 'string') {
-                        return v
-                    }
-                    return v.value
-                })}
-                onChange={onChange}
-            />
+                <CopyInputSettings
+                    input={input}
+                    configToCopy={currentSetting.map((v) => {
+                        if (typeof v === 'string') {
+                            return v
+                        }
+                        return v.value
+                    })}
+                    onChange={onChange}
+                />
+            </div>
         </div>
     )
 }
