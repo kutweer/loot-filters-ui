@@ -32,7 +32,7 @@ export const CopyInputSettings: React.FC<{
     }, [configToCopy, onChange])
 
     return (
-        <div>
+        <div style={{ display: 'flex', gap: 2 }}>
             <SmartTooltip
                 enabledTitle="Paste Settings"
                 disabledTitle="No settings copied"

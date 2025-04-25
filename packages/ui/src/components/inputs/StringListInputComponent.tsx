@@ -39,37 +39,42 @@ export const StringListInputComponent: React.FC<{
 
     return (
         <div style={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-            <UISelect
-                disabled={readonly}
-                options={options}
-                label={input.label}
-                multiple={true}
-                freeSolo={true}
-                value={currentValues.map((value: string | ListOption) => {
-                    if (typeof value === 'string') {
-                        const found = options.find((o) => o.value === value)
-                        if (found) {
-                            return found
-                        }
-                        return {
-                            label: value,
-                            value: value,
-                        }
-                    }
-                    return value
-                })}
-                onChange={(newValue) => {
-                    const values = ((newValue as Option[]) || []).map(
-                        (option) => option.value
-                    )
-                    onChange(convertToListDiff(values, input.default))
-                }}
-            />
             <CopyInputSettings
                 input={input}
                 configToCopy={currentValues}
                 onChange={onChange}
             />
+            <div style={{ width: '100%' }}>
+                <UISelect
+                    sx={{
+                        width: '100%',
+                    }}
+                    disabled={readonly}
+                    options={options}
+                    label={input.label}
+                    multiple={true}
+                    freeSolo={true}
+                    value={currentValues.map((value: string | ListOption) => {
+                        if (typeof value === 'string') {
+                            const found = options.find((o) => o.value === value)
+                            if (found) {
+                                return found
+                            }
+                            return {
+                                label: value,
+                                value: value,
+                            }
+                        }
+                        return value
+                    })}
+                    onChange={(newValue) => {
+                        const values = ((newValue as Option[]) || []).map(
+                            (option) => option.value
+                        )
+                        onChange(convertToListDiff(values, input.default))
+                    }}
+                />
+            </div>
         </div>
     )
 }

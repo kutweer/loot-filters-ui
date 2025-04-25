@@ -100,7 +100,10 @@ export const UISelect = <T = string,>({
 
     return (
         <Autocomplete<Option<T>, boolean, boolean, boolean>
-            sx={sx}
+            sx={{
+                minWidth: '8rem',
+                ...sx,
+            }}
             multiple={multiple}
             freeSolo={freeSolo}
             options={options}
