@@ -77,6 +77,12 @@ export const StringListInputComponent: React.FC<{
                         (option) => option.value
                     )
                     const splitValues = values
+                        .map((v) => {
+                            if (v.startsWith('[') && v.endsWith(']')) {
+                                return v.slice(1, -1)
+                            }
+                            return v
+                        })
                         .map((v) =>
                             v
                                 .split(',')
