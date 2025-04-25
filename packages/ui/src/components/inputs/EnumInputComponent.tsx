@@ -16,6 +16,7 @@ import {
 } from '../../utils/ListDiffUtils'
 import { SmartTooltip } from '../SmartTooltip'
 import { Option, UISelect } from './UISelect'
+import { CopyInputSettings } from './CopyInputSettings'
 
 export const EnumInputComponent: React.FC<{
     input: EnumListInput
@@ -77,56 +78,16 @@ export const EnumInputComponent: React.FC<{
                 label="Select options"
             />
 
-            <SmartTooltip
-                enabledTitle="Paste enum settings from clipboard"
-                disabledTitle="No enum list settings copied"
-                enabled={
-                    pasteableConfig !== null && copiedInput?.type === 'enumlist'
-                }
-            >
-                <IconButton
-                    disabled={
-                        pasteableConfig == null ||
-                        copiedInput?.type !== 'enumlist'
+            <CopyInputSettings
+                input={input}
+                configToCopy={currentSetting.map((v) => {
+                    if (typeof v === 'string') {
+                        return v
                     }
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        onChange(pasteableConfig ?? {})
-                    }}
-                >
-                    <ContentPaste
-                        sx={{
-                            color:
-                                pasteableConfig == null ||
-                                copiedInput?.type !== 'enumlist'
-                                    ? 'grey'
-                                    : colors.rsOrange,
-                        }}
-                    />
-                </IconButton>
-            </SmartTooltip>
-            <SmartTooltip
-                enabledTitle="Copy enum input settings to clipboard"
-                disabledTitle=""
-                enabled={true}
-            >
-                <IconButton
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        setSettingsCopy(input, configuredDiff)
-                        addAlert({
-                            children: 'Enum input settings copied to clipboard',
-                            severity: 'success',
-                        })
-                    }}
-                >
-                    <CopyAll
-                        sx={{
-                            color: colors.rsOrange,
-                        }}
-                    />
-                </IconButton>
-            </SmartTooltip>
+                    return v.value
+                })}
+                onChange={onChange}
+            />
         </div>
     )
 }

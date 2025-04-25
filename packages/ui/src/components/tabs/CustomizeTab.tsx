@@ -22,6 +22,7 @@ import { colors, MuiRsTheme } from '../../styles/MuiTheme'
 
 import { ExpandLess } from '@mui/icons-material'
 import SettingsIcon from '@mui/icons-material/Settings'
+import { useSearchParams } from 'react-router-dom'
 import { parseModules } from '../../parsing/parse'
 import {
     BooleanInput,
@@ -51,7 +52,6 @@ import { NumberInputComponent } from '../inputs/NumberInputComponent'
 import { StringListInputComponent } from '../inputs/StringListInputComponent'
 import { TextInputComponent } from '../inputs/TextInputComponent'
 import { ItemLabelPreview } from '../Previews'
-import { useParams, useSearchParams } from 'react-router-dom'
 
 const InputComponent: React.FC<{
     config: FilterConfiguration
@@ -103,6 +103,13 @@ const InputComponent: React.FC<{
                     input={input as StringListInput}
                     readonly={readonly}
                     onChange={(diff) => {
+                        if (!isObject(diff)) {
+                            console.error(
+                                'onChange something bad happened',
+                                diff,
+                                input.macroName
+                            )
+                        }
                         persist(diff, input.macroName)
                     }}
                 />

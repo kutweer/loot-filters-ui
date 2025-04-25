@@ -29,9 +29,9 @@ const Page: React.FC<{
 
     return (
         <Container className="rs-container" maxWidth="xl">
-            {alerts.map((alert) => (
+            {alerts.map((alert, i) => (
                 <Snackbar
-                    key={alert.key}
+                    key={i}
                     open={isAlerts}
                     autoHideDuration={2000}
                     onClose={() => closeAlert(0)}

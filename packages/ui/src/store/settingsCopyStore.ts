@@ -5,7 +5,7 @@ import { Input } from '../parsing/UiTypesSpec'
 interface SettingsCopyStoreState {
     copiedInput: Input | null
     pasteableConfig: any | null
-    setSettingsCopy: (input: Input, settings: any) => void
+    setSettingsCopy: (input: Input | null, settings: any | null) => void
     clearSettingsCopy: () => void
 }
 export const useSettingsCopyStore = create<SettingsCopyStoreState>()(

@@ -1,4 +1,11 @@
-import { Edit, FiberNew, FileCopy, IosShare, Update } from '@mui/icons-material'
+import {
+    Edit,
+    FiberNew,
+    FileCopy,
+    IosShare,
+    Update,
+    UpdateDisabled,
+} from '@mui/icons-material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import DeleteIcon from '@mui/icons-material/Delete'
 import DownloadIcon from '@mui/icons-material/Download'
@@ -117,7 +124,6 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
 
     const updateAvailable = useMemo(() => {
         const result = updateAvailableFn(activeFilter, updatedFilter)
-        console.log('result', result)
         return result
     }, [activeFilter, updatedFilter])
 
@@ -228,13 +234,16 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                     }
                 }}
             >
-                <Update
-                    style={{
-                        color: updateAvailable
-                            ? colors.rsOrange
-                            : colors.rsGrey,
-                    }}
-                />
+                {!updateAvailable && (
+                    <UpdateDisabled style={{ color: 'grey' }} />
+                )}
+                {updateAvailable && (
+                    <Update
+                        style={{
+                            color: colors.rsOrange,
+                        }}
+                    />
+                )}
             </IconButton>
         </SmartTooltip>
     )
