@@ -312,21 +312,25 @@ export const ItemLabelPreview: React.FC<{
                     margin: '6px',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 2,
                     backgroundColor: backgroundColor,
+                    // background:
+                    //     'linear-gradient(45deg,rgb(255, 255, 255) 0%, rgb(0, 0, 0) 100%)',
                     border: `1px solid ${borderColor}`,
                     ...textAccentStyle,
                 }}
             >
-                <span
-                    style={{
-                        padding: '4px',
-                        color: foregroundColor ?? '#ffffff',
-                        fontSize: '24px',
-                        fontFamily: fontFamily,
-                    }}
-                >
-                    <span style={{ verticalAlign: 'middle' }}>
+                <span>
+                    <span
+                        style={{
+                            padding: '2px',
+                            color: foregroundColor ?? '#ffffff',
+                            fontSize: '24px',
+                            fontFamily: fontFamily,
+
+                            verticalAlign: 'middle',
+                            lineHeight: '1.0',
+                        }}
+                    >
                         {input.exampleItem || itemName || 'Item Name'}
                     </span>
                 </span>

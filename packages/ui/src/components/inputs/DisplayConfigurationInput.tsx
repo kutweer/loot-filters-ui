@@ -19,6 +19,8 @@ import {
     StyleConfigSpec,
     StyleInput,
 } from '../../parsing/UiTypesSpec'
+import { useAlertStore } from '../../store/alerts'
+import { useSettingsCopyStore } from '../../store/settingsCopyStore'
 import { colors } from '../../styles/MuiTheme'
 import {
     FontType,
@@ -29,6 +31,7 @@ import {
 } from '../../types/Rs2fEnum'
 import { ItemLabelPreview, ItemMenuPreview } from '../Previews'
 import { ColorPickerInput } from './ColorPicker'
+import { CopyInputSettings } from './CopyInputSettings'
 import { UISelect } from './UISelect'
 
 const parseSoundInput = (value: string): string | number | undefined => {
@@ -112,6 +115,9 @@ export const DisplayConfigurationInput: React.FC<{
     input: StyleInput
 }> = ({ config, onChange, readonly, module, input }) => {
     const [searchParams] = useSearchParams()
+    const { addAlert } = useAlertStore()
+    const { copiedInput, pasteableConfig, setSettingsCopy } =
+        useSettingsCopyStore()
     const [expanded, setExpanded] = useState(
         searchParams.get('expanded') === 'true'
     )
@@ -119,8 +125,6 @@ export const DisplayConfigurationInput: React.FC<{
     const styleConfig = StyleConfigSpec.optional()
         .default({})
         .parse(config?.inputConfigs?.[input.macroName])
-
-    console.log('styleConfig', styleConfig)
 
     const [iconType, setIconType] = useState<
         'none' | 'current' | 'file' | 'sprite' | 'itemId'
@@ -538,6 +542,14 @@ export const DisplayConfigurationInput: React.FC<{
                     <ItemLabelPreview input={input} itemName={input.label} />
                     <ItemMenuPreview input={input} itemName={input.label} />
                 </Box>
+                <CopyInputSettings
+                    input={input}
+                    configToCopy={{
+                        ...input.default,
+                        ...styleConfig,
+                    }}
+                    onChange={onChange}
+                />
             </AccordionSummary>
             <AccordionDetails
                 sx={{

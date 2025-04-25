@@ -1,4 +1,11 @@
-import { Edit, FiberNew, FileCopy, IosShare, Update } from '@mui/icons-material'
+import {
+    Edit,
+    FiberNew,
+    FileCopy,
+    IosShare,
+    Update,
+    UpdateDisabled,
+} from '@mui/icons-material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import DeleteIcon from '@mui/icons-material/Delete'
 import DownloadIcon from '@mui/icons-material/Download'
@@ -33,30 +40,7 @@ import { loadFilterFromUrl } from '../utils/loaderv2'
 import { renderFilter } from '../utils/render'
 import { ImportFilterDialog } from './ImportFilterDialog'
 import { Option, UISelect } from './inputs/UISelect'
-
-const SmartTooltip = ({
-    enabledTitle,
-    disabledTitle,
-    tooltipSide = 'top',
-    enabled,
-    children,
-}: {
-    enabledTitle: string
-    disabledTitle: string
-    enabled: boolean
-    children: React.ReactNode
-    tooltipSide?: 'top' | 'bottom' | 'left' | 'right'
-}) => {
-    return (
-        <Tooltip
-            title={enabled ? enabledTitle : disabledTitle}
-            placement={tooltipSide}
-        >
-            {/* span is required to prevent tooltip from being disabled when input is disabled */}
-            <span>{children}</span>
-        </Tooltip>
-    )
-}
+import { SmartTooltip } from './SmartTooltip'
 
 const updateAvailableFn = (
     activeFilter?: Filter | null,
@@ -140,7 +124,6 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
 
     const updateAvailable = useMemo(() => {
         const result = updateAvailableFn(activeFilter, updatedFilter)
-        console.log('result', result)
         return result
     }, [activeFilter, updatedFilter])
 
@@ -251,13 +234,16 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                     }
                 }}
             >
-                <Update
-                    style={{
-                        color: updateAvailable
-                            ? colors.rsOrange
-                            : colors.rsGrey,
-                    }}
-                />
+                {!updateAvailable && (
+                    <UpdateDisabled style={{ color: 'grey' }} />
+                )}
+                {updateAvailable && (
+                    <Update
+                        style={{
+                            color: colors.rsOrange,
+                        }}
+                    />
+                )}
             </IconButton>
         </SmartTooltip>
     )

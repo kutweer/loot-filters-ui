@@ -1,17 +1,22 @@
+import { ContentPaste, CopyAll } from '@mui/icons-material'
+import { IconButton } from '@mui/material'
 import {
     EnumListInput,
     FilterConfiguration,
-    FilterId,
     ListDiff,
     ListDiffSpec,
 } from '../../parsing/UiTypesSpec'
-import { useFilterConfigStore } from '../../store/filterConfigurationStore'
+import { useAlertStore } from '../../store/alerts'
+import { useSettingsCopyStore } from '../../store/settingsCopyStore'
+import { colors } from '../../styles/MuiTheme'
 import {
     applyDiff,
     convertToListDiff,
     EMPTY_DIFF,
 } from '../../utils/ListDiffUtils'
+import { SmartTooltip } from '../SmartTooltip'
 import { Option, UISelect } from './UISelect'
+import { CopyInputSettings } from './CopyInputSettings'
 
 export const EnumInputComponent: React.FC<{
     input: EnumListInput
@@ -22,6 +27,9 @@ export const EnumInputComponent: React.FC<{
     const configuredDiff = ListDiffSpec.optional()
         .default(EMPTY_DIFF)
         .parse(config?.inputConfigs?.[input.macroName])
+    const { copiedInput, pasteableConfig, setSettingsCopy } =
+        useSettingsCopyStore()
+    const { addAlert } = useAlertStore()
 
     const currentSetting = applyDiff(input.default, configuredDiff)
 
@@ -51,20 +59,35 @@ export const EnumInputComponent: React.FC<{
         : []
 
     return (
-        <UISelect<string>
-            disabled={readonly}
-            options={options}
-            value={selectedOptions}
-            onChange={(newValue: Option<string>[] | null) => {
-                onChange(
-                    convertToListDiff(
-                        newValue ? newValue.map((option) => option.value) : [],
-                        input.default
+        <div style={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <UISelect<string>
+                disabled={readonly}
+                options={options}
+                value={selectedOptions}
+                onChange={(newValue: Option<string>[] | null) => {
+                    onChange(
+                        convertToListDiff(
+                            newValue
+                                ? newValue.map((option) => option.value)
+                                : [],
+                            input.default
+                        )
                     )
-                )
-            }}
-            multiple
-            label="Select options"
-        />
+                }}
+                multiple
+                label="Select options"
+            />
+
+            <CopyInputSettings
+                input={input}
+                configToCopy={currentSetting.map((v) => {
+                    if (typeof v === 'string') {
+                        return v
+                    }
+                    return v.value
+                })}
+                onChange={onChange}
+            />
+        </div>
     )
 }

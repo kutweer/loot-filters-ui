@@ -35,7 +35,6 @@ export const parseComponent = async (
     config: FilterConfiguration
 }> => {
     const data = decompressFromEncodedURIComponent(component)
-    console.log('data', data)
     const parsedData = JSON.parse(data)
     return parsedData
 }

@@ -66,8 +66,6 @@ export const getIcon = async (
         iconId = parsed
     }
 
-    console.log('icons', window.osrs_icons)
-
     return setIcon(
         toPng(window.osrs_icons.find((icon) => icon.id === iconId)?.iconPng)
     )
