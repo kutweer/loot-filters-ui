@@ -77,13 +77,13 @@ export const StringListInputComponent: React.FC<{
                         (option) => option.value
                     )
                     const splitValues = values
-                        .map((v) => {
+                        .flatMap((v) => {
                             if (v.startsWith('[') && v.endsWith(']')) {
                                 return v.slice(1, -1)
                             }
                             return v
                         })
-                        .map((v) =>
+                        .flatMap((v) =>
                             v
                                 .split(',')
                                 .map((v) => v.trim())
@@ -94,7 +94,6 @@ export const StringListInputComponent: React.FC<{
                                         : v
                                 )
                         )
-                        .flat()
                     onChange(convertToListDiff(splitValues, input.default))
                 }}
             />
