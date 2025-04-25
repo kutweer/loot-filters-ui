@@ -14,6 +14,25 @@ import {
 import { CopyInputSettings } from './CopyInputSettings'
 import { Option, UISelect } from './UISelect'
 
+const parseValues = (values: string[]): string[] => {
+    return values
+        .flatMap((v) => {
+            if (v.startsWith('[') && v.endsWith(']')) {
+                return v.slice(1, -1)
+            }
+            return v
+        })
+        .flatMap((v) =>
+            v
+                .split(',')
+                .map((v) => v.trim())
+                .filter((v) => v)
+                .map((v) =>
+                    v.startsWith('"') && v.endsWith('"') ? v.slice(1, -1) : v
+                )
+        )
+}
+
 export const StringListInputComponent: React.FC<{
     input: StringListInput
     config: FilterConfiguration
@@ -76,24 +95,7 @@ export const StringListInputComponent: React.FC<{
                     const values = ((newValue as Option[]) || []).map(
                         (option) => option.value
                     )
-                    const splitValues = values
-                        .flatMap((v) => {
-                            if (v.startsWith('[') && v.endsWith(']')) {
-                                return v.slice(1, -1)
-                            }
-                            return v
-                        })
-                        .flatMap((v) =>
-                            v
-                                .split(',')
-                                .map((v) => v.trim())
-                                .filter((v) => v)
-                                .map((v) =>
-                                    v.startsWith('"') && v.endsWith('"')
-                                        ? v.slice(1, -1)
-                                        : v
-                                )
-                        )
+                    const splitValues = parseValues(values)
                     onChange(convertToListDiff(splitValues, input.default))
                 }}
             />
