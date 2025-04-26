@@ -25,10 +25,21 @@ export const CopyInputSettings: React.FC<{
     const doCopy = useCallback(() => {
         console.log('doCopy', configToCopy)
         setSettingsCopy(input, configToCopy)
-        addAlert({
-            children: `${input.label} ${input.type} settings copied to clipboard`,
-            severity: 'success',
-        })
+        const formattedConfig = JSON.stringify(configToCopy)
+        navigator.clipboard
+            .writeText(formattedConfig)
+            .then(() => {
+                addAlert({
+                    children: `${input.label} ${input.type} settings copied to clipboard`,
+                    severity: 'success',
+                })
+            })
+            .catch(() => {
+                addAlert({
+                    children: `Failed to copy ${input.label} ${input.type} settings to clipboard`,
+                    severity: 'error',
+                })
+            })
     }, [configToCopy, onChange])
 
     return (

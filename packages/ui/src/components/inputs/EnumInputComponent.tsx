@@ -5,14 +5,11 @@ import {
     ListDiff,
     ListDiffSpec,
 } from '../../parsing/UiTypesSpec'
-import { useAlertStore } from '../../store/alerts'
-import { useSettingsCopyStore } from '../../store/settingsCopyStore'
 import {
     applyDiff,
     convertToListDiff,
     EMPTY_DIFF,
 } from '../../utils/ListDiffUtils'
-import { CopyInputSettings } from './CopyInputSettings'
 import { Option, UISelect } from './UISelect'
 
 export const EnumInputComponent: React.FC<{
@@ -24,9 +21,6 @@ export const EnumInputComponent: React.FC<{
     const configuredDiff = ListDiffSpec.optional()
         .default(EMPTY_DIFF)
         .parse(config?.inputConfigs?.[input.macroName])
-    const { copiedInput, pasteableConfig, setSettingsCopy } =
-        useSettingsCopyStore()
-    const { addAlert } = useAlertStore()
 
     const currentSetting = applyDiff(input.default, configuredDiff)
 
@@ -61,16 +55,6 @@ export const EnumInputComponent: React.FC<{
                 <Typography variant="h6" color="primary">
                     {input.label}
                 </Typography>
-                <CopyInputSettings
-                    input={input}
-                    configToCopy={currentSetting.map((v) => {
-                        if (typeof v === 'string') {
-                            return v
-                        }
-                        return v.value
-                    })}
-                    onChange={onChange}
-                />
             </div>
             <UISelect<string>
                 disabled={readonly}
