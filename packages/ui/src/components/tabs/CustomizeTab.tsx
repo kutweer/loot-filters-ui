@@ -41,7 +41,7 @@ import {
 } from '../../parsing/UiTypesSpec'
 import { useFilterConfigStore } from '../../store/filterConfigurationStore'
 import { useFilterStore } from '../../store/filterStore'
-import { isConfigEmpty } from '../../utils/configUtils'
+import { countConfigChanges } from '../../utils/configUtils'
 import { generateId } from '../../utils/idgen'
 import { BackgroundSelector } from '../BackgroundSelector'
 import { GitHubFlavoredMarkdown } from '../GitHubFlavoredMarkdown'
@@ -241,9 +241,7 @@ const ModuleSection: React.FC<{
 
     const moduleMacronames = module.inputs.map((input) => input.macroName)
 
-    const configCount = Object.keys(config.inputConfigs ?? {})
-        .filter((macroName) => moduleMacronames.includes(macroName))
-        .filter((key) => !isConfigEmpty(config?.inputConfigs?.[key])).length
+    const configCount = countConfigChanges(config, moduleMacronames)
 
     const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
     return (

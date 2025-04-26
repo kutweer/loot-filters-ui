@@ -12,6 +12,12 @@ import DownloadIcon from '@mui/icons-material/Download'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import {
     Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
     FormControl,
     IconButton,
     ListItemText,
@@ -19,6 +25,7 @@ import {
     MenuItem,
     Stack,
     Tooltip,
+    Typography,
 } from '@mui/material'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
@@ -33,6 +40,7 @@ import { useAlertStore } from '../store/alerts'
 import { useFilterConfigStore } from '../store/filterConfigurationStore'
 import { useFilterStore } from '../store/filterStore'
 import { colors } from '../styles/MuiTheme'
+import { countConfigChanges } from '../utils/configUtils'
 import { downloadFile } from '../utils/file'
 import { generateId } from '../utils/idgen'
 import { createLink } from '../utils/link'
@@ -71,6 +79,8 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
     const [importDialogOpen, setImportDialogOpen] = useState(
         Object.keys(filters).length === 0
     )
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+
     const activeFilter = useMemo(
         () => Object.values(filters).find((filter) => filter.active),
         [filters]
@@ -339,19 +349,6 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                 </MenuItem>
             </SmartTooltip>
             <SmartTooltip
-                enabledTitle="Delete filter"
-                disabledTitle="No filter selected"
-                enabled={activeFilter != null}
-                tooltipSide="right"
-            >
-                <MenuItem disabled={!activeFilter} onClick={handleDeleteFilter}>
-                    <ListItemIcon>
-                        <DeleteIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>Delete</ListItemText>
-                </MenuItem>
-            </SmartTooltip>
-            <SmartTooltip
                 enabledTitle="Download filter"
                 disabledTitle="No filter selected"
                 enabled={activeFilter != null}
@@ -419,6 +416,25 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                     <ListItemText>Duplicate</ListItemText>
                 </MenuItem>
             </SmartTooltip>
+            <SmartTooltip
+                enabledTitle="Delete filter"
+                disabledTitle="No filter selected"
+                enabled={activeFilter != null}
+                tooltipSide="right"
+            >
+                <MenuItem
+                    disabled={!activeFilter}
+                    onClick={() => setDeleteDialogOpen(true)}
+                >
+                    <ListItemIcon>
+                        <DeleteIcon
+                            style={{ color: colors.rsRed }}
+                            fontSize="small"
+                        />
+                    </ListItemIcon>
+                    <ListItemText>Delete</ListItemText>
+                </MenuItem>
+            </SmartTooltip>
         </Menu>
     )
 
@@ -465,6 +481,51 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                 open={importDialogOpen}
                 onClose={() => setImportDialogOpen(false)}
             />
+            <Dialog
+                open={deleteDialogOpen}
+                onClose={() => setDeleteDialogOpen(false)}
+            >
+                <DialogTitle>Delete Filter?</DialogTitle>
+                <DialogContent>
+                    <Typography
+                        sx={{
+                            fontSize: '3rem',
+                            color: colors.rsLightestBrown,
+                        }}
+                    >
+                        Filter {activeFilter?.name} has{' '}
+                        <span style={{ color: colors.rsYellow }}>
+                            {countConfigChanges(
+                                (activeFilterConfig as any) ?? {}
+                            )}
+                        </span>{' '}
+                        configuration changes.
+                    </Typography>
+                    <DialogContentText
+                        sx={{
+                            fontSize: '2rem',
+                            color: colors.rsRed,
+                        }}
+                    >
+                        This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        variant="outlined"
+                        onClick={() => setDeleteDialogOpen(false)}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        style={{ color: colors.rsRed }}
+                        onClick={handleDeleteFilter}
+                    >
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     )
 }
