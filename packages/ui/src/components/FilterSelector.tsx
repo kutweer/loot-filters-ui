@@ -85,8 +85,7 @@ const UpdateAvailableDialog: React.FC<{
         filterUrl != null &&
         filterUrl != undefined &&
         (filterUrl?.startsWith(
-            // 'https://raw.githubusercontent.com/riktenx/filterscape'
-            'asdf'
+            'https://raw.githubusercontent.com/riktenx/filterscape'
         ) ||
             filterUrl?.startsWith(
                 'https://raw.githubusercontent.com/typical-whack/loot-filters-modules'
