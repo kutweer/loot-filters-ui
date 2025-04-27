@@ -13,6 +13,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert'
 import {
     Box,
     Button,
+    CircularProgress,
     Dialog,
     DialogActions,
     DialogContent,
@@ -63,6 +64,114 @@ const updateAvailableFn = (
         console.log('error', e)
         return false
     }
+}
+
+const UpdateAvailableDialog: React.FC<{
+    open: boolean
+    filterName: string
+    filterUrl?: string
+    onClose: () => void
+    onUpdate: () => void
+}> = ({ open, filterName, filterUrl, onClose, onUpdate }) => {
+    console.log('open', open)
+
+    let updateText = (
+        <span>
+            A new version of the filter is available. Would you like to update?
+        </span>
+    )
+
+    const autoUpdate =
+        filterUrl != null &&
+        filterUrl != undefined &&
+        (filterUrl?.startsWith(
+            // 'https://raw.githubusercontent.com/riktenx/filterscape'
+            'asdf'
+        ) ||
+            filterUrl?.startsWith(
+                'https://raw.githubusercontent.com/typical-whack/loot-filters-modules'
+            ))
+
+    const [timeoutDone, setTimeoutDone] = useState(false)
+
+    if (autoUpdate) {
+        updateText = (
+            <span>
+                This filter is supported by the loot-filters plugin or
+                filterscape site maintainers. To keep it compatible with the
+                site it is being automatically updated.
+                <br />
+                <br />
+                After the update re-import the filter to RuneLite to apply the
+                changes.
+            </span>
+        )
+        setTimeout(() => {
+            setTimeoutDone(true)
+        }, 5000)
+    }
+
+    return (
+        // Do not set onClose to prevent closing with escape key & clicking away
+        // We want to force the user to click the button to close the dialog
+        <Dialog open={open}>
+            <DialogTitle sx={{ textAlign: 'center' }}>
+                Update Available for {filterName}
+            </DialogTitle>
+            <DialogContent>
+                <Typography
+                    sx={{ textAlign: 'center', color: colors.rsLightestBrown }}
+                >
+                    {updateText}
+                </Typography>
+            </DialogContent>
+            <DialogActions
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 2,
+                }}
+            >
+                {autoUpdate && !timeoutDone && (
+                    <Typography>
+                        Update in progress...
+                        <CircularProgress size={16} />
+                    </Typography>
+                )}
+                {autoUpdate && timeoutDone && (
+                    <Button variant="outlined" onClick={onUpdate}>
+                        I will ReImport to RuneLite
+                    </Button>
+                )}
+
+                {!autoUpdate && (
+                    <div style={{ display: 'flex', gap: 10 }}>
+                        <Button
+                            sx={{
+                                borderColor: colors.rsLightestBrown,
+                                color: colors.rsLightestBrown,
+                            }}
+                            variant="outlined"
+                            onClick={onClose}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            sx={{
+                                color: colors.rsYellow,
+                                borderColor: colors.rsYellow,
+                            }}
+                            variant="outlined"
+                            onClick={onUpdate}
+                        >
+                            Update
+                        </Button>
+                    </div>
+                )}
+            </DialogActions>
+        </Dialog>
+    )
 }
 
 export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
@@ -210,40 +319,38 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
         </SmartTooltip>
     )
 
+    const updateFilterFn = () => {
+        if (!activeFilter) {
+            return
+        }
+        if (updatedFilter != null) {
+            const updatedAt = new Date().toISOString()
+
+            updateFilter({
+                ...updatedFilter,
+                id: activeFilter.id,
+                name: activeFilter.name,
+                importedOn: activeFilter.importedOn,
+                updatedOn: updatedAt,
+                active: true,
+                description: updatedFilter?.description,
+            })
+            setUpdatedFilter(null)
+
+            addAlert({
+                children: 'Filter updated',
+                severity: 'success',
+            })
+        }
+    }
+
     const updateFilterButton = (
         <SmartTooltip
             enabledTitle="Update filter"
             disabledTitle="No updates available"
             enabled={updateAvailable}
         >
-            <IconButton
-                disabled={!updateAvailable}
-                onClick={() => {
-                    if (!activeFilter) {
-                        return
-                    }
-                    if (updatedFilter != null) {
-                        let name = activeFilter.name
-
-                        const updatedAt = new Date().toISOString()
-
-                        updateFilter({
-                            ...updatedFilter,
-                            id: activeFilter.id,
-                            name: activeFilter.name,
-                            importedOn: activeFilter.importedOn,
-                            updatedOn: updatedAt,
-                            active: true,
-                            description: updatedFilter?.description,
-                        })
-                        setUpdatedFilter(null)
-                        addAlert({
-                            children: 'Filter updated',
-                            severity: 'success',
-                        })
-                    }
-                }}
-            >
+            <IconButton disabled={!updateAvailable} onClick={updateFilterFn}>
                 {!updateAvailable && (
                     <UpdateDisabled style={{ color: 'grey' }} />
                 )}
@@ -474,6 +581,15 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                     {shareFilterButton}
                     {menuButton}
                     {menu}
+                    <UpdateAvailableDialog
+                        open={updateAvailable}
+                        filterName={activeFilter?.name ?? ''}
+                        filterUrl={activeFilter?.source ?? ''}
+                        onClose={() => {
+                            setUpdatedFilter(null)
+                        }}
+                        onUpdate={updateFilterFn}
+                    />
                 </Box>
             </Stack>
 

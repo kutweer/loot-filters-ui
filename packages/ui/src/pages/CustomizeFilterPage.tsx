@@ -5,7 +5,7 @@ import { CustomizeTab } from '../components/tabs/CustomizeTab'
 import { useFilterConfigStore } from '../store/filterConfigurationStore'
 import { useFilterStore } from '../store/filterStore'
 
-export const FilterTabs: React.FC = () => {
+export const CustomizeFilterPageBody: React.FC = () => {
     const [activeTab, setActiveTab] = useState(0)
 
     const activeFilter = useFilterStore((state) =>

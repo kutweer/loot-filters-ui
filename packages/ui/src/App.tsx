@@ -6,7 +6,7 @@ import { AppHeader } from './components/AppHeader'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { FilterSelector } from './components/FilterSelector'
 import { initImages } from './images/osrs/imageUtils'
-import { FilterTabs } from './pages/CustomizeFilterPage'
+import { CustomizeFilterPageBody } from './pages/CustomizeFilterPage'
 import { DebugPage } from './pages/DebugPage'
 import { EditorLoadedFilterPage } from './pages/EditLoadedFilterPage'
 import { ImportPage } from './pages/ImportPage'
@@ -87,7 +87,7 @@ export const App = () => {
                                             />
                                         }
                                     >
-                                        <FilterTabs />
+                                        <CustomizeFilterPageBody />
                                     </ErrorBoundary>
                                 }
                             />
