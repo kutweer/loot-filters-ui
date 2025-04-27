@@ -1,4 +1,4 @@
-import { parseAsync as parse } from '../parsing/parse'
+import { addRs2fHash, parseAsync as parse } from '../parsing/parse'
 import { Filter } from '../parsing/UiTypesSpec'
 
 const stringifyErrors = (errors: Error[]) => {
@@ -23,5 +23,5 @@ export const loadFilterFromUrl = async (url: string): Promise<Filter> => {
     }
 
     filter.source = url
-    return filter
+    return addRs2fHash(filter)
 }

@@ -30,7 +30,7 @@ import {
 } from '@mui/material'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import {
     DEFAULT_FILTER_CONFIGURATION,
     Filter,
@@ -47,7 +47,6 @@ import { generateId } from '../utils/idgen'
 import { createLink } from '../utils/link'
 import { loadFilterFromUrl } from '../utils/loaderv2'
 import { renderFilter } from '../utils/render'
-import { ImportFilterDialog } from './ImportFilterDialog'
 import { Option, UISelect } from './inputs/UISelect'
 import { SmartTooltip } from './SmartTooltip'
 
@@ -107,7 +106,7 @@ const UpdateAvailableDialog: React.FC<{
         )
         setTimeout(() => {
             setTimeoutDone(true)
-        }, 5000)
+        }, 3000)
     }
 
     return (
@@ -184,9 +183,6 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
     const { setFilterConfiguration, removeFilterConfiguration } =
         useFilterConfigStore()
 
-    const [importDialogOpen, setImportDialogOpen] = useState(
-        Object.keys(filters).length === 0
-    )
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
     const activeFilter = useMemo(
@@ -215,9 +211,6 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
         [setActiveFilter]
     )
     const handleDeleteFilter = useCallback(() => {
-        if (Object.keys(filters).length === 1) {
-            setImportDialogOpen(true)
-        }
         if (activeFilter) {
             removeFilter(activeFilter.id)
             removeFilterConfiguration(activeFilter.id)
@@ -272,7 +265,7 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
             <IconButton
                 color="primary"
                 onClick={() => {
-                    setImportDialogOpen(true)
+                    navigate('/new-filter')
                 }}
             >
                 <FiberNew style={{ color: colors.rsOrange }} />
@@ -544,6 +537,10 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
         </Menu>
     )
 
+    if (Object.keys(filters).length === 0) {
+        return <Navigate to="/new-filter" />
+    }
+
     return (
         <>
             <Stack spacing={2}>
@@ -587,15 +584,13 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                         onClose={() => {
                             setUpdatedFilter(null)
                         }}
-                        onUpdate={updateFilterFn}
+                        onUpdate={() => {
+                            updateFilterFn()
+                            setUpdatedFilter(null)
+                        }}
                     />
                 </Box>
             </Stack>
-
-            <ImportFilterDialog
-                open={importDialogOpen}
-                onClose={() => setImportDialogOpen(false)}
-            />
             <Dialog
                 open={deleteDialogOpen}
                 onClose={() => setDeleteDialogOpen(false)}

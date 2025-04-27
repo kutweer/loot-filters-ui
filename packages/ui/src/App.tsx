@@ -16,6 +16,7 @@ import {
     requiresMigration,
 } from './store/migrations/MigrateLegacyData'
 import { MuiRsTheme } from './styles/MuiTheme'
+import { NewFilterPage } from './pages/NewFilterPage'
 
 const Page: React.FC<{
     component?: ReactNode
@@ -98,6 +99,10 @@ export const App = () => {
                         element={
                             <Page component={<EditorLoadedFilterPage />} />
                         }
+                    />
+                    <Route
+                        path="/new-filter"
+                        element={<Page component={<NewFilterPage />} />}
                     />
                     <Route
                         path="/import"
