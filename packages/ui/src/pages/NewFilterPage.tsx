@@ -80,12 +80,260 @@ export const NewFilterPage: React.FC = () => {
 
     return (
         <div>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <Typography
+                    fontSize="40px"
+                    component="div"
+                    sx={{ color: 'text.primary', mt: 2, mb: 2 }}
+                >
+                    Select a filter
+                </Typography>
+            </div>
+            <Grid2
+                container
+                spacing={2}
+                justifyContent="center"
+                display={'flex'}
+            >
+                <Grid2 size={3}>
+                    <Card variant="outlined">
+                        <CardContent>
+                            <Typography
+                                variant="h6"
+                                fontSize="36px"
+                                component="div"
+                            >
+                                FilterScape
+                            </Typography>
+                            <Typography variant="subtitle2">
+                                by Rikten X
+                            </Typography>
+                            <Typography
+                                variant="body2"
+                                fontSize="24px"
+                                sx={{
+                                    color: 'text.secondary',
+                                    minHeight: '4lh',
+                                }}
+                            >
+                                An all-in-one filter for mains. Useful by
+                                default, with limited styling/filtering options.
+                            </Typography>
+                        </CardContent>
+                        <CardActions>
+                            <Button
+                                variant="outlined"
+                                disabled={loading}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    loadFilter(FILTERSCAPE_FILTER)
+                                }}
+                            >
+                                Select this filter
+                            </Button>
+                        </CardActions>
+                    </Card>
+                </Grid2>
+                <Grid2 size={3}>
+                    <Card variant="outlined">
+                        <CardContent>
+                            <Typography
+                                variant="h6"
+                                fontSize="36px"
+                                component="div"
+                            >
+                                Joe's Filter
+                            </Typography>
+                            <Typography variant="subtitle2">by Joe</Typography>
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: 'text.secondary',
+                                    fontSize: '24px',
+                                    minHeight: '4lh',
+                                }}
+                            >
+                                Offers an original color scheme with extensive
+                                support for category-based styling/filtering.
+                            </Typography>
+                        </CardContent>
+                        <CardActions>
+                            <Button
+                                variant="outlined"
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    loadFilter(JOES_FILTER)
+                                }}
+                                disabled={loading}
+                            >
+                                Select this filter
+                            </Button>
+                        </CardActions>
+                    </Card>
+                </Grid2>
+            </Grid2>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <Typography
+                    fontSize="28px"
+                    component="div"
+                    sx={{ color: 'text.primary', mt: 2, mb: 2 }}
+                >
+                    Advanced options
+                </Typography>
+            </div>
+            <Grid2
+                container
+                spacing={2}
+                justifyContent="center"
+                display={showURLImportOptions ? 'none' : 'flex'}
+            >
+                <Grid2 size={3}>
+                    <Card variant="outlined">
+                        <CardContent>
+                            <Typography
+                                variant="h6"
+                                component="div"
+                                fontSize="28px"
+                            >
+                                From a URL
+                            </Typography>
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: 'text.secondary',
+                                    fontSize: '20px',
+                                    minHeight: '3lh',
+                                }}
+                            >
+                                Import a filter from a GitHub URL. Documentation
+                                about writing and importing filters on the
+                                website can be found{' '}
+                                <a href="https://github.com/Kaqemeex/loot-filters-ui/tree/main/module-system-docs/modular-filters-book">
+                                    on GitHub
+                                </a>
+                                .
+                            </Typography>
+                        </CardContent>
+                        <CardActions>
+                            <Button
+                                size="small"
+                                onClick={(e) => {
+                                    setShowURLImportOptions(true)
+                                }}
+                            >
+                                Import
+                            </Button>
+                        </CardActions>
+                    </Card>
+                </Grid2>
+                <Grid2 size={3}>
+                    <Card variant="outlined">
+                        <CardContent>
+                            <Typography
+                                variant="h6"
+                                component="div"
+                                fontSize="28px"
+                            >
+                                Create In UI
+                            </Typography>
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: 'text.secondary',
+                                    fontSize: '20px',
+                                    minHeight: '3lh',
+                                }}
+                            >
+                                Write your filter manually in a text editor on
+                                the website.
+                            </Typography>
+                        </CardContent>
+                        <CardActions>
+                            <Button
+                                size="small"
+                                onClick={(e) => {
+                                    const id = generateId()
+                                    updateFilter(
+                                        FilterSpec.parse({
+                                            id: id,
+                                            name: 'My new filter',
+                                            rs2fHash: '',
+                                            modules: [], // TODO add a module
+                                            rs2f: '',
+                                        })
+                                    )
+                                    navigate(
+                                        `/editor/${id}?initialFile=filterRs2f`
+                                    )
+                                }}
+                            >
+                                Get started
+                            </Button>
+                        </CardActions>
+                    </Card>
+                </Grid2>
+            </Grid2>
+            <Box
+                sx={{
+                    display: showURLImportOptions ? 'flex' : 'none',
+                    flexDirection: 'column',
+                    gap: 2,
+                    marginBottom: 2,
+                }}
+            >
+                <TextField
+                    label="Filter URL"
+                    value={filterUrl}
+                    onChange={(e) => {
+                        setFilterUrl(e.target.value)
+                        setImportError('')
+                    }}
+                    error={importError !== ''}
+                    helperText={importError}
+                />
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: 2,
+                    }}
+                >
+                    <Button
+                        disabled={filterUrl.length === 0}
+                        variant="outlined"
+                        color="primary"
+                        onClick={(e) => {
+                            setLoading(true)
+                            if (!filterUrl) {
+                                setLoading(false)
+                                setImportError('No filter URL provided')
+                                return
+                            }
+                            createLink(
+                                filterUrl,
+                                DEFAULT_FILTER_CONFIGURATION
+                            ).then((link) => {
+                                window.location.href = link
+                            })
+                        }}
+                    >
+                        Import
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={() => setShowURLImportOptions(false)}
+                    >
+                        Back
+                    </Button>
+                </Box>
+            </Box>
             <Box>
                 <Button
                     onClick={() => {
                         setOnboardingComplete(!onboardingComplete)
                     }}
-                    sx={{ float: 'right' }}
+                    sx={{ float: 'right', display: 'none' }}
                 >
                     {onboardingComplete ? 'UNHIDE INTRO' : 'HIDE INTRO'}
                 </Button>
@@ -93,7 +341,7 @@ export const NewFilterPage: React.FC = () => {
                     container
                     spacing={2}
                     sx={{ mt: 2, justifyContent: 'center' }}
-                    display={onboardingComplete ? 'none' : 'flex'}
+                    display="none"
                 >
                     <Grid2 size={3}>
                         <Typography
@@ -180,288 +428,6 @@ export const NewFilterPage: React.FC = () => {
                         </Typography>
                     </Grid2>
                 </Grid2>
-            </Box>
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <Typography
-                    fontSize="40px"
-                    component="div"
-                    sx={{ color: 'text.primary', mt: 2, mb: 2 }}
-                >
-                    Pick a filter to import
-                </Typography>
-            </div>
-            <Grid2
-                container
-                spacing={2}
-                justifyContent="center"
-                display={showURLImportOptions ? 'none' : 'flex'}
-            >
-                <Grid2 size={3}>
-                    <Card variant="outlined">
-                        <CardContent>
-                            <Typography
-                                variant="h6"
-                                fontSize="36px"
-                                component="div"
-                            >
-                                FilterScape
-                            </Typography>
-                            <Typography
-                                variant="body2"
-                                fontSize="24px"
-                                sx={{
-                                    color: 'text.secondary',
-                                    minHeight: '4lh',
-                                }}
-                            >
-                                An all in one filter for mains. Configurable
-                                styling for most monsters and bosses.
-                            </Typography>
-                        </CardContent>
-                        <CardActions>
-                            <Button
-                                size="small"
-                                color="secondary"
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    window.open(
-                                        'https://github.com/riktenx/filterscape',
-                                        '_blank'
-                                    )
-                                }}
-                            >
-                                GitHub
-                            </Button>
-                            <Button
-                                disabled={loading}
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    loadFilter(FILTERSCAPE_FILTER)
-                                }}
-                            >
-                                Import
-                            </Button>
-                            <div
-                                style={{
-                                    width: '100%',
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <Typography
-                                    variant="body2"
-                                    sx={{
-                                        color: 'text.secondary',
-                                    }}
-                                >
-                                    RiktenX & Abstain
-                                </Typography>
-                            </div>
-                        </CardActions>
-                    </Card>
-                </Grid2>
-                <Grid2 size={3}>
-                    <Card variant="outlined">
-                        <CardContent>
-                            <Typography
-                                variant="h6"
-                                fontSize="36px"
-                                component="div"
-                            >
-                                Joe's Filter
-                            </Typography>
-                            <Typography
-                                variant="body2"
-                                sx={{
-                                    color: 'text.secondary',
-                                    fontSize: '24px',
-                                    minHeight: '4lh',
-                                }}
-                            >
-                                Goal is customizable styling for every item in
-                                every context.
-                            </Typography>
-                        </CardContent>
-                        <CardActions>
-                            <Button
-                                size="small"
-                                color="secondary"
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    window.open(
-                                        'https://github.com/typical-whack/loot-filters-modules',
-                                        '_blank'
-                                    )
-                                }}
-                            >
-                                GitHub
-                            </Button>
-                            <Button
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    loadFilter(JOES_FILTER)
-                                }}
-                                disabled={loading}
-                            >
-                                Import
-                            </Button>
-
-                            <div
-                                style={{
-                                    width: '100%',
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <Typography
-                                    variant="body2"
-                                    sx={{ color: 'text.secondary' }}
-                                >
-                                    Joe
-                                </Typography>
-                            </div>
-                        </CardActions>
-                    </Card>
-                </Grid2>
-                <Grid2 size={3}>
-                    <Card variant="outlined">
-                        <CardContent>
-                            <Typography
-                                variant="h6"
-                                component="div"
-                                fontSize="36px"
-                            >
-                                From a URL
-                            </Typography>
-                            <Typography
-                                variant="body2"
-                                sx={{
-                                    color: 'text.secondary',
-                                    fontSize: '24px',
-                                    minHeight: '4lh',
-                                }}
-                            >
-                                Import a filter from a github url. Documentation
-                                about writing and importing filters on the
-                                website can be found{' '}
-                                <a href="https://github.com/Kaqemeex/loot-filters-ui/tree/main/module-system-docs/modular-filters-book">
-                                    on GitHub
-                                </a>
-                                .
-                            </Typography>
-                        </CardContent>
-                        <CardActions>
-                            <Button
-                                size="small"
-                                onClick={(e) => {
-                                    setShowURLImportOptions(true)
-                                }}
-                            >
-                                Import
-                            </Button>
-                        </CardActions>
-                    </Card>
-                </Grid2>
-                <Grid2 size={3}>
-                    <Card variant="outlined">
-                        <CardContent>
-                            <Typography
-                                variant="h6"
-                                component="div"
-                                fontSize="36px"
-                            >
-                                Create In UI
-                            </Typography>
-                            <Typography
-                                variant="body2"
-                                sx={{
-                                    color: 'text.secondary',
-                                    fontSize: '24px',
-                                    minHeight: '4lh',
-                                }}
-                            >
-                                Write a filter right here in the UI.
-                            </Typography>
-                        </CardContent>
-                        <CardActions>
-                            <Button
-                                size="small"
-                                onClick={(e) => {
-                                    const id = generateId()
-                                    updateFilter(
-                                        FilterSpec.parse({
-                                            id: id,
-                                            name: 'My new filter',
-                                            rs2fHash: '',
-                                            modules: [], // TODO add a module
-                                            rs2f: '',
-                                        })
-                                    )
-                                    navigate(
-                                        `/editor/${id}?initialFile=filterRs2f`
-                                    )
-                                }}
-                            >
-                                Import
-                            </Button>
-                        </CardActions>
-                    </Card>
-                </Grid2>
-            </Grid2>
-            <Box
-                sx={{
-                    display: showURLImportOptions ? 'flex' : 'none',
-                    flexDirection: 'column',
-                    gap: 2,
-                    marginBottom: 2,
-                }}
-            >
-                <TextField
-                    label="Filter URL"
-                    value={filterUrl}
-                    onChange={(e) => {
-                        setFilterUrl(e.target.value)
-                        setImportError('')
-                    }}
-                    error={importError !== ''}
-                    helperText={importError}
-                />
-                <Box
-                    sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        gap: 2,
-                    }}
-                >
-                    <Button
-                        disabled={filterUrl.length === 0}
-                        variant="outlined"
-                        color="primary"
-                        onClick={(e) => {
-                            setLoading(true)
-                            if (!filterUrl) {
-                                setLoading(false)
-                                setImportError('No filter URL provided')
-                                return
-                            }
-                            createLink(
-                                filterUrl,
-                                DEFAULT_FILTER_CONFIGURATION
-                            ).then((link) => {
-                                window.location.href = link
-                            })
-                        }}
-                    >
-                        Import
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        color="primary"
-                        onClick={() => setShowURLImportOptions(false)}
-                    >
-                        Back
-                    </Button>
-                </Box>
             </Box>
         </div>
     )
