@@ -107,6 +107,17 @@ const Label: React.FC<{ label: string; sx?: SxProps }> = ({ label, sx }) => {
     )
 }
 
+const inferSoundType = (value: any): 'none' | 'soundeffect' | 'fromfile' => {
+    switch (typeof value) {
+        case 'number':
+            return 'soundeffect'
+        case 'string':
+            return 'fromfile'
+        default:
+            return 'none'
+    }
+}
+
 export const DisplayConfigurationInput: React.FC<{
     config: FilterConfiguration
     onChange: (style: StyleConfig) => void
@@ -129,6 +140,10 @@ export const DisplayConfigurationInput: React.FC<{
     const [iconType, setIconType] = useState<
         'none' | 'current' | 'file' | 'sprite' | 'itemId'
     >(styleConfig?.icon?.type ?? input.default?.icon?.type ?? 'none')
+
+    const [soundType, setSoundType] = useState<
+        'none' | 'soundeffect' | 'fromfile'
+    >(inferSoundType(styleConfig?.sound ?? input.default?.sound))
 
     const displayLootbeamInput = (
         <Checkbox
@@ -227,15 +242,59 @@ export const DisplayConfigurationInput: React.FC<{
         />
     )
 
+    const soundOpts = [
+        { label: 'None', value: 'none' },
+        { label: 'Sound Effect', value: 'soundeffect' },
+        { label: 'From File', value: 'fromfile' },
+    ]
+    const soundTypeSelect = (
+        <UISelect<string>
+            sx={{ width: '12rem' }}
+            disabled={readonly}
+            options={soundOpts}
+            multiple={false}
+            freeSolo={false}
+            value={
+                soundOpts.find((opt) => opt.value === soundType) || soundOpts[0]
+            }
+            onChange={(newValue) => {
+                switch (newValue?.value) {
+                    case 'soundeffect':
+                        setSoundType('soundeffect')
+                        onChange({ sound: 0 })
+                        break
+                    case 'fromfile':
+                        setSoundType('fromfile')
+                        onChange({ sound: 'example.wav' })
+                        break
+                    default:
+                        setSoundType('none')
+                        onChange({ sound: undefined })
+                        break
+                }
+            }}
+        />
+    )
+
+    const soundEffectInput = (
+        <TextField
+            type="number"
+            sx={{ minWidth: '12rem' }}
+            disabled={readonly}
+            size="small"
+            placeholder="Effect ID"
+            value={styleConfig?.sound ?? input.default?.sound ?? 0}
+            onChange={(e) => onChange({ sound: parseInt(e.target.value) || 0 })}
+        />
+    )
+
     const soundFileInput = (
         <TextField
-            sx={{ minWidth: '10rem', marginBottom: '-25px' }}
-            placeholder="Sound File or Id"
-            value={styleConfig?.sound ?? input.default?.sound ?? ''}
-            onChange={(e) =>
-                onChange({ sound: parseSoundInput(e.target.value) })
-            }
+            sx={{ minWidth: '12rem' }}
             disabled={readonly}
+            placeholder="Filename"
+            value={styleConfig?.sound ?? input.default?.sound ?? ''}
+            onChange={(e) => onChange({ sound: e.target.value })}
         />
     )
 
@@ -683,37 +742,81 @@ export const DisplayConfigurationInput: React.FC<{
                         </Grid2>
                     </Column>
                     <HeaderCol text="General" />
-                    <Grid2 rowSpacing={0} container size={11}>
+                    <Grid2 rowSpacing={0} container size={10}>
                         <Row>
                             <Label label="Lootbeam" />
                             <Grid2 size={1}>{displayLootbeamInput}</Grid2>
-                            <Label label="Hilight Tile" />
+                            <Label label="Highlight Tile" />
                             <Grid2 size={1}>{highlightTileComponent}</Grid2>
                             <Label label="Show Item Value" />
                             <Grid2 size={1}>{valueComponent}</Grid2>
-                            <Label
-                                sx={{ justifyContent: 'flex-start' }}
-                                label="Drop Sound"
-                            />
+                            <Label label="Drop Sound" />
+                            <Grid2 size={1}>{soundTypeSelect}</Grid2>
                         </Row>
                         <Row>
                             <Label label="Lootbeam Color" />
                             <Grid2 size={1}>{lootbeamColorInput}</Grid2>
-                            <Label label="Hilight Tile Fill Color" />
+                            <Label label="Tile Fill" />
                             <Grid2 size={1}>{hilightTileFillColorInput}</Grid2>
                             <Label label="Show Despawn Timer" />
                             <Grid2 size={1}>{despawnComponent}</Grid2>
-                            <Grid2 size={2}>{soundFileInput}</Grid2>
+                            <Grid2 size={2} />
+                            <Grid2 size={1}>
+                                {soundType === 'soundeffect' &&
+                                    soundEffectInput}
+                                {soundType === 'fromfile' && soundFileInput}
+                            </Grid2>
                         </Row>
                         <Row>
                             <Grid2 size={2} />
                             <Grid2 size={1} />
-                            <Label label="Hilight Tile Stroke" />
+                            <Label label="Tile Stroke" />
                             <Grid2 size={1}>
                                 {hilightTileStrokeColorInput}
                             </Grid2>
                             <Label label="Notify on Drop" />
                             <Grid2 size={1}>{notifyComponent}</Grid2>
+                            <Grid2 size={2} />
+                            {soundType === 'soundeffect' && (
+                                <Grid2 size={1}>
+                                    <Typography
+                                        variant="caption"
+                                        color={colors.rsDarkOrange}
+                                        sx={{
+                                            textWrap: 'nowrap',
+                                            lineHeight: 1.0,
+                                        }}
+                                    >
+                                        Sound Effect ID
+                                        <br />
+                                        <a
+                                            target="_blank"
+                                            style={{
+                                                color: colors.rsDarkYellow,
+                                            }}
+                                            href="https://oldschool.runescape.wiki/w/List_of_sound_IDs"
+                                        >
+                                            (browse sound effects by name)
+                                        </a>
+                                    </Typography>
+                                </Grid2>
+                            )}
+                            {soundType === 'fromfile' && (
+                                <Grid2 size={1}>
+                                    <Typography
+                                        variant="caption"
+                                        color={colors.rsDarkOrange}
+                                        sx={{
+                                            textWrap: 'nowrap',
+                                            lineHeight: 1.0,
+                                        }}
+                                    >
+                                        Place your sound files in
+                                        <br />
+                                        .runelite/loot-filters/sounds
+                                    </Typography>
+                                </Grid2>
+                            )}
                         </Row>
                         <Row>
                             <Grid2 size={2} />
