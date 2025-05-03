@@ -38,7 +38,7 @@ export const AppHeader: React.FC = () => {
                                     textDecorationColor: colors.rsYellow,
                                 }}
                                 target="_blank"
-                                href="https://github.com/riktenx/loot-filters"
+                                href="https://runelite.net/plugin-hub/show/loot-filters"
                             >
                                 RuneLite Loot Filters
                             </Link>
