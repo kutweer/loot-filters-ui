@@ -811,7 +811,7 @@ export const DisplayConfigurationInput: React.FC<{
                                             lineHeight: 1.0,
                                         }}
                                     >
-                                        Place your sound files in
+                                        Place your sound files (must be .wav) in
                                         <br />
                                         .runelite/loot-filters/sounds
                                     </Typography>
