@@ -216,7 +216,6 @@ export const NewFilterPage: React.FC = () => {
                         </CardContent>
                         <CardActions>
                             <Button
-                                size="small"
                                 onClick={(e) => {
                                     setShowURLImportOptions(true)
                                 }}
@@ -250,7 +249,6 @@ export const NewFilterPage: React.FC = () => {
                         </CardContent>
                         <CardActions>
                             <Button
-                                size="small"
                                 onClick={(e) => {
                                     const id = generateId()
                                     updateFilter(
