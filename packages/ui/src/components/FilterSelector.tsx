@@ -40,6 +40,7 @@ import {
 import { useAlertStore } from '../store/alerts'
 import { useFilterConfigStore } from '../store/filterConfigurationStore'
 import { useFilterStore } from '../store/filterStore'
+import { useOboardingStore } from '../store/onboarding'
 import { colors } from '../styles/MuiTheme'
 import { countConfigChanges } from '../utils/configUtils'
 import { downloadFile } from '../utils/file'
@@ -49,6 +50,8 @@ import { loadFilterFromUrl } from '../utils/loaderv2'
 import { renderFilter } from '../utils/render'
 import { Option, UISelect } from './inputs/UISelect'
 import { SmartTooltip } from './SmartTooltip'
+
+import ImportRuneliteGif from '../images/import_runelite.gif'
 
 const updateAvailableFn = (
     activeFilter?: Filter | null,
@@ -177,6 +180,8 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
 }) => {
     const navigate = useNavigate()
 
+    const { disableExportDialog, setDisableExportDialog } = useOboardingStore()
+
     const { filters, removeFilter, setActiveFilter, updateFilter } =
         useFilterStore()
 
@@ -184,6 +189,7 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
         useFilterConfigStore()
 
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+    const [exportDialogOpen, setExportDialogOpen] = useState(false)
 
     const activeFilter = useMemo(
         () => Object.values(filters).find((filter) => filter.active),
@@ -293,10 +299,15 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                     navigator.clipboard
                         .writeText(renderedFilter)
                         .then(() => {
-                            addAlert({
-                                children: 'Filter copied to clipboard',
-                                severity: 'success',
-                            })
+                            if (disableExportDialog) {
+                                addAlert({
+                                    children:
+                                        'Filter copied to clipboard, import it to RuneLite via the Loot Filters plugin panel.',
+                                    severity: 'success',
+                                })
+                            } else {
+                                setExportDialogOpen(true)
+                            }
                         })
                         .catch(() => {
                             addAlert({
@@ -633,6 +644,40 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                         onClick={handleDeleteFilter}
                     >
                         Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                open={exportDialogOpen}
+                onClose={() => setExportDialogOpen(false)}
+            >
+                <DialogTitle>
+                    The filter has been copied to the clipboard.
+                </DialogTitle>
+                <DialogContent>
+                    <Typography color={colors.rsLightestBrown}>
+                        Navigate to the Loot Filters plugin panel in RuneLite
+                        and click the "Import from clipboard" button:
+                    </Typography>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <img src={ImportRuneliteGif} />
+                    </div>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        variant="outlined"
+                        onClick={() => setExportDialogOpen(false)}
+                    >
+                        OK
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        onClick={() => {
+                            setDisableExportDialog(true)
+                            setExportDialogOpen(false)
+                        }}
+                    >
+                        Don't show this again
                     </Button>
                 </DialogActions>
             </Dialog>
