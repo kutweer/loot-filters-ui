@@ -148,6 +148,44 @@ const InputComponent: React.FC<{
     }
 }
 
+const InputGroup: React.FC<{
+    config: FilterConfiguration
+    module: Module
+    inputs: Input[]
+    readonly: boolean
+    onChange: (config: FilterConfiguration) => void
+}> = ({ config, module, inputs, readonly, onChange }) => {
+    const sorted = inputs.sort((a: Input, b: Input) => sizeOf(a) - sizeOf(b))
+    return (
+        <>
+            {sorted.map((input, index) => (
+                <Grid2 key={index} size={sizeOf(input)}>
+                    <InputComponent
+                        config={config}
+                        module={module}
+                        input={input}
+                        readonly={readonly}
+                        persist={(value, macroName) => {
+                            const existing = config.inputConfigs?.[macroName]
+                            const newConf = isObject(value)
+                                ? { ...(existing ?? {}), ...value }
+                                : value
+
+                            onChange({
+                                ...config,
+                                inputConfigs: {
+                                    ...config.inputConfigs,
+                                    [macroName]: newConf,
+                                },
+                            })
+                        }}
+                    />
+                </Grid2>
+            ))}
+        </>
+    )
+}
+
 const sizeOf = (input: Input) => {
     switch (input.type) {
         case 'number':
@@ -395,57 +433,13 @@ const ModuleSection: React.FC<{
                                                 ) : null}
                                             </Divider>
                                         </Grid2>
-                                        {inputs
-                                            .sort(
-                                                (a: Input, b: Input) =>
-                                                    sizeOf(a) - sizeOf(b)
-                                            )
-                                            .map((input, index) => {
-                                                return (
-                                                    <Grid2
-                                                        key={index}
-                                                        size={sizeOf(input)}
-                                                    >
-                                                        <InputComponent
-                                                            config={config}
-                                                            module={module}
-                                                            input={input}
-                                                            readonly={readonly}
-                                                            persist={(
-                                                                value,
-                                                                macroName
-                                                            ) => {
-                                                                const existingValue =
-                                                                    config
-                                                                        .inputConfigs?.[
-                                                                        macroName
-                                                                    ]
-
-                                                                const newConf =
-                                                                    isObject(
-                                                                        value
-                                                                    )
-                                                                        ? {
-                                                                              ...(existingValue ??
-                                                                                  {}),
-                                                                              ...value,
-                                                                          }
-                                                                        : value
-
-                                                                onChange({
-                                                                    ...config,
-                                                                    inputConfigs:
-                                                                        {
-                                                                            ...config.inputConfigs,
-                                                                            [macroName]:
-                                                                                newConf,
-                                                                        },
-                                                                })
-                                                            }}
-                                                        />
-                                                    </Grid2>
-                                                )
-                                            })}
+                                        <InputGroup
+                                            config={config}
+                                            module={module}
+                                            inputs={inputs}
+                                            readonly={readonly}
+                                            onChange={onChange}
+                                        />
                                     </Grid2>
                                 )
                             }
