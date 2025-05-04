@@ -3,7 +3,9 @@ import { devtools, persist } from 'zustand/middleware'
 
 interface OnboardingStoreState {
     onboardingComplete: boolean
+    disableExportDialog: boolean
     setOnboardingComplete: (onboardingComplete: boolean) => void
+    setDisableExportDialog: (disable: boolean) => void
 }
 
 export const useOboardingStore = create<OnboardingStoreState>()(
@@ -11,8 +13,11 @@ export const useOboardingStore = create<OnboardingStoreState>()(
         persist(
             (set) => ({
                 onboardingComplete: false,
+                disableExportDialog: false,
                 setOnboardingComplete: (onboardingComplete) =>
-                    set((state) => ({ onboardingComplete })),
+                    set((_) => ({ onboardingComplete })),
+                setDisableExportDialog: (disableExportDialog) =>
+                    set((_) => ({ disableExportDialog })),
             }),
             {
                 name: 'onboarding-complete',
