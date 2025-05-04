@@ -655,7 +655,7 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                     The filter has been copied to the clipboard.
                 </DialogTitle>
                 <DialogContent>
-                    <Typography>
+                    <Typography color={colors.rsLightestBrown}>
                         Navigate to the Loot Filters plugin panel in RuneLite
                         and click the "Import from clipboard" button:
                     </Typography>
