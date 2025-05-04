@@ -26,11 +26,11 @@ export const NumberInputComponent: React.FC<{
             </Typography>
             <TextField
                 disabled={readonly}
-                type="number"
-                value={currentSetting}
+                type="text"
+                value={(currentSetting || 0).toLocaleString('en-us')}
                 onChange={(event) => {
                     const value = event.target.value
-                    onChange(parseInt(value))
+                    onChange(parseInt(value.replaceAll(',', '')))
                 }}
             />
         </div>
