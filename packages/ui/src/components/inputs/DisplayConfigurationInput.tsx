@@ -34,18 +34,6 @@ import { ColorPickerInput } from './ColorPicker'
 import { CopyInputSettings } from './CopyInputSettings'
 import { UISelect } from './UISelect'
 
-const parseSoundInput = (value: string): string | number | undefined => {
-    if (value.length === 0) {
-        return undefined
-    }
-    for (const ch of value) {
-        if (ch < '0' || ch > '9') {
-            return value
-        }
-    }
-    return parseInt(value)
-}
-
 const Column: React.FC<{
     children: React.ReactNode[] | React.ReactNode
 }> = ({ children }) => {
@@ -288,15 +276,42 @@ export const DisplayConfigurationInput: React.FC<{
         />
     )
 
+    const soundFile = styleConfig?.sound ?? input.default?.sound ?? ''
     const soundFileInput = (
         <TextField
             sx={{ minWidth: '12rem' }}
             disabled={readonly}
             placeholder="Filename"
-            value={styleConfig?.sound ?? input.default?.sound ?? ''}
+            value={soundFile}
             onChange={(e) => onChange({ sound: e.target.value })}
         />
     )
+    const soundFileHelpText =
+        typeof soundFile === 'string' && soundFile.endsWith('.wav') ? (
+            <Typography
+                variant="caption"
+                color={colors.rsDarkOrange}
+                sx={{
+                    textWrap: 'nowrap',
+                    lineHeight: 1.0,
+                }}
+            >
+                Place your sound files (must be .wav) in
+                <br />
+                .runelite/loot-filters/sounds
+            </Typography>
+        ) : (
+            <Typography
+                variant="caption"
+                color={colors.rsLightRed}
+                sx={{
+                    textWrap: 'nowrap',
+                    lineHeight: 1.0,
+                }}
+            >
+                Sound file must be a WAV (ends in .wav)
+            </Typography>
+        )
 
     const textColorInput = (
         <ColorPickerInput
@@ -802,20 +817,7 @@ export const DisplayConfigurationInput: React.FC<{
                                 </Grid2>
                             )}
                             {soundType === 'fromfile' && (
-                                <Grid2 size={1}>
-                                    <Typography
-                                        variant="caption"
-                                        color={colors.rsDarkOrange}
-                                        sx={{
-                                            textWrap: 'nowrap',
-                                            lineHeight: 1.0,
-                                        }}
-                                    >
-                                        Place your sound files (must be .wav) in
-                                        <br />
-                                        .runelite/loot-filters/sounds
-                                    </Typography>
-                                </Grid2>
+                                <Grid2 size={1}>{soundFileHelpText}</Grid2>
                             )}
                         </Row>
                         <Row>
