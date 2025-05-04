@@ -180,6 +180,8 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
 }) => {
     const navigate = useNavigate()
 
+    const { disableExportDialog, setDisableExportDialog } = useOboardingStore()
+
     const { filters, removeFilter, setActiveFilter, updateFilter } =
         useFilterStore()
 
@@ -549,8 +551,6 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
     if (Object.keys(filters).length === 0) {
         return <Navigate to="/new-filter" />
     }
-
-    const { disableExportDialog, setDisableExportDialog } = useOboardingStore()
 
     return (
         <>
