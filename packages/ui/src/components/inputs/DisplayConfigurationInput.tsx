@@ -616,6 +616,7 @@ export const DisplayConfigurationInput: React.FC<{
                                                 style={{
                                                     color: colors.rsDarkYellow,
                                                 }}
+                                                target="_blank"
                                                 href="https://chisel.weirdgloop.org/moid/"
                                             >
                                                 this tool
@@ -660,6 +661,7 @@ export const DisplayConfigurationInput: React.FC<{
                                                 style={{
                                                     color: colors.rsDarkYellow,
                                                 }}
+                                                target="_blank"
                                                 href="https://abextm.github.io/cache2/#/viewer/sprite/"
                                             >
                                                 this tool
