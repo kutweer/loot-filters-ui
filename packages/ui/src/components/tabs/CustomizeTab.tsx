@@ -42,7 +42,6 @@ import {
 import { useFilterConfigStore } from '../../store/filterConfigurationStore'
 import { useFilterStore } from '../../store/filterStore'
 import { countConfigChanges } from '../../utils/configUtils'
-import { generateId } from '../../utils/idgen'
 import { BackgroundSelector } from '../BackgroundSelector'
 import { GitHubFlavoredMarkdown } from '../GitHubFlavoredMarkdown'
 import { BooleanInputComponent } from '../inputs/BooleanInputComponent'
@@ -52,6 +51,8 @@ import { NumberInputComponent } from '../inputs/NumberInputComponent'
 import { StringListInputComponent } from '../inputs/StringListInputComponent'
 import { TextInputComponent } from '../inputs/TextInputComponent'
 import { ItemLabelPreview } from '../Previews'
+
+const MAX_GROUPCOUNT_AUTOEXPAND = 3
 
 const InputComponent: React.FC<{
     config: FilterConfiguration
@@ -149,15 +150,16 @@ const InputComponent: React.FC<{
 }
 
 const InputGroup: React.FC<{
+    key: number
     config: FilterConfiguration
     module: Module
     inputs: Input[]
     readonly: boolean
     onChange: (config: FilterConfiguration) => void
-}> = ({ config, module, inputs, readonly, onChange }) => {
+}> = ({ key, config, module, inputs, readonly, onChange }) => {
     const sorted = inputs.sort((a: Input, b: Input) => sizeOf(a) - sizeOf(b))
     return (
-        <>
+        <Grid2 key={key} container spacing={2}>
             {sorted.map((input, index) => (
                 <Grid2 key={index} size={sizeOf(input)}>
                     <InputComponent
@@ -182,7 +184,7 @@ const InputGroup: React.FC<{
                     />
                 </Grid2>
             ))}
-        </>
+        </Grid2>
     )
 }
 
@@ -258,15 +260,18 @@ const ModuleSection: React.FC<{
     setEnabledModule,
     showSettings,
 }) => {
-    const defaultGroupId = generateId()
-
     const groupedInputs = groupBy(
         module.inputs.map((input) => ({
             ...input,
-            group: input.group ?? defaultGroupId,
+            group: input.group ?? '',
         })),
         'group'
     )
+
+    const defaultGroup = groupedInputs[''] || []
+    delete groupedInputs['']
+
+    const groupCount = Object.keys(groupedInputs).length
 
     const moduleEnabledDefaultValue = module.enabled
 
@@ -417,30 +422,55 @@ const ModuleSection: React.FC<{
                                 gfmd={module.description ?? ''}
                             />
                         </Stack>
+                        <InputGroup
+                            key={-1}
+                            config={config}
+                            module={module}
+                            inputs={defaultGroup}
+                            readonly={readonly}
+                            onChange={onChange}
+                        />
                         {Object.entries(groupedInputs).map(
                             ([group, inputs], index) => {
                                 return (
-                                    <Grid2 key={index} container spacing={2}>
-                                        <Grid2 size={12}>
-                                            <Divider>
-                                                {group !== defaultGroupId ? (
-                                                    <Typography
-                                                        variant="h6"
-                                                        color="primary"
-                                                    >
-                                                        {group}
-                                                    </Typography>
-                                                ) : null}
-                                            </Divider>
-                                        </Grid2>
-                                        <InputGroup
-                                            config={config}
-                                            module={module}
-                                            inputs={inputs}
-                                            readonly={readonly}
-                                            onChange={onChange}
-                                        />
-                                    </Grid2>
+                                    <Accordion
+                                        disableGutters={true}
+                                        defaultExpanded={
+                                            groupCount <=
+                                            MAX_GROUPCOUNT_AUTOEXPAND
+                                        }
+                                        sx={{
+                                            '::before': { display: 'none' },
+                                        }}
+                                    >
+                                        <AccordionSummary
+                                            component="div"
+                                            expandIcon={<ExpandMore />}
+                                            sx={{
+                                                flexDirection: 'row-reverse',
+                                                backgroundColor:
+                                                    colors.rsLighterBrown,
+                                            }}
+                                        >
+                                            <Typography>{group}</Typography>
+                                        </AccordionSummary>
+                                        <AccordionDetails
+                                            sx={{
+                                                border: 2,
+                                                borderColor:
+                                                    colors.rsLighterBrown,
+                                            }}
+                                        >
+                                            <InputGroup
+                                                key={index}
+                                                config={config}
+                                                module={module}
+                                                inputs={inputs}
+                                                readonly={readonly}
+                                                onChange={onChange}
+                                            />
+                                        </AccordionDetails>
+                                    </Accordion>
                                 )
                             }
                         )}
