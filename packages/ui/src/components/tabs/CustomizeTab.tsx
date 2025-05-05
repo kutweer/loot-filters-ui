@@ -4,7 +4,6 @@ import {
     AccordionDetails,
     AccordionSummary,
     Badge,
-    Divider,
     Grid2,
     IconButton,
     Menu,
@@ -432,6 +431,11 @@ const ModuleSection: React.FC<{
                         />
                         {Object.entries(groupedInputs).map(
                             ([group, inputs], index) => {
+                                const groupName = group || 'Default Group'
+                                const groupDescription = module.groups.find(
+                                    (g) => g.name === groupName
+                                )?.description
+
                                 return (
                                     <Accordion
                                         disableGutters={true}
@@ -461,6 +465,9 @@ const ModuleSection: React.FC<{
                                                     colors.rsLighterBrown,
                                             }}
                                         >
+                                            <GitHubFlavoredMarkdown
+                                                gfmd={groupDescription ?? ''}
+                                            />
                                             <InputGroup
                                                 key={index}
                                                 config={config}

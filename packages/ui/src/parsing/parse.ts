@@ -1,6 +1,7 @@
 import { generateId } from '../utils/idgen'
 import { Filter, FilterSpec, Module } from './UiTypesSpec'
 import { Lexer } from './lexer'
+import { parseGroup } from './parseGroup'
 import { parseInput } from './parseInput'
 import { parseModule } from './parseModule'
 import { parseMetaDescription, parseMetaName } from './rs2fParser'
@@ -10,6 +11,10 @@ import { TokenStream } from './tokenstream'
 const isModuleDeclaration = (token: Token) =>
     token.type === TokenType.COMMENT &&
     token.value.startsWith('/*@ define:module')
+
+const isGroupDeclaration = (token: Token) =>
+    token.type === TokenType.COMMENT &&
+    token.value.startsWith('/*@ define:group')
 
 const isInputDeclaration = (token: Token) =>
     token.type === TokenType.COMMENT &&
@@ -99,6 +104,11 @@ export const parse = (
                 modulesById[decl.id] = parseModule(decl.id, next.value)
 
                 modulesById[currentModule].rs2f += next.value
+            } else if (isGroupDeclaration(next)) {
+                const group = parseGroup(next.value)
+
+                const module = modulesById[currentModule]
+                module.groups.push(group)
             } else if (isInputDeclaration(next)) {
                 // define MUST come after the input declaration
                 if (
