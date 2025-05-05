@@ -1,6 +1,7 @@
 import { generateId } from '../utils/idgen'
 import { Filter, FilterSpec, Module } from './UiTypesSpec'
 import { Lexer } from './lexer'
+import { parseGroup } from './parseGroup'
 import { parseInput } from './parseInput'
 import { parseModule } from './parseModule'
 import { parseMetaDescription, parseMetaName } from './rs2fParser'
@@ -11,11 +12,26 @@ const isModuleDeclaration = (token: Token) =>
     token.type === TokenType.COMMENT &&
     token.value.startsWith('/*@ define:module')
 
+const isGroupDeclaration = (token: Token) =>
+    token.type === TokenType.COMMENT &&
+    token.value.startsWith('/*@ define:group')
+
 const isInputDeclaration = (token: Token) =>
     token.type === TokenType.COMMENT &&
     token.value.startsWith('/*@ define:input')
 
 const parseModuleDeclaration = (line: string) => {
+    const match = line.match(/\/\*@ define:([a-z]+):([a-z0-9_]+)/)
+    if (!match) {
+        throw new Error(`Unparseable declaration at '${line}'`)
+    }
+    return {
+        type: match[1],
+        id: match[2],
+    }
+}
+
+const parseGroupDeclaration = (line: string) => {
     const match = line.match(/\/\*@ define:([a-z]+):([a-z0-9_]+)/)
     if (!match) {
         throw new Error(`Unparseable declaration at '${line}'`)
@@ -99,6 +115,12 @@ export const parse = (
                 modulesById[decl.id] = parseModule(decl.id, next.value)
 
                 modulesById[currentModule].rs2f += next.value
+            } else if (isGroupDeclaration(next)) {
+                const decl = parseGroupDeclaration(next.value)
+                const group = parseGroup(decl.id, next.value)
+
+                const module = modulesById[currentModule]
+                module.groups.push(group)
             } else if (isInputDeclaration(next)) {
                 // define MUST come after the input declaration
                 if (
