@@ -31,17 +31,6 @@ const parseModuleDeclaration = (line: string) => {
     }
 }
 
-const parseGroupDeclaration = (line: string) => {
-    const match = line.match(/\/\*@ define:([a-z]+):([a-z0-9_]+)/)
-    if (!match) {
-        throw new Error(`Unparseable declaration at '${line}'`)
-    }
-    return {
-        type: match[1],
-        id: match[2],
-    }
-}
-
 export type ParseResult = {
     errors?: Array<{ line: string; error: Error }>
     filter?: Filter
@@ -116,7 +105,6 @@ export const parse = (
 
                 modulesById[currentModule].rs2f += next.value
             } else if (isGroupDeclaration(next)) {
-                const decl = parseGroupDeclaration(next.value)
                 const group = parseGroup(next.value)
 
                 const module = modulesById[currentModule]
