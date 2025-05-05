@@ -1,16 +1,11 @@
 import { parse as parseYaml } from 'yaml'
-import { GroupSpec as FilterSpecGroup } from './FilterTypesSpec'
-import { Group, GroupSpec } from './UiTypesSpec'
+import { Group, GroupSpec } from './FilterTypesSpec'
 
-export const parseGroup = (groupId: string, comment: string): Group => {
+export const parseGroup = (comment: string): Group => {
     const declarationContent = comment.substring(
         comment.indexOf('\n'), // chop the structured declaration
         comment.indexOf('*/')
     )
     const group = parseYaml(declarationContent)
-    return GroupSpec.parse({
-        ...FilterSpecGroup.parse(group),
-        id: groupId,
-        rs2f: '',
-    })
+    return GroupSpec.parse(group)
 }

@@ -1,9 +1,9 @@
 import { z } from 'zod'
 import { backgroundImages } from '../types/Images'
 import {
-    GroupSpec as FilterSpecGroup,
     InputSpec as FilterSpecInput,
     ModuleSpec as FilterSpecModule,
+    GroupSpec,
 } from './FilterTypesSpec'
 
 export const InputSpec = FilterSpecInput.extend({
@@ -12,13 +12,6 @@ export const InputSpec = FilterSpecInput.extend({
 }).catchall(z.any())
 
 export type Input = z.infer<typeof InputSpec>
-
-export const GroupSpec = FilterSpecGroup.extend({
-    id: z.string().nonempty(),
-    rs2f: z.string(),
-})
-
-export type Group = z.infer<typeof GroupSpec>
 
 export const ModuleSpec = FilterSpecModule.extend({
     id: z.string().nonempty(),

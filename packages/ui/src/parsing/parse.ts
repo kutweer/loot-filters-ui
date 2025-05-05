@@ -117,7 +117,7 @@ export const parse = (
                 modulesById[currentModule].rs2f += next.value
             } else if (isGroupDeclaration(next)) {
                 const decl = parseGroupDeclaration(next.value)
-                const group = parseGroup(decl.id, next.value)
+                const group = parseGroup(next.value)
 
                 const module = modulesById[currentModule]
                 module.groups.push(group)
