@@ -435,13 +435,17 @@ const ModuleSection: React.FC<{
                                 const groupDescription = module.groups.find(
                                     (g) => g.name === groupName
                                 )?.description
+                                const groupExpanded = module.groups.find(
+                                    (g) => g.name === groupName
+                                )?.expanded
 
                                 return (
                                     <Accordion
                                         disableGutters={true}
                                         defaultExpanded={
+                                            groupExpanded ??
                                             groupCount <=
-                                            MAX_GROUPCOUNT_AUTOEXPAND
+                                                MAX_GROUPCOUNT_AUTOEXPAND
                                         }
                                         sx={{
                                             '::before': { display: 'none' },
