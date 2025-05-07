@@ -49,7 +49,7 @@ export const useFilterStore = create<FilterStoreState>()(
             },
             {
                 name: 'filter-store',
-                version: 3,
+                version: 4,
                 migrate: async (state: unknown, version: number) => {
                     return await migrateFilterStore(
                         state as FilterStoreState,
