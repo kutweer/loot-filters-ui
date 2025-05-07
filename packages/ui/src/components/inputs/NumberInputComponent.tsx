@@ -30,7 +30,7 @@ export const NumberInputComponent: React.FC<{
                 value={(currentSetting || 0).toLocaleString('en-us')}
                 onChange={(event) => {
                     const value = event.target.value
-                    onChange(parseInt(value.replaceAll(',', '')))
+                    onChange(parseInt(value.replaceAll(',', '')) || 0)
                 }}
             />
         </div>
