@@ -15,6 +15,10 @@ export const migrateFilterStore = async (
     if (version < 3) {
         await toV3(updated)
     }
+
+    if (version < 4) {
+        await toV4(updated)
+    }
     return updated
 }
 
@@ -45,6 +49,42 @@ const toV2 = (state: FilterStoreState) => {
  * We moved back to having the rs2f stored on each module (though the whole thing also remains on the filter)
  */
 const toV3 = async (state: FilterStoreState) => {
+    const updatedFilters = await Promise.all(
+        Object.values(state.filters).map(async (filter: Filter) => {
+            const parsed = await parse(filter.rs2f, true)
+
+            if (parsed.errors) {
+                console.error(parsed.errors)
+                throw Error('Error parsing filter during migration')
+            }
+
+            const updatedFilter = { ...parsed.filter!! }
+
+            // Preserve certain fields off the original
+            // Ensures configurations still map correctly
+            updatedFilter.id = filter.id
+            // User can edit these
+            updatedFilter.active = filter.active
+            updatedFilter.name = filter.name
+            updatedFilter.description = filter.description
+
+            // We parsed from raw text- no url; so copy over source & date
+            updatedFilter.source = filter.source
+            updatedFilter.importedOn = filter.importedOn
+            // preserve original hash so that we don't immediately re-check for an
+            //  update for a filter that doesn't start with a module declaration.
+            updatedFilter.rs2fHash = filter.rs2fHash
+
+            return updatedFilter
+        })
+    )
+
+    state.filters = Object.fromEntries(
+        updatedFilters.map((filter) => [filter.id, filter])
+    )
+}
+
+const toV4 = async (state: FilterStoreState) => {
     const updatedFilters = await Promise.all(
         Object.values(state.filters).map(async (filter: Filter) => {
             const parsed = await parse(filter.rs2f, true)

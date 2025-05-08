@@ -3,6 +3,7 @@ import { backgroundImages } from '../types/Images'
 import {
     InputSpec as FilterSpecInput,
     ModuleSpec as FilterSpecModule,
+    GroupSpec,
 } from './FilterTypesSpec'
 
 export const InputSpec = FilterSpecInput.extend({
@@ -15,6 +16,7 @@ export type Input = z.infer<typeof InputSpec>
 export const ModuleSpec = FilterSpecModule.extend({
     id: z.string().nonempty(),
     inputs: z.array(InputSpec).default([]),
+    groups: z.array(GroupSpec).default([]),
     rs2f: z.string(),
 })
 

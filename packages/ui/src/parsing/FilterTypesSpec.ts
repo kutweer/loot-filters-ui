@@ -10,6 +10,14 @@ export const ModuleSpec = z.object({
 
 export type Module = z.infer<typeof ModuleSpec>
 
+export const GroupSpec = z.object({
+    name: z.string().nonempty(),
+    description: z.string().optional(),
+    expanded: z.boolean().optional(),
+})
+
+export type Group = z.infer<typeof GroupSpec>
+
 export const InputSpec = z
     .object({
         type: z.enum([

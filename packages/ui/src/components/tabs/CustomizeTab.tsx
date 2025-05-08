@@ -4,7 +4,6 @@ import {
     AccordionDetails,
     AccordionSummary,
     Badge,
-    Divider,
     Grid2,
     IconButton,
     Menu,
@@ -42,7 +41,6 @@ import {
 import { useFilterConfigStore } from '../../store/filterConfigurationStore'
 import { useFilterStore } from '../../store/filterStore'
 import { countConfigChanges } from '../../utils/configUtils'
-import { generateId } from '../../utils/idgen'
 import { BackgroundSelector } from '../BackgroundSelector'
 import { GitHubFlavoredMarkdown } from '../GitHubFlavoredMarkdown'
 import { BooleanInputComponent } from '../inputs/BooleanInputComponent'
@@ -52,6 +50,8 @@ import { NumberInputComponent } from '../inputs/NumberInputComponent'
 import { StringListInputComponent } from '../inputs/StringListInputComponent'
 import { TextInputComponent } from '../inputs/TextInputComponent'
 import { ItemLabelPreview } from '../Previews'
+
+const MAX_GROUPCOUNT_AUTOEXPAND = 3
 
 const InputComponent: React.FC<{
     config: FilterConfiguration
@@ -148,6 +148,45 @@ const InputComponent: React.FC<{
     }
 }
 
+const InputGroup: React.FC<{
+    key: number
+    config: FilterConfiguration
+    module: Module
+    inputs: Input[]
+    readonly: boolean
+    onChange: (config: FilterConfiguration) => void
+}> = ({ key, config, module, inputs, readonly, onChange }) => {
+    const sorted = inputs.sort((a: Input, b: Input) => sizeOf(a) - sizeOf(b))
+    return (
+        <Grid2 key={key} container spacing={2}>
+            {sorted.map((input, index) => (
+                <Grid2 key={index} size={sizeOf(input)}>
+                    <InputComponent
+                        config={config}
+                        module={module}
+                        input={input}
+                        readonly={readonly}
+                        persist={(value, macroName) => {
+                            const existing = config.inputConfigs?.[macroName]
+                            const newConf = isObject(value)
+                                ? { ...(existing ?? {}), ...value }
+                                : value
+
+                            onChange({
+                                ...config,
+                                inputConfigs: {
+                                    ...config.inputConfigs,
+                                    [macroName]: newConf,
+                                },
+                            })
+                        }}
+                    />
+                </Grid2>
+            ))}
+        </Grid2>
+    )
+}
+
 const sizeOf = (input: Input) => {
     switch (input.type) {
         case 'number':
@@ -220,15 +259,18 @@ const ModuleSection: React.FC<{
     setEnabledModule,
     showSettings,
 }) => {
-    const defaultGroupId = generateId()
-
     const groupedInputs = groupBy(
         module.inputs.map((input) => ({
             ...input,
-            group: input.group ?? defaultGroupId,
+            group: input.group ?? '',
         })),
         'group'
     )
+
+    const defaultGroup = groupedInputs[''] || []
+    delete groupedInputs['']
+
+    const groupCount = Object.keys(groupedInputs).length
 
     const moduleEnabledDefaultValue = module.enabled
 
@@ -379,74 +421,67 @@ const ModuleSection: React.FC<{
                                 gfmd={module.description ?? ''}
                             />
                         </Stack>
+                        <InputGroup
+                            key={-1}
+                            config={config}
+                            module={module}
+                            inputs={defaultGroup}
+                            readonly={readonly}
+                            onChange={onChange}
+                        />
                         {Object.entries(groupedInputs).map(
                             ([group, inputs], index) => {
+                                const groupName = group || 'Default Group'
+                                const groupDescription = module.groups.find(
+                                    (g) => g.name === groupName
+                                )?.description
+                                const groupExpanded = module.groups.find(
+                                    (g) => g.name === groupName
+                                )?.expanded
+
                                 return (
-                                    <Grid2 key={index} container spacing={2}>
-                                        <Grid2 size={12}>
-                                            <Divider>
-                                                {group !== defaultGroupId ? (
-                                                    <Typography
-                                                        variant="h6"
-                                                        color="primary"
-                                                    >
-                                                        {group}
-                                                    </Typography>
-                                                ) : null}
-                                            </Divider>
-                                        </Grid2>
-                                        {inputs
-                                            .sort(
-                                                (a: Input, b: Input) =>
-                                                    sizeOf(a) - sizeOf(b)
-                                            )
-                                            .map((input, index) => {
-                                                return (
-                                                    <Grid2
-                                                        key={index}
-                                                        size={sizeOf(input)}
-                                                    >
-                                                        <InputComponent
-                                                            config={config}
-                                                            module={module}
-                                                            input={input}
-                                                            readonly={readonly}
-                                                            persist={(
-                                                                value,
-                                                                macroName
-                                                            ) => {
-                                                                const existingValue =
-                                                                    config
-                                                                        .inputConfigs?.[
-                                                                        macroName
-                                                                    ]
-
-                                                                const newConf =
-                                                                    isObject(
-                                                                        value
-                                                                    )
-                                                                        ? {
-                                                                              ...(existingValue ??
-                                                                                  {}),
-                                                                              ...value,
-                                                                          }
-                                                                        : value
-
-                                                                onChange({
-                                                                    ...config,
-                                                                    inputConfigs:
-                                                                        {
-                                                                            ...config.inputConfigs,
-                                                                            [macroName]:
-                                                                                newConf,
-                                                                        },
-                                                                })
-                                                            }}
-                                                        />
-                                                    </Grid2>
-                                                )
-                                            })}
-                                    </Grid2>
+                                    <Accordion
+                                        disableGutters={true}
+                                        defaultExpanded={
+                                            groupExpanded ??
+                                            groupCount <=
+                                                MAX_GROUPCOUNT_AUTOEXPAND
+                                        }
+                                        sx={{
+                                            '::before': { display: 'none' },
+                                        }}
+                                    >
+                                        <AccordionSummary
+                                            component="div"
+                                            expandIcon={<ExpandMore />}
+                                            sx={{
+                                                flexDirection: 'row-reverse',
+                                                backgroundColor:
+                                                    colors.rsLighterBrown,
+                                            }}
+                                        >
+                                            <Typography>{group}</Typography>
+                                        </AccordionSummary>
+                                        <AccordionDetails
+                                            sx={{
+                                                border: 2,
+                                                borderColor:
+                                                    colors.rsLighterBrown,
+                                            }}
+                                        >
+                                            <GitHubFlavoredMarkdown
+                                                gfmd={groupDescription ?? ''}
+                                            />
+                                            <InputGroup
+                                                key={index}
+                                                config={config}
+                                                module={module}
+                                                inputs={inputs}
+                                                readonly={readonly}
+                                                onChange={onChange}
+                                            />
+                                        </AccordionDetails>
+                                    </Accordion>
                                 )
                             }
                         )}
