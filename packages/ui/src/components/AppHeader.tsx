@@ -50,6 +50,14 @@ export const AppHeader: React.FC = () => {
                         to="/help"
                         component={RouterLink}
                     />
+                    {buildInfo.gitSha === 'main' && (
+                        <Tab
+                            label="Debug"
+                            value="/debug"
+                            to="/debug"
+                            component={RouterLink}
+                        />
+                    )}
                 </Tabs>
                 <Button color="secondary">
                     <Link
