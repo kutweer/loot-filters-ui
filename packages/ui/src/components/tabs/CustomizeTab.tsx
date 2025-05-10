@@ -318,29 +318,6 @@ const ModuleSection: React.FC<{
 
     const showPreviews = useMediaQuery(MuiRsTheme.breakpoints.up('sm'))
     const previews = getPreviews({ module })
-    const groupedPreviews = Object.entries(groupedInputs).map(
-        ([groupName, inputs]) => {
-            const groupPreviews = getPreviewsForGroup({
-                module,
-                groupName,
-            })
-            return (
-                <Stack
-                    key={groupName}
-                    direction="row"
-                    sx={{
-                        flex: '1',
-                        flexWrap: 'wrap',
-                        justifyContent: 'flex-end',
-                        gap: '8px',
-                        alignItems: 'center',
-                    }}
-                >
-                    {groupPreviews}
-                </Stack>
-            )
-        }
-    )
 
     const moduleMacronames = module.inputs.map((input) => input.macroName)
 
