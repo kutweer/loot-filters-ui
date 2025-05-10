@@ -507,23 +507,18 @@ const ModuleSection: React.FC<{
                                             >
                                                 {group}
                                             </Typography>
-                                            {showPreviews &&
-                                                groupPreviews.length > 0 && (
-                                                    <Stack
-                                                        direction="row"
-                                                        sx={{
-                                                            flex: '1',
-                                                            flexWrap: 'wrap',
-                                                            justifyContent:
-                                                                'flex-end',
-                                                            gap: '8px',
-                                                            alignItems:
-                                                                'center',
-                                                        }}
-                                                    >
-                                                        {groupPreviews}
-                                                    </Stack>
-                                                )}
+                                            <Stack
+                                                direction="row"
+                                                sx={{
+                                                    flex: '1',
+                                                    flexWrap: 'wrap',
+                                                    justifyContent: 'flex-end',
+                                                    gap: '8px',
+                                                    alignItems: 'center',
+                                                }}
+                                            >
+                                                {groupPreviews}
+                                            </Stack>
                                         </AccordionSummary>
                                         <AccordionDetails
                                             sx={{
