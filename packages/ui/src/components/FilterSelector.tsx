@@ -278,6 +278,7 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                 sx={{
                     color: colors.rsHerbGreen,
                     borderColor: colors.rsHerbGreen,
+                    backgroundColor: colors.rsDarkBrown,
                 }}
                 disabled={!activeFilter}
                 onClick={() => {
@@ -310,7 +311,7 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                 }}
             >
                 <ContentCopyIcon />
-                Import to RuneLite
+                Export to RuneLite
             </Button>
         </SmartTooltip>
     )
