@@ -368,7 +368,8 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
             enabled={activeFilter?.source != null}
         >
             <span>
-                <IconButton
+                <Button
+                    variant="outlined"
                     disabled={!activeFilter || !activeFilter.source}
                     onClick={() => {
                         if (!activeFilter) {
@@ -412,7 +413,8 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                                 : colors.rsGrey,
                         }}
                     />
-                </IconButton>
+                    Share
+                </Button>
             </span>
         </SmartTooltip>
     )
