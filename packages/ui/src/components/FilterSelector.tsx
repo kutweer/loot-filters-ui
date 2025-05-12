@@ -1,6 +1,5 @@
 import {
     Edit,
-    FiberNew,
     FileCopy,
     IosShare,
     Update,
@@ -25,19 +24,18 @@ import {
     Menu,
     MenuItem,
     Stack,
-    Tooltip,
     Typography,
 } from '@mui/material'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
+import { BackgroundSelector } from '../components/BackgroundSelector'
 import {
     DEFAULT_FILTER_CONFIGURATION,
     Filter,
     FilterConfigurationSpec,
     FilterId,
 } from '../parsing/UiTypesSpec'
-import { BackgroundSelector } from '../components/BackgroundSelector'
 import { useAlertStore } from '../store/alerts'
 import { useFilterConfigStore } from '../store/filterConfigurationStore'
 import { useFilterStore } from '../store/filterStore'
@@ -310,7 +308,9 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                         })
                 }}
             >
-                <ContentCopyIcon />
+                <ContentCopyIcon
+                    sx={{ fontSize: '20px', paddingRight: '5px' }}
+                />
                 Export to RuneLite
             </Button>
         </SmartTooltip>
@@ -409,6 +409,8 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                 >
                     <IosShare
                         style={{
+                            fontSize: '20px',
+                            paddingRight: '5px',
                             color: activeFilter?.source
                                 ? colors.rsOrange
                                 : colors.rsGrey,
