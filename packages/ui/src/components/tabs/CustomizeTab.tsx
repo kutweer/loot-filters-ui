@@ -228,6 +228,128 @@ const getPreviews = ({ module }: { module: Module }) => {
     })
 }
 
+const getPreviewsForGroup = ({
+    module,
+    groupName,
+}: {
+    module: Module
+    groupName: string
+}) => {
+    const styleInputs: StyleInput[] = module.inputs.filter(
+        (input) => input.type === 'style' && input.group === groupName
+    ) as StyleInput[]
+
+    const activeFilterId = useFilterStore(
+        (state) =>
+            Object.keys(state.filters).find((id) => state.filters[id].active)!!
+    )
+    const configForModule = useFilterConfigStore(
+        (state) => state.filterConfigurations?.[activeFilterId]?.inputConfigs
+    )
+
+    const visibleStyleInputs = styleInputs.filter((input) => {
+        const config = StyleConfigSpec.optional()
+            .default({})
+            .parse(configForModule?.[input.macroName])
+        return !(config?.hideOverlay ?? input.default?.hideOverlay ?? false)
+    })
+
+    return visibleStyleInputs.slice(0, 4).map((input) => {
+        const macroName = (input as StyleInput).macroName
+        return (
+            <ItemLabelPreview
+                key={macroName}
+                itemName={input.label}
+                input={input}
+            />
+        )
+    })
+}
+
+const ModuleGroup: React.FC<{
+    config: FilterConfiguration
+    group: string
+    groupCount: number
+    index: number
+    inputs: Input[]
+    module: Module
+    readonly: boolean
+    onChange: (config: FilterConfiguration) => void
+}> = ({
+    module,
+    group,
+    readonly,
+    groupCount,
+    inputs,
+    index,
+    config,
+    onChange,
+}) => {
+    const groupName = group || 'Default Group'
+    const groupDescription = module.groups.find(
+        (g) => g.name === groupName
+    )?.description
+    const groupExpanded = module.groups.find(
+        (g) => g.name === groupName
+    )?.expanded
+    const groupPreviews = getPreviewsForGroup({
+        module,
+        groupName,
+    })
+
+    return (
+        <Accordion
+            disableGutters={true}
+            defaultExpanded={
+                groupExpanded ?? groupCount <= MAX_GROUPCOUNT_AUTOEXPAND
+            }
+            sx={{
+                '::before': { display: 'none' },
+            }}
+            slotProps={{ transition: { unmountOnExit: true } }}
+        >
+            <AccordionSummary
+                component="div"
+                expandIcon={<ExpandMore />}
+                sx={{
+                    flexDirection: 'row-reverse',
+                    backgroundColor: colors.rsLighterBrown,
+                }}
+            >
+                <Typography sx={{ alignSelf: 'center' }}>{group}</Typography>
+                <Stack
+                    direction="row"
+                    sx={{
+                        flex: '1',
+                        flexWrap: 'wrap',
+                        justifyContent: 'flex-end',
+                        gap: '8px',
+                        alignItems: 'center',
+                    }}
+                >
+                    {groupPreviews}
+                </Stack>
+            </AccordionSummary>
+            <AccordionDetails
+                sx={{
+                    border: 2,
+                    borderColor: colors.rsLighterBrown,
+                }}
+            >
+                <GitHubFlavoredMarkdown gfmd={groupDescription ?? ''} />
+                <InputGroup
+                    key={index}
+                    config={config}
+                    module={module}
+                    inputs={inputs}
+                    readonly={readonly}
+                    onChange={onChange}
+                />
+            </AccordionDetails>
+        </Accordion>
+    )
+}
+
 const ModuleSection: React.FC<{
     activeFilterId: FilterId
     expanded: boolean
@@ -426,60 +548,19 @@ const ModuleSection: React.FC<{
                             onChange={onChange}
                         />
                         {Object.entries(groupedInputs).map(
-                            ([group, inputs], index) => {
-                                const groupName = group || 'Default Group'
-                                const groupDescription = module.groups.find(
-                                    (g) => g.name === groupName
-                                )?.description
-                                const groupExpanded = module.groups.find(
-                                    (g) => g.name === groupName
-                                )?.expanded
-
-                                return (
-                                    <Accordion
-                                        disableGutters={true}
-                                        defaultExpanded={
-                                            groupExpanded ??
-                                            groupCount <=
-                                                MAX_GROUPCOUNT_AUTOEXPAND
-                                        }
-                                        sx={{
-                                            '::before': { display: 'none' },
-                                        }}
-                                    >
-                                        <AccordionSummary
-                                            component="div"
-                                            expandIcon={<ExpandMore />}
-                                            sx={{
-                                                flexDirection: 'row-reverse',
-                                                backgroundColor:
-                                                    colors.rsLighterBrown,
-                                            }}
-                                        >
-                                            <Typography>{group}</Typography>
-                                        </AccordionSummary>
-                                        <AccordionDetails
-                                            sx={{
-                                                border: 2,
-                                                borderColor:
-                                                    colors.rsLighterBrown,
-                                            }}
-                                        >
-                                            <GitHubFlavoredMarkdown
-                                                gfmd={groupDescription ?? ''}
-                                            />
-                                            <InputGroup
-                                                key={index}
-                                                config={config}
-                                                module={module}
-                                                inputs={inputs}
-                                                readonly={readonly}
-                                                onChange={onChange}
-                                            />
-                                        </AccordionDetails>
-                                    </Accordion>
-                                )
-                            }
+                            ([group, inputs], index) => (
+                                <ModuleGroup
+                                    key={index}
+                                    index={index}
+                                    config={config}
+                                    module={module}
+                                    group={group}
+                                    groupCount={groupCount}
+                                    inputs={inputs}
+                                    readonly={readonly}
+                                    onChange={onChange}
+                                />
+                            )
                         )}
                     </Stack>
                 </AccordionDetails>
