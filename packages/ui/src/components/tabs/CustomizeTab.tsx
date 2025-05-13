@@ -19,6 +19,7 @@ import { colors, MuiRsTheme } from '../../styles/MuiTheme'
 
 import SettingsIcon from '@mui/icons-material/Settings'
 import { useSearchParams } from 'react-router-dom'
+import { getIcon, getSprite } from '../../images/osrs/imageUtils'
 import { parseModules } from '../../parsing/parse'
 import {
     BooleanInput,
@@ -286,12 +287,30 @@ const ModuleGroup: React.FC<{
     onChange,
 }) => {
     const groupName = group || 'Default Group'
-    const groupDescription = module.groups.find(
-        (g) => g.name === groupName
-    )?.description
-    const groupExpanded = module.groups.find(
-        (g) => g.name === groupName
-    )?.expanded
+    const groupConfig = module.groups.find((g) => g.name === groupName)
+    const groupDescription = groupConfig?.description
+    const groupExpanded = groupConfig?.expanded
+    const groupIconConfig = groupConfig?.icon
+    const [groupIcon, setGroupIcon] = useState<HTMLImageElement | undefined>(
+        undefined
+    )
+    useEffect(() => {
+        switch (groupIconConfig?.type) {
+            case 'itemId':
+                getIcon(groupIconConfig.itemId, setGroupIcon)
+                break
+            case 'sprite':
+                getSprite(
+                    groupIconConfig.spriteId ?? 0,
+                    groupIconConfig.spriteIndex ?? 0,
+                    setGroupIcon
+                )
+                break
+            default:
+                break
+        }
+    }, [setGroupIcon, groupIconConfig])
+
     const groupPreviews = getPreviewsForGroup({
         module,
         groupName,
@@ -316,7 +335,29 @@ const ModuleGroup: React.FC<{
                     backgroundColor: colors.rsLighterBrown,
                 }}
             >
-                <Typography sx={{ alignSelf: 'center' }}>{group}</Typography>
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                    }}
+                >
+                    {groupIcon && (
+                        <img
+                            style={{
+                                verticalAlign: 'middle',
+                                width: '36px',
+                                height: '36px',
+                                objectFit: 'contain',
+                            }}
+                            src={groupIcon.src}
+                            alt={groupIcon.name}
+                        />
+                    )}
+                    <Typography sx={{ alignSelf: 'center' }}>
+                        {group}
+                    </Typography>
+                </div>
                 <Stack
                     direction="row"
                     sx={{

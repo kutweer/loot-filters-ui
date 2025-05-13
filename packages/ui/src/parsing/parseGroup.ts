@@ -6,6 +6,6 @@ export const parseGroup = (comment: string): Group => {
         comment.indexOf('\n'), // chop the structured declaration
         comment.indexOf('*/')
     )
-    const group = parseYaml(declarationContent)
-    return GroupSpec.parse(group)
+    const groupYaml = parseYaml(declarationContent)
+    return GroupSpec.parse(groupYaml)
 }

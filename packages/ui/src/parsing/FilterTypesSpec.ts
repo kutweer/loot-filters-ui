@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { IconSpec } from './IconSpec'
 
 export const ModuleSpec = z.object({
     name: z.string().nonempty(),
@@ -12,6 +13,7 @@ export type Module = z.infer<typeof ModuleSpec>
 
 export const GroupSpec = z.object({
     name: z.string().nonempty(),
+    icon: IconSpec.optional(),
     description: z.string().optional(),
     expanded: z.boolean().optional(),
 })

@@ -9,15 +9,15 @@ import { initImages } from './images/osrs/imageUtils'
 import { CustomizeFilterPageBody } from './pages/CustomizeFilterPage'
 import { DebugPage } from './pages/DebugPage'
 import { EditorLoadedFilterPage } from './pages/EditLoadedFilterPage'
-import { ImportPage } from './pages/ImportPage'
 import { HelpPage } from './pages/HelpPage'
+import { ImportPage } from './pages/ImportPage'
+import { NewFilterPage } from './pages/NewFilterPage'
 import { useAlertStore } from './store/alerts'
 import {
     MigrateLegacyData,
     requiresMigration,
 } from './store/migrations/MigrateLegacyData'
 import { MuiRsTheme } from './styles/MuiTheme'
-import { NewFilterPage } from './pages/NewFilterPage'
 
 const Page: React.FC<{
     component?: ReactNode
