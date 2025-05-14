@@ -1,15 +1,14 @@
+import { Icon } from '../parsing/IconSpec'
 import { parseModules } from '../parsing/parse'
 import {
     Filter,
     FilterConfiguration,
-    Icon,
     ListDiff,
     MacroName,
     Module,
     StyleConfig,
 } from '../parsing/UiTypesSpec'
 import { applyDiff, convertOptionsToStrings, EMPTY_DIFF } from './ListDiffUtils'
-
 export const renderFilter = (
     filter: Filter,
     activeConfig: FilterConfiguration | undefined

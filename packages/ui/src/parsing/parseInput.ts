@@ -1,5 +1,6 @@
 import { parse as parseYaml } from 'yaml'
 import { InputSpec as FilterSpecInput } from './FilterTypesSpec'
+import { Icon } from './IconSpec'
 import {
     BooleanInputSpec,
     EnumListInputSpec,
@@ -7,10 +8,9 @@ import {
     InputSpec,
     NumberInputSpec,
     StringListInputSpec,
+    StyleConfig,
     StyleInputSpec,
     TextInputSpec,
-    StyleConfig,
-    Icon,
 } from './UiTypesSpec'
 import { TokenType } from './token'
 import { TokenStream, TokenStreamError } from './tokenstream'
