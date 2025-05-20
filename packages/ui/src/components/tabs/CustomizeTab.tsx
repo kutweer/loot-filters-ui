@@ -38,6 +38,7 @@ import {
 } from '../../parsing/UiTypesSpec'
 import { useFilterConfigStore } from '../../store/filterConfigurationStore'
 import { useFilterStore } from '../../store/filterStore'
+import { useSearchStore } from '../../store/search'
 import { countConfigChanges } from '../../utils/configUtils'
 import { GitHubFlavoredMarkdown } from '../GitHubFlavoredMarkdown'
 import { BooleanInputComponent } from '../inputs/BooleanInputComponent'
@@ -47,6 +48,7 @@ import { NumberInputComponent } from '../inputs/NumberInputComponent'
 import { StringListInputComponent } from '../inputs/StringListInputComponent'
 import { TextInputComponent } from '../inputs/TextInputComponent'
 import { ItemLabelPreview } from '../Previews'
+import { searchModule, GroupSearchResult } from '../../utils/search'
 
 const MAX_GROUPCOUNT_AUTOEXPAND = 3
 
@@ -275,6 +277,7 @@ const ModuleGroup: React.FC<{
     inputs: Input[]
     module: Module
     readonly: boolean
+    searchResult?: GroupSearchResult
     onChange: (config: FilterConfiguration) => void
 }> = ({
     module,
@@ -284,6 +287,7 @@ const ModuleGroup: React.FC<{
     inputs,
     index,
     config,
+    searchResult,
     onChange,
 }) => {
     const groupName = group || 'Default Group'
@@ -316,14 +320,19 @@ const ModuleGroup: React.FC<{
         groupName,
     })
 
+    const searchExpand = searchResult !== undefined && searchResult.nameMatches
+    const searchHide = searchResult !== undefined && !searchResult.nameMatches
+
     return (
         <Accordion
             disableGutters={true}
             defaultExpanded={
-                groupExpanded ?? groupCount <= MAX_GROUPCOUNT_AUTOEXPAND
+                (groupExpanded ?? groupCount <= MAX_GROUPCOUNT_AUTOEXPAND) ||
+                searchExpand
             }
             sx={{
                 '::before': { display: 'none' },
+                display: searchHide ? 'none' : undefined,
             }}
             slotProps={{ transition: { unmountOnExit: true } }}
         >
@@ -445,6 +454,17 @@ const ModuleSection: React.FC<{
     const configCount = countConfigChanges(config, moduleMacronames)
 
     const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
+
+    const { search } = useSearchStore()
+    const searchResult =
+        search.length > 0 ? searchModule(module, search) : undefined
+    const searchMatched =
+        search.length > 0 &&
+        (searchResult?.nameMatches ||
+            Object.values(searchResult?.groups ?? []).some(
+                (result) => result.nameMatches
+            ))
+
     return (
         <>
             <Menu
@@ -492,13 +512,21 @@ const ModuleSection: React.FC<{
             </Menu>
             <Accordion
                 slotProps={{ transition: { unmountOnExit: true } }}
-                expanded={expanded && enabled}
-                onChange={() => setExpanded(!expanded)}
+                expanded={(expanded || searchMatched) && enabled}
+                onChange={() => {
+                    if (!searchMatched) {
+                        setExpanded(!expanded)
+                    }
+                }}
                 sx={{
                     '&::before': {
                         backgroundColor: colors.rsDarkBrown,
                     },
                     filter: !enabled ? 'grayscale(0.75)' : 'none',
+                    display:
+                        search.length > 0 && !searchMatched
+                            ? 'none'
+                            : undefined,
                 }}
             >
                 <AccordionSummary
@@ -599,6 +627,7 @@ const ModuleSection: React.FC<{
                                     groupCount={groupCount}
                                     inputs={inputs}
                                     readonly={readonly}
+                                    searchResult={searchResult?.groups[group]}
                                     onChange={onChange}
                                 />
                             )
