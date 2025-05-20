@@ -457,13 +457,19 @@ const ModuleSection: React.FC<{
 
     const { search } = useSearchStore()
     const searchResult =
-        search.length > 0 ? searchModule(module, search) : undefined
+        search.length > 2 ? searchModule(module, search) : undefined
     const searchMatched =
-        search.length > 0 &&
-        (searchResult?.nameMatches ||
-            Object.values(searchResult?.groups ?? []).some(
+        searchResult !== undefined &&
+        (searchResult.nameMatches ||
+            Object.values(searchResult.groups).some(
                 (result) => result.nameMatches
             ))
+    const searchHide =
+        searchResult !== undefined &&
+        !searchResult.nameMatches &&
+        !Object.values(searchResult?.groups).some(
+            (result) => result.nameMatches
+        )
 
     return (
         <>
@@ -523,10 +529,7 @@ const ModuleSection: React.FC<{
                         backgroundColor: colors.rsDarkBrown,
                     },
                     filter: !enabled ? 'grayscale(0.75)' : 'none',
-                    display:
-                        search.length > 0 && !searchMatched
-                            ? 'none'
-                            : undefined,
+                    display: searchHide ? 'none' : undefined,
                 }}
             >
                 <AccordionSummary
