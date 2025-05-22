@@ -11,6 +11,8 @@ import {
     SxProps,
     TextField,
     Typography,
+    List,
+    ListItem,
 } from '@mui/material'
 import React, { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
@@ -36,6 +38,23 @@ import { ColorPickerInput } from './ColorPicker'
 import { CopyInputSettings } from './CopyInputSettings'
 import { UISelect } from './UISelect'
 import { EventShield } from '../EventShield'
+import { InfoLink } from '../InfoDialog'
+
+const commonSoundEffects = (
+    <List>
+        <ListItem>6765 - Muspah unique loot</ListItem>
+        <ListItem>10224 - ToA dung jingle</ListItem>
+        <ListItem>10241 - Yama drop</ListItem>
+        <ListItem>2380 - Bell</ListItem>
+        <ListItem>2310 - Quiz select</ListItem>
+        <ListItem>5316 - Leagues III fragment drop</ListItem>
+        <ListItem>4218 - League trophy</ListItem>
+        <ListItem>413 - Quack</ListItem>
+        <ListItem>3385 - Fossil island bell</ListItem>
+        <ListItem>1299-1307 - Light beams</ListItem>
+        <ListItem>5306 - ACB spec</ListItem>
+    </List>
+)
 
 const Column: React.FC<{
     children: React.ReactNode[] | React.ReactNode
@@ -845,6 +864,18 @@ export const DisplayConfigurationInput: React.FC<{
                                     >
                                         Sound Effect ID
                                         <br />
+                                        <InfoLink content={commonSoundEffects}>
+                                            <Typography
+                                                sx={{
+                                                    color: colors.rsDarkYellow,
+                                                    textDecoration: 'underline',
+                                                }}
+                                                variant="caption"
+                                            >
+                                                view common effects
+                                            </Typography>
+                                        </InfoLink>
+                                        {', or '}
                                         <a
                                             target="_blank"
                                             style={{
@@ -852,7 +883,7 @@ export const DisplayConfigurationInput: React.FC<{
                                             }}
                                             href="https://oldschool.runescape.wiki/w/List_of_sound_IDs"
                                         >
-                                            (browse sound effects by name)
+                                            browse all by name
                                         </a>
                                     </Typography>
                                 </Grid2>
