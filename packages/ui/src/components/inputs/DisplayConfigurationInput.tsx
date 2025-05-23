@@ -857,7 +857,7 @@ export const DisplayConfigurationInput: React.FC<{
                                                 }}
                                                 variant="caption"
                                             >
-                                                view common effects
+                                                hear common effects
                                             </Typography>
                                         </InfoLink>
                                         {', or '}
