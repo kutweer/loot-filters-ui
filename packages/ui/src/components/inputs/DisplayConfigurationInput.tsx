@@ -11,8 +11,6 @@ import {
     SxProps,
     TextField,
     Typography,
-    List,
-    ListItem,
 } from '@mui/material'
 import React, { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
@@ -39,6 +37,7 @@ import { CopyInputSettings } from './CopyInputSettings'
 import { UISelect } from './UISelect'
 import { EventShield } from '../EventShield'
 import { InfoLink } from '../InfoDialog'
+import { CommonSoundEffects } from '../info/CommonSoundEffects'
 
 const Column: React.FC<{
     children: React.ReactNode[] | React.ReactNode
@@ -100,36 +99,6 @@ const Label: React.FC<{ label: string; sx?: SxProps }> = ({ label, sx }) => {
         </Grid2>
     )
 }
-
-const CommonSoundEffect: React.FC<{
-    id: string
-    desc: string
-}> = ({ id, desc }) => (
-    <Grid2 container size={12}>
-        <Grid2 size={3}>
-            <Typography>{id}</Typography>
-        </Grid2>
-        <Grid2 size={9}>
-            <Typography color="secondary">{desc}</Typography>
-        </Grid2>
-    </Grid2>
-)
-
-const CommonSoundEffects: React.FC<{}> = () => (
-    <Grid2 container size={12}>
-        <CommonSoundEffect id={'413'} desc={'Quack'} />
-        <CommonSoundEffect id={'1299-1307'} desc={'Light beams'} />
-        <CommonSoundEffect id={'2136'} desc={'Dung'} />
-        <CommonSoundEffect id={'2310'} desc={'Quiz select'} />
-        <CommonSoundEffect id={'2380'} desc={'Bell'} />
-        <CommonSoundEffect id={'3385'} desc={'Fossil island bell'} />
-        <CommonSoundEffect id={'4218'} desc={'Leagues trophy'} />
-        <CommonSoundEffect id={'5306'} desc={'ACB spec'} />
-        <CommonSoundEffect id={'5316'} desc={'Leagues III fragment'} />
-        <CommonSoundEffect id={'6765'} desc={'Muspah drop'} />
-        <CommonSoundEffect id={'10241'} desc={'Yama drop'} />
-    </Grid2>
-)
 
 const inferSoundType = (value: any): 'none' | 'soundeffect' | 'fromfile' => {
     switch (typeof value) {
