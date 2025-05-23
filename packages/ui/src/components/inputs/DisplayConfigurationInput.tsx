@@ -40,22 +40,6 @@ import { UISelect } from './UISelect'
 import { EventShield } from '../EventShield'
 import { InfoLink } from '../InfoDialog'
 
-const commonSoundEffects = (
-    <List>
-        <ListItem>6765 - Muspah unique loot</ListItem>
-        <ListItem>10224 - ToA dung jingle</ListItem>
-        <ListItem>10241 - Yama drop</ListItem>
-        <ListItem>2380 - Bell</ListItem>
-        <ListItem>2310 - Quiz select</ListItem>
-        <ListItem>5316 - Leagues III fragment drop</ListItem>
-        <ListItem>4218 - League trophy</ListItem>
-        <ListItem>413 - Quack</ListItem>
-        <ListItem>3385 - Fossil island bell</ListItem>
-        <ListItem>1299-1307 - Light beams</ListItem>
-        <ListItem>5306 - ACB spec</ListItem>
-    </List>
-)
-
 const Column: React.FC<{
     children: React.ReactNode[] | React.ReactNode
 }> = ({ children }) => {
@@ -116,6 +100,36 @@ const Label: React.FC<{ label: string; sx?: SxProps }> = ({ label, sx }) => {
         </Grid2>
     )
 }
+
+const CommonSoundEffect: React.FC<{
+    id: string
+    desc: string
+}> = ({ id, desc }) => (
+    <Grid2 container size={12}>
+        <Grid2 size={3}>
+            <Typography>{id}</Typography>
+        </Grid2>
+        <Grid2 size={9}>
+            <Typography color="secondary">{desc}</Typography>
+        </Grid2>
+    </Grid2>
+)
+
+const CommonSoundEffects: React.FC<{}> = () => (
+    <Grid2 container size={12}>
+        <CommonSoundEffect id={'413'} desc={'Quack'} />
+        <CommonSoundEffect id={'1299-1307'} desc={'Light beams'} />
+        <CommonSoundEffect id={'2136'} desc={'Dung'} />
+        <CommonSoundEffect id={'2310'} desc={'Quiz select'} />
+        <CommonSoundEffect id={'2380'} desc={'Bell'} />
+        <CommonSoundEffect id={'3385'} desc={'Fossil island bell'} />
+        <CommonSoundEffect id={'4218'} desc={'Leagues trophy'} />
+        <CommonSoundEffect id={'5306'} desc={'ACB spec'} />
+        <CommonSoundEffect id={'5316'} desc={'Leagues III fragment'} />
+        <CommonSoundEffect id={'6765'} desc={'Muspah drop'} />
+        <CommonSoundEffect id={'10241'} desc={'Yama drop'} />
+    </Grid2>
+)
 
 const inferSoundType = (value: any): 'none' | 'soundeffect' | 'fromfile' => {
     switch (typeof value) {
@@ -864,7 +878,9 @@ export const DisplayConfigurationInput: React.FC<{
                                     >
                                         Sound Effect ID
                                         <br />
-                                        <InfoLink content={commonSoundEffects}>
+                                        <InfoLink
+                                            content={<CommonSoundEffects />}
+                                        >
                                             <Typography
                                                 sx={{
                                                     color: colors.rsDarkYellow,
@@ -883,7 +899,7 @@ export const DisplayConfigurationInput: React.FC<{
                                             }}
                                             href="https://oldschool.runescape.wiki/w/List_of_sound_IDs"
                                         >
-                                            browse all by name
+                                            browse the wiki
                                         </a>
                                     </Typography>
                                 </Grid2>
