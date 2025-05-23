@@ -163,7 +163,7 @@ export const DisplayConfigurationInput: React.FC<{
                     }
                 }}
             >
-                <MenuItem value={1}>Inherit</MenuItem>
+                <MenuItem value={1}>Default</MenuItem>
                 <MenuItem value={2}>Show</MenuItem>
                 <MenuItem value={3}>Hide</MenuItem>
             </Select>
