@@ -143,6 +143,12 @@ export const DisplayConfigurationInput: React.FC<{
     } else if (isHidden === true) {
         displayMode = 3
     }
+
+    // if the filter is specifying to explicitly show or hide, then they cannot
+    // 'unset' the value
+    const hasExplicitDisplayMode =
+        input.default?.hidden === true || input.default?.hidden === false
+
     const displayModeInput = (
         <EventShield>
             <Select
@@ -163,7 +169,9 @@ export const DisplayConfigurationInput: React.FC<{
                     }
                 }}
             >
-                <MenuItem value={1}>Default</MenuItem>
+                {!hasExplicitDisplayMode && (
+                    <MenuItem value={1}>Default</MenuItem>
+                )}
                 <MenuItem value={2}>Show</MenuItem>
                 <MenuItem value={3}>Hide</MenuItem>
             </Select>
