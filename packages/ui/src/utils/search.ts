@@ -3,24 +3,71 @@ import { groupBy } from 'underscore'
 
 import { Module, Input } from '../parsing/UiTypesSpec'
 
+const MIN_SEARCH_LENGTH = 3
+
 // fuzzy score threshold - 0 means perfect match, 1 means not at all
 // this number is selected through trial and error
 const FUZZY_THRESHOLD = 0.3
 
+export type SearchState = 'none' | 'expand' | 'hide'
+
 export type ModuleSearchResult = {
-    nameMatches: boolean
+    state: SearchState
     groups: Record<string, GroupSearchResult>
 }
 
 export type GroupSearchResult = {
-    nameMatches: boolean
-    matchedInputs: Record<string, boolean>
+    state: SearchState
+    inputs: Record<string, InputSearchResult>
+}
+
+export type InputSearchResult = {
+    state: SearchState
 }
 
 export const searchModule = (
     input: Module,
     search: string
 ): ModuleSearchResult => {
+    const result = init(input)
+    if (search.length < MIN_SEARCH_LENGTH) {
+        return result
+    }
+
+    result.state = 'hide'
+    if (isStringMatch(input.name, search)) {
+        result.state = 'expand'
+        return result
+    }
+
+    for (const [groupName, group] of Object.entries(result.groups)) {
+        group.state = 'hide'
+        if (isStringMatch(groupName, search)) {
+            result.state = 'expand'
+            group.state = 'expand'
+            continue
+        }
+
+        for (const inputName of Object.keys(group.inputs)) {
+            // for now we don't hide unmatched inputs within a module
+            // input.state = 'hide'
+            if (isStringMatch(inputName, search)) {
+                result.state = 'expand'
+                group.state = 'expand'
+                // input.state = 'expand'
+            }
+        }
+    }
+
+    return result
+}
+
+const init = (input: Module): ModuleSearchResult => {
+    const result: ModuleSearchResult = {
+        state: 'none',
+        groups: {},
+    }
+
     const groupedInputs = groupBy(
         input.inputs.map((input) => ({
             ...input,
@@ -29,37 +76,21 @@ export const searchModule = (
         'group'
     )
 
-    const groups: Record<string, GroupSearchResult> = {}
     for (const [name, inputs] of Object.entries(groupedInputs)) {
-        const matchedInputs: Record<string, boolean> = {}
-        for (const input of inputs) {
-            matchedInputs[input.label] = isInputMatch(input, search)
-        }
-
-        groups[name] = {
-            nameMatches: name !== '_' && isStringMatch(name, search),
-            matchedInputs,
+        result.groups[name] = {
+            state: 'none',
+            inputs: inputs.reduce(
+                (acc, v) => ({ ...acc, [v.label]: { state: 'none' } }),
+                {}
+            ),
         }
     }
 
-    return {
-        nameMatches: isStringMatch(input.name, search),
-        groups,
-    }
+    return result
 }
 
 const isStringMatch = (input: string, search: string): boolean => {
     const fuse = new Fuse([input], {
-        includeScore: true,
-    })
-    const result = fuse.search(search)
-    return result.length > 0 && (result[0].score ?? 1) < FUZZY_THRESHOLD
-}
-
-// FUTURE: right now this just checks label, in theory we'd also want to check
-// things like the configured list or enum list
-const isInputMatch = (input: Input, search: string): boolean => {
-    const fuse = new Fuse([input.label], {
         includeScore: true,
     })
     const result = fuse.search(search)

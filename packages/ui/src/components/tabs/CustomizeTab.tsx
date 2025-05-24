@@ -277,7 +277,7 @@ const ModuleGroup: React.FC<{
     inputs: Input[]
     module: Module
     readonly: boolean
-    searchResult?: GroupSearchResult
+    searchResult: GroupSearchResult
     onChange: (config: FilterConfiguration) => void
 }> = ({
     module,
@@ -320,19 +320,16 @@ const ModuleGroup: React.FC<{
         groupName,
     })
 
-    const searchExpand = searchResult !== undefined && searchResult.nameMatches
-    const searchHide = searchResult !== undefined && !searchResult.nameMatches
-
     return (
         <Accordion
             disableGutters={true}
             defaultExpanded={
-                (groupExpanded ?? groupCount <= MAX_GROUPCOUNT_AUTOEXPAND) ||
-                searchExpand
+                groupExpanded ?? groupCount <= MAX_GROUPCOUNT_AUTOEXPAND
             }
+            expanded={searchResult.state === 'expand' ? true : undefined}
             sx={{
                 '::before': { display: 'none' },
-                display: searchHide ? 'none' : undefined,
+                display: searchResult.state === 'hide' ? 'none' : undefined,
             }}
             slotProps={{ transition: { unmountOnExit: true } }}
         >
@@ -456,20 +453,7 @@ const ModuleSection: React.FC<{
     const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
 
     const { search } = useSearchStore()
-    const searchResult =
-        search.length > 2 ? searchModule(module, search) : undefined
-    const searchMatched =
-        searchResult !== undefined &&
-        (searchResult.nameMatches ||
-            Object.values(searchResult.groups).some(
-                (result) => result.nameMatches
-            ))
-    const searchHide =
-        searchResult !== undefined &&
-        !searchResult.nameMatches &&
-        !Object.values(searchResult?.groups).some(
-            (result) => result.nameMatches
-        )
+    const searchResult = searchModule(module, search)
 
     return (
         <>
@@ -518,9 +502,11 @@ const ModuleSection: React.FC<{
             </Menu>
             <Accordion
                 slotProps={{ transition: { unmountOnExit: true } }}
-                expanded={(expanded || searchMatched) && enabled}
+                expanded={
+                    (expanded || searchResult.state === 'expand') && enabled
+                }
                 onChange={() => {
-                    if (!searchMatched) {
+                    if (searchResult.state !== 'expand') {
                         setExpanded(!expanded)
                     }
                 }}
@@ -529,7 +515,7 @@ const ModuleSection: React.FC<{
                         backgroundColor: colors.rsDarkBrown,
                     },
                     filter: !enabled ? 'grayscale(0.75)' : 'none',
-                    display: searchHide ? 'none' : undefined,
+                    display: searchResult.state === 'hide' ? 'none' : undefined,
                 }}
             >
                 <AccordionSummary
@@ -630,7 +616,7 @@ const ModuleSection: React.FC<{
                                     groupCount={groupCount}
                                     inputs={inputs}
                                     readonly={readonly}
-                                    searchResult={searchResult?.groups[group]}
+                                    searchResult={searchResult.groups[group]}
                                     onChange={onChange}
                                 />
                             )
