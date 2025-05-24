@@ -13,6 +13,7 @@ import {
     Typography,
     useMediaQuery,
 } from '@mui/material'
+import { SxProps } from '@mui/system'
 import React, { CSSProperties, useEffect, useState } from 'react'
 import { groupBy, isObject } from 'underscore'
 import { colors, MuiRsTheme } from '../../styles/MuiTheme'
@@ -48,7 +49,11 @@ import { NumberInputComponent } from '../inputs/NumberInputComponent'
 import { StringListInputComponent } from '../inputs/StringListInputComponent'
 import { TextInputComponent } from '../inputs/TextInputComponent'
 import { ItemLabelPreview } from '../Previews'
-import { searchModule, GroupSearchResult } from '../../utils/search'
+import {
+    searchModule,
+    GroupSearchResult,
+    InputSearchResult,
+} from '../../utils/search'
 
 const MAX_GROUPCOUNT_AUTOEXPAND = 3
 
@@ -153,13 +158,20 @@ const InputGroup: React.FC<{
     module: Module
     inputs: Input[]
     readonly: boolean
+    searchResult: GroupSearchResult
     onChange: (config: FilterConfiguration) => void
-}> = ({ key, config, module, inputs, readonly, onChange }) => {
+}> = ({ key, config, module, inputs, readonly, searchResult, onChange }) => {
     const sorted = inputs.sort((a: Input, b: Input) => sizeOf(a) - sizeOf(b))
     return (
         <Grid2 key={key} container spacing={2}>
             {sorted.map((input, index) => (
-                <Grid2 key={index} size={sizeOf(input)}>
+                <Grid2
+                    sx={{
+                        ...inputSearchStyle(searchResult.inputs[input.label]),
+                    }}
+                    key={index}
+                    size={sizeOf(input)}
+                >
                     <InputComponent
                         config={config}
                         module={module}
@@ -185,6 +197,14 @@ const InputGroup: React.FC<{
         </Grid2>
     )
 }
+
+const inputSearchStyle = (result: InputSearchResult): SxProps =>
+    result.state === 'expand'
+        ? {
+              border: 2,
+              borderColor: colors.rsDarkYellow,
+          }
+        : {}
 
 const sizeOf = (input: Input) => {
     switch (input.type) {
@@ -390,6 +410,7 @@ const ModuleGroup: React.FC<{
                     module={module}
                     inputs={inputs}
                     readonly={readonly}
+                    searchResult={searchResult}
                     onChange={onChange}
                 />
             </AccordionDetails>
@@ -603,6 +624,7 @@ const ModuleSection: React.FC<{
                             module={module}
                             inputs={defaultGroup}
                             readonly={readonly}
+                            searchResult={searchResult.groups['_']}
                             onChange={onChange}
                         />
                         {Object.entries(groupedInputs).map(
