@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Search, Clear } from '@mui/icons-material'
 import { TextField, InputAdornment, IconButton } from '@mui/material'
 
@@ -7,12 +7,18 @@ import { useSearchStore } from '../store/search'
 export const SearchBar: React.FC<{}> = () => {
     const { search, setSearch } = useSearchStore()
 
+    const [searchText, setSearchText] = useState(search)
+    useEffect(() => {
+        const timeout = setTimeout(() => setSearch(searchText), 250)
+        return () => clearTimeout(timeout)
+    }, [searchText])
+
     return (
         <TextField
             sx={{ minWidth: '20rem' }}
             label="Search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
             slotProps={{
                 input: {
                     startAdornment: (
@@ -22,8 +28,8 @@ export const SearchBar: React.FC<{}> = () => {
                     ),
                     endAdornment: search !== '' && (
                         <InputAdornment position="end">
-                            <IconButton>
-                                <Clear onClick={() => setSearch('')} />
+                            <IconButton onClick={() => setSearch('')}>
+                                <Clear />
                             </IconButton>
                         </InputAdornment>
                     ),
