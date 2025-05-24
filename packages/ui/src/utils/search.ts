@@ -1,7 +1,7 @@
 import Fuse from 'fuse.js'
 import { groupBy } from 'underscore'
 
-import { Module, Input } from '../parsing/UiTypesSpec'
+import { Module, Input, isEnumListInput } from '../parsing/UiTypesSpec'
 
 const MIN_SEARCH_LENGTH = 3
 
@@ -23,6 +23,7 @@ export type GroupSearchResult = {
 
 export type InputSearchResult = {
     state: SearchState
+    contents: string[]
 }
 
 export const searchModule = (
@@ -35,26 +36,26 @@ export const searchModule = (
     }
 
     result.state = 'hide'
-    if (isStringMatch(input.name, search)) {
+    if (isStringMatch([input.name], search)) {
         result.state = 'expand'
         return result
     }
 
     for (const [groupName, group] of Object.entries(result.groups)) {
         group.state = 'hide'
-        if (isStringMatch(groupName, search)) {
+        if (isStringMatch([groupName], search)) {
             result.state = 'expand'
             group.state = 'expand'
             continue
         }
 
-        for (const inputName of Object.keys(group.inputs)) {
+        for (const [inputName, input] of Object.entries(group.inputs)) {
             // for now we don't hide unmatched inputs within a module
             // input.state = 'hide'
-            if (isStringMatch(inputName, search)) {
+            if (isStringMatch([inputName, ...input.contents], search)) {
                 result.state = 'expand'
                 group.state = 'expand'
-                // input.state = 'expand'
+                input.state = 'expand'
             }
         }
     }
@@ -80,8 +81,14 @@ const init = (input: Module): ModuleSearchResult => {
         result.groups[name] = {
             state: 'none',
             inputs: inputs.reduce(
-                (acc, v) => ({ ...acc, [v.label]: { state: 'none' } }),
-                {}
+                (acc, v) => ({
+                    ...acc,
+                    [v.label]: {
+                        state: 'none',
+                        contents: getInputContents(v),
+                    },
+                }),
+                {} as Record<string, InputSearchResult>
             ),
         }
     }
@@ -89,10 +96,24 @@ const init = (input: Module): ModuleSearchResult => {
     return result
 }
 
-const isStringMatch = (input: string, search: string): boolean => {
-    const fuse = new Fuse([input], {
+const getInputContents = (input: Input): string[] => {
+    const enums: string[] = []
+    if (isEnumListInput(input)) {
+        for (const v of input.enum) {
+            if (typeof v === 'string') {
+                enums.push(v)
+            } else {
+                enums.push(v.label, v.value)
+            }
+        }
+    }
+    return [...(input.default || []), ...enums]
+}
+
+const isStringMatch = (inputs: string[], search: string): boolean => {
+    const fuse = new Fuse(inputs, {
         includeScore: true,
     })
     const result = fuse.search(search)
-    return result.length > 0 && (result[0].score ?? 1) < FUZZY_THRESHOLD
+    return result.some((r) => (r.score ?? 1) < FUZZY_THRESHOLD)
 }

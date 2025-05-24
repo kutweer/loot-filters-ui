@@ -28,7 +28,12 @@ export const SearchBar: React.FC<{}> = () => {
                     ),
                     endAdornment: search !== '' && (
                         <InputAdornment position="end">
-                            <IconButton onClick={() => setSearch('')}>
+                            <IconButton
+                                onClick={() => {
+                                    setSearch('') // skip debounce
+                                    setSearchText('')
+                                }}
+                            >
                                 <Clear />
                             </IconButton>
                         </InputAdornment>
