@@ -6,8 +6,6 @@ import {
     Box,
     Checkbox,
     Grid2,
-    MenuItem,
-    Select,
     SxProps,
     TextField,
     Typography,
@@ -151,12 +149,31 @@ export const DisplayConfigurationInput: React.FC<{
 
     const displayModeInput = (
         <EventShield>
-            <Select
-                sx={{ minWidth: '6rem', maxHeight: '3rem' }}
-                value={displayMode}
+            <UISelect<number>
+                sx={{ minWidth: '7rem', maxHeight: '3rem' }}
+                value={{
+                    label:
+                        displayMode === 1
+                            ? 'Default'
+                            : displayMode === 2
+                              ? 'Show'
+                              : 'Hide',
+                    value: displayMode,
+                }}
                 disabled={readonly || input.disableDisplayMode}
-                onChange={(e) => {
-                    switch (e.target.value) {
+                label="Display Mode"
+                disableClearable={true}
+                options={[
+                    ...(!hasExplicitDisplayMode
+                        ? [{ label: 'Default', value: 1 }]
+                        : []),
+                    { label: 'Show', value: 2 },
+                    { label: 'Hide', value: 3 },
+                ]}
+                multiple={false}
+                freeSolo={false}
+                onChange={(newValue) => {
+                    switch (newValue?.value) {
                         case 1:
                             onChange({ hidden: undefined })
                             break
@@ -168,13 +185,7 @@ export const DisplayConfigurationInput: React.FC<{
                             break
                     }
                 }}
-            >
-                {!hasExplicitDisplayMode && (
-                    <MenuItem value={1}>Default</MenuItem>
-                )}
-                <MenuItem value={2}>Show</MenuItem>
-                <MenuItem value={3}>Hide</MenuItem>
-            </Select>
+            />
         </EventShield>
     )
 
