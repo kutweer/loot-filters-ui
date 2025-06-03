@@ -9,7 +9,6 @@ export const applyDiff = (
     list: (string | ListOption)[],
     diffs: (ListDiff | undefined)[]
 ): (string | ListOption)[] => {
-
     return diffs.reduce((acc, diff) => {
         return applyDiffSingle(acc, diff)
     }, list)

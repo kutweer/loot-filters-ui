@@ -129,21 +129,32 @@ export const DisplayConfigurationInput: React.FC<{
         searchParams.get('expanded') === 'true'
     )
 
-    const spec = StyleConfigSpec.optional()
-        .default({})
+    const spec = StyleConfigSpec.optional().default({})
 
-    const themeConfig = spec.parse(theme?.config?.inputConfigs?.[input.macroName])
+    const themeConfig = spec.parse(
+        theme?.config?.inputConfigs?.[input.macroName]
+    )
     const styleConfig = spec.parse(config?.inputConfigs?.[input.macroName])
 
     const [iconType, setIconType] = useState<
         'none' | 'current' | 'file' | 'sprite' | 'itemId'
-    >(styleConfig?.icon?.type ?? themeConfig?.icon?.type ?? input.default?.icon?.type ?? 'none')
+    >(
+        styleConfig?.icon?.type ??
+            themeConfig?.icon?.type ??
+            input.default?.icon?.type ??
+            'none'
+    )
 
     const [soundType, setSoundType] = useState<
         'none' | 'soundeffect' | 'fromfile'
-    >(inferSoundType(styleConfig?.sound ?? themeConfig?.sound ?? input.default?.sound))
+    >(
+        inferSoundType(
+            styleConfig?.sound ?? themeConfig?.sound ?? input.default?.sound
+        )
+    )
 
-    const isHidden = styleConfig?.hidden ?? themeConfig?.hidden ?? input.default?.hidden
+    const isHidden =
+        styleConfig?.hidden ?? themeConfig?.hidden ?? input.default?.hidden
     let displayMode = 1
     if (isHidden === false) {
         displayMode = 2
@@ -189,7 +200,10 @@ export const DisplayConfigurationInput: React.FC<{
         <Checkbox
             disabled={readonly}
             checked={
-                styleConfig.showLootbeam ?? themeConfig?.showLootbeam ?? input.default?.showLootbeam ?? false
+                styleConfig.showLootbeam ??
+                themeConfig?.showLootbeam ??
+                input.default?.showLootbeam ??
+                false
             }
             onChange={(e) => onChange({ showLootbeam: e.target.checked })}
         />
@@ -198,8 +212,11 @@ export const DisplayConfigurationInput: React.FC<{
     const lootbeamColorInput = (
         <ColorPickerInput
             disabled={
-                !(styleConfig.showLootbeam ?? themeConfig?.showLootbeam ?? input.default?.showLootbeam) ||
-                readonly
+                !(
+                    styleConfig.showLootbeam ??
+                    themeConfig?.showLootbeam ??
+                    input.default?.showLootbeam
+                ) || readonly
             }
             configField="lootbeamColor"
             config={styleConfig}
@@ -212,7 +229,12 @@ export const DisplayConfigurationInput: React.FC<{
     const valueComponent = (
         <Checkbox
             disabled={readonly}
-            checked={styleConfig.showValue ?? themeConfig?.showValue ?? input.default?.showValue ?? false}
+            checked={
+                styleConfig.showValue ??
+                themeConfig?.showValue ??
+                input.default?.showValue ??
+                false
+            }
             onChange={(e) => onChange({ showValue: e.target.checked })}
         />
     )
@@ -221,7 +243,10 @@ export const DisplayConfigurationInput: React.FC<{
         <Checkbox
             disabled={readonly}
             checked={
-                styleConfig.showDespawn ?? themeConfig?.showDespawn ?? input.default?.showDespawn ?? false
+                styleConfig.showDespawn ??
+                themeConfig?.showDespawn ??
+                input.default?.showDespawn ??
+                false
             }
             onChange={(e) => onChange({ showDespawn: e.target.checked })}
         />
@@ -230,7 +255,12 @@ export const DisplayConfigurationInput: React.FC<{
     const notifyComponent = (
         <Checkbox
             disabled={readonly}
-            checked={styleConfig.notify ?? themeConfig?.notify ?? input.default?.notify ?? false}
+            checked={
+                styleConfig.notify ??
+                themeConfig?.notify ??
+                input.default?.notify ??
+                false
+            }
             onChange={(e) => onChange({ notify: e.target.checked })}
         />
     )
@@ -256,8 +286,11 @@ export const DisplayConfigurationInput: React.FC<{
             input={input}
             onChange={onChange}
             disabled={
-                !(styleConfig.highlightTile ?? themeConfig?.highlightTile ?? input.default?.highlightTile) ||
-                readonly
+                !(
+                    styleConfig.highlightTile ??
+                    themeConfig?.highlightTile ??
+                    input.default?.highlightTile
+                ) || readonly
             }
         />
     )
@@ -270,8 +303,11 @@ export const DisplayConfigurationInput: React.FC<{
             input={input}
             onChange={onChange}
             disabled={
-                !(styleConfig.highlightTile ?? themeConfig?.highlightTile ?? input.default?.highlightTile) ||
-                readonly
+                !(
+                    styleConfig.highlightTile ??
+                    themeConfig?.highlightTile ??
+                    input.default?.highlightTile
+                ) || readonly
             }
         />
     )
@@ -317,12 +353,18 @@ export const DisplayConfigurationInput: React.FC<{
             disabled={readonly}
             size="small"
             placeholder="Effect ID"
-            value={styleConfig?.sound ?? themeConfig?.sound ?? input.default?.sound ?? 0}
+            value={
+                styleConfig?.sound ??
+                themeConfig?.sound ??
+                input.default?.sound ??
+                0
+            }
             onChange={(e) => onChange({ sound: parseInt(e.target.value) || 0 })}
         />
     )
 
-    const soundFile = styleConfig?.sound ?? themeConfig?.sound ?? input.default?.sound ?? ''
+    const soundFile =
+        styleConfig?.sound ?? themeConfig?.sound ?? input.default?.sound ?? ''
     const soundFileInput = (
         <TextField
             sx={{ minWidth: '12rem' }}
@@ -414,7 +456,12 @@ export const DisplayConfigurationInput: React.FC<{
             sx={{ minWidth: '10rem', ml: 1 }}
             placeholder="priority"
             type="number"
-            value={styleConfig?.menuSort ?? themeConfig?.menuSort ?? input.default?.menuSort ?? 0}
+            value={
+                styleConfig?.menuSort ??
+                themeConfig?.menuSort ??
+                input.default?.menuSort ??
+                0
+            }
             onChange={(e) =>
                 onChange({
                     menuSort:
@@ -444,7 +491,11 @@ export const DisplayConfigurationInput: React.FC<{
                         input.default?.fontType ??
                         FontType.Small // Default to small
                 ),
-                value: styleConfig?.fontType ?? themeConfig?.fontType ?? input.default?.fontType ?? 1,
+                value:
+                    styleConfig?.fontType ??
+                    themeConfig?.fontType ??
+                    input.default?.fontType ??
+                    1,
             }}
             onChange={(newValue) => {
                 if (newValue === null) {
@@ -475,7 +526,10 @@ export const DisplayConfigurationInput: React.FC<{
                         TextAccent.Shadow // Default to shadow
                 ),
                 value:
-                    styleConfig?.textAccent ?? themeConfig?.textAccent ?? input.default?.textAccent ?? 1, // Default to shadow
+                    styleConfig?.textAccent ??
+                    themeConfig?.textAccent ??
+                    input.default?.textAccent ??
+                    1, // Default to shadow
             }}
             onChange={(newValue) => {
                 if (newValue === null) {
@@ -568,7 +622,10 @@ export const DisplayConfigurationInput: React.FC<{
             placeholder="Item Id"
             type="number"
             value={
-                styleConfig?.icon?.itemId ?? themeConfig?.icon?.itemId ?? input.default?.icon?.itemId ?? 0
+                styleConfig?.icon?.itemId ??
+                themeConfig?.icon?.itemId ??
+                input.default?.icon?.itemId ??
+                0
             }
             onChange={(e) => {
                 onChange({
@@ -596,7 +653,12 @@ export const DisplayConfigurationInput: React.FC<{
                 }
                 onChange({ icon: { type: 'file', path } })
             }}
-            value={styleConfig?.icon?.path ?? themeConfig?.icon?.path ?? input.default?.icon?.path ?? ''}
+            value={
+                styleConfig?.icon?.path ??
+                themeConfig?.icon?.path ??
+                input.default?.icon?.path ??
+                ''
+            }
         />
     )
 

@@ -231,7 +231,15 @@ const ColorPickerInput: React.FC<{
     onChange: (config: StyleConfig) => void
     disabled?: boolean
     helpText?: string
-}> = ({ configField, config, themeConfig, input, onChange, disabled, helpText }) => {
+}> = ({
+    configField,
+    config,
+    themeConfig,
+    input,
+    onChange,
+    disabled,
+    helpText,
+}) => {
     return (
         <FormControl component="div">
             <ColorPicker

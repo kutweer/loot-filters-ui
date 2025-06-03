@@ -25,7 +25,9 @@ export const renderFilter = (
         ...(parseModules(activeConfig?.suffixRs2f || '')?.modules || []),
     ]
 
-    const theme = filter.themes.find((theme) => theme.id === activeConfig?.selectedThemeId)
+    const theme = filter.themes.find(
+        (theme) => theme.id === activeConfig?.selectedThemeId
+    )
 
     let filterText = modules
         .map((m) => applyModule(m, activeConfig?.inputConfigs, theme))
@@ -46,7 +48,7 @@ export const renderFilter = (
 export const applyModule = (
     module: Module,
     config: { [key: MacroName]: any } | undefined,
-    theme?: Theme,
+    theme?: Theme
 ): string => {
     let updated = module.rs2f
 
@@ -80,7 +82,10 @@ export const applyModule = (
                 const themeDiff = theme?.config?.inputConfigs?.[input.macroName]
 
                 const list = convertOptionsToStrings(
-                    applyDiff(input.default, [themeDiff, configuredDiff ?? EMPTY_DIFF])
+                    applyDiff(input.default, [
+                        themeDiff,
+                        configuredDiff ?? EMPTY_DIFF,
+                    ])
                 )
 
                 updated = updateMacro(

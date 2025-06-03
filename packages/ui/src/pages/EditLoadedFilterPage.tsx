@@ -104,7 +104,11 @@ export const EditorLoadedFilterPage: React.FC = () => {
                 if (selectedModules) {
                     const newContent = selectedModules
                         .map((m) => {
-                            return applyModule(m, config.inputConfigs, undefined)
+                            return applyModule(
+                                m,
+                                config.inputConfigs,
+                                undefined
+                            )
                         })
                         .join('')
 

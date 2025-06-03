@@ -14,7 +14,6 @@ export const ThemeSpec = FilterSpecTheme.extend({
 
 export type Theme = z.infer<typeof ThemeSpec>
 
-
 export const InputSpec = FilterSpecInput.extend({
     macroName: z.string().nonempty(),
     default: z.any().optional(),
@@ -173,4 +172,3 @@ export type MacroName = string
 
 export const isEnumListInput = (v: Input): v is EnumListInput =>
     v.type === 'enumlist'
-

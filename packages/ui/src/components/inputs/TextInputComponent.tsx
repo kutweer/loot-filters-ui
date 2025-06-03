@@ -1,5 +1,9 @@
 import { TextField, Typography } from '@mui/material'
-import { FilterConfiguration, TextInput, Theme } from '../../parsing/UiTypesSpec'
+import {
+    FilterConfiguration,
+    TextInput,
+    Theme,
+} from '../../parsing/UiTypesSpec'
 
 export const TextInputComponent: React.FC<{
     input: TextInput
@@ -9,7 +13,10 @@ export const TextInputComponent: React.FC<{
     readonly: boolean
 }> = ({ input, config, theme, onChange, readonly }) => {
     const userConfigValue = config?.inputConfigs?.[input.macroName]
-    const currentSetting = userConfigValue ?? theme?.config?.inputConfigs?.[input.macroName] ?? input?.default
+    const currentSetting =
+        userConfigValue ??
+        theme?.config?.inputConfigs?.[input.macroName] ??
+        input?.default
 
     return (
         <div>

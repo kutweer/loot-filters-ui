@@ -228,4 +228,3 @@ export const addRs2fHash = async (filter: Filter) => {
 
     return { ...filter, rs2fHash }
 }
-

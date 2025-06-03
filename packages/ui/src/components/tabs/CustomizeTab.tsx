@@ -165,7 +165,16 @@ const InputGroup: React.FC<{
     readonly: boolean
     searchResult: GroupSearchResult
     onChange: (config: FilterConfiguration) => void
-}> = ({ key, config, theme, module, inputs, readonly, searchResult, onChange }) => {
+}> = ({
+    key,
+    config,
+    theme,
+    module,
+    inputs,
+    readonly,
+    searchResult,
+    onChange,
+}) => {
     const sorted = inputs.sort((a: Input, b: Input) => sizeOf(a) - sizeOf(b))
     return (
         <Grid2 key={key} container spacing={2}>
@@ -750,7 +759,9 @@ export const CustomizeTab: React.FC<{
                             module={module}
                             showSettings={showSettings}
                             config={config ?? DEFAULT_FILTER_CONFIGURATION}
-                            theme={filter.themes.find((t) => t.id === config?.selectedThemeId)}
+                            theme={filter.themes.find(
+                                (t) => t.id === config?.selectedThemeId
+                            )}
                             onChange={onChange}
                             clearConfiguration={clearConfiguration}
                             setEnabledModule={setEnabledModule}

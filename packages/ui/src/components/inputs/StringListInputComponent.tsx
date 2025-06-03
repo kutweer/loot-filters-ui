@@ -102,7 +102,12 @@ export const StringListInputComponent: React.FC<{
                         (option) => option.value
                     )
                     const splitValues = parseValues(values)
-                    onChange(convertToListDiff(splitValues, applyDiff(input.default, [themeDiff])))
+                    onChange(
+                        convertToListDiff(
+                            splitValues,
+                            applyDiff(input.default, [themeDiff])
+                        )
+                    )
                 }}
             />
         </div>

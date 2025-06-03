@@ -19,7 +19,10 @@ export const NumberInputComponent: React.FC<{
             ? NumberInputDefaultSpec.optional().parse(activeConfigValue)
             : undefined
 
-    const currentSetting = userConfigValue ?? theme?.config?.inputConfigs?.[input.macroName] ?? input.default
+    const currentSetting =
+        userConfigValue ??
+        theme?.config?.inputConfigs?.[input.macroName] ??
+        input.default
 
     return (
         <div>

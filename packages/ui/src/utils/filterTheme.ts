@@ -8,7 +8,7 @@ export const toThemeStructuredComment = (
     config: FilterConfiguration,
     subtitle?: string,
     description?: string
-) : string => {
+): string => {
     const theme = ThemeSpec.parse({
         name,
         subtitle,
@@ -18,8 +18,6 @@ export const toThemeStructuredComment = (
             inputConfigs: config.inputConfigs,
         },
     })
-
-    
 
     return `/*@ define:theme:${generateId()}\n${yaml.stringify(theme)}*/\n`
 }

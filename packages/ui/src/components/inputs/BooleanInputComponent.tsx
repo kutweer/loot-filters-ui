@@ -13,9 +13,10 @@ export const BooleanInputComponent: React.FC<{
     onChange: (boolean: boolean) => void
     readonly: boolean
 }> = ({ input, config, theme, onChange, readonly }) => {
-
     const currentSetting = BooleanInputDefaultSpec.parse(
-        config?.inputConfigs?.[input.macroName] ?? theme?.config?.inputConfigs?.[input.macroName] ?? input.default
+        config?.inputConfigs?.[input.macroName] ??
+            theme?.config?.inputConfigs?.[input.macroName] ??
+            input.default
     )
 
     return (
