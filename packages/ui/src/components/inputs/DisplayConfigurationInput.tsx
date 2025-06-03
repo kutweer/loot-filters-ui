@@ -34,6 +34,9 @@ import { ItemLabelPreview, ItemMenuPreview } from '../Previews'
 import { ColorPickerInput } from './ColorPicker'
 import { CopyInputSettings } from './CopyInputSettings'
 import { UISelect } from './UISelect'
+import { EventShield } from '../EventShield'
+import { InfoLink } from '../InfoDialog'
+import { CommonSoundEffects } from '../info/CommonSoundEffects'
 
 const Column: React.FC<{
     children: React.ReactNode[] | React.ReactNode
@@ -876,6 +879,20 @@ export const DisplayConfigurationInput: React.FC<{
                                     >
                                         Sound Effect ID
                                         <br />
+                                        <InfoLink
+                                            content={<CommonSoundEffects />}
+                                        >
+                                            <Typography
+                                                sx={{
+                                                    color: colors.rsDarkYellow,
+                                                    textDecoration: 'underline',
+                                                }}
+                                                variant="caption"
+                                            >
+                                                hear common effects
+                                            </Typography>
+                                        </InfoLink>
+                                        {', or '}
                                         <a
                                             target="_blank"
                                             style={{
@@ -883,7 +900,7 @@ export const DisplayConfigurationInput: React.FC<{
                                             }}
                                             href="https://oldschool.runescape.wiki/w/List_of_sound_IDs"
                                         >
-                                            (browse sound effects by name)
+                                            browse the wiki
                                         </a>
                                     </Typography>
                                 </Grid2>
