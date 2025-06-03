@@ -30,13 +30,12 @@ import {
     TextAccent,
 } from '../../types/Rs2fEnum'
 import { EventShield } from '../EventShield'
+import { InfoLink } from '../InfoDialog'
 import { ItemLabelPreview, ItemMenuPreview } from '../Previews'
+import { CommonSoundEffects } from '../info/CommonSoundEffects'
 import { ColorPickerInput } from './ColorPicker'
 import { CopyInputSettings } from './CopyInputSettings'
 import { UISelect } from './UISelect'
-import { EventShield } from '../EventShield'
-import { InfoLink } from '../InfoDialog'
-import { CommonSoundEffects } from '../info/CommonSoundEffects'
 
 const Column: React.FC<{
     children: React.ReactNode[] | React.ReactNode
