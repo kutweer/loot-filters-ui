@@ -6,8 +6,6 @@ import {
     Box,
     Checkbox,
     Grid2,
-    MenuItem,
-    Select,
     SxProps,
     TextField,
     Typography,
@@ -31,13 +29,13 @@ import {
     labelFromTextAccent,
     TextAccent,
 } from '../../types/Rs2fEnum'
+import { EventShield } from '../EventShield'
+import { InfoLink } from '../InfoDialog'
 import { ItemLabelPreview, ItemMenuPreview } from '../Previews'
+import { CommonSoundEffects } from '../info/CommonSoundEffects'
 import { ColorPickerInput } from './ColorPicker'
 import { CopyInputSettings } from './CopyInputSettings'
 import { UISelect } from './UISelect'
-import { EventShield } from '../EventShield'
-import { InfoLink } from '../InfoDialog'
-import { CommonSoundEffects } from '../info/CommonSoundEffects'
 
 const Column: React.FC<{
     children: React.ReactNode[] | React.ReactNode
@@ -153,12 +151,31 @@ export const DisplayConfigurationInput: React.FC<{
 
     const displayModeInput = (
         <EventShield>
-            <Select
-                sx={{ minWidth: '6rem', maxHeight: '3rem' }}
-                value={displayMode}
+            <UISelect<number>
+                sx={{ minWidth: '7rem', maxHeight: '3rem' }}
+                value={{
+                    label:
+                        displayMode === 1
+                            ? 'Default'
+                            : displayMode === 2
+                              ? 'Show'
+                              : 'Hide',
+                    value: displayMode,
+                }}
                 disabled={readonly || input.disableDisplayMode}
-                onChange={(e) => {
-                    switch (e.target.value) {
+                label="Display Mode"
+                disableClearable={true}
+                options={[
+                    ...(!hasExplicitDisplayMode
+                        ? [{ label: 'Default', value: 1 }]
+                        : []),
+                    { label: 'Show', value: 2 },
+                    { label: 'Hide', value: 3 },
+                ]}
+                multiple={false}
+                freeSolo={false}
+                onChange={(newValue) => {
+                    switch (newValue?.value) {
                         case 1:
                             onChange({ hidden: undefined })
                             break
@@ -170,13 +187,7 @@ export const DisplayConfigurationInput: React.FC<{
                             break
                     }
                 }}
-            >
-                {!hasExplicitDisplayMode && (
-                    <MenuItem value={1}>Default</MenuItem>
-                )}
-                <MenuItem value={2}>Show</MenuItem>
-                <MenuItem value={3}>Hide</MenuItem>
-            </Select>
+            />
         </EventShield>
     )
 
@@ -652,10 +663,30 @@ export const DisplayConfigurationInput: React.FC<{
             >
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
                     {displayModeInput}
-                    <ItemLabelPreview input={input} itemName={input.label} />
+                    <Typography
+                        style={{
+                            fontFamily: 'RuneScape',
+                            fontSize: '24px',
+                            marginRight: 2,
+                            lineHeight: 1,
+                        }}
+                    >
+                        {input.label}
+                    </Typography>
+                </Box>
+
+                <Box
+                    sx={{
+                        display: 'flex',
+                        gap: 2,
+                        alignItems: 'center',
+                        marginLeft: 'auto',
+                    }}
+                >
                     {!isHidden && (
                         <ItemMenuPreview input={input} itemName={input.label} />
                     )}
+                    <ItemLabelPreview input={input} itemName={input.label} />
                 </Box>
                 {!isHidden && (
                     <CopyInputSettings
