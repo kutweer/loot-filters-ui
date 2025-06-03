@@ -43,7 +43,7 @@ export const CopyInputSettings: React.FC<{
     }, [configToCopy, onChange])
 
     return (
-        <div style={{ display: 'flex', gap: 2, marginLeft: 'auto' }}>
+        <div style={{ display: 'flex', gap: 2, alignItems: 'center' }}>
             <SmartTooltip
                 enabledTitle="Copy Settings and Defaults"
                 disabledTitle=""

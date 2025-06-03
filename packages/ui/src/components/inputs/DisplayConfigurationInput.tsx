@@ -31,11 +31,11 @@ import {
     labelFromTextAccent,
     TextAccent,
 } from '../../types/Rs2fEnum'
+import { EventShield } from '../EventShield'
 import { ItemLabelPreview, ItemMenuPreview } from '../Previews'
 import { ColorPickerInput } from './ColorPicker'
 import { CopyInputSettings } from './CopyInputSettings'
 import { UISelect } from './UISelect'
-import { EventShield } from '../EventShield'
 
 const Column: React.FC<{
     children: React.ReactNode[] | React.ReactNode
@@ -650,10 +650,30 @@ export const DisplayConfigurationInput: React.FC<{
             >
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
                     {displayModeInput}
-                    <ItemLabelPreview input={input} itemName={input.label} />
+                    <Typography
+                        style={{
+                            fontFamily: 'RuneScape',
+                            fontSize: '24px',
+                            marginRight: 2,
+                            lineHeight: 1,
+                        }}
+                    >
+                        {input.label}
+                    </Typography>
+                </Box>
+
+                <Box
+                    sx={{
+                        display: 'flex',
+                        gap: 2,
+                        alignItems: 'center',
+                        marginLeft: 'auto',
+                    }}
+                >
                     {!isHidden && (
                         <ItemMenuPreview input={input} itemName={input.label} />
                     )}
+                    <ItemLabelPreview input={input} itemName={input.label} />
                 </Box>
                 {!isHidden && (
                     <CopyInputSettings
