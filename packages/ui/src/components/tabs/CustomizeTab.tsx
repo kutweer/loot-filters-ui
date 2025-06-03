@@ -36,6 +36,7 @@ import {
     StyleConfigSpec,
     StyleInput,
     TextInput,
+    Theme,
 } from '../../parsing/UiTypesSpec'
 import { useFilterConfigStore } from '../../store/filterConfigurationStore'
 import { useFilterStore } from '../../store/filterStore'
@@ -59,11 +60,12 @@ const MAX_GROUPCOUNT_AUTOEXPAND = 3
 
 const InputComponent: React.FC<{
     config: FilterConfiguration
+    theme?: Theme
     module: Module
     input: Input
     readonly: boolean
     persist: (value: any, macroName: string) => void
-}> = ({ config, module, input, readonly, persist }) => {
+}> = ({ config, theme, module, input, readonly, persist }) => {
     switch (input.type) {
         case 'number':
             const numberInput = input as NumberInput
@@ -95,6 +97,7 @@ const InputComponent: React.FC<{
                     config={config}
                     input={enumListInput}
                     readonly={readonly}
+                    theme={theme}
                     onChange={(diff) => {
                         persist(diff, input.macroName)
                     }}
@@ -106,6 +109,7 @@ const InputComponent: React.FC<{
                     config={config}
                     input={input as StringListInput}
                     readonly={readonly}
+                    theme={theme}
                     onChange={(diff) => {
                         if (!isObject(diff)) {
                             console.error(
@@ -155,12 +159,13 @@ const InputComponent: React.FC<{
 const InputGroup: React.FC<{
     key: number
     config: FilterConfiguration
+    theme?: Theme
     module: Module
     inputs: Input[]
     readonly: boolean
     searchResult: GroupSearchResult
     onChange: (config: FilterConfiguration) => void
-}> = ({ key, config, module, inputs, readonly, searchResult, onChange }) => {
+}> = ({ key, config, theme, module, inputs, readonly, searchResult, onChange }) => {
     const sorted = inputs.sort((a: Input, b: Input) => sizeOf(a) - sizeOf(b))
     return (
         <Grid2 key={key} container spacing={2}>
@@ -176,6 +181,7 @@ const InputGroup: React.FC<{
                         config={config}
                         module={module}
                         input={input}
+                        theme={theme}
                         readonly={readonly}
                         persist={(value, macroName) => {
                             const existing = config.inputConfigs?.[macroName]
@@ -291,6 +297,7 @@ const getPreviewsForGroup = ({
 
 const ModuleGroup: React.FC<{
     config: FilterConfiguration
+    theme?: Theme
     group: string
     groupCount: number
     index: number
@@ -307,6 +314,7 @@ const ModuleGroup: React.FC<{
     inputs,
     index,
     config,
+    theme,
     searchResult,
     onChange,
 }) => {
@@ -412,6 +420,7 @@ const ModuleGroup: React.FC<{
                     readonly={readonly}
                     searchResult={searchResult}
                     onChange={onChange}
+                    theme={theme}
                 />
             </AccordionDetails>
         </Accordion>
@@ -425,6 +434,7 @@ const ModuleSection: React.FC<{
     module: Module
     readonly: boolean
     config: FilterConfiguration
+    theme?: Theme
     onChange: (config: FilterConfiguration) => void
     clearConfiguration: (filterId: FilterId, macroNames: string[]) => void
     setEnabledModule: (
@@ -440,6 +450,7 @@ const ModuleSection: React.FC<{
     module,
     readonly,
     config,
+    theme,
     onChange,
     clearConfiguration,
     setEnabledModule,
@@ -626,6 +637,7 @@ const ModuleSection: React.FC<{
                             readonly={readonly}
                             searchResult={searchResult.groups['_']}
                             onChange={onChange}
+                            theme={theme}
                         />
                         {Object.entries(groupedInputs).map(
                             ([group, inputs], index) => (
@@ -633,6 +645,7 @@ const ModuleSection: React.FC<{
                                     key={index}
                                     index={index}
                                     config={config}
+                                    theme={theme}
                                     module={module}
                                     group={group}
                                     groupCount={groupCount}
@@ -737,6 +750,7 @@ export const CustomizeTab: React.FC<{
                             module={module}
                             showSettings={showSettings}
                             config={config ?? DEFAULT_FILTER_CONFIGURATION}
+                            theme={filter.themes.find((t) => t.id === config?.selectedThemeId)}
                             onChange={onChange}
                             clearConfiguration={clearConfiguration}
                             setEnabledModule={setEnabledModule}

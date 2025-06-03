@@ -7,6 +7,16 @@ export const EMPTY_DIFF: ListDiff = {
 
 export const applyDiff = (
     list: (string | ListOption)[],
+    diffs: (ListDiff | undefined)[]
+): (string | ListOption)[] => {
+
+    return diffs.reduce((acc, diff) => {
+        return applyDiffSingle(acc, diff)
+    }, list)
+}
+
+const applyDiffSingle = (
+    list: (string | ListOption)[],
     diff: ListDiff | undefined
 ): (string | ListOption)[] => {
     if (!diff) {

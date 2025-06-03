@@ -3,21 +3,23 @@ import {
     FilterConfiguration,
     NumberInput,
     NumberInputDefaultSpec,
+    Theme,
 } from '../../parsing/UiTypesSpec'
 
 export const NumberInputComponent: React.FC<{
     config: FilterConfiguration
+    theme?: Theme
     input: NumberInput
     readonly: boolean
     onChange: (number: number) => void
-}> = ({ config, input, readonly, onChange }) => {
+}> = ({ config, theme, input, readonly, onChange }) => {
     const activeConfigValue = config?.inputConfigs?.[input.macroName]
     const userConfigValue =
         activeConfigValue || activeConfigValue === 0
             ? NumberInputDefaultSpec.optional().parse(activeConfigValue)
             : undefined
 
-    const currentSetting = userConfigValue ?? input.default
+    const currentSetting = userConfigValue ?? theme?.config?.inputConfigs?.[input.macroName] ?? input.default
 
     return (
         <div>

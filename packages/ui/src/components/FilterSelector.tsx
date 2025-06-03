@@ -1,4 +1,5 @@
 import {
+    CopyAll,
     Edit,
     FileCopy,
     IosShare,
@@ -52,6 +53,7 @@ import { Option, UISelect } from './inputs/UISelect'
 import { SmartTooltip } from './SmartTooltip'
 
 import ImportRuneliteGif from '../images/import_runelite.gif'
+import { toThemeStructuredComment } from '../utils/filterTheme'
 
 const updateAvailableFn = (
     activeFilter?: Filter | null,
@@ -190,6 +192,7 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
 
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [exportDialogOpen, setExportDialogOpen] = useState(false)
+    const [exportThemeDialogOpen, setExportThemeDialogOpen] = useState(false)
 
     const activeFilter = useMemo(
         () => Object.values(filters).find((filter) => filter.active),
@@ -544,7 +547,44 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                     <ListItemText>Delete</ListItemText>
                 </MenuItem>
             </SmartTooltip>
+
+            <MenuItem
+                disabled={!activeFilter}
+                onClick={() => setExportThemeDialogOpen(true)}
+            >
+                <ListItemIcon>
+                    <CopyAll fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>Copy configuration as Theme</ListItemText>
+            </MenuItem>
         </Menu>
+    )
+
+    const themeSelector = (
+        <UISelect<string>
+            label="Theme"
+            sx={{width: '200px'}}
+            options={
+                [{label: 'Default', value: ''}, ...(activeFilter?.themes.map((theme) => ({
+                    label: theme.name,
+                    value: theme.id,
+                })) ?? [])]
+            }
+            value={{label: activeFilter?.themes.find((theme) => theme.id === activeFilterConfig?.selectedThemeId)?.name || 'Default', value: activeFilterConfig?.selectedThemeId || ''}}
+            onChange={
+                (value) => {
+                    if (value == null) {
+                        return
+                    }
+
+                    setFilterConfiguration(activeFilter?.id!!, {
+                        ...activeFilterConfig!!,
+                        selectedThemeId: value?.value === '' ? undefined : value?.value,
+                    })
+                }
+
+            }
+        />
     )
 
     if (Object.keys(filters).length === 0) {
@@ -581,6 +621,7 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                         />
                     </FormControl>
 
+                    {themeSelector}
                     {copyToClipboardButton}
                     {!isAutoUpdate(activeFilter?.source) && updateFilterButton}
                     {shareFilterButton}
@@ -680,6 +721,33 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                         }}
                     >
                         Don't show this again
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                open={exportThemeDialogOpen}
+                onClose={() => setExportThemeDialogOpen(false)}
+            >
+                <DialogTitle>Export Theme</DialogTitle>
+                <DialogContent>
+                    <pre>{JSON.stringify(activeFilterConfig, null, 2)}</pre>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        variant="outlined"
+                        onClick={() => {
+                            setExportThemeDialogOpen(false)
+                            navigator.clipboard.writeText(
+                                toThemeStructuredComment(
+                                    'test',
+                                    activeFilterConfig!!,
+                                    'subtitle',
+                                    'description'
+                                )
+                            )
+                        }}
+                    >
+                        Copy to clipboard
                     </Button>
                 </DialogActions>
             </Dialog>

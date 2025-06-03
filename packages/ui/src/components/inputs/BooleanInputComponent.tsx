@@ -3,16 +3,19 @@ import {
     BooleanInput,
     BooleanInputDefaultSpec,
     FilterConfiguration,
+    Theme,
 } from '../../parsing/UiTypesSpec'
 
 export const BooleanInputComponent: React.FC<{
     input: BooleanInput
     config: FilterConfiguration
+    theme?: Theme
     onChange: (boolean: boolean) => void
     readonly: boolean
-}> = ({ input, config, onChange, readonly }) => {
+}> = ({ input, config, theme, onChange, readonly }) => {
+
     const currentSetting = BooleanInputDefaultSpec.parse(
-        config?.inputConfigs?.[input.macroName] ?? input.default
+        config?.inputConfigs?.[input.macroName] ?? theme?.config?.inputConfigs?.[input.macroName] ?? input.default
     )
 
     return (

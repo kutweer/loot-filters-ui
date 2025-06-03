@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { ErrorBoundary } from '../components/ErrorBoundary'
 import { Rs2fEditor } from '../components/Rs2fEditor'
-import { parseModules } from '../parsing/parse'
+import { parse, parseModules } from '../parsing/parse'
 import { FilterConfiguration } from '../parsing/UiTypesSpec'
 import { useFilterConfigStore } from '../store/filterConfigurationStore'
 import { useFilterStore } from '../store/filterStore'
@@ -67,10 +67,13 @@ export const EditorLoadedFilterPage: React.FC = () => {
     )
     const setContent = (id: string, content: string) => {
         if (id === 'filterRs2f') {
-            const modules = parseModules(content)
+            const filter = parse(content, false, { name: 'update' })
             const newFilter = {
                 ...filters[filterId],
-                ...(modules.modules ? { modules: modules.modules } : {}),
+                ...filter.filter,
+                name: filters[filterId].name,
+                id: filters[filterId].id,
+                // ...(modules.modules ? { modules: modules.modules } : {}),
                 rs2f: content,
             }
             updateFilter(newFilter)
@@ -101,7 +104,7 @@ export const EditorLoadedFilterPage: React.FC = () => {
                 if (selectedModules) {
                     const newContent = selectedModules
                         .map((m) => {
-                            return applyModule(m, config.inputConfigs)
+                            return applyModule(m, config.inputConfigs, undefined)
                         })
                         .join('')
 

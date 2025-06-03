@@ -5,6 +5,7 @@ import {
     ListDiffSpec,
     ListOption,
     StringListInput,
+    Theme,
 } from '../../parsing/UiTypesSpec'
 import {
     applyDiff,
@@ -37,13 +38,18 @@ export const StringListInputComponent: React.FC<{
     input: StringListInput
     config: FilterConfiguration
     onChange: (diff: ListDiff) => void
+    theme?: Theme
     readonly: boolean
-}> = ({ input, config, onChange, readonly }) => {
-    const configuredDiff = ListDiffSpec.optional()
-        .default(EMPTY_DIFF)
-        .parse(config?.inputConfigs?.[input.macroName])
+}> = ({ input, config, theme, onChange, readonly }) => {
+    console.log('theme', theme)
 
-    const currentValues = applyDiff(input.default, configuredDiff)
+    const spec = ListDiffSpec.optional().default(EMPTY_DIFF)
+
+    const configuredDiff = spec.parse(config?.inputConfigs?.[input.macroName])
+
+    const themeDiff = spec.parse(theme?.config?.inputConfigs?.[input.macroName])
+
+    const currentValues = applyDiff(input.default, [themeDiff, configuredDiff])
 
     const options: Option[] = input.default.map(
         (option: string | ListOption) => {
@@ -96,7 +102,7 @@ export const StringListInputComponent: React.FC<{
                         (option) => option.value
                     )
                     const splitValues = parseValues(values)
-                    onChange(convertToListDiff(splitValues, input.default))
+                    onChange(convertToListDiff(splitValues, applyDiff(input.default, [themeDiff])))
                 }}
             />
         </div>

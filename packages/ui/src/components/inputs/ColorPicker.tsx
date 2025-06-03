@@ -226,17 +226,18 @@ const ColorPickerInput: React.FC<{
         | 'lootbeamColor'
         | 'menuTextColor'
     config?: StyleConfig
+    themeConfig?: StyleConfig
     input?: StyleInput
-
     onChange: (config: StyleConfig) => void
     disabled?: boolean
     helpText?: string
-}> = ({ configField, config, input, onChange, disabled, helpText }) => {
+}> = ({ configField, config, themeConfig, input, onChange, disabled, helpText }) => {
     return (
         <FormControl component="div">
             <ColorPicker
                 color={
                     config?.[configField] ??
+                    themeConfig?.[configField] ??
                     input?.default?.[configField] ??
                     null
                 }

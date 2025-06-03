@@ -4,8 +4,16 @@ import {
     InputSpec as FilterSpecInput,
     ModuleSpec as FilterSpecModule,
     GroupSpec,
+    ThemeSpec as FilterSpecTheme,
 } from './FilterTypesSpec'
 import { IconSpec } from './IconSpec'
+
+export const ThemeSpec = FilterSpecTheme.extend({
+    id: z.string().nonempty(),
+})
+
+export type Theme = z.infer<typeof ThemeSpec>
+
 
 export const InputSpec = FilterSpecInput.extend({
     macroName: z.string().nonempty(),
@@ -135,6 +143,7 @@ export const FilterSpec = z.object({
     updatedOn: z.string().datetime().optional(),
     source: z.string().url().optional(),
     modules: z.array(ModuleSpec),
+    themes: z.array(ThemeSpec).default([]),
     rs2f: z.string(),
 })
 
@@ -155,6 +164,7 @@ export const FilterConfigurationSpec = z.object({
     inputConfigs: z.record(z.string(), z.any()).optional().default({}),
     prefixRs2f: z.string().optional(),
     suffixRs2f: z.string().optional(),
+    selectedThemeId: z.string().optional(),
 })
 
 export type FilterConfiguration = z.infer<typeof FilterConfigurationSpec>
@@ -163,3 +173,4 @@ export type MacroName = string
 
 export const isEnumListInput = (v: Input): v is EnumListInput =>
     v.type === 'enumlist'
+

@@ -7,6 +7,7 @@ import {
     MacroName,
     Module,
     StyleConfig,
+    Theme,
 } from '../parsing/UiTypesSpec'
 import { applyDiff, convertOptionsToStrings, EMPTY_DIFF } from './ListDiffUtils'
 export const renderFilter = (
@@ -24,8 +25,10 @@ export const renderFilter = (
         ...(parseModules(activeConfig?.suffixRs2f || '')?.modules || []),
     ]
 
+    const theme = filter.themes.find((theme) => theme.id === activeConfig?.selectedThemeId)
+
     let filterText = modules
-        .map((m) => applyModule(m, activeConfig?.inputConfigs))
+        .map((m) => applyModule(m, activeConfig?.inputConfigs, theme))
         .join('\n')
 
     filterText = filterText.replace(
@@ -42,7 +45,8 @@ export const renderFilter = (
 
 export const applyModule = (
     module: Module,
-    config: { [key: MacroName]: any } | undefined
+    config: { [key: MacroName]: any } | undefined,
+    theme?: Theme,
 ): string => {
     let updated = module.rs2f
 
@@ -73,9 +77,10 @@ export const applyModule = (
             case 'stringlist':
             case 'enumlist': {
                 const configuredDiff = config?.[input.macroName] as ListDiff
+                const themeDiff = theme?.config?.inputConfigs?.[input.macroName]
 
                 const list = convertOptionsToStrings(
-                    applyDiff(input.default, configuredDiff ?? EMPTY_DIFF)
+                    applyDiff(input.default, [themeDiff, configuredDiff ?? EMPTY_DIFF])
                 )
 
                 updated = updateMacro(
