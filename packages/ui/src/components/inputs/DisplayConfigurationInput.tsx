@@ -31,11 +31,11 @@ import {
     labelFromTextAccent,
     TextAccent,
 } from '../../types/Rs2fEnum'
+import { EventShield } from '../EventShield'
 import { ItemLabelPreview, ItemMenuPreview } from '../Previews'
 import { ColorPickerInput } from './ColorPicker'
 import { CopyInputSettings } from './CopyInputSettings'
 import { UISelect } from './UISelect'
-import { EventShield } from '../EventShield'
 
 const Column: React.FC<{
     children: React.ReactNode[] | React.ReactNode
@@ -634,242 +634,262 @@ export const DisplayConfigurationInput: React.FC<{
     )
 
     return (
-        <Accordion
-            slotProps={{ transition: { unmountOnExit: true } }}
-            expanded={expanded && !isHidden}
-            onChange={() => setExpanded(!expanded)}
-        >
-            <AccordionSummary
-                sx={{
-                    backgroundColor: isHidden
-                        ? colors.rsDarkBrown
-                        : colors.rsLighterBrown,
-                    minHeight: '5rem',
+        <div>
+            <Typography
+                style={{
+                    fontFamily: 'RuneScape',
+                    fontSize: '24px',
+                    marginRight: 2,
+                    lineHeight: 1,
                 }}
-                expandIcon={!isHidden && <ExpandMore />}
             >
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                    {displayModeInput}
-                    <ItemLabelPreview input={input} itemName={input.label} />
+                {input.label}
+            </Typography>
+            <Accordion
+                slotProps={{ transition: { unmountOnExit: true } }}
+                expanded={expanded && !isHidden}
+                onChange={() => setExpanded(!expanded)}
+            >
+                <AccordionSummary
+                    sx={{
+                        backgroundColor: isHidden
+                            ? colors.rsDarkBrown
+                            : colors.rsLighterBrown,
+                        minHeight: '5rem',
+                    }}
+                    expandIcon={!isHidden && <ExpandMore />}
+                >
+                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                        {displayModeInput}
+                        <ItemLabelPreview
+                            input={input}
+                            itemName={input.label}
+                        />
+                        {!isHidden && (
+                            <ItemMenuPreview
+                                input={input}
+                                itemName={input.label}
+                            />
+                        )}
+                    </Box>
                     {!isHidden && (
-                        <ItemMenuPreview input={input} itemName={input.label} />
+                        <CopyInputSettings
+                            input={input}
+                            configToCopy={{
+                                ...input.default,
+                                ...styleConfig,
+                            }}
+                            onChange={onChange}
+                        />
                     )}
-                </Box>
-                {!isHidden && (
-                    <CopyInputSettings
-                        input={input}
-                        configToCopy={{
-                            ...input.default,
-                            ...styleConfig,
-                        }}
-                        onChange={onChange}
-                    />
-                )}
-            </AccordionSummary>
-            <AccordionDetails
-                sx={{
-                    backgroundColor: colors.rsLighterBrown,
-                }}
-            >
-                <Grid2 container columns={12} rowSpacing={4}>
-                    <HeaderCol text="Overlay" />
-                    <Column>
-                        <Row>
-                            <Label label="Text Color" />
-                            <Grid2 size={1}>{textColorInput}</Grid2>
-                            <Label label="Font Type" />
-                            <Grid2 size={2}>{fontTypeInput}</Grid2>
-                            <Label label="Item Icon" />
-                            <Grid2 size={2}>{itemIconTypeSelect}</Grid2>
-                        </Row>
-                        <Row>
-                            <Label label="Background Color" />
-                            <Grid2 size={1}>{backgroundColorInput}</Grid2>
-                            <Label label="Text Accent" />
-                            <Grid2 size={4}>{textAccentInput}</Grid2>
-                            <Grid2 size={3}>
-                                {iconType === 'itemId' && iconItemIdInput}
-                                {iconType === 'file' && iconFileInput}
-                                {iconType === 'sprite' && iconSpriteInput}
-                            </Grid2>
-                        </Row>
-                        <Row>
-                            <Label label="Border Color" />
-                            <Grid2 size={1}>{borderColorInput}</Grid2>
-                            <Label label="Text Accent Color" />
-                            <Grid2 size={1}>{textAccentColorInput}</Grid2>
-                            <Grid2 size={3} />
-                            <Grid2 size={3}>
-                                {iconType === 'file' && (
-                                    <Typography
-                                        variant="caption"
-                                        color={colors.rsDarkOrange}
-                                        sx={{ lineHeight: 1.0 }}
-                                    >
-                                        Icon files must live in the folder
-                                        <br />
-                                        .runelite/loot-filters/icons
-                                    </Typography>
-                                )}
-                                {iconType === 'itemId' && (
-                                    <div>
+                </AccordionSummary>
+                <AccordionDetails
+                    sx={{
+                        backgroundColor: colors.rsLighterBrown,
+                    }}
+                >
+                    <Grid2 container columns={12} rowSpacing={4}>
+                        <HeaderCol text="Overlay" />
+                        <Column>
+                            <Row>
+                                <Label label="Text Color" />
+                                <Grid2 size={1}>{textColorInput}</Grid2>
+                                <Label label="Font Type" />
+                                <Grid2 size={2}>{fontTypeInput}</Grid2>
+                                <Label label="Item Icon" />
+                                <Grid2 size={2}>{itemIconTypeSelect}</Grid2>
+                            </Row>
+                            <Row>
+                                <Label label="Background Color" />
+                                <Grid2 size={1}>{backgroundColorInput}</Grid2>
+                                <Label label="Text Accent" />
+                                <Grid2 size={4}>{textAccentInput}</Grid2>
+                                <Grid2 size={3}>
+                                    {iconType === 'itemId' && iconItemIdInput}
+                                    {iconType === 'file' && iconFileInput}
+                                    {iconType === 'sprite' && iconSpriteInput}
+                                </Grid2>
+                            </Row>
+                            <Row>
+                                <Label label="Border Color" />
+                                <Grid2 size={1}>{borderColorInput}</Grid2>
+                                <Label label="Text Accent Color" />
+                                <Grid2 size={1}>{textAccentColorInput}</Grid2>
+                                <Grid2 size={3} />
+                                <Grid2 size={3}>
+                                    {iconType === 'file' && (
                                         <Typography
-                                            component="div"
                                             variant="caption"
                                             color={colors.rsDarkOrange}
+                                            sx={{ lineHeight: 1.0 }}
                                         >
-                                            Item Id
+                                            Icon files must live in the folder
+                                            <br />
+                                            .runelite/loot-filters/icons
                                         </Typography>
-                                        <Typography
-                                            component="div"
-                                            style={{ marginTop: '-0.5rem' }}
-                                            variant="caption"
-                                            color={colors.rsDarkOrange}
-                                        >
-                                            You can use{' '}
-                                            <a
-                                                style={{
-                                                    color: colors.rsDarkYellow,
-                                                }}
-                                                target="_blank"
-                                                href="https://chisel.weirdgloop.org/moid/"
-                                            >
-                                                this tool
-                                            </a>{' '}
-                                            to browse items by ID.
-                                        </Typography>
-                                    </div>
-                                )}
-                                {iconType === 'sprite' && (
-                                    <div>
-                                        <div
-                                            style={{
-                                                display: 'flex',
-                                                flexDirection: 'row',
-                                                gap: 1,
-                                            }}
-                                        >
+                                    )}
+                                    {iconType === 'itemId' && (
+                                        <div>
                                             <Typography
+                                                component="div"
                                                 variant="caption"
                                                 color={colors.rsDarkOrange}
-                                                sx={{ lineHeight: 1.0 }}
                                             >
-                                                Sprite Id
+                                                Item Id
                                             </Typography>
                                             <Typography
-                                                sx={{
-                                                    lineHeight: 1.0,
-                                                    marginLeft: '7rem',
-                                                }}
+                                                component="div"
+                                                style={{ marginTop: '-0.5rem' }}
                                                 variant="caption"
                                                 color={colors.rsDarkOrange}
                                             >
-                                                Sprite Index
+                                                You can use{' '}
+                                                <a
+                                                    style={{
+                                                        color: colors.rsDarkYellow,
+                                                    }}
+                                                    target="_blank"
+                                                    href="https://chisel.weirdgloop.org/moid/"
+                                                >
+                                                    this tool
+                                                </a>{' '}
+                                                to browse items by ID.
                                             </Typography>
                                         </div>
+                                    )}
+                                    {iconType === 'sprite' && (
+                                        <div>
+                                            <div
+                                                style={{
+                                                    display: 'flex',
+                                                    flexDirection: 'row',
+                                                    gap: 1,
+                                                }}
+                                            >
+                                                <Typography
+                                                    variant="caption"
+                                                    color={colors.rsDarkOrange}
+                                                    sx={{ lineHeight: 1.0 }}
+                                                >
+                                                    Sprite Id
+                                                </Typography>
+                                                <Typography
+                                                    sx={{
+                                                        lineHeight: 1.0,
+                                                        marginLeft: '7rem',
+                                                    }}
+                                                    variant="caption"
+                                                    color={colors.rsDarkOrange}
+                                                >
+                                                    Sprite Index
+                                                </Typography>
+                                            </div>
+                                            <Typography
+                                                variant="caption"
+                                                color={colors.rsDarkOrange}
+                                            >
+                                                You can use{' '}
+                                                <a
+                                                    style={{
+                                                        color: colors.rsDarkYellow,
+                                                    }}
+                                                    target="_blank"
+                                                    href="https://abextm.github.io/cache2/#/viewer/sprite/"
+                                                >
+                                                    this tool
+                                                </a>{' '}
+                                                to browse sprites.
+                                            </Typography>
+                                        </div>
+                                    )}
+                                </Grid2>
+                            </Row>
+                        </Column>
+                        <HeaderCol text="Menu" />
+                        <Column>
+                            <Grid2 container size={11}>
+                                <Label label="Menu Color" />
+                                <Grid2 size={1}>{menuColorInput}</Grid2>
+                                <Label label="Menu Sort" />
+                                <Grid2 size={1}>{menuSortInput}</Grid2>
+                            </Grid2>
+                        </Column>
+                        <HeaderCol text="General" />
+                        <Grid2 rowSpacing={0} container size={10}>
+                            <Row>
+                                <Label label="Lootbeam" />
+                                <Grid2 size={1}>{displayLootbeamInput}</Grid2>
+                                <Label label="Highlight Tile" />
+                                <Grid2 size={1}>{highlightTileComponent}</Grid2>
+                                <Label label="Show Item Value" />
+                                <Grid2 size={1}>{valueComponent}</Grid2>
+                                <Label label="Drop Sound" />
+                                <Grid2 size={1}>{soundTypeSelect}</Grid2>
+                            </Row>
+                            <Row>
+                                <Label label="Lootbeam Color" />
+                                <Grid2 size={1}>{lootbeamColorInput}</Grid2>
+                                <Label label="Tile Fill" />
+                                <Grid2 size={1}>
+                                    {hilightTileFillColorInput}
+                                </Grid2>
+                                <Label label="Show Despawn Timer" />
+                                <Grid2 size={1}>{despawnComponent}</Grid2>
+                                <Grid2 size={2} />
+                                <Grid2 size={1}>
+                                    {soundType === 'soundeffect' &&
+                                        soundEffectInput}
+                                    {soundType === 'fromfile' && soundFileInput}
+                                </Grid2>
+                            </Row>
+                            <Row>
+                                <Grid2 size={2} />
+                                <Grid2 size={1} />
+                                <Label label="Tile Stroke" />
+                                <Grid2 size={1}>
+                                    {hilightTileStrokeColorInput}
+                                </Grid2>
+                                <Label label="Notify on Drop" />
+                                <Grid2 size={1}>{notifyComponent}</Grid2>
+                                <Grid2 size={2} />
+                                {soundType === 'soundeffect' && (
+                                    <Grid2 size={1}>
                                         <Typography
                                             variant="caption"
                                             color={colors.rsDarkOrange}
+                                            sx={{
+                                                textWrap: 'nowrap',
+                                                lineHeight: 1.0,
+                                            }}
                                         >
-                                            You can use{' '}
+                                            Sound Effect ID
+                                            <br />
                                             <a
+                                                target="_blank"
                                                 style={{
                                                     color: colors.rsDarkYellow,
                                                 }}
-                                                target="_blank"
-                                                href="https://abextm.github.io/cache2/#/viewer/sprite/"
+                                                href="https://oldschool.runescape.wiki/w/List_of_sound_IDs"
                                             >
-                                                this tool
-                                            </a>{' '}
-                                            to browse sprites.
+                                                (browse sound effects by name)
+                                            </a>
                                         </Typography>
-                                    </div>
+                                    </Grid2>
                                 )}
-                            </Grid2>
-                        </Row>
-                    </Column>
-                    <HeaderCol text="Menu" />
-                    <Column>
-                        <Grid2 container size={11}>
-                            <Label label="Menu Color" />
-                            <Grid2 size={1}>{menuColorInput}</Grid2>
-                            <Label label="Menu Sort" />
-                            <Grid2 size={1}>{menuSortInput}</Grid2>
+                                {soundType === 'fromfile' && (
+                                    <Grid2 size={1}>{soundFileHelpText}</Grid2>
+                                )}
+                            </Row>
+                            <Row>
+                                <Grid2 size={2} />
+                                <Grid2 size={1} />
+                                <Grid2 size={2} />
+                                <Grid2 size={1} />
+                            </Row>
                         </Grid2>
-                    </Column>
-                    <HeaderCol text="General" />
-                    <Grid2 rowSpacing={0} container size={10}>
-                        <Row>
-                            <Label label="Lootbeam" />
-                            <Grid2 size={1}>{displayLootbeamInput}</Grid2>
-                            <Label label="Highlight Tile" />
-                            <Grid2 size={1}>{highlightTileComponent}</Grid2>
-                            <Label label="Show Item Value" />
-                            <Grid2 size={1}>{valueComponent}</Grid2>
-                            <Label label="Drop Sound" />
-                            <Grid2 size={1}>{soundTypeSelect}</Grid2>
-                        </Row>
-                        <Row>
-                            <Label label="Lootbeam Color" />
-                            <Grid2 size={1}>{lootbeamColorInput}</Grid2>
-                            <Label label="Tile Fill" />
-                            <Grid2 size={1}>{hilightTileFillColorInput}</Grid2>
-                            <Label label="Show Despawn Timer" />
-                            <Grid2 size={1}>{despawnComponent}</Grid2>
-                            <Grid2 size={2} />
-                            <Grid2 size={1}>
-                                {soundType === 'soundeffect' &&
-                                    soundEffectInput}
-                                {soundType === 'fromfile' && soundFileInput}
-                            </Grid2>
-                        </Row>
-                        <Row>
-                            <Grid2 size={2} />
-                            <Grid2 size={1} />
-                            <Label label="Tile Stroke" />
-                            <Grid2 size={1}>
-                                {hilightTileStrokeColorInput}
-                            </Grid2>
-                            <Label label="Notify on Drop" />
-                            <Grid2 size={1}>{notifyComponent}</Grid2>
-                            <Grid2 size={2} />
-                            {soundType === 'soundeffect' && (
-                                <Grid2 size={1}>
-                                    <Typography
-                                        variant="caption"
-                                        color={colors.rsDarkOrange}
-                                        sx={{
-                                            textWrap: 'nowrap',
-                                            lineHeight: 1.0,
-                                        }}
-                                    >
-                                        Sound Effect ID
-                                        <br />
-                                        <a
-                                            target="_blank"
-                                            style={{
-                                                color: colors.rsDarkYellow,
-                                            }}
-                                            href="https://oldschool.runescape.wiki/w/List_of_sound_IDs"
-                                        >
-                                            (browse sound effects by name)
-                                        </a>
-                                    </Typography>
-                                </Grid2>
-                            )}
-                            {soundType === 'fromfile' && (
-                                <Grid2 size={1}>{soundFileHelpText}</Grid2>
-                            )}
-                        </Row>
-                        <Row>
-                            <Grid2 size={2} />
-                            <Grid2 size={1} />
-                            <Grid2 size={2} />
-                            <Grid2 size={1} />
-                        </Row>
                     </Grid2>
-                </Grid2>
-            </AccordionDetails>
-        </Accordion>
+                </AccordionDetails>
+            </Accordion>
+        </div>
     )
 }
