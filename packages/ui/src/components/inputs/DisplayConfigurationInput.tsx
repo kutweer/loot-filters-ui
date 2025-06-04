@@ -3,11 +3,13 @@ import {
     Accordion,
     AccordionDetails,
     AccordionSummary,
+    Badge,
     Box,
     Checkbox,
     Grid2,
     SxProps,
     TextField,
+    Tooltip,
     Typography,
 } from '@mui/material'
 import React, { useState } from 'react'
@@ -165,7 +167,41 @@ export const DisplayConfigurationInput: React.FC<{
     const hasExplicitDisplayMode =
         input.default?.hidden === true || input.default?.hidden === false
 
-    const displayModeInput = (
+    // Helper to wrap an input with a badge if changed from default
+    const inputWithBadge = (child: React.ReactNode, configField: string) => {
+        // Get values for the field from user, theme, and default
+        const userValue = (styleConfig as any)?.[configField]
+        const themeValue = (themeConfig as any)?.[configField] // TODO: handle theme config
+        const filterValue = (input.default as any)?.[configField]
+        // Determine which value is active
+        let isChanged = false
+        let badgeColor: 'success' | 'warning' | undefined = undefined
+        if (userValue !== undefined && userValue !== filterValue) {
+            isChanged = true
+            badgeColor = 'success' // user-set (green)
+        } else if (userValue === undefined && filterValue !== undefined) {
+            isChanged = true
+            badgeColor = 'warning' // filter-set (yellow)
+        }
+        return isChanged && badgeColor ? (
+            <Tooltip
+                title={
+                    badgeColor === 'success'
+                        ? 'Changed by you'
+                        : 'Set by filter/theme'
+                }
+            >
+                <Badge color={badgeColor} variant="dot">
+                    {child}
+                </Badge>
+            </Tooltip>
+        ) : (
+            child
+        )
+    }
+
+    // Now wrap all inputs with inputWithBadge
+    const displayModeInput = inputWithBadge(
         <EventShield>
             <UISelect<number>
                 sx={{ minWidth: '7rem', maxHeight: '3rem' }}
@@ -204,10 +240,11 @@ export const DisplayConfigurationInput: React.FC<{
                     }
                 }}
             />
-        </EventShield>
+        </EventShield>,
+        'hidden'
     )
 
-    const displayLootbeamInput = (
+    const displayLootbeamInput = inputWithBadge(
         <Checkbox
             disabled={readonly}
             checked={
@@ -217,10 +254,10 @@ export const DisplayConfigurationInput: React.FC<{
                 false
             }
             onChange={(e) => onChange({ showLootbeam: e.target.checked })}
-        />
+        />,
+        'showLootbeam'
     )
-
-    const lootbeamColorInput = (
+    const lootbeamColorInput = inputWithBadge(
         <ColorPickerInput
             disabled={
                 !(
@@ -234,10 +271,10 @@ export const DisplayConfigurationInput: React.FC<{
             themeConfig={themeConfig}
             input={input}
             onChange={onChange}
-        />
+        />,
+        'lootbeamColor'
     )
-
-    const valueComponent = (
+    const valueComponent = inputWithBadge(
         <Checkbox
             disabled={readonly}
             checked={
@@ -247,10 +284,10 @@ export const DisplayConfigurationInput: React.FC<{
                 false
             }
             onChange={(e) => onChange({ showValue: e.target.checked })}
-        />
+        />,
+        'showValue'
     )
-
-    const despawnComponent = (
+    const despawnComponent = inputWithBadge(
         <Checkbox
             disabled={readonly}
             checked={
@@ -260,10 +297,10 @@ export const DisplayConfigurationInput: React.FC<{
                 false
             }
             onChange={(e) => onChange({ showDespawn: e.target.checked })}
-        />
+        />,
+        'showDespawn'
     )
-
-    const notifyComponent = (
+    const notifyComponent = inputWithBadge(
         <Checkbox
             disabled={readonly}
             checked={
@@ -273,10 +310,10 @@ export const DisplayConfigurationInput: React.FC<{
                 false
             }
             onChange={(e) => onChange({ notify: e.target.checked })}
-        />
+        />,
+        'notify'
     )
-
-    const highlightTileComponent = (
+    const highlightTileComponent = inputWithBadge(
         <Checkbox
             disabled={readonly}
             checked={
@@ -286,10 +323,10 @@ export const DisplayConfigurationInput: React.FC<{
                 false
             }
             onChange={(e) => onChange({ highlightTile: e.target.checked })}
-        />
+        />,
+        'highlightTile'
     )
-
-    const hilightTileFillColorInput = (
+    const hilightTileFillColorInput = inputWithBadge(
         <ColorPickerInput
             configField="tileFillColor"
             config={styleConfig}
@@ -303,10 +340,10 @@ export const DisplayConfigurationInput: React.FC<{
                     input.default?.highlightTile
                 ) || readonly
             }
-        />
+        />,
+        'tileFillColor'
     )
-
-    const hilightTileStrokeColorInput = (
+    const hilightTileStrokeColorInput = inputWithBadge(
         <ColorPickerInput
             configField="tileStrokeColor"
             config={styleConfig}
@@ -320,7 +357,8 @@ export const DisplayConfigurationInput: React.FC<{
                     input.default?.highlightTile
                 ) || readonly
             }
-        />
+        />,
+        'tileStrokeColor'
     )
 
     const soundOpts = [
@@ -328,7 +366,8 @@ export const DisplayConfigurationInput: React.FC<{
         { label: 'Sound Effect', value: 'soundeffect' },
         { label: 'From File', value: 'fromfile' },
     ]
-    const soundTypeSelect = (
+
+    const soundTypeSelect = inputWithBadge(
         <UISelect<string>
             sx={{ width: '12rem' }}
             disabled={readonly}
@@ -354,10 +393,10 @@ export const DisplayConfigurationInput: React.FC<{
                         break
                 }
             }}
-        />
+        />,
+        'sound'
     )
-
-    const soundEffectInput = (
+    const soundEffectInput = inputWithBadge(
         <TextField
             type="number"
             sx={{ minWidth: '12rem' }}
@@ -371,19 +410,22 @@ export const DisplayConfigurationInput: React.FC<{
                 0
             }
             onChange={(e) => onChange({ sound: parseInt(e.target.value) || 0 })}
-        />
+        />,
+        'sound'
     )
 
     const soundFile =
         styleConfig?.sound ?? themeConfig?.sound ?? input.default?.sound ?? ''
-    const soundFileInput = (
+
+    const soundFileInput = inputWithBadge(
         <TextField
             sx={{ minWidth: '12rem' }}
             disabled={readonly}
             placeholder="Filename"
             value={soundFile}
             onChange={(e) => onChange({ sound: e.target.value })}
-        />
+        />,
+        'sound'
     )
     const soundFileHelpText =
         typeof soundFile === 'string' && soundFile.endsWith('.wav') ? (
@@ -412,7 +454,7 @@ export const DisplayConfigurationInput: React.FC<{
             </Typography>
         )
 
-    const textColorInput = (
+    const textColorInput = inputWithBadge(
         <ColorPickerInput
             configField="textColor"
             config={styleConfig}
@@ -420,49 +462,50 @@ export const DisplayConfigurationInput: React.FC<{
             input={input}
             disabled={readonly}
             onChange={onChange}
-        />
+        />,
+        'textColor'
     )
-
-    const backgroundColorInput = (
+    const backgroundColorInput = inputWithBadge(
         <ColorPickerInput
             configField="backgroundColor"
             config={styleConfig}
             themeConfig={themeConfig}
             input={input}
             onChange={onChange}
-        />
+        />,
+        'backgroundColor'
     )
-
-    const borderColorInput = (
+    const borderColorInput = inputWithBadge(
         <ColorPickerInput
             configField="borderColor"
             config={styleConfig}
             themeConfig={themeConfig}
             input={input}
             onChange={onChange}
-        />
+        />,
+        'borderColor'
     )
-
-    const textAccentColorInput = (
+    const textAccentColorInput = inputWithBadge(
         <ColorPickerInput
             configField="textAccentColor"
             config={styleConfig}
             themeConfig={themeConfig}
             input={input}
             onChange={onChange}
-        />
+        />,
+        'textAccentColor'
     )
-
-    const menuColorInput = (
+    const menuColorInput = inputWithBadge(
         <ColorPickerInput
             configField="menuTextColor"
             config={styleConfig}
             themeConfig={themeConfig}
             input={input}
             onChange={onChange}
-        />
+        />,
+        'menuTextColor'
     )
-    const menuSortInput = (
+    const menuSortInput = inputWithBadge(
         <TextField
             sx={{ minWidth: '10rem', ml: 1 }}
             placeholder="priority"
@@ -482,10 +525,10 @@ export const DisplayConfigurationInput: React.FC<{
                 })
             }
             disabled={readonly}
-        />
+        />,
+        'menuSort'
     )
-
-    const fontTypeInput = (
+    const fontTypeInput = inputWithBadge(
         <UISelect<number>
             sx={{ width: '15rem', marginLeft: 1 }}
             disabled={readonly}
@@ -517,9 +560,10 @@ export const DisplayConfigurationInput: React.FC<{
                     })
                 }
             }}
-        />
+        />,
+        'fontType'
     )
-    const textAccentInput = (
+    const textAccentInput = inputWithBadge(
         <UISelect<number>
             sx={{ width: '15rem', marginLeft: 1 }}
             disabled={readonly}
@@ -551,7 +595,8 @@ export const DisplayConfigurationInput: React.FC<{
                     })
                 }
             }}
-        />
+        />,
+        'textAccent'
     )
     const iconOpts = [
         {
