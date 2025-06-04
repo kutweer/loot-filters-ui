@@ -1,7 +1,7 @@
 import Fuse from 'fuse.js'
 import { groupBy } from 'underscore'
 
-import { Module, Input, isEnumListInput } from '../parsing/UiTypesSpec'
+import { Input, isEnumListInput, Module } from '../parsing/UiTypesSpec'
 
 const MIN_SEARCH_LENGTH = 3
 
@@ -97,17 +97,27 @@ const init = (input: Module): ModuleSearchResult => {
 }
 
 const getInputContents = (input: Input): string[] => {
-    const enums: string[] = []
+    const inputContents: string[] = []
     if (isEnumListInput(input)) {
         for (const v of input.enum) {
             if (typeof v === 'string') {
-                enums.push(v)
+                inputContents.push(v)
             } else {
-                enums.push(v.label, v.value)
+                inputContents.push(v.label, v.value)
             }
         }
     }
-    return [...(input.default || []), ...enums]
+    if (input.type === 'text' && input.default) {
+        inputContents.push(input.default)
+    }
+    if (input.type === 'stringlist' && input.default) {
+        inputContents.push(...input.default)
+    }
+    if (input.type === 'style' && input.exampleItem) {
+        inputContents.push(input.exampleItem)
+    }
+    inputContents.push(input.label)
+    return inputContents
 }
 
 const isStringMatch = (inputs: string[], search: string): boolean => {
