@@ -42,6 +42,11 @@ import { useFilterConfigStore } from '../../store/filterConfigurationStore'
 import { useFilterStore } from '../../store/filterStore'
 import { useSearchStore } from '../../store/search'
 import { countConfigChanges } from '../../utils/configUtils'
+import {
+    GroupSearchResult,
+    InputSearchResult,
+    searchModule,
+} from '../../utils/search'
 import { GitHubFlavoredMarkdown } from '../GitHubFlavoredMarkdown'
 import { BooleanInputComponent } from '../inputs/BooleanInputComponent'
 import { DisplayConfigurationInput } from '../inputs/DisplayConfigurationInput'
@@ -50,11 +55,6 @@ import { NumberInputComponent } from '../inputs/NumberInputComponent'
 import { StringListInputComponent } from '../inputs/StringListInputComponent'
 import { TextInputComponent } from '../inputs/TextInputComponent'
 import { ItemLabelPreview } from '../Previews'
-import {
-    searchModule,
-    GroupSearchResult,
-    InputSearchResult,
-} from '../../utils/search'
 
 const MAX_GROUPCOUNT_AUTOEXPAND = 3
 
@@ -759,7 +759,7 @@ export const CustomizeTab: React.FC<{
                             module={module}
                             showSettings={showSettings}
                             config={config ?? DEFAULT_FILTER_CONFIGURATION}
-                            theme={filter.themes.find(
+                            theme={filter.themes?.find(
                                 (t) => t.id === config?.selectedThemeId
                             )}
                             onChange={onChange}
