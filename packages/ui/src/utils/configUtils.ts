@@ -43,7 +43,6 @@ export const countConfigChanges = (
         .map((macroName) => {
             const inputConfig = config.inputConfigs?.[macroName]
             const count = countChanges(inputConfig)
-            console.log(macroName, inputConfig, count)
             return count
         })
         .reduce((acc, count) => {

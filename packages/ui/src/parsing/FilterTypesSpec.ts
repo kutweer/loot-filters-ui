@@ -36,3 +36,20 @@ export const InputSpec = z
     .catchall(z.any())
 
 export type Input = z.infer<typeof InputSpec>
+
+export const ThemeSpec = z.object({
+    name: z.string().nonempty(),
+    subtitle: z.string().optional(),
+    description: z.string().optional(),
+    config: z
+        .object({
+            enabledModules: z
+                .record(z.string(), z.boolean())
+                .optional()
+                .default({}),
+            inputConfigs: z.record(z.string(), z.any()).optional().default({}),
+        })
+        .optional(),
+})
+
+export type Theme = z.infer<typeof ThemeSpec>

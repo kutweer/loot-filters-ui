@@ -7,6 +7,7 @@ import {
     MacroName,
     Module,
     StyleConfig,
+    Theme,
 } from '../parsing/UiTypesSpec'
 import { applyDiff, convertOptionsToStrings, EMPTY_DIFF } from './ListDiffUtils'
 export const renderFilter = (
@@ -24,8 +25,12 @@ export const renderFilter = (
         ...(parseModules(activeConfig?.suffixRs2f || '')?.modules || []),
     ]
 
+    const theme = filter.themes.find(
+        (theme) => theme.id === activeConfig?.selectedThemeId
+    )
+
     let filterText = modules
-        .map((m) => applyModule(m, activeConfig?.inputConfigs))
+        .map((m) => applyModule(m, activeConfig?.inputConfigs, theme))
         .join('\n')
 
     filterText = filterText.replace(
@@ -42,14 +47,18 @@ export const renderFilter = (
 
 export const applyModule = (
     module: Module,
-    config: { [key: MacroName]: any } | undefined
+    config: { [key: MacroName]: any } | undefined,
+    theme?: Theme
 ): string => {
     let updated = module.rs2f
 
     for (const input of module.inputs) {
         switch (input.type) {
             case 'boolean': {
-                const bool = config?.[input.macroName] ?? input.default
+                const bool =
+                    config?.[input.macroName] ??
+                    theme?.config?.inputConfigs[input.macroName] ??
+                    input.default
                 if (bool !== undefined) {
                     updated = updateMacro(
                         updated,
@@ -60,7 +69,10 @@ export const applyModule = (
                 break
             }
             case 'number': {
-                const value = config?.[input.macroName] ?? input.default
+                const value =
+                    config?.[input.macroName] ??
+                    theme?.config?.inputConfigs[input.macroName] ??
+                    input.default
                 if (value !== undefined) {
                     updated = updateMacro(
                         updated,
@@ -73,9 +85,13 @@ export const applyModule = (
             case 'stringlist':
             case 'enumlist': {
                 const configuredDiff = config?.[input.macroName] as ListDiff
+                const themeDiff = theme?.config?.inputConfigs?.[input.macroName]
 
                 const list = convertOptionsToStrings(
-                    applyDiff(input.default, configuredDiff ?? EMPTY_DIFF)
+                    applyDiff(input.default, [
+                        themeDiff,
+                        configuredDiff ?? EMPTY_DIFF,
+                    ])
                 )
 
                 updated = updateMacro(
@@ -89,9 +105,12 @@ export const applyModule = (
                 const style = config?.[input.macroName] as
                     | StyleConfig
                     | undefined
+                const themeStyle =
+                    theme?.config?.inputConfigs?.[input.macroName]
                 const defaultStyle = input.default as StyleConfig
                 const mergedStyle = {
                     ...(defaultStyle ?? {}),
+                    ...(themeStyle ?? {}),
                     ...(style ?? {}),
                 }
                 if (Object.keys(mergedStyle).length > 0) {
@@ -104,9 +123,9 @@ export const applyModule = (
                 break
             }
             case 'text': {
-                const text = (config?.[input.macroName] ?? input.default) as
-                    | string
-                    | undefined
+                const text = (config?.[input.macroName] ??
+                    theme?.config?.inputConfigs?.[input.macroName] ??
+                    input.default) as string | undefined
                 if (text !== undefined) {
                     updated = updateMacro(updated, input.macroName, `"${text}"`)
                 }

@@ -21,6 +21,7 @@ export const localStorageKeys = [
     'filter-configuration-store',
     'modular-filter-storage-migrated',
 ]
+
 export const localState = () => {
     return Object.fromEntries(
         localStorageKeys

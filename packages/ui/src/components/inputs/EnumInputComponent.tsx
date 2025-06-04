@@ -4,6 +4,7 @@ import {
     FilterConfiguration,
     ListDiff,
     ListDiffSpec,
+    Theme,
 } from '../../parsing/UiTypesSpec'
 import {
     applyDiff,
@@ -15,14 +16,17 @@ import { Option, UISelect } from './UISelect'
 export const EnumInputComponent: React.FC<{
     input: EnumListInput
     config: FilterConfiguration
+    theme?: Theme
     onChange: (diff: ListDiff) => void
     readonly: boolean
-}> = ({ input, config, onChange, readonly }) => {
+}> = ({ input, config, theme, onChange, readonly }) => {
     const configuredDiff = ListDiffSpec.optional()
         .default(EMPTY_DIFF)
         .parse(config?.inputConfigs?.[input.macroName])
 
-    const currentSetting = applyDiff(input.default, configuredDiff)
+    const themeDiff = theme?.config?.inputConfigs?.[input.macroName]
+
+    const currentSetting = applyDiff(input.default, [themeDiff, configuredDiff])
 
     const options: Option<string>[] = input.enum.map((enumValue) => {
         if (typeof enumValue === 'string') {
@@ -66,7 +70,7 @@ export const EnumInputComponent: React.FC<{
                             newValue
                                 ? newValue.map((option) => option.value)
                                 : [],
-                            input.default
+                            applyDiff(input.default, [themeDiff])
                         )
                     )
                 }}

@@ -1,9 +1,9 @@
 import { generateId } from '../utils/idgen'
-import { Filter, FilterSpec, Module } from './UiTypesSpec'
+import { Filter, FilterSpec, Module, Theme } from './UiTypesSpec'
 import { Lexer } from './lexer'
 import { parseGroup } from './parseGroup'
 import { parseInput } from './parseInput'
-import { parseModule } from './parseModule'
+import { parseModule, parseTheme } from './parseStructuredComment'
 import { parseMetaDescription, parseMetaName } from './rs2fParser'
 import { Token, TokenType } from './token'
 import { TokenStream } from './tokenstream'
@@ -20,7 +20,11 @@ const isInputDeclaration = (token: Token) =>
     token.type === TokenType.COMMENT &&
     token.value.startsWith('/*@ define:input')
 
-const parseModuleDeclaration = (line: string) => {
+const isThemeDeclaration = (token: Token) =>
+    token.type === TokenType.COMMENT &&
+    token.value.startsWith('/*@ define:theme')
+
+const parseStructuredComment = (line: string) => {
     const match = line.match(/\/\*@ define:([a-z]+):([a-z0-9_]+)/)
     if (!match) {
         throw new Error(`Unparseable declaration at '${line}'`)
@@ -90,6 +94,7 @@ export const parse = (
     }
 
     const modulesById: Record<string, Module> = {}
+    const themesById: Record<string, Theme> = {}
     const errors: { line: string; error: Error }[] = []
 
     // we vetted the first token above, the loop will properly init this
@@ -99,7 +104,7 @@ export const parse = (
         const next = tokens.take(true)!! // preserve whitespace in output
         try {
             if (isModuleDeclaration(next)) {
-                const decl = parseModuleDeclaration(next.value)
+                const decl = parseStructuredComment(next.value)
                 currentModule = decl.id
                 modulesById[decl.id] = parseModule(decl.id, next.value)
 
@@ -134,6 +139,12 @@ export const parse = (
 
                 modulesById[currentModule].rs2f += next.value + '\n'
                 modulesById[currentModule].rs2f += defineSource + '\n'
+            } else if (isThemeDeclaration(next)) {
+                const decl = parseStructuredComment(next.value)
+                themesById[decl.id] = parseTheme(decl.id, next.value)
+
+                // A theme doesn't _really_ belong to a module, but for serde to work we need it
+                modulesById[currentModule].rs2f += next.value
             } else {
                 modulesById[currentModule].rs2f +=
                     next.type === TokenType.LITERAL_STRING
@@ -157,6 +168,7 @@ export const parse = (
 
     const name = parseMetaName(filter)
     const description = parseMetaDescription(filter) || undefined
+    console.log('themesById', Object.values(themesById))
 
     try {
         const parsedFilter = FilterSpec.parse({
@@ -169,6 +181,7 @@ export const parse = (
             active: false,
             rs2f: filter,
             rs2fHash: '00000000',
+            themes: Object.values(themesById),
             ...(metaContentOverride || {}),
         })
         return {
