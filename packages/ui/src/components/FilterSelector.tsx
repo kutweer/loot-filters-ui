@@ -54,6 +54,7 @@ import { SmartTooltip } from './SmartTooltip'
 
 import ImportRuneliteGif from '../images/import_runelite.gif'
 import { toThemeStructuredComment } from '../utils/filterTheme'
+import { FeatureFlagged } from './FeatureFlagged'
 
 const updateAvailableFn = (
     activeFilter?: Filter | null,
@@ -548,23 +549,26 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                 </MenuItem>
             </SmartTooltip>
 
-            <MenuItem
-                disabled={!activeFilter}
-                onClick={() => setExportThemeDialogOpen(true)}
-            >
-                <ListItemIcon>
-                    <CopyAll fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>Copy configuration as Theme</ListItemText>
-            </MenuItem>
+            <FeatureFlagged featureFlag="themes">
+                <MenuItem
+                    disabled={!activeFilter}
+                    onClick={() => setExportThemeDialogOpen(true)}
+                >
+                    <ListItemIcon>
+                        <CopyAll fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Copy configuration as Theme</ListItemText>
+                </MenuItem>
+            </FeatureFlagged>
         </Menu>
     )
 
     const themeSelector = (
-        <UISelect<string>
-            label="Theme"
-            sx={{ width: '200px' }}
-            options={[
+        <FeatureFlagged featureFlag="themes">
+            <UISelect<string>
+                label="Theme"
+                sx={{ width: '200px' }}
+                options={[
                 { label: 'Default', value: '' },
                 ...(activeFilter?.themes.map((theme) => ({
                     label: theme.name,
@@ -590,7 +594,8 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                         value?.value === '' ? undefined : value?.value,
                 })
             }}
-        />
+            />
+        </FeatureFlagged>
     )
 
     if (Object.keys(filters).length === 0) {
