@@ -41,6 +41,11 @@ import { useFilterConfigStore } from '../../store/filterConfigurationStore'
 import { useFilterStore } from '../../store/filterStore'
 import { useSearchStore } from '../../store/search'
 import { countConfigChanges } from '../../utils/configUtils'
+import {
+    GroupSearchResult,
+    InputSearchResult,
+    searchModule,
+} from '../../utils/search'
 import { GitHubFlavoredMarkdown } from '../GitHubFlavoredMarkdown'
 import { BooleanInputComponent } from '../inputs/BooleanInputComponent'
 import { DisplayConfigurationInput } from '../inputs/DisplayConfigurationInput'
@@ -49,11 +54,6 @@ import { NumberInputComponent } from '../inputs/NumberInputComponent'
 import { StringListInputComponent } from '../inputs/StringListInputComponent'
 import { TextInputComponent } from '../inputs/TextInputComponent'
 import { ItemLabelPreview } from '../Previews'
-import {
-    searchModule,
-    GroupSearchResult,
-    InputSearchResult,
-} from '../../utils/search'
 
 const MAX_GROUPCOUNT_AUTOEXPAND = 3
 
@@ -64,10 +64,26 @@ const InputComponent: React.FC<{
     readonly: boolean
     persist: (value: any, macroName: string) => void
 }> = ({ config, module, input, readonly, persist }) => {
+    const inputConfigCount = countConfigChanges(config, [input.macroName])
+
+    const inputWithBadge = (child: React.ReactNode) => (
+        <Tooltip
+            title={
+                inputConfigCount
+                    ? `${inputConfigCount} setting${inputConfigCount > 1 ? 's' : ''} changed`
+                    : ''
+            }
+        >
+            <Badge badgeContent={inputConfigCount} color="secondary">
+                {child}
+            </Badge>
+        </Tooltip>
+    )
+
     switch (input.type) {
         case 'number':
             const numberInput = input as NumberInput
-            return (
+            return inputWithBadge(
                 <NumberInputComponent
                     config={config}
                     input={numberInput}
@@ -78,7 +94,7 @@ const InputComponent: React.FC<{
                 />
             )
         case 'boolean':
-            return (
+            return inputWithBadge(
                 <BooleanInputComponent
                     input={input as BooleanInput}
                     config={config}
@@ -90,7 +106,7 @@ const InputComponent: React.FC<{
             )
         case 'enumlist':
             const enumListInput = input as EnumListInput
-            return (
+            return inputWithBadge(
                 <EnumInputComponent
                     config={config}
                     input={enumListInput}
@@ -101,7 +117,7 @@ const InputComponent: React.FC<{
                 />
             )
         case 'stringlist':
-            return (
+            return inputWithBadge(
                 <StringListInputComponent
                     config={config}
                     input={input as StringListInput}
@@ -119,7 +135,7 @@ const InputComponent: React.FC<{
                 />
             )
         case 'style':
-            return (
+            return inputWithBadge(
                 <DisplayConfigurationInput
                     config={config}
                     onChange={(style) => {
@@ -132,7 +148,7 @@ const InputComponent: React.FC<{
             )
         case 'text':
             const textInput = input as TextInput
-            return (
+            return inputWithBadge(
                 <TextInputComponent
                     config={config}
                     input={textInput}
@@ -143,7 +159,7 @@ const InputComponent: React.FC<{
                 />
             )
         default:
-            return (
+            return inputWithBadge(
                 <Typography variant="h6" color="secondary">
                     Unsupported input type:{' '}
                     <span style={{ color: colors.rsOrange }}>{input.type}</span>
@@ -340,6 +356,9 @@ const ModuleGroup: React.FC<{
         groupName,
     })
 
+    const groupMacronames = inputs.map((input) => input.macroName)
+    const configCount = countConfigChanges(config, groupMacronames)
+
     return (
         <Accordion
             disableGutters={true}
@@ -396,6 +415,11 @@ const ModuleGroup: React.FC<{
                 >
                     {groupPreviews}
                 </Stack>
+                <Tooltip
+                    title={configCount ? `${configCount} settings changed` : ''}
+                >
+                    <Badge badgeContent={configCount} color="secondary"></Badge>
+                </Tooltip>
             </AccordionSummary>
             <AccordionDetails
                 sx={{

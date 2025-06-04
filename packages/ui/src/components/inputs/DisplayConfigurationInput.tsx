@@ -3,11 +3,13 @@ import {
     Accordion,
     AccordionDetails,
     AccordionSummary,
+    Badge,
     Box,
     Checkbox,
     Grid2,
     SxProps,
     TextField,
+    Tooltip,
     Typography,
 } from '@mui/material'
 import React, { useState } from 'react'
@@ -36,6 +38,21 @@ import { CommonSoundEffects } from '../info/CommonSoundEffects'
 import { ColorPickerInput } from './ColorPicker'
 import { CopyInputSettings } from './CopyInputSettings'
 import { UISelect } from './UISelect'
+
+// Remove: import isEqual from 'lodash/isEqual'
+// Add a simple shallowEqual function for primitives and shallow objects
+function shallowEqual(a: any, b: any): boolean {
+    if (a === b) return true
+    if (typeof a !== typeof b) return false
+    if (typeof a !== 'object' || a === null || b === null) return false
+    const aKeys = Object.keys(a)
+    const bKeys = Object.keys(b)
+    if (aKeys.length !== bKeys.length) return false
+    for (const key of aKeys) {
+        if (a[key] !== b[key]) return false
+    }
+    return true
+}
 
 const Column: React.FC<{
     children: React.ReactNode[] | React.ReactNode
@@ -149,7 +166,49 @@ export const DisplayConfigurationInput: React.FC<{
     const hasExplicitDisplayMode =
         input.default?.hidden === true || input.default?.hidden === false
 
-    const displayModeInput = (
+    // Helper to wrap an input with a badge if changed from default
+    const inputWithBadge = (child: React.ReactNode, configField: string) => {
+        // Get current and default values for the field
+        const userConfig = (config?.inputConfigs?.[input.macroName] ?? {})[
+            configField
+        ]
+        const filterConfig = ((input.default ?? {}) as any)[configField]
+        let isChanged: boolean
+        if (
+            typeof userConfig === 'object' &&
+            typeof filterConfig === 'object'
+        ) {
+            isChanged = !shallowEqual(userConfig, filterConfig)
+        } else {
+            isChanged = userConfig !== filterConfig
+        }
+        // Determine badge color
+        let badgeColor: 'success' | 'warning' | undefined = undefined
+        if (isChanged) {
+            if (userConfig !== undefined) {
+                badgeColor = 'success' // user-set (green)
+            } else if (filterConfig !== undefined) {
+                badgeColor = 'warning' // filter-set (yellow)
+            }
+        }
+        return badgeColor ? (
+            <Tooltip
+                title={
+                    badgeColor === 'success'
+                        ? 'Changed by you'
+                        : 'Set by filter'
+                }
+            >
+                <Badge color={badgeColor} variant="dot">
+                    {child}
+                </Badge>
+            </Tooltip>
+        ) : (
+            child
+        )
+    }
+
+    const displayModeInput = inputWithBadge(
         <EventShield>
             <UISelect<number>
                 sx={{ minWidth: '7rem', maxHeight: '3rem' }}
@@ -188,20 +247,22 @@ export const DisplayConfigurationInput: React.FC<{
                     }
                 }}
             />
-        </EventShield>
+        </EventShield>,
+        'hidden'
     )
 
-    const displayLootbeamInput = (
+    const displayLootbeamInput = inputWithBadge(
         <Checkbox
             disabled={readonly}
             checked={
                 styleConfig.showLootbeam ?? input.default?.showLootbeam ?? false
             }
             onChange={(e) => onChange({ showLootbeam: e.target.checked })}
-        />
+        />,
+        'showLootbeam'
     )
 
-    const lootbeamColorInput = (
+    const lootbeamColorInput = inputWithBadge(
         <ColorPickerInput
             disabled={
                 !(styleConfig.showLootbeam ?? input.default?.showLootbeam) ||
@@ -211,36 +272,40 @@ export const DisplayConfigurationInput: React.FC<{
             config={styleConfig}
             input={input}
             onChange={onChange}
-        />
+        />,
+        'lootbeamColor'
     )
 
-    const valueComponent = (
+    const valueComponent = inputWithBadge(
         <Checkbox
             disabled={readonly}
             checked={styleConfig.showValue ?? input.default?.showValue ?? false}
             onChange={(e) => onChange({ showValue: e.target.checked })}
-        />
+        />,
+        'showValue'
     )
 
-    const despawnComponent = (
+    const despawnComponent = inputWithBadge(
         <Checkbox
             disabled={readonly}
             checked={
                 styleConfig.showDespawn ?? input.default?.showDespawn ?? false
             }
             onChange={(e) => onChange({ showDespawn: e.target.checked })}
-        />
+        />,
+        'showDespawn'
     )
 
-    const notifyComponent = (
+    const notifyComponent = inputWithBadge(
         <Checkbox
             disabled={readonly}
             checked={styleConfig.notify ?? input.default?.notify ?? false}
             onChange={(e) => onChange({ notify: e.target.checked })}
-        />
+        />,
+        'notify'
     )
 
-    const highlightTileComponent = (
+    const highlightTileComponent = inputWithBadge(
         <Checkbox
             disabled={readonly}
             checked={
@@ -249,10 +314,11 @@ export const DisplayConfigurationInput: React.FC<{
                 false
             }
             onChange={(e) => onChange({ highlightTile: e.target.checked })}
-        />
+        />,
+        'highlightTile'
     )
 
-    const hilightTileFillColorInput = (
+    const hilightTileFillColorInput = inputWithBadge(
         <ColorPickerInput
             configField="tileFillColor"
             config={styleConfig}
@@ -262,10 +328,11 @@ export const DisplayConfigurationInput: React.FC<{
                 !(styleConfig.highlightTile ?? input.default?.highlightTile) ||
                 readonly
             }
-        />
+        />,
+        'tileFillColor'
     )
 
-    const hilightTileStrokeColorInput = (
+    const hilightTileStrokeColorInput = inputWithBadge(
         <ColorPickerInput
             configField="tileStrokeColor"
             config={styleConfig}
@@ -275,7 +342,8 @@ export const DisplayConfigurationInput: React.FC<{
                 !(styleConfig.highlightTile ?? input.default?.highlightTile) ||
                 readonly
             }
-        />
+        />,
+        'tileStrokeColor'
     )
 
     const soundOpts = [
@@ -283,7 +351,7 @@ export const DisplayConfigurationInput: React.FC<{
         { label: 'Sound Effect', value: 'soundeffect' },
         { label: 'From File', value: 'fromfile' },
     ]
-    const soundTypeSelect = (
+    const soundTypeSelect = inputWithBadge(
         <UISelect<string>
             sx={{ width: '12rem' }}
             disabled={readonly}
@@ -309,10 +377,11 @@ export const DisplayConfigurationInput: React.FC<{
                         break
                 }
             }}
-        />
+        />,
+        'sound'
     )
 
-    const soundEffectInput = (
+    const soundEffectInput = inputWithBadge(
         <TextField
             type="number"
             sx={{ minWidth: '12rem' }}
@@ -321,18 +390,20 @@ export const DisplayConfigurationInput: React.FC<{
             placeholder="Effect ID"
             value={styleConfig?.sound ?? input.default?.sound ?? 0}
             onChange={(e) => onChange({ sound: parseInt(e.target.value) || 0 })}
-        />
+        />,
+        'sound'
     )
 
     const soundFile = styleConfig?.sound ?? input.default?.sound ?? ''
-    const soundFileInput = (
+    const soundFileInput = inputWithBadge(
         <TextField
             sx={{ minWidth: '12rem' }}
             disabled={readonly}
             placeholder="Filename"
             value={soundFile}
             onChange={(e) => onChange({ sound: e.target.value })}
-        />
+        />,
+        'sound'
     )
     const soundFileHelpText =
         typeof soundFile === 'string' && soundFile.endsWith('.wav') ? (
@@ -361,52 +432,57 @@ export const DisplayConfigurationInput: React.FC<{
             </Typography>
         )
 
-    const textColorInput = (
+    const textColorInput = inputWithBadge(
         <ColorPickerInput
             configField="textColor"
             config={styleConfig}
             input={input}
             disabled={readonly}
             onChange={onChange}
-        />
+        />,
+        'textColor'
     )
 
-    const backgroundColorInput = (
+    const backgroundColorInput = inputWithBadge(
         <ColorPickerInput
             configField="backgroundColor"
             config={styleConfig}
             input={input}
             onChange={onChange}
-        />
+        />,
+        'backgroundColor'
     )
 
-    const borderColorInput = (
+    const borderColorInput = inputWithBadge(
         <ColorPickerInput
             configField="borderColor"
             config={styleConfig}
             input={input}
             onChange={onChange}
-        />
+        />,
+        'borderColor'
     )
 
-    const textAccentColorInput = (
+    const textAccentColorInput = inputWithBadge(
         <ColorPickerInput
             configField="textAccentColor"
             config={styleConfig}
             input={input}
             onChange={onChange}
-        />
+        />,
+        'textAccentColor'
     )
 
-    const menuColorInput = (
+    const menuColorInput = inputWithBadge(
         <ColorPickerInput
             configField="menuTextColor"
             config={styleConfig}
             input={input}
             onChange={onChange}
-        />
+        />,
+        'menuTextColor'
     )
-    const menuSortInput = (
+    const menuSortInput = inputWithBadge(
         <TextField
             sx={{ minWidth: '10rem', ml: 1 }}
             placeholder="priority"
@@ -421,10 +497,11 @@ export const DisplayConfigurationInput: React.FC<{
                 })
             }
             disabled={readonly}
-        />
+        />,
+        'menuSort'
     )
 
-    const fontTypeInput = (
+    const fontTypeInput = inputWithBadge(
         <UISelect<number>
             sx={{ width: '15rem', marginLeft: 1 }}
             disabled={readonly}
@@ -451,9 +528,10 @@ export const DisplayConfigurationInput: React.FC<{
                     })
                 }
             }}
-        />
+        />,
+        'fontType'
     )
-    const textAccentInput = (
+    const textAccentInput = inputWithBadge(
         <UISelect<number>
             sx={{ width: '15rem', marginLeft: 1 }}
             disabled={readonly}
@@ -481,7 +559,8 @@ export const DisplayConfigurationInput: React.FC<{
                     })
                 }
             }}
-        />
+        />,
+        'textAccent'
     )
     const iconOpts = [
         {
@@ -506,7 +585,7 @@ export const DisplayConfigurationInput: React.FC<{
         },
     ]
 
-    const itemIconTypeSelect = (
+    const itemIconTypeSelect = inputWithBadge(
         <UISelect<string>
             sx={{ width: '15rem' }}
             disabled={readonly}
@@ -553,10 +632,10 @@ export const DisplayConfigurationInput: React.FC<{
                         break
                 }
             }}
-        />
+        />,
+        'icon'
     )
-
-    const iconItemIdInput = (
+    const iconItemIdInput = inputWithBadge(
         <TextField
             sx={{ maxWidth: '6rem' }}
             size="small"
@@ -576,10 +655,10 @@ export const DisplayConfigurationInput: React.FC<{
                     },
                 })
             }}
-        />
+        />,
+        'icon'
     )
-
-    const iconFileInput = (
+    const iconFileInput = inputWithBadge(
         <TextField
             size="small"
             sx={{ minWidth: '10rem', maxWidth: '10rem' }}
@@ -592,10 +671,10 @@ export const DisplayConfigurationInput: React.FC<{
                 onChange({ icon: { type: 'file', path } })
             }}
             value={styleConfig?.icon?.path ?? input.default?.icon?.path ?? ''}
-        />
+        />,
+        'icon'
     )
-
-    const iconSpriteInput = (
+    const iconSpriteInput = inputWithBadge(
         <span style={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
             <TextField
                 size="small"
@@ -643,7 +722,8 @@ export const DisplayConfigurationInput: React.FC<{
                     0
                 }
             />
-        </span>
+        </span>,
+        'icon'
     )
 
     return (

@@ -50,3 +50,16 @@ export const countConfigChanges = (
             return acc + count
         }, 0)
 }
+
+export const getChangedMacros = (
+    config: FilterConfiguration
+): Record<string, boolean> => {
+    const result: Record<string, boolean> = {}
+    const inputConfigs = config.inputConfigs ?? {}
+
+    Object.keys(inputConfigs).forEach((macroName) => {
+        result[macroName] = countChanges(inputConfigs[macroName]) > 0
+    })
+
+    return result
+}
