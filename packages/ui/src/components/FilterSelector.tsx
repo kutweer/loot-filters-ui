@@ -30,8 +30,8 @@ import {
 import ListItemIcon from '@mui/material/ListItemIcon'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { SearchBar } from '../components/SearchBar'
 import { BackgroundSelector } from '../components/BackgroundSelector'
+import { SearchBar } from '../components/SearchBar'
 import {
     DEFAULT_FILTER_CONFIGURATION,
     Filter,
@@ -570,14 +570,14 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                 sx={{ width: '200px' }}
                 options={[
                     { label: 'Default', value: '' },
-                    ...(activeFilter?.themes.map((theme) => ({
+                    ...(activeFilter?.themes?.map((theme) => ({
                         label: theme.name,
                         value: theme.id,
                     })) ?? []),
                 ]}
                 value={{
                     label:
-                        activeFilter?.themes.find(
+                        activeFilter?.themes?.find(
                             (theme) =>
                                 theme.id === activeFilterConfig?.selectedThemeId
                         )?.name || 'Default',
