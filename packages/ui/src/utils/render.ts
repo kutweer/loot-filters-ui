@@ -55,7 +55,10 @@ export const applyModule = (
     for (const input of module.inputs) {
         switch (input.type) {
             case 'boolean': {
-                const bool = config?.[input.macroName] ?? input.default
+                const bool =
+                    config?.[input.macroName] ??
+                    theme?.config?.inputConfigs[input.macroName] ??
+                    input.default
                 if (bool !== undefined) {
                     updated = updateMacro(
                         updated,
@@ -66,7 +69,10 @@ export const applyModule = (
                 break
             }
             case 'number': {
-                const value = config?.[input.macroName] ?? input.default
+                const value =
+                    config?.[input.macroName] ??
+                    theme?.config?.inputConfigs[input.macroName] ??
+                    input.default
                 if (value !== undefined) {
                     updated = updateMacro(
                         updated,
@@ -99,9 +105,12 @@ export const applyModule = (
                 const style = config?.[input.macroName] as
                     | StyleConfig
                     | undefined
+                const themeStyle =
+                    theme?.config?.inputConfigs?.[input.macroName]
                 const defaultStyle = input.default as StyleConfig
                 const mergedStyle = {
                     ...(defaultStyle ?? {}),
+                    ...(themeStyle ?? {}),
                     ...(style ?? {}),
                 }
                 if (Object.keys(mergedStyle).length > 0) {
@@ -114,9 +123,9 @@ export const applyModule = (
                 break
             }
             case 'text': {
-                const text = (config?.[input.macroName] ?? input.default) as
-                    | string
-                    | undefined
+                const text = (config?.[input.macroName] ??
+                    theme?.config?.inputConfigs?.[input.macroName] ??
+                    input.default) as string | undefined
                 if (text !== undefined) {
                     updated = updateMacro(updated, input.macroName, `"${text}"`)
                 }
