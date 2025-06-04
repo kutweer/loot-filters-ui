@@ -1,37 +1,47 @@
-import { create } from "zustand"
-import { persist, devtools } from "zustand/middleware"
+import { create } from 'zustand'
+import { persist, devtools, createJSONStorage } from 'zustand/middleware'
 
+export const FLAG_NAMES = ['themes'] as const
+
+type FlagName = (typeof FLAG_NAMES)[number]
 
 export interface FeatureFlaggedStore {
     themes: boolean
-    checkFeatureFlag: (featureFlag: string) => boolean
+    checkFeatureFlag: (featureFlag: FlagName) => boolean
+    setFeatureFlag: (featureFlag: FlagName, value: boolean) => void
 }
 
-export const FeatureFlaggedStore = create<FeatureFlaggedStore>()(
+export const useFeatureFlagStore = create<FeatureFlaggedStore>()(
     devtools(
         persist(
-            (_, get) => ({
+            (set, get) => ({
                 themes: false,
-                checkFeatureFlag: (featureFlag: string) => {
-                    if (featureFlag === 'themes') {
-                        return get().themes
-                    }
-                    return false
+                checkFeatureFlag: (featureFlag: FlagName) => {
+                    return get()[featureFlag] ?? false
+                },
+                setFeatureFlag: (featureFlag: FlagName, value: boolean) => {
+                    set((state) => ({
+                        ...state,
+                        [featureFlag]: value,
+                    }))
                 },
             }),
             {
                 name: 'feature-flags',
                 version: 1,
+                storage: createJSONStorage(() => localStorage),
             }
         )
     )
 )
 
 export const FeatureFlagged: React.FC<{
-    featureFlag: string,
+    featureFlag: FlagName
     children: React.ReactNode
 }> = ({ featureFlag, children }) => {
-    const isEnabled = FeatureFlaggedStore.getState().checkFeatureFlag(featureFlag)
+    const isEnabled = useFeatureFlagStore
+        .getState()
+        .checkFeatureFlag(featureFlag)
 
     if (!isEnabled) {
         return null

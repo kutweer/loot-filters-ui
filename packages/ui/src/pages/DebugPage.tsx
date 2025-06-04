@@ -1,9 +1,19 @@
 import { Editor } from '@monaco-editor/react'
 import { Delete, Download, Upload } from '@mui/icons-material'
-import { Box, Button, Container, Tab, Tabs } from '@mui/material'
+import {
+    Box,
+    Button,
+    Container,
+    FormControlLabel,
+    Switch,
+    Tab,
+    Tabs,
+    Typography,
+} from '@mui/material'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { downloadFile, localState, localStorageKeys } from '../utils/file'
+import { useFeatureFlagStore, FLAG_NAMES } from '../components/FeatureFlagged'
 
 const FilterStoreTabs = ({
     filterStoreTab,
@@ -66,8 +76,36 @@ export const DebugPage = () => {
     const navigator = useNavigate()
     const [tab, setTab] = useState('filter-store')
     const [filterStoreTab, setFilterStoreTab] = useState('everything')
+
+    const { checkFeatureFlag, setFeatureFlag } = useFeatureFlagStore()
+
     return (
         <Container maxWidth="lg">
+            <Box>
+                {FLAG_NAMES.map((flag) => {
+                    return (
+                        <FormControlLabel
+                            key={flag}
+                            control={
+                                <Switch
+                                    checked={checkFeatureFlag(flag)}
+                                    onChange={(e) => {
+                                        setFeatureFlag(flag, e.target.checked)
+                                    }}
+                                />
+                            }
+                            label={
+                                <Typography
+                                    color="text.secondary"
+                                    fontSize="24px"
+                                >
+                                    {flag} feature flag
+                                </Typography>
+                            }
+                        />
+                    )
+                })}
+            </Box>
             <Box
                 sx={{
                     mt: 5,

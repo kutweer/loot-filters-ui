@@ -569,31 +569,31 @@ export const FilterSelector: React.FC<{ reloadOnChange?: boolean }> = ({
                 label="Theme"
                 sx={{ width: '200px' }}
                 options={[
-                { label: 'Default', value: '' },
-                ...(activeFilter?.themes.map((theme) => ({
-                    label: theme.name,
-                    value: theme.id,
-                })) ?? []),
-            ]}
-            value={{
-                label:
-                    activeFilter?.themes.find(
-                        (theme) =>
-                            theme.id === activeFilterConfig?.selectedThemeId
-                    )?.name || 'Default',
-                value: activeFilterConfig?.selectedThemeId || '',
-            }}
-            onChange={(value) => {
-                if (value == null) {
-                    return
-                }
+                    { label: 'Default', value: '' },
+                    ...(activeFilter?.themes.map((theme) => ({
+                        label: theme.name,
+                        value: theme.id,
+                    })) ?? []),
+                ]}
+                value={{
+                    label:
+                        activeFilter?.themes.find(
+                            (theme) =>
+                                theme.id === activeFilterConfig?.selectedThemeId
+                        )?.name || 'Default',
+                    value: activeFilterConfig?.selectedThemeId || '',
+                }}
+                onChange={(value) => {
+                    if (value == null) {
+                        return
+                    }
 
-                setFilterConfiguration(activeFilter?.id!!, {
-                    ...activeFilterConfig!!,
-                    selectedThemeId:
-                        value?.value === '' ? undefined : value?.value,
-                })
-            }}
+                    setFilterConfiguration(activeFilter?.id!!, {
+                        ...activeFilterConfig!!,
+                        selectedThemeId:
+                            value?.value === '' ? undefined : value?.value,
+                    })
+                }}
             />
         </FeatureFlagged>
     )
