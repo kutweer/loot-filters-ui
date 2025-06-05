@@ -93,6 +93,7 @@ const Swatch: React.FC<{
                         pointerEvents: 'none',
                         fontFamily: 'RuneScapeSmall',
                         textShadow: '1px 1px #000000',
+                        color: '#bdbdbd', // MUI's default disabled text color
                     }}
                 >
                     Default
