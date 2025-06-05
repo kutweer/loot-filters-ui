@@ -201,7 +201,7 @@ export const DisplayConfigurationInput: React.FC<{
     }
 
     // Now wrap all inputs with inputWithBadge
-    const displayModeInput = (
+    const displayModeInput = inputWithBadge(
         <EventShield>
             <UISelect<number>
                 sx={{
@@ -251,7 +251,8 @@ export const DisplayConfigurationInput: React.FC<{
                     }
                 }}
             />
-        </EventShield>
+        </EventShield>,
+        'hidden'
     )
 
     const displayLootbeamInput = (
