@@ -612,7 +612,20 @@ export const DisplayConfigurationInput: React.FC<{
     )
     const textAccentInput = inputWithBadge(
         <UISelect<number>
-            sx={{ width: '15rem', marginLeft: 1 }}
+            sx={{
+                width: '15rem',
+                marginLeft: 1,
+                color:
+                    styleConfig?.textAccent === undefined && !readonly
+                        ? 'text.disabled'
+                        : undefined,
+                '& .MuiInputBase-input': {
+                    color:
+                        styleConfig?.textAccent === undefined && !readonly
+                            ? 'text.disabled'
+                            : undefined,
+                },
+            }}
             disabled={readonly}
             options={Object.values(TextAccent).map((textAccent) => ({
                 label: labelFromTextAccent(textAccent),
