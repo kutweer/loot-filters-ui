@@ -542,7 +542,20 @@ export const DisplayConfigurationInput: React.FC<{
     )
     const fontTypeInput = inputWithBadge(
         <UISelect<number>
-            sx={{ width: '15rem', marginLeft: 1 }}
+            sx={{
+                width: '15rem',
+                marginLeft: 1,
+                color:
+                    styleConfig?.fontType === undefined && !readonly
+                        ? 'text.disabled'
+                        : undefined,
+                '& .MuiInputBase-input': {
+                    color:
+                        styleConfig?.fontType === undefined && !readonly
+                            ? 'text.disabled'
+                            : undefined,
+                },
+            }}
             disabled={readonly}
             options={fontTypes.map((fontType) => ({
                 label: labelFromFontType(fontType),
