@@ -660,18 +660,16 @@ export const DisplayConfigurationInput: React.FC<{
         },
     ]
 
-    const itemIconTypeSelect = (
+    const itemIconTypeSelect = inputWithBadge(
         <UISelect<string>
             sx={{
                 width: '15rem',
                 // Make text grey if unchanged
                 '& .MuiInputBase-input': {
                     color:
-                        (styleConfig?.icon?.type === undefined ||
-                            styleConfig?.icon?.type ===
-                                (themeConfig?.icon?.type ??
-                                    input.default?.icon?.type ??
-                                    'none')) &&
+                        styleConfig?.icon?.type === undefined &&
+                        themeConfig?.icon?.type === undefined &&
+                        input.default?.icon?.type === undefined &&
                         !readonly
                             ? 'text.disabled'
                             : undefined,
@@ -721,7 +719,8 @@ export const DisplayConfigurationInput: React.FC<{
                         break
                 }
             }}
-        />
+        />,
+        'icon'
     )
 
     const iconItemIdInput = (
