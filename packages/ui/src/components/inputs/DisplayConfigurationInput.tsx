@@ -507,14 +507,26 @@ export const DisplayConfigurationInput: React.FC<{
     )
     const menuSortInput = inputWithBadge(
         <TextField
-            sx={{ minWidth: '10rem', ml: 1 }}
-            placeholder="priority"
+            sx={{
+                minWidth: '10rem',
+                ml: 1,
+                color:
+                    styleConfig?.menuSort === undefined && !readonly
+                        ? 'text.disabled'
+                        : undefined,
+                '& .MuiInputBase-input': {
+                    color:
+                        styleConfig?.menuSort === undefined && !readonly
+                            ? 'text.disabled'
+                            : undefined,
+                },
+            }}
+            placeholder={
+                styleConfig?.menuSort === undefined ? 'Default' : undefined
+            }
             type="number"
             value={
-                styleConfig?.menuSort ??
-                themeConfig?.menuSort ??
-                input.default?.menuSort ??
-                0
+                styleConfig?.menuSort !== undefined ? styleConfig.menuSort : ''
             }
             onChange={(e) =>
                 onChange({
