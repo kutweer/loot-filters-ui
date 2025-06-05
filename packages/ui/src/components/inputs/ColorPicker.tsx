@@ -67,15 +67,38 @@ const Swatch: React.FC<{
     }, [color])
 
     return (
-        <canvas
-            ref={canvasRef}
-            width={50}
-            height={30}
-            style={{
-                borderRadius: '4px',
-                border: '1px solid #564e43',
-            }}
-        />
+        <div style={{ position: 'relative', display: 'inline-block' }}>
+            <canvas
+                ref={canvasRef}
+                width={50}
+                height={30}
+                style={{
+                    borderRadius: '4px',
+                    border: '1px solid #564e43',
+                    display: 'block',
+                }}
+            />
+            {color === null && (
+                <span
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: 50,
+                        height: 30,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 'bold',
+                        pointerEvents: 'none',
+                        fontFamily: 'RuneScapeSmall',
+                        textShadow: '1px 1px #000000',
+                    }}
+                >
+                    unset
+                </span>
+            )}
+        </div>
     )
 }
 
