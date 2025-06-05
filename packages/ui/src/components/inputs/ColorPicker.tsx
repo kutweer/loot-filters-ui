@@ -95,7 +95,7 @@ const Swatch: React.FC<{
                         textShadow: '1px 1px #000000',
                     }}
                 >
-                    unset
+                    Default
                 </span>
             )}
         </div>
