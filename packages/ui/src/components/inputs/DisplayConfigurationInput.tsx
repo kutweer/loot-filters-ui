@@ -371,15 +371,6 @@ export const DisplayConfigurationInput: React.FC<{
         <UISelect<string>
             sx={{
                 width: '12rem',
-                color:
-                    (styleConfig?.sound === undefined ||
-                        styleConfig?.sound ===
-                            (themeConfig?.sound ??
-                                input.default?.sound ??
-                                undefined)) &&
-                    !readonly
-                        ? 'text.disabled'
-                        : undefined,
                 '& .MuiInputBase-input': {
                     color:
                         (styleConfig?.sound === undefined ||
@@ -532,10 +523,6 @@ export const DisplayConfigurationInput: React.FC<{
             sx={{
                 minWidth: '10rem',
                 ml: 1,
-                color:
-                    styleConfig?.menuSort === undefined && !readonly
-                        ? 'text.disabled'
-                        : undefined,
                 '& .MuiInputBase-input': {
                     color:
                         styleConfig?.menuSort === undefined && !readonly
@@ -567,10 +554,6 @@ export const DisplayConfigurationInput: React.FC<{
             sx={{
                 width: '15rem',
                 marginLeft: 1,
-                color:
-                    styleConfig?.fontType === undefined && !readonly
-                        ? 'text.disabled'
-                        : undefined,
                 '& .MuiInputBase-input': {
                     color:
                         styleConfig?.fontType === undefined && !readonly
@@ -615,10 +598,6 @@ export const DisplayConfigurationInput: React.FC<{
             sx={{
                 width: '15rem',
                 marginLeft: 1,
-                color:
-                    styleConfig?.textAccent === undefined && !readonly
-                        ? 'text.disabled'
-                        : undefined,
                 '& .MuiInputBase-input': {
                     color:
                         styleConfig?.textAccent === undefined && !readonly
@@ -686,15 +665,6 @@ export const DisplayConfigurationInput: React.FC<{
             sx={{
                 width: '15rem',
                 // Make text grey if unchanged
-                color:
-                    (styleConfig?.icon?.type === undefined ||
-                        styleConfig?.icon?.type ===
-                            (themeConfig?.icon?.type ??
-                                input.default?.icon?.type ??
-                                'none')) &&
-                    !readonly
-                        ? 'text.disabled'
-                        : undefined,
                 '& .MuiInputBase-input': {
                     color:
                         (styleConfig?.icon?.type === undefined ||
