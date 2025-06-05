@@ -204,7 +204,18 @@ export const DisplayConfigurationInput: React.FC<{
     const displayModeInput = (
         <EventShield>
             <UISelect<number>
-                sx={{ minWidth: '7rem', maxHeight: '3rem' }}
+                sx={{
+                    minWidth: '7rem',
+                    maxHeight: '3rem',
+                    '& .MuiInputBase-input': {
+                        color:
+                            displayMode === 1 &&
+                            !hasExplicitDisplayMode &&
+                            !readonly
+                                ? 'text.disabled'
+                                : undefined,
+                    },
+                }}
                 value={{
                     label:
                         displayMode === 1
