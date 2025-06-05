@@ -369,7 +369,29 @@ export const DisplayConfigurationInput: React.FC<{
 
     const soundTypeSelect = inputWithBadge(
         <UISelect<string>
-            sx={{ width: '12rem' }}
+            sx={{
+                width: '12rem',
+                color:
+                    (styleConfig?.sound === undefined ||
+                        styleConfig?.sound ===
+                            (themeConfig?.sound ??
+                                input.default?.sound ??
+                                undefined)) &&
+                    !readonly
+                        ? 'text.disabled'
+                        : undefined,
+                '& .MuiInputBase-input': {
+                    color:
+                        (styleConfig?.sound === undefined ||
+                            styleConfig?.sound ===
+                                (themeConfig?.sound ??
+                                    input.default?.sound ??
+                                    undefined)) &&
+                        !readonly
+                            ? 'text.disabled'
+                            : undefined,
+                },
+            }}
             disabled={readonly}
             options={soundOpts}
             multiple={false}
