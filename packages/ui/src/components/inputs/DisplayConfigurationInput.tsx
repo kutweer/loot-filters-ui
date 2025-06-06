@@ -591,19 +591,25 @@ export const DisplayConfigurationInput: React.FC<{
             }))}
             multiple={false}
             freeSolo={false}
-            value={{
-                label: labelFromTextAccent(
-                    (styleConfig?.textAccent as TextAccent) ??
-                        themeConfig?.textAccent ??
-                        input.default?.textAccent ??
-                        TextAccent.Shadow // Default to shadow
-                ),
-                value:
-                    styleConfig?.textAccent ??
-                    themeConfig?.textAccent ??
-                    input.default?.textAccent ??
-                    1, // Default to shadow
-            }}
+            value={
+                styleConfig?.textAccent !== undefined ||
+                themeConfig?.textAccent !== undefined ||
+                input.default?.textAccent !== undefined
+                    ? {
+                          label: labelFromTextAccent(
+                              (styleConfig?.textAccent as TextAccent) ??
+                                  themeConfig?.textAccent ??
+                                  input.default?.textAccent ??
+                                  TextAccent.Shadow // fallback
+                          ),
+                          value:
+                              styleConfig?.textAccent ??
+                              themeConfig?.textAccent ??
+                              input.default?.textAccent ??
+                              1,
+                      }
+                    : null
+            }
             onChange={(newValue) => {
                 if (newValue === null) {
                     onChange({ textAccent: undefined })
