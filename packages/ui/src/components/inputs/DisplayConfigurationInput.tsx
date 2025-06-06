@@ -363,7 +363,6 @@ export const DisplayConfigurationInput: React.FC<{
     )
 
     const soundOpts = [
-        { label: 'None', value: 'none' },
         { label: 'Sound Effect', value: 'soundeffect' },
         { label: 'From File', value: 'fromfile' },
     ]
@@ -377,9 +376,7 @@ export const DisplayConfigurationInput: React.FC<{
             options={soundOpts}
             multiple={false}
             freeSolo={false}
-            value={
-                soundOpts.find((opt) => opt.value === soundType) || soundOpts[0]
-            }
+            value={soundOpts.find((opt) => opt.value === soundType) ?? null}
             onChange={(newValue) => {
                 switch (newValue?.value) {
                     case 'soundeffect':
