@@ -621,10 +621,6 @@ export const DisplayConfigurationInput: React.FC<{
 
     const iconOpts = [
         {
-            label: 'None',
-            value: 'none',
-        },
-        {
             label: 'Current Item',
             value: 'current',
         },
@@ -651,18 +647,9 @@ export const DisplayConfigurationInput: React.FC<{
             options={iconOpts}
             multiple={false}
             freeSolo={false}
-            value={
-                iconOpts.find((opt) => opt.value === iconType) || {
-                    label: 'None',
-                    value: 'none',
-                }
-            }
+            value={iconOpts.find((opt) => opt.value === iconType) ?? null}
             onChange={(newValue) => {
                 switch (newValue?.value) {
-                    case 'none':
-                        setIconType('none')
-                        onChange({ icon: { type: 'none' } })
-                        break
                     case 'current':
                         setIconType('current')
                         onChange({ icon: { type: 'current' } })
