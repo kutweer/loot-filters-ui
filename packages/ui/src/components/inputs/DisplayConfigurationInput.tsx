@@ -207,14 +207,6 @@ export const DisplayConfigurationInput: React.FC<{
                 sx={{
                     minWidth: '7rem',
                     maxHeight: '3rem',
-                    '& .MuiInputBase-input': {
-                        color:
-                            displayMode === 1 &&
-                            !hasExplicitDisplayMode &&
-                            !readonly
-                                ? 'text.disabled'
-                                : undefined,
-                    },
                 }}
                 value={{
                     label:
@@ -380,17 +372,6 @@ export const DisplayConfigurationInput: React.FC<{
         <UISelect<string>
             sx={{
                 width: '12rem',
-                '& .MuiInputBase-input': {
-                    color:
-                        (styleConfig?.sound === undefined ||
-                            styleConfig?.sound ===
-                                (themeConfig?.sound ??
-                                    input.default?.sound ??
-                                    undefined)) &&
-                        !readonly
-                            ? 'text.disabled'
-                            : undefined,
-                },
             }}
             disabled={readonly}
             options={soundOpts}
@@ -531,12 +512,6 @@ export const DisplayConfigurationInput: React.FC<{
             sx={{
                 minWidth: '10rem',
                 ml: 1,
-                '& .MuiInputBase-input': {
-                    color:
-                        styleConfig?.menuSort === undefined && !readonly
-                            ? 'text.disabled'
-                            : undefined,
-                },
             }}
             placeholder={
                 styleConfig?.menuSort === undefined ? 'Default' : undefined
@@ -562,12 +537,6 @@ export const DisplayConfigurationInput: React.FC<{
             sx={{
                 width: '15rem',
                 marginLeft: 1,
-                '& .MuiInputBase-input': {
-                    color:
-                        styleConfig?.fontType === undefined && !readonly
-                            ? 'text.disabled'
-                            : undefined,
-                },
             }}
             disabled={readonly}
             options={fontTypes.map((fontType) => ({
@@ -576,19 +545,25 @@ export const DisplayConfigurationInput: React.FC<{
             }))}
             multiple={false}
             freeSolo={false}
-            value={{
-                label: labelFromFontType(
-                    (styleConfig?.fontType as FontType) ??
-                        themeConfig?.fontType ??
-                        input.default?.fontType ??
-                        FontType.Small // Default to small
-                ),
-                value:
-                    styleConfig?.fontType ??
-                    themeConfig?.fontType ??
-                    input.default?.fontType ??
-                    1,
-            }}
+            value={
+                styleConfig?.fontType !== undefined ||
+                themeConfig?.fontType !== undefined ||
+                input.default?.fontType !== undefined
+                    ? {
+                          label: labelFromFontType(
+                              (styleConfig?.fontType as FontType) ??
+                                  themeConfig?.fontType ??
+                                  input.default?.fontType ??
+                                  FontType.Small // fallback, but will never hit if all undefined
+                          ),
+                          value:
+                              styleConfig?.fontType ??
+                              themeConfig?.fontType ??
+                              input.default?.fontType ??
+                              1,
+                      }
+                    : null
+            }
             onChange={(newValue) => {
                 if (newValue === null) {
                     onChange({ fontType: undefined })
@@ -606,12 +581,6 @@ export const DisplayConfigurationInput: React.FC<{
             sx={{
                 width: '15rem',
                 marginLeft: 1,
-                '& .MuiInputBase-input': {
-                    color:
-                        styleConfig?.textAccent === undefined && !readonly
-                            ? 'text.disabled'
-                            : undefined,
-                },
             }}
             disabled={readonly}
             options={Object.values(TextAccent).map((textAccent) => ({
@@ -672,16 +641,6 @@ export const DisplayConfigurationInput: React.FC<{
         <UISelect<string>
             sx={{
                 width: '15rem',
-                // Make text grey if unchanged
-                '& .MuiInputBase-input': {
-                    color:
-                        styleConfig?.icon?.type === undefined &&
-                        themeConfig?.icon?.type === undefined &&
-                        input.default?.icon?.type === undefined &&
-                        !readonly
-                            ? 'text.disabled'
-                            : undefined,
-                },
             }}
             disabled={readonly}
             options={iconOpts}

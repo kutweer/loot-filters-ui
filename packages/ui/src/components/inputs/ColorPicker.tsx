@@ -96,7 +96,7 @@ const Swatch: React.FC<{
                         color: '#bdbdbd', // MUI's default disabled text color
                     }}
                 >
-                    Default
+                    unset
                 </span>
             )}
         </div>
