@@ -514,7 +514,9 @@ export const DisplayConfigurationInput: React.FC<{
                 ml: 1,
             }}
             placeholder={
-                styleConfig?.menuSort === undefined ? 'Default' : undefined
+                styleConfig?.menuSort === undefined
+                    ? 'Enter a number'
+                    : undefined
             }
             type="number"
             value={
