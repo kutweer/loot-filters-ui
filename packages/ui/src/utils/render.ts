@@ -25,7 +25,7 @@ export const renderFilter = (
         ...(parseModules(activeConfig?.suffixRs2f || '')?.modules || []),
     ]
 
-    const theme = filter.themes.find(
+    const theme = filter.themes?.find(
         (theme) => theme.id === activeConfig?.selectedThemeId
     )
 
