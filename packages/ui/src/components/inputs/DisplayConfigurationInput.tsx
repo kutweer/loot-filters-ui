@@ -176,10 +176,10 @@ export const DisplayConfigurationInput: React.FC<{
         // Determine which value is active
         let isChanged = false
         let badgeColor: 'success' | 'warning' | undefined = undefined
-        if (userValue !== undefined && userValue !== filterValue) {
+        if (userValue !== undefined) {
             isChanged = true
             badgeColor = 'success' // user-set (green)
-        } else if (userValue === undefined && filterValue !== undefined) {
+        } else if (filterValue !== undefined) {
             isChanged = true
             badgeColor = 'warning' // filter-set (yellow)
         }
