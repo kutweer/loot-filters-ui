@@ -49,10 +49,16 @@ const Swatch: React.FC<{
 
         // Create checkerboard pattern
         const size = 10
-        for (let x = 0; x < canvas.width; x += size) {
-            for (let y = 0; y < canvas.height; y += size) {
-                ctx.fillStyle = ((x + y) / size) % 2 ? '#CCCCCC' : '#FFFFFF'
-                ctx.fillRect(x, y, size, size)
+        if (color === null) {
+            // clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+        }
+        if (color !== null) {
+            for (let x = 0; x < canvas.width; x += size) {
+                for (let y = 0; y < canvas.height; y += size) {
+                    ctx.fillStyle = ((x + y) / size) % 2 ? '#CCCCCC' : '#FFFFFF'
+                    ctx.fillRect(x, y, size, size)
+                }
             }
         }
 
@@ -84,19 +90,16 @@ const Swatch: React.FC<{
                         position: 'absolute',
                         top: 0,
                         left: 0,
-                        width: 50,
-                        height: 30,
+                        width: '100%',
+                        height: '100%',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontWeight: 'bold',
                         pointerEvents: 'none',
-                        fontFamily: 'RuneScapeSmall',
-                        textShadow: '1px 1px #000000',
-                        color: '#bdbdbd', // MUI's default disabled text color
+                        fontFamily: 'RuneScape',
                     }}
                 >
-                    unset
+                    Unset
                 </span>
             )}
         </div>
