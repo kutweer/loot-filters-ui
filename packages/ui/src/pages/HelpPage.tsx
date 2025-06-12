@@ -2,6 +2,9 @@ import { Box, createTheme, ThemeProvider, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import '.././styles/helpStyles.css'
 import { colors, MuiRsTheme } from '../styles/MuiTheme'
+import filterscapeFilterExample from './../images/examples/filterscapeFilterBasic.png'
+import joesFilterExample from './../images/examples/joesFilterBasic.png'
+import sidePanelReference from './../images/examples/sidePanel.png'
 export const HelpPage: React.FC = () => {
     const [headings, setHeadings] = useState<
         { id: string; text: string | null; level: number }[]
@@ -112,7 +115,13 @@ const HelpContent = () => {
                         accessed via the Loot Filters side panel (Not the
                         config, pictured below).
                         <br />
-                        <br />
+                        <div>
+                            <img
+                                src={sidePanelReference}
+                                style={{ width: 'fit-content' }}
+                                alt="Side panel"
+                            />
+                        </div>
                         There are a couple default filters pre-installed, which
                         give a good experience out of the box. If you want to
                         further customize or change things, that is what the
@@ -120,6 +129,33 @@ const HelpContent = () => {
                         slightly different from one another, and can both be
                         extensively customized if desired.
                     </Typography>
+                    <Typography
+                        variant="h5"
+                        id="the-loot-filters-plugin"
+                        gutterBottom
+                    >
+                        Showcase
+                    </Typography>
+
+                    <div style={{ display: 'flex' }}>
+                        <div style={{ paddingRight: '20px' }}>
+                            <Typography>RiktenX-FilterScape</Typography>
+                            <img
+                                src={filterscapeFilterExample}
+                                style={{ width: 'fit-content' }}
+                                alt="Riktenx-FilterScape filter"
+                            />
+                        </div>
+
+                        <div>
+                            <Typography>Joe's filter</Typography>
+                            <img
+                                src={joesFilterExample}
+                                style={{ width: 'fit-content' }}
+                                alt="Joe's filter"
+                            />
+                        </div>
+                    </div>
 
                     <Typography
                         variant="h4"
